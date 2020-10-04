@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30516.212
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Sandbox", "src\Titan.Sandbox\Titan.Sandbox.csproj", "{3F8A1FE3-A3EE-4C3E-94F6-5D0517752CDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Sandbox", "src\Titan.Sandbox\Titan.Sandbox.csproj", "{3F8A1FE3-A3EE-4C3E-94F6-5D0517752CDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{F2F17201-8E65-4284-AB69-902FD25F1C63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{356E7F71-4ED3-406C-BD86-156D7AFCC57C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan", "src\Titan\Titan.csproj", "{D81C5EB5-8F87-432B-951C-086BC4C222A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Core", "src\Titan.Core\Titan.Core.csproj", "{8D430C73-9023-45C2-B434-02A75046AC46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +23,21 @@ Global
 		{3F8A1FE3-A3EE-4C3E-94F6-5D0517752CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F8A1FE3-A3EE-4C3E-94F6-5D0517752CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F8A1FE3-A3EE-4C3E-94F6-5D0517752CDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D81C5EB5-8F87-432B-951C-086BC4C222A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D81C5EB5-8F87-432B-951C-086BC4C222A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D81C5EB5-8F87-432B-951C-086BC4C222A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D81C5EB5-8F87-432B-951C-086BC4C222A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D430C73-9023-45C2-B434-02A75046AC46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D430C73-9023-45C2-B434-02A75046AC46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D430C73-9023-45C2-B434-02A75046AC46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D430C73-9023-45C2-B434-02A75046AC46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D81C5EB5-8F87-432B-951C-086BC4C222A6} = {F2F17201-8E65-4284-AB69-902FD25F1C63}
+		{8D430C73-9023-45C2-B434-02A75046AC46} = {F2F17201-8E65-4284-AB69-902FD25F1C63}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B379FCF9-0746-4E66-BFF2-78F67D73774A}
