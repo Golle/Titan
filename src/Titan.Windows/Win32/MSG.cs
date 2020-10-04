@@ -6,10 +6,10 @@ namespace Titan.Windows.Win32
     [StructLayout(LayoutKind.Sequential)]
     internal struct Msg
     {
-        internal IntPtr Hwnd;
+        internal nint Hwnd;
         internal WindowsMessage Message;
-        internal UIntPtr WParam;
-        internal UIntPtr LParam;
+        internal nuint WParam;
+        internal nuint LParam;
         internal int Time;
         internal Point Point;
     }

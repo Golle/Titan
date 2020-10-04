@@ -5,7 +5,7 @@ namespace Titan.Windows.Win32
 {
     internal class User32
     {
-        internal delegate IntPtr WndProcDelegate(IntPtr hWnd, WindowsMessage msg, UIntPtr wParam, UIntPtr lParam);
+        internal delegate nint WndProcDelegate(nint hWnd, WindowsMessage msg, nuint wParam, nuint lParam);
 
         private const string User32Dll = "user32";
 
@@ -16,39 +16,39 @@ namespace Titan.Windows.Win32
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int ShowWindow(
-            IntPtr hWnd,
-            ShowWindow nCmdShow
+            [In] nint hWnd,
+            [In] ShowWindow nCmdShow
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern IntPtr CreateWindowExA(
-            WindowStylesEx dwExStyle,
-            string lpClassName,
-            string lpWindowName,
-            WindowStyles dwStyle,
-            int x,
-            int y,
-            int nWidth,
-            int nHeight,
-            IntPtr hWndParent,
-            IntPtr hMenu,
-            IntPtr hInstance,
-            IntPtr lpParam
+        public static extern nint CreateWindowExA(
+            [In] WindowStylesEx dwExStyle,
+            [In] string lpClassName,
+            [In] string lpWindowName,
+            [In] WindowStyles dwStyle,
+            [In] int x,
+            [In] int y,
+            [In] int nWidth,
+            [In] int nHeight,
+            [In] nint hWndParent,
+            [In] nint hMenu,
+            [In] nint hInstance,
+            [In] nint lpParam
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern IntPtr DefWindowProcA(
-            [In] IntPtr hWnd,
+        public static extern nint DefWindowProcA(
+            [In] nint hWnd,
             [In] WindowsMessage msg,
-            [In] UIntPtr wParam,
-            [In] UIntPtr lParam
+            [In] nuint wParam,
+            [In] nuint lParam
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool PeekMessageA(
             [Out] out Msg lpMsg,
-            [In] IntPtr hWnd,
+            [In] nint hWnd,
             [In] uint wMsgFilterMin,
             [In] uint wMsgFilterMax,
             [In] uint removeMessage
@@ -57,12 +57,12 @@ namespace Titan.Windows.Win32
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TranslateMessage(
-            [In] ref Msg lpMsg
+            [In] in Msg lpMsg
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern IntPtr DispatchMessage(
-            [In] ref Msg lpMsg
+        public static extern nint DispatchMessage(
+            [In] in Msg lpMsg
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
@@ -73,13 +73,13 @@ namespace Titan.Windows.Win32
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DestroyWindow(
-            [In] IntPtr hWnd
+            [In] nint hWnd
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetWindowTextA(
-            [In] IntPtr hWnd,
+            [In] nint hWnd,
             [In] string lpString
         );
 
@@ -104,8 +104,8 @@ namespace Titan.Windows.Win32
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ScreenToClient(
-            [In] IntPtr hWnd,
-            ref Point lpPoint
+            [In] nint hWnd,
+            [In, Out] ref Point lpPoint
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]

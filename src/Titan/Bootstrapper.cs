@@ -1,5 +1,6 @@
 using Titan.Core;
 using Titan.IOC;
+using Titan.Windows;
 
 namespace Titan
 {
@@ -11,6 +12,8 @@ namespace Titan
             return new Container()
                     
                     .AddRegistry<CoreRegistry>()
+
+                    .AddRegistry<WindowsRegistry>()
                 
                 ;
 
