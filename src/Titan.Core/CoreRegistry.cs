@@ -8,7 +8,6 @@ namespace Titan.Core
     {
         public void Register(IContainer container)
         {
-            
             container
                 .Register<IDateTime, DateTimeWrapper>()
                 .Register<ILogFormatter, TimeLogFormatter>()
