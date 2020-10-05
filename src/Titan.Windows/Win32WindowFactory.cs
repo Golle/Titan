@@ -10,6 +10,7 @@ namespace Titan.Windows
         {
             _log = log;
         }
+
         public IWindow Create(int width, int height, string title)
         {
             _log.Debug("Creating Window: \"{0}\" Size: {1} x {2}", title, width, height);

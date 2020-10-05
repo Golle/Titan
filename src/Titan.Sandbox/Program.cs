@@ -1,23 +1,13 @@
 using System;
-using Titan.Core.Logging;
+using Titan;
 using Titan.Windows;
 
-namespace Titan.Sandbox
+using var window = Bootstrapper
+    .Container
+    .GetInstance<IWindowFactory>()
+    .Create(1920, 1080, "Donkey box #2!");
+    
+while (window.Update())
 {
-    internal class Program
-    {
-        static void Main(string[] args)
-        {
-            using var window = Bootstrapper.Container.GetInstance<IWindowFactory>()
-                .Create(1024, 768, "Donkey box returns!");
-
-            while (window.Update())
-            {
-                
-                
-                GC.Collect();
-            }
-            Console.WriteLine("Hello Titan!");
-        }
-    }
+    GC.Collect();
 }
