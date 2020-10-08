@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 
 // ReSharper disable InconsistentNaming
@@ -45,41 +46,20 @@ namespace Titan.D3D11
         // _In_opt_  const D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc,
         // /* [annotation] */
         // _COM_Outptr_opt_  ID3D11UnorderedAccessView** ppUAView);
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public HRESULT CreateRenderTargetView(ID3D11Resource* pResource, D3D11_RENDER_TARGET_VIEW_DESC* pDesc, ID3D11RenderTargetView** ppRTView) => ((delegate* unmanaged[Stdcall]<void*, ID3D11Resource*, D3D11_RENDER_TARGET_VIEW_DESC*, ID3D11RenderTargetView**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), pResource, pDesc, ppRTView);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateDepthStencilView(ID3D11Resource* pResource, D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc, ID3D11DepthStencilView** ppDepthStencilView) => ((delegate* unmanaged[Stdcall]<void*, ID3D11Resource*, D3D11_DEPTH_STENCIL_VIEW_DESC*, ID3D11DepthStencilView**, HRESULT>)_vtbl[10])(Unsafe.AsPointer(ref this), pResource, pDesc, ppDepthStencilView);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateInputLayout(D3D11_INPUT_ELEMENT_DESC* pInputElementDescs, uint numElements, void* pShaderBytecodeWithInputSignature, nuint bytecodeLength, ID3D11InputLayout** ppInputLayout)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D11_INPUT_ELEMENT_DESC*, uint, void*, nuint, ID3D11InputLayout**, HRESULT>)_vtbl[11])(Unsafe.AsPointer(ref this), pInputElementDescs, numElements, pShaderBytecodeWithInputSignature, bytecodeLength, ppInputLayout);
 
-        //HRESULT(STDMETHODCALLTYPE* CreateDepthStencilView)(
-        // ID3D11Device* This,
-        // /* [annotation] */
-        // _In_ ID3D11Resource * pResource,
-        // /* [annotation] */
-        // _In_opt_  const D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc,
-        // /* [annotation] */
-        // _COM_Outptr_opt_  ID3D11DepthStencilView** ppDepthStencilView);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateInputLayout)(
-        // ID3D11Device* This,
-        // /* [annotation] */
-        // _In_reads_(NumElements) const D3D11_INPUT_ELEMENT_DESC* pInputElementDescs,
-        ///* [annotation] */
-        //_In_range_( 0, D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT )  UINT NumElements,
-        ///* [annotation] */
-        //_In_reads_(BytecodeLength)  const void* pShaderBytecodeWithInputSignature,
-        ///* [annotation] */
-        //_In_  SIZE_T BytecodeLength,
-        ///* [annotation] */
-        //_COM_Outptr_opt_  ID3D11InputLayout** ppInputLayout);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateVertexShader)(
-        // ID3D11Device* This,
-        // /* [annotation] */
-        // _In_reads_(BytecodeLength) const void* pShaderBytecode,
-        ///* [annotation] */
-        //_In_  SIZE_T BytecodeLength,
-        ///* [annotation] */
-        //_In_opt_  ID3D11ClassLinkage* pClassLinkage,
-        ///* [annotation] */
-        //_COM_Outptr_opt_  ID3D11VertexShader** ppVertexShader);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateVertexShader(void* pShaderBytecode, nuint bytecodeLength, ID3D11ClassLinkage* pClassLinkage, ID3D11VertexShader** ppVertexShader) 
+        => ((delegate* unmanaged[Stdcall]<void*, void*, nuint, ID3D11ClassLinkage*, ID3D11VertexShader**, HRESULT>)_vtbl[12])(Unsafe.AsPointer(ref this), pShaderBytecode, bytecodeLength, pClassLinkage, ppVertexShader);
 
         ////HRESULT(STDMETHODCALLTYPE* CreateGeometryShader)(
         //// ID3D11Device* This,
@@ -113,16 +93,8 @@ namespace Titan.D3D11
         /////* [annotation] */
         ////_COM_Outptr_opt_  ID3D11GeometryShader** ppGeometryShader);
 
-        //HRESULT(STDMETHODCALLTYPE* CreatePixelShader)(
-        // ID3D11Device* This,
-        // /* [annotation] */
-        // _In_reads_(BytecodeLength) const void* pShaderBytecode,
-        ///* [annotation] */
-        //_In_  SIZE_T BytecodeLength,
-        ///* [annotation] */
-        //_In_opt_  ID3D11ClassLinkage* pClassLinkage,
-        ///* [annotation] */
-        //_COM_Outptr_opt_  ID3D11PixelShader** ppPixelShader);
+        public HRESULT CreatePixelShader(void* pShaderBytecode, nuint bytecodeLength, ID3D11ClassLinkage* pClassLinkage, ID3D11PixelShader** ppPixelShader)
+            => ((delegate* unmanaged[Stdcall]<void*, void*, nuint, ID3D11ClassLinkage*, ID3D11PixelShader**, HRESULT>)_vtbl[15])(Unsafe.AsPointer(ref this), pShaderBytecode, bytecodeLength, pClassLinkage, ppPixelShader);
 
         ////HRESULT(STDMETHODCALLTYPE* CreateHullShader)(
         //// ID3D11Device* This,
@@ -162,33 +134,17 @@ namespace Titan.D3D11
         //// /* [annotation] */
         //// _COM_Outptr_ ID3D11ClassLinkage ** ppLinkage);
 
-        //HRESULT(STDMETHODCALLTYPE* CreateBlendState)(
-        // ID3D11Device* This,
-        // /* [annotation] */
-        // _In_  const D3D11_BLEND_DESC* pBlendStateDesc,
-        // /* [annotation] */
-        // _COM_Outptr_opt_  ID3D11BlendState** ppBlendState);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateDepthStencilState)(
-        // ID3D11Device* This,
-        // /* [annotation] */
-        // _In_  const D3D11_DEPTH_STENCIL_DESC* pDepthStencilDesc,
-        // /* [annotation] */
-        // _COM_Outptr_opt_  ID3D11DepthStencilState** ppDepthStencilState);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateRasterizerState)(
-        // ID3D11Device* This,
-        // /* [annotation] */
-        // _In_  const D3D11_RASTERIZER_DESC* pRasterizerDesc,
-        // /* [annotation] */
-        // _COM_Outptr_opt_  ID3D11RasterizerState** ppRasterizerState);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateSamplerState)(
-        // ID3D11Device* This,
-        // /* [annotation] */
-        // _In_  const D3D11_SAMPLER_DESC* pSamplerDesc,
-        // /* [annotation] */
-        // _COM_Outptr_opt_  ID3D11SamplerState** ppSamplerState);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateBlendState(D3D11_BLEND_DESC* pBlendStateDesc, ID3D11BlendState** ppBlendState) => ((delegate* unmanaged[Stdcall]<void*, D3D11_BLEND_DESC*, ID3D11BlendState**, HRESULT>)_vtbl[20])(Unsafe.AsPointer(ref this), pBlendStateDesc, ppBlendState);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateDepthStencilState(D3D11_DEPTH_STENCIL_DESC* pDepthStencilDesc, ID3D11DepthStencilState** ppDepthStencilState) => ((delegate* unmanaged[Stdcall]<void*, D3D11_DEPTH_STENCIL_DESC*, ID3D11DepthStencilState**, HRESULT>)_vtbl[21])(Unsafe.AsPointer(ref this), pDepthStencilDesc, ppDepthStencilState);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateRasterizerState(D3D11_RASTERIZER_DESC* pRasterizerDesc, ID3D11RasterizerState** ppRasterizerState) => ((delegate* unmanaged[Stdcall]<void*, D3D11_RASTERIZER_DESC*, ID3D11RasterizerState**, HRESULT>)_vtbl[22])(Unsafe.AsPointer(ref this), pRasterizerDesc, ppRasterizerState);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateSamplerState(D3D11_SAMPLER_DESC* pSamplerDesc, ID3D11SamplerState** ppSamplerState) => ((delegate* unmanaged[Stdcall]<void*, D3D11_SAMPLER_DESC*, ID3D11SamplerState**, HRESULT>)_vtbl[23])(Unsafe.AsPointer(ref this), pSamplerDesc, ppSamplerState);
 
         ////HRESULT(STDMETHODCALLTYPE* CreateQuery)(
         //// ID3D11Device* This,
@@ -267,13 +223,9 @@ namespace Titan.D3D11
         //// _Out_writes_opt_(*pDescriptionLength)  LPSTR szDescription,
         //// /* [annotation] */
         //// _Inout_opt_  UINT* pDescriptionLength);
-
-        ////HRESULT(STDMETHODCALLTYPE* CheckFeatureSupport)(
-        //// ID3D11Device* This,
-        //// D3D11_FEATURE Feature,
-        //// /* [annotation] */
-        //// _Out_writes_bytes_(FeatureSupportDataSize) void* pFeatureSupportData,
-        ////UINT FeatureSupportDataSize);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CheckFeatureSupport(D3D11_FEATURE feature, void* pFeatureSupportData, uint featureSupportDataSize) =>
+            ((delegate* unmanaged[Stdcall]<void*, D3D11_FEATURE, void*, uint, HRESULT>)_vtbl[33])(Unsafe.AsPointer(ref this), feature, pFeatureSupportData, featureSupportDataSize);
 
         ////HRESULT(STDMETHODCALLTYPE* GetPrivateData)(
         //// ID3D11Device* This,
