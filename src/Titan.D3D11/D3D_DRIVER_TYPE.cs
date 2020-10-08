@@ -1,3 +1,4 @@
+// ReSharper disable InconsistentNaming
 namespace Titan.D3D11
 {
     public enum D3D_DRIVER_TYPE

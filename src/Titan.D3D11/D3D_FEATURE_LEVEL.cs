@@ -1,5 +1,5 @@
 using System;
-
+// ReSharper disable InconsistentNaming
 namespace Titan.D3D11
 {
     [Flags]

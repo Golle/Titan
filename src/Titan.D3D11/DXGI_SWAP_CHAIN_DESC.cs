@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-
+// ReSharper disable InconsistentNaming
 namespace Titan.D3D11
 {
     public struct DXGI_SWAP_CHAIN_DESC

@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-
+// ReSharper disable InconsistentNaming
 namespace Titan.D3D11
 {
     public static unsafe class D3D11Common
@@ -7,7 +7,7 @@ namespace Titan.D3D11
         public const int D3D11_SDK_VERSION = (7);
 
         public static bool FAILED(in HRESULT result) => result.Value != 0;
-        public static bool SUCEEDED(in HRESULT result) => result.Value == 0;
+        public static bool SUCCEEDED(in HRESULT result) => result.Value == 0;
 
         
         [DllImport("d3d11", CallingConvention = CallingConvention.StdCall, SetLastError = true)]

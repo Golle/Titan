@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-#pragma warning disable 169
+// ReSharper disable InconsistentNaming
 
 namespace Titan.D3D11
 {

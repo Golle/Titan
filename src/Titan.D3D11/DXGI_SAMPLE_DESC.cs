@@ -1,4 +1,5 @@
-﻿namespace Titan.D3D11
+// ReSharper disable InconsistentNaming
+namespace Titan.D3D11
 {
     public struct DXGI_SAMPLE_DESC
     {

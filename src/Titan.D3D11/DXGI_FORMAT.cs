@@ -1,3 +1,4 @@
+// ReSharper disable InconsistentNaming
 namespace Titan.D3D11
 {
     public enum DXGI_FORMAT : uint

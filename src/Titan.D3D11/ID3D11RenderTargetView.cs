@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Titan.D3D11
 {
-    public unsafe struct ID3D11DeviceContext
+    public unsafe struct ID3D11RenderTargetView
     {
         private void** _vtbl;
 
