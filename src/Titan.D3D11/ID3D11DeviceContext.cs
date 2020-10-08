@@ -51,7 +51,7 @@ namespace Titan.D3D11
         public void PSSetSamplers(uint startSlot, uint numSamplers, ID3D11SamplerState** ppSamplers) => ((delegate* unmanaged[Stdcall]<void*, uint, uint, ID3D11SamplerState**, void>) _vtbl[10])(Unsafe.AsPointer(ref this), startSlot, numSamplers, ppSamplers);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void VSSetShader(ID3D11VertexShader * pVertexShader, ID3D11ClassInstance ** ppClassInstances, uint numClassInstances) => ((delegate* unmanaged[Stdcall]<void*, ID3D11VertexShader*, ID3D11ClassInstance**, uint, void>) _vtbl[11])(Unsafe.AsPointer(ref this), pVertexShader, ppClassInstances, numClassInstances);
+        public void VSSetShader(ID3D11VertexShader * pVertexShader, ID3D11ClassInstance** ppClassInstances, uint numClassInstances) => ((delegate* unmanaged[Stdcall]<void*, ID3D11VertexShader*, ID3D11ClassInstance**, uint, void>) _vtbl[11])(Unsafe.AsPointer(ref this), pVertexShader, ppClassInstances, numClassInstances);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DrawIndexed(uint indexCount, uint startIndexLocation, int baseVertexLocation) => ((delegate* unmanaged[Stdcall]<void*, uint, uint, int, void>)_vtbl[12])(Unsafe.AsPointer(ref this), indexCount, startIndexLocation, baseVertexLocation);

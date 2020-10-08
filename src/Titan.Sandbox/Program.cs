@@ -12,26 +12,6 @@ using var window = Bootstrapper
     .GetInstance<IWindowFactory>()
     .Create(1920, 1080, "Donkey box #2!");
 
-
-unsafe
-{
-    ID3D11Device * device;
-    ID3D11DeviceContext * deviceContext;
-    var featureLevel = D3D_FEATURE_LEVEL_11_1;
-    var result = D3D11CreateDevice(null, D3D_DRIVER_TYPE_HARDWARE, 0, 0, &featureLevel,1, D3D11_SDK_VERSION, &device, null, &deviceContext);
-    if (FAILED(result))
-    {
-        Console.WriteLine($"Failed to create the device with code: {result}");
-    }
-    else
-    {
-        Console.WriteLine("Omgz, SUCCESS!");
-    }
-
-    Console.WriteLine($"Release: {deviceContext->Release()}");
-    Console.WriteLine($"Release: {device->Release()}");
-}
-
 unsafe
 {
     ID3D11Device * device;
@@ -56,24 +36,44 @@ unsafe
     desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_DISCARD;
     desc.Flags = DXGI_SWAP_CHAIN_FLAG.DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    var featureLevel = D3D_FEATURE_LEVEL_11_1;
-    var result = D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE_HARDWARE, 0, 0, &featureLevel, 1, D3D11_SDK_VERSION, &desc, &swapChain, &device, null, &deviceContext);
-    if (FAILED(result))
     {
-        Console.WriteLine($"Failed to create the device with code: {result}");
-    }
-    else
-    {
-        Console.WriteLine("Omgz, SUCCESS!");
+        var flags = 2u; // debug
+        var featureLevel = D3D_FEATURE_LEVEL_11_1;
+        var result = D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE_HARDWARE, 0, flags, &featureLevel, 1, D3D11_SDK_VERSION, &desc, &swapChain, &device, null, &deviceContext);
+        if (FAILED(result)) throw new InvalidOperationException($"Failed to create the device with code: {result}");
     }
 
+    ID3D11Buffer* backBuffer;
+    fixed (Guid* resourcePointer = &D3D11Resource)
+    {
+        var result = swapChain->GetBuffer(0, resourcePointer, (void**)&backBuffer);
+        if (FAILED(result)) throw new InvalidOperationException($"Failed to get backbuffer: {result}");
+    }
+
+    ID3D11RenderTargetView* renderTargetView;
+    {
+        var result = device->CreateRenderTargetView((ID3D11Resource*)backBuffer, null, &renderTargetView);
+        if (FAILED(result)) throw new InvalidOperationException($"Failed to create render target view: {result}");
+    }
+    
+    backBuffer->Release();
+
+    var floats = stackalloc float[4];
+    floats[0] = 1f;
+    floats[1] = 0.4f;
+    floats[2] = 0.1f;
+    floats[3] = 1;
+
+    while (window.Update())
+    {
+        deviceContext->ClearRenderTargetView(renderTargetView, floats);
+        swapChain->Present(1, 0);
+        GC.Collect();
+    }
+
+
+    Console.WriteLine($"Release: {renderTargetView->Release()}");
     Console.WriteLine($"Release: {swapChain->Release()}");
     Console.WriteLine($"Release: {deviceContext->Release()}");
     Console.WriteLine($"Release: {device->Release()}");
-}
-
-
-while (window.Update())
-{
-    GC.Collect();
 }
