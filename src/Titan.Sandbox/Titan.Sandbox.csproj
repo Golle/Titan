@@ -2,12 +2,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <Lang>preview</Lang>
+    <LangVersion>preview</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <ItemGroup>
+    <ProjectReference Include="..\Titan.D3D11\Titan.D3D11.csproj" />
+    <ProjectReference Include="..\Titan.Windows\Titan.Windows.csproj" />
     <ProjectReference Include="..\Titan\Titan.csproj" />
   </ItemGroup>
-
 </Project>
