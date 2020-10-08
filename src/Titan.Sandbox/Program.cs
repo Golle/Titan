@@ -54,11 +54,10 @@ unsafe
     desc.OutputWindow = window.NativeHandle;
     desc.Windowed = true;
     desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_DISCARD;
-    //desc.SwapEffect = DxgiSwapEffect.FlipDiscard;    // how do I use this with depth stencil?
     desc.Flags = DXGI_SWAP_CHAIN_FLAG.DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     var featureLevel = D3D_FEATURE_LEVEL_11_1;
-    var result = D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE_HARDWARE, 0, 0, &featureLevel,1, D3D11_SDK_VERSION, &desc, &swapChain, &device, null, &deviceContext);
+    var result = D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE_HARDWARE, 0, 0, &featureLevel, 1, D3D11_SDK_VERSION, &desc, &swapChain, &device, null, &deviceContext);
     if (FAILED(result))
     {
         Console.WriteLine($"Failed to create the device with code: {result}");
