@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Titan.Windows.Win32
+namespace Titan.Windows.Win32.Native
 {
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct HRESULT

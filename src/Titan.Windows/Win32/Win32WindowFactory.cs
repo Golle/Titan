@@ -1,6 +1,6 @@
 using Titan.Core.Logging;
 
-namespace Titan.Windows
+namespace Titan.Windows.Win32
 {
     internal class Win32WindowFactory : IWindowFactory
     {

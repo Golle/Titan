@@ -1,4 +1,4 @@
-namespace Titan.Windows.Win32
+namespace Titan.Windows.Win32.Native
 {
     internal enum WindowsMessage : uint
     {

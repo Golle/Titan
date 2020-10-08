@@ -1,7 +1,6 @@
-using System;
 using System.Runtime.InteropServices;
 
-namespace Titan.Windows.Win32
+namespace Titan.Windows.Win32.Native
 {
     [StructLayout(LayoutKind.Sequential)]
     internal struct Msg

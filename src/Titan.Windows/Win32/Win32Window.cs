@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Titan.Windows.Win32;
+using Titan.Windows.Win32.Native;
 
-namespace Titan.Windows
+namespace Titan.Windows.Win32
 {
     internal class Win32Window : IWindow
     {

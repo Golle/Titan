@@ -1,6 +1,6 @@
 using System;
 
-namespace Titan.Windows.Win32
+namespace Titan.Windows.Win32.Native
 {
     [Flags]
     internal enum WindowStyles : uint
