@@ -44,5 +44,33 @@ namespace Titan.D3D11
             [Out] D3D_FEATURE_LEVEL *pFeatureLevel,
             [Out] ID3D11DeviceContext** ppImmediateContext
         );
+
+        [DllImport("d3dcompiler_47", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern HRESULT D3DCompile(
+            [In] void * pSrcData,
+            [In] nuint srcDataSize,
+            [In] sbyte* pSourceName,
+            [In] D3D_SHADER_MACRO* pDefines,
+            [In] ID3DInclude* pInclude,
+            [In] sbyte* pEntrypoint,
+            [In] sbyte* pTarget,
+            [In] uint flags1,
+            [In] uint flags2,
+            [Out] ID3DBlob** ppCode,
+            [Out] ID3DBlob** ppErrorMsgs
+        );
+
+        [DllImport("d3dcompiler_47", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern HRESULT D3DCompileFromFile(
+            [In] char* pFileName,
+            [In] D3D_SHADER_MACRO* pDefines,
+            [In] ID3DInclude* pInclude,
+            [In] sbyte* pEntrypoint,
+            [In] sbyte* pTarget,
+            [In] uint flags1,
+            [In] uint flags2,
+            [Out] ID3DBlob** ppCode,
+            [Out] ID3DBlob** ppErrorMsgs
+        );
     }
 }
