@@ -1,10 +1,13 @@
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
 
 namespace Titan.Windows.Win32.Native
 {
-    internal class User32
+    internal unsafe class User32
     {
-        internal delegate nint WndProcDelegate(nint hWnd, WindowsMessage msg, nuint wParam, nuint lParam);
+        public const int GWLP_USERDATA = -21;
+
+        internal delegate nint WndProcDelegate(HWND hWnd, WindowsMessage msg, nuint wParam, nuint lParam);
 
         private const string User32Dll = "user32";
 
@@ -15,12 +18,12 @@ namespace Titan.Windows.Win32.Native
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int ShowWindow(
-            [In] nint hWnd,
-            [In] ShowWindow nCmdShow
+            [In] HWND hWnd,
+            [In] ShowWindowCommand nCmdShow
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern nint CreateWindowExA(
+        public static extern HWND CreateWindowExA(
             [In] WindowStylesEx dwExStyle,
             [In] string lpClassName,
             [In] string lpWindowName,
@@ -29,15 +32,15 @@ namespace Titan.Windows.Win32.Native
             [In] int y,
             [In] int nWidth,
             [In] int nHeight,
-            [In] nint hWndParent,
+            [In] HWND hWndParent,
             [In] nint hMenu,
             [In] nint hInstance,
-            [In] nint lpParam
+            [In] void* lpParam
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern nint DefWindowProcA(
-            [In] nint hWnd,
+            [In] HWND hWnd,
             [In] WindowsMessage msg,
             [In] nuint wParam,
             [In] nuint lParam
@@ -47,7 +50,7 @@ namespace Titan.Windows.Win32.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool PeekMessageA(
             [Out] out Msg lpMsg,
-            [In] nint hWnd,
+            [In] HWND hWnd,
             [In] uint wMsgFilterMin,
             [In] uint wMsgFilterMax,
             [In] uint removeMessage
@@ -72,13 +75,13 @@ namespace Titan.Windows.Win32.Native
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DestroyWindow(
-            [In] nint hWnd
+            [In] HWND hWnd
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetWindowTextA(
-            [In] nint hWnd,
+            [In] HWND hWnd,
             [In] string lpString
         );
 
@@ -103,7 +106,7 @@ namespace Titan.Windows.Win32.Native
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ScreenToClient(
-            [In] nint hWnd,
+            [In] HWND hWnd,
             [In, Out] ref Point lpPoint
         );
 
@@ -114,5 +117,20 @@ namespace Titan.Windows.Win32.Native
             [In] WindowStyles dwStyle,
             [In, MarshalAs(UnmanagedType.Bool)] bool bMenu
         );
+
+        [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern nint SetWindowLongPtrA(
+            [In] HWND hwnd,
+            [In] int nIndex,
+            [In] nint dwNewLong
+        );
+
+        [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern nint GetWindowLongPtrA(
+            [In] HWND hwnd,
+            [In] int nIndex
+        );
+
+
     }
 }

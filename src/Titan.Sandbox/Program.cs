@@ -6,16 +6,12 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Titan;
-using Titan.D3D11;
 using Titan.Sandbox;
 using Titan.Windows;
-
-using static Titan.D3D11.D3D11Common;
-using static Titan.D3D11.D3D_DRIVER_TYPE;
-using static Titan.D3D11.D3D_FEATURE_LEVEL;
-
-
-
+using Titan.Windows.Win32.D3D11;
+using static Titan.Windows.Win32.D3D11.D3D11Common;
+using static Titan.Windows.Win32.D3D11.D3D_DRIVER_TYPE;
+using static Titan.Windows.Win32.D3D11.D3D_FEATURE_LEVEL;
 
 
 var pixelShaderPath = @"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl";
@@ -48,7 +44,7 @@ unsafe
 
     desc.Flags = 0;
     desc.BufferUsage = DXGI_USAGE.DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    desc.OutputWindow = window.NativeHandle;
+    desc.OutputWindow = window.Handle;
     desc.Windowed = true;
     desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_DISCARD;
     desc.Flags = DXGI_SWAP_CHAIN_FLAG.DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;

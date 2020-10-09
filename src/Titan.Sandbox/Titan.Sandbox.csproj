@@ -7,7 +7,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Titan.D3D11\Titan.D3D11.csproj" />
     <ProjectReference Include="..\Titan.Windows\Titan.Windows.csproj" />
     <ProjectReference Include="..\Titan\Titan.csproj" />
   </ItemGroup>

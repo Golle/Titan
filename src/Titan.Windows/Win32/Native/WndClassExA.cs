@@ -7,7 +7,7 @@ namespace Titan.Windows.Win32.Native
     {
         internal uint CbSize;
         internal uint Style;
-        internal unsafe delegate*<nint, WindowsMessage, nuint, nuint, nint> LpFnWndProc;
+        internal unsafe delegate*<HWND, WindowsMessage, nuint, nuint, nint> LpFnWndProc;
         internal int CbClsExtra;
         internal int CbWndExtra;
         internal nint HInstance;

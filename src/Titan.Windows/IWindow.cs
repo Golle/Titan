@@ -1,10 +1,11 @@
 using System;
+using Titan.Windows.Win32;
 
 namespace Titan.Windows
 {
     public interface IWindow : IDisposable
     {
-        nint NativeHandle { get; }
+        HWND Handle { get; }
         int Height { get; }
         int Width { get; }
 

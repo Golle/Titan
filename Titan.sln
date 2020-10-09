@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Benchmark", "src\Tita
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Windows", "src\Titan.Windows\Titan.Windows.csproj", "{83582C4E-27D4-4338-9D15-ACDE9A034B88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.D3D11", "src\Titan.D3D11\Titan.D3D11.csproj", "{2364A206-9536-457F-A399-0FB74CCEB8C6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,10 +53,6 @@ Global
 		{83582C4E-27D4-4338-9D15-ACDE9A034B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83582C4E-27D4-4338-9D15-ACDE9A034B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83582C4E-27D4-4338-9D15-ACDE9A034B88}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2364A206-9536-457F-A399-0FB74CCEB8C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2364A206-9536-457F-A399-0FB74CCEB8C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2364A206-9536-457F-A399-0FB74CCEB8C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2364A206-9536-457F-A399-0FB74CCEB8C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,7 +63,6 @@ Global
 		{FDD27D25-FA21-42EA-B77E-E90298649257} = {BFD1A3E8-CEEE-4020-8020-ACDCD0C92D3F}
 		{68193550-82F3-4AD1-B461-2AF72D873C7E} = {BE7E7A08-4444-4878-8BB4-D02F12E8EA37}
 		{83582C4E-27D4-4338-9D15-ACDE9A034B88} = {F2F17201-8E65-4284-AB69-902FD25F1C63}
-		{2364A206-9536-457F-A399-0FB74CCEB8C6} = {F2F17201-8E65-4284-AB69-902FD25F1C63}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B379FCF9-0746-4E66-BFF2-78F67D73774A}
