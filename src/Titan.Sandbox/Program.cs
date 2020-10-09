@@ -55,14 +55,39 @@ unsafe
         var result = device->CreateRenderTargetView((ID3D11Resource*)backBuffer, null, &renderTargetView);
         if (FAILED(result)) throw new InvalidOperationException($"Failed to create render target view: {result}");
     }
-    
-    backBuffer->Release();
+
+    Console.WriteLine($"Release backbuffer:  {backBuffer->Release()}");
 
     var floats = stackalloc float[4];
     floats[0] = 1f;
     floats[1] = 0.4f;
     floats[2] = 0.1f;
-    floats[3] = 1;
+    floats[3] = 1f;
+
+    ID3D11Buffer * vertexBuffer;
+    {
+        var vertices = new []
+        {
+            new Vertex{},
+            new Vertex{},
+            new Vertex{}
+        };
+
+        D3D11_BUFFER_DESC bufferDesc = default;
+        bufferDesc.BindFlags = D3D11_BIND_FLAG.D3D11_BIND_VERTEX_BUFFER;
+        bufferDesc.StructureByteStride = (uint)sizeof(Vertex);
+        bufferDesc.Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT;
+        bufferDesc.ByteWidth = (uint) (sizeof(Vertex) * vertices.Length);
+        bufferDesc.StructureByteStride = (uint) sizeof(Vertex);
+        D3D11_SUBRESOURCE_DATA vertexData;
+        fixed (void* verticesPointer = vertices)
+        {
+            vertexData.pSysMem = verticesPointer;
+        }
+
+        var result = device->CreateBuffer(&bufferDesc, &vertexData, &vertexBuffer);
+        if (FAILED(result)) throw new InvalidOperationException($"Failed to create vertex buffer: {result}");
+    }
 
     while (window.Update())
     {
@@ -72,8 +97,35 @@ unsafe
     }
 
 
+
+
+    Console.WriteLine($"Release: {vertexBuffer->Release()}");
     Console.WriteLine($"Release: {renderTargetView->Release()}");
     Console.WriteLine($"Release: {swapChain->Release()}");
     Console.WriteLine($"Release: {deviceContext->Release()}");
+    
+    //{
+    //    ID3D11Debug* d3dDebug;
+    //    fixed (Guid* debugGuidPtr = &D3D11Debug)
+    //    {
+    //        var result = device->QueryInterface(debugGuidPtr, (void**)&d3dDebug);
+    //        if (FAILED(result)) throw new InvalidOperationException($"Failed to query for debug interface: {result}");
+    //    }
+
+    //    {
+    //        var result = d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_SUMMARY);
+    //        if (FAILED(result)) throw new InvalidOperationException($"Failed to ReportLiveDeviceObjects: {result}");
+    //    }
+
+    //    d3dDebug->Release();
+    //}
     Console.WriteLine($"Release: {device->Release()}");
+
+}
+
+
+
+struct Vertex
+{
+
 }
