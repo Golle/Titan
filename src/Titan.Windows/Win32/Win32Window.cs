@@ -12,22 +12,13 @@ namespace Titan.Windows.Win32
         public HWND Handle { get; }
         public int Height { get; }
         public int Width { get; }
-
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-        //private readonly User32.WndProcDelegate _wndProcDelegate; // Prevent the delegate from being garbage collected
-        //private GCHandle _wndProdPinnedMemory;
-        private readonly string _className = $"{nameof(Win32Window)}_class_" + Guid.NewGuid().ToString().Substring(0, 4);
-        
         public unsafe Win32Window(int width, int height, string title)
         {
             Width = width;
             Height = height;
 
-            // Set up the WndProc callback
-            //_wndProcDelegate = WindowProcedure;
-            //var wndProcPointer = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
-            //_wndProdPinnedMemory = GCHandle.Alloc(wndProcPointer, GCHandleType.Pinned);
 
+            var className = $"{nameof(Win32Window)}_class_" + Guid.NewGuid().ToString().Substring(0, 4);
             // Create the Window Class EX
             var wndClassExA = new WndClassExA
             {
@@ -41,7 +32,7 @@ namespace Titan.Windows.Win32
                 HIconSm = 0,
                 HInstance = Marshal.GetHINSTANCE(GetType().Module),
                 HbrBackground = 0,
-                LpszClassName = _className,
+                LpszClassName = className,
                 Style = 0
             };
             if (RegisterClassExA(wndClassExA) == 0)
@@ -62,7 +53,7 @@ namespace Titan.Windows.Win32
             // Create the Window
             Handle = CreateWindowExA(
                 0,
-                _className,
+                className,
                 title,
                 wsStyle,
                 -1,
@@ -103,7 +94,7 @@ namespace Titan.Windows.Win32
                 case WindowsMessage.Create:
                 {
                     var pCreateStruct = (CREATESTRUCTA*)lParam;
-                    _ = SetWindowLongPtrA(hWnd, GWLP_USERDATA, (IntPtr)pCreateStruct->lpCreateParams);
+                    _ = SetWindowLongPtrA(hWnd, GWLP_USERDATA, (nint)pCreateStruct->lpCreateParams);
                     return 0;
                 }
             }
@@ -136,7 +127,6 @@ namespace Titan.Windows.Win32
                             handle.Free();
                         }
                     }
-
                     return false;
                 }
                 TranslateMessage(msg);
@@ -147,10 +137,7 @@ namespace Titan.Windows.Win32
 
         public void Dispose()
         {
-            //if (_wndProdPinnedMemory.IsAllocated)
-            //{
-            //    _wndProdPinnedMemory.Free();
-            //}
+            
         }
     }
 }
