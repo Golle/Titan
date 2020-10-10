@@ -9,12 +9,13 @@ namespace Titan.Graphics.D3D11.Buffers
 {
     public unsafe class IndexBuffer<T> : IDisposable where T : unmanaged
     {
-        public DXGI_FORMAT Format { get; } = sizeof(T) == 2 ? DXGI_FORMAT.DXGI_FORMAT_R16_UINT : DXGI_FORMAT.DXGI_FORMAT_R32_UINT;
-
+        public DXGI_FORMAT Format { get; } = typeof(T) == typeof(ushort) ? DXGI_FORMAT.DXGI_FORMAT_R16_UINT : DXGI_FORMAT.DXGI_FORMAT_R32_UINT;
+        internal ref readonly ComPtr<ID3D11Buffer> Buffer => ref _buffer;
+        
         private ComPtr<ID3D11Buffer> _buffer;
         public IndexBuffer(IGraphicsDevice device, uint count, D3D11_USAGE usage = D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG cpuAccess = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_RESOURCE_MISC_FLAG miscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED)
         {
-            Debug.Assert(sizeof(T) == 2 || sizeof(T) == 4, "Currently supported formats are ushort and uint");
+            Debug.Assert(typeof(T) == typeof(ushort) || typeof(T) == typeof(uint), "Currently supported formats are ushort and uint");
             Debug.Assert(count > 0, "Must be atleast 1 index");
             var desc = new D3D11_BUFFER_DESC
             {
@@ -31,7 +32,7 @@ namespace Titan.Graphics.D3D11.Buffers
 
         public IndexBuffer(IGraphicsDevice device, in T[] indices, D3D11_USAGE usage = D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG cpuAccess = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_RESOURCE_MISC_FLAG miscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED)
         {
-            Debug.Assert(sizeof(T) == 2 || sizeof(T) == 4, "Currently supported formats are ushort and uint");
+            Debug.Assert(typeof(T) == typeof(ushort) || typeof(T) == typeof(uint), "Currently supported formats are ushort and uint");
             Debug.Assert(indices != null, "Indices can't be null");
 
             var desc = new D3D11_BUFFER_DESC
@@ -54,9 +55,9 @@ namespace Titan.Graphics.D3D11.Buffers
             }
         }
 
-        public IndexBuffer(IGraphicsDevice device, void* indices, uint count, D3D11_USAGE usage = D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG cpuAccess = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_RESOURCE_MISC_FLAG miscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED)
+        public IndexBuffer(IGraphicsDevice device, T* indices, uint count, D3D11_USAGE usage = D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG cpuAccess = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_RESOURCE_MISC_FLAG miscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED)
         {
-            Debug.Assert(sizeof(T) == 2 || sizeof(T) == 4, "Currently supported formats are ushort and uint");
+            Debug.Assert(typeof(T) == typeof(ushort) || typeof(T) == typeof(uint), "Currently supported formats are ushort and uint");
             Debug.Assert(indices != null, "Indices can't be null");
             Debug.Assert(count > 0, "Must be atleast 1 index in the data");
 

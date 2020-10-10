@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
@@ -14,6 +16,15 @@ namespace Titan.Windows.Win32.D3D11
 
         public static bool FAILED(in HRESULT result) => result.Value != 0;
         public static bool SUCCEEDED(in HRESULT result) => result.Value == 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CheckAndThrow(in HRESULT result, string functionName, string message = null)
+        {
+            if (FAILED(result))
+            {
+                throw new Win32Exception(result, message ?? $"Call to {functionName} failed with HRESULT {result}");
+            }
+        }
 
         
         [DllImport("d3d11", CallingConvention = CallingConvention.StdCall, SetLastError = true)]

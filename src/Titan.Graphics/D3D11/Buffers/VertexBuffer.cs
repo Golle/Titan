@@ -9,7 +9,7 @@ namespace Titan.Graphics.D3D11.Buffers
 {
     public unsafe class VertexBuffer<T> : IDisposable where T : unmanaged
     {
-        internal ID3D11Buffer* Ptr => _buffer.Get();
+        internal ref readonly ComPtr<ID3D11Buffer> Buffer => ref _buffer;
         
         private ComPtr<ID3D11Buffer> _buffer;
 
