@@ -5,7 +5,6 @@ using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.D3D11
 {
-
     public unsafe class ImmediateContext : IDisposable
     {
         private ComPtr<ID3D11DeviceContext> _context;
@@ -15,6 +14,8 @@ namespace Titan.Graphics.D3D11
             _context = new ComPtr<ID3D11DeviceContext>(device.ImmediateContextPtr);
         }
 
+
+        // TODO: is this the best way to do it? 
         public void SetVertexBuffer(IVertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u)
         {
             var stride = vertexBuffer.Stride;
