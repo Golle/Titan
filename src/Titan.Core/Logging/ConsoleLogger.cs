@@ -11,6 +11,11 @@ namespace Titan.Core.Logging
         {
             _logFormatter = logFormatter;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Trace(string message) => StdOut(_logFormatter.Format(LogLevel.Trace, message));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Trace(string format, params object[] values) => StdOut(_logFormatter.Format(LogLevel.Trace, format, values));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Debug(string message) => StdOut(_logFormatter.Format(LogLevel.Debug, message));

@@ -5,6 +5,7 @@ namespace Titan.Core.Logging
         Error,
         Warning,
         Info,
-        Debug
+        Debug,
+        Trace
     }
 }
