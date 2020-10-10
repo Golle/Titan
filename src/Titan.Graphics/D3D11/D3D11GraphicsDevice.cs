@@ -4,10 +4,13 @@ using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.D3D11.D3D11Common;
 
-namespace Titan.Graphics
+namespace Titan.Graphics.D3D11
 {
-    public unsafe class D3D11GraphicsDevice : IGraphicsDevice
+    public unsafe class D3D11GraphicsDevice : ID3D11GraphicsDevice
     {
+        ID3D11Device* ID3D11GraphicsDevice.Ptr => _device.Get();
+        ID3D11DeviceContext* ID3D11GraphicsDevice.ImmediateContextPtr => _immediateContext.Get();
+
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
         private ComPtr<ID3D11DeviceContext> _immediateContext;
@@ -28,7 +31,6 @@ namespace Titan.Graphics
             desc.SampleDesc.Count = 1;
             desc.SampleDesc.Quality = 0;
 
-            desc.Flags = 0;
             desc.BufferUsage = DXGI_USAGE.DXGI_USAGE_RENDER_TARGET_OUTPUT;
             desc.OutputWindow = window.Handle;
             desc.Windowed = window.Windowed;

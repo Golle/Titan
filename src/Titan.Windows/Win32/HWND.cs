@@ -7,7 +7,7 @@ namespace Titan.Windows.Win32
 {
     [SkipLocalsInit]
     [StructLayout(LayoutKind.Sequential)]
-    public struct HWND
+    public unsafe struct HWND
     {
         public nint Value;
 

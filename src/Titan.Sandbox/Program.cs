@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Titan;
-using Titan.Graphics;
+using Titan.Graphics.D3D11;
 using Titan.Sandbox;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
@@ -22,9 +22,11 @@ using var window = Bootstrapper
     .GetInstance<IWindowFactory>()
     .Create(1920, 1080, "Donkey box #2!");
 
-using (var device = new D3D11GraphicsDevice(window, 144, true))
-{
 
+{
+    using var d3dDevice = new D3D11GraphicsDevice(window);
+
+    using var vertexBuffer1 = new VertexBuffer<Vertex>(d3dDevice, numberOfVertices: 1000);
 }
 
 
