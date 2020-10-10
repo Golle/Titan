@@ -12,6 +12,8 @@ namespace Titan.Windows.Win32
         public HWND Handle { get; }
         public int Height { get; }
         public int Width { get; }
+        public bool Windowed => true;
+
         public unsafe Win32Window(int width, int height, string title)
         {
             Width = width;

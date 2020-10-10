@@ -8,6 +8,7 @@ namespace Titan.Windows
         HWND Handle { get; }
         int Height { get; }
         int Width { get; }
+        bool Windowed { get; }
 
 
         void SetTitle(string title);

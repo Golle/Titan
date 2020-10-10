@@ -1,11 +1,10 @@
 using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Titan;
+using Titan.Graphics;
 using Titan.Sandbox;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
@@ -22,6 +21,12 @@ using var window = Bootstrapper
     .Container
     .GetInstance<IWindowFactory>()
     .Create(1920, 1080, "Donkey box #2!");
+
+using (var device = new D3D11GraphicsDevice(window, 144, true))
+{
+
+}
+
 
 unsafe
 {
