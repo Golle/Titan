@@ -126,7 +126,8 @@ unsafe
     {
         deviceContext->ClearRenderTargetView(device.BackBuffer.Get(), floats);
         //deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-        immediateContext.SetVertexBuffer(vertexBuffer);
+        immediateContext.SetVertexBuffer(vertexBuffer, 0);
+        immediateContext.SetVertexBuffer(vertexBuffer, 1);
         //deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
         deviceContext->IASetInputLayout(inputLayout);

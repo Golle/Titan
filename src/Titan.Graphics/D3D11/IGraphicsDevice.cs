@@ -15,12 +15,10 @@ namespace Titan.Graphics.D3D11
             _context = new ComPtr<ID3D11DeviceContext>(device.ImmediateContextPtr);
         }
 
-
-        public void SetVertexBuffer(IVertexBuffer vertexBuffer)
+        public void SetVertexBuffer(IVertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u)
         {
             var stride = vertexBuffer.Stride;
-            var offset = 0u;
-            _context.Get()->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+            _context.Get()->IASetVertexBuffers(slot, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         }
 
         public void Dispose()
