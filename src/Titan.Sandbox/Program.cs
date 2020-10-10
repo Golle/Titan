@@ -4,7 +4,9 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Titan;
+using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Buffers;
 using Titan.Sandbox;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
@@ -12,13 +14,15 @@ using static Titan.Windows.Win32.D3D11.D3D11Common;
 using static Titan.Windows.Win32.D3D11.D3D_DRIVER_TYPE;
 using static Titan.Windows.Win32.D3D11.D3D_FEATURE_LEVEL;
 
-
 var pixelShaderPath = @"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl";
 var vertexShaderPath = @"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl";
 
 
-using var window = Bootstrapper
-    .Container
+var container = Bootstrapper.Container;
+
+LOGGER.InitializeLogger(container.GetInstance<ILog>());
+
+using var window = container
     .GetInstance<IWindowFactory>()
     .Create(1920, 1080, "Donkey box #2!");
 
@@ -31,6 +35,9 @@ unsafe
 
     var vertices = stackalloc Vertex[10];
     using var vertexBuffer3 = new VertexBuffer<Vertex>(d3dDevice, vertices, 10);
+
+    using var indexBuffer1 = new IndexBuffer<ushort>(d3dDevice, 10);
+    using var indexBuffer2 = new IndexBuffer<uint>(d3dDevice, 100);
 }
 
 
