@@ -9,6 +9,18 @@ namespace Titan.Windows.Win32
     {
         private T* _ptr;
         
+        public ComPtr(T* ptr)
+        {
+            _ptr = ptr;
+            InternalAddRef();
+        }
+
+        public ComPtr(in ComPtr<T> ptr)
+        {
+            _ptr = ptr._ptr;
+            InternalAddRef();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly T* Get() => _ptr;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -32,10 +44,14 @@ namespace Titan.Windows.Win32
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            Release();
+            InternalRelease();
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void Release()
+        private void InternalAddRef() => ((IUnknown*)_ptr)->AddRef();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void InternalRelease()
         {
             // TODO: handle AddRef and Release counts
             if (_ptr != null)

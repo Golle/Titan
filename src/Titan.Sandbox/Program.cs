@@ -121,13 +121,13 @@ unsafe
     deviceContext->RSSetViewports(1, &viewport);
     
     var drawIndexed = true;
-    
+    using var immediateContext = new ImmediateContext(device);
     while (window.Update())
     {
         deviceContext->ClearRenderTargetView(device.BackBuffer.Get(), floats);
-        deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-
-        deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        //deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        immediateContext.SetVertexBuffer(vertexBuffer);
+        //deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
         deviceContext->IASetInputLayout(inputLayout);
         deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -164,7 +164,9 @@ unsafe
 
     //    d3dDebug->Release();
     //}
-
+    pixelShader->Release();
+    vertexShader->Release();
+    inputLayout->Release();
 }
 
 
