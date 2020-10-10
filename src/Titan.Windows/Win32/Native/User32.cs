@@ -13,7 +13,7 @@ namespace Titan.Windows.Win32.Native
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern ushort RegisterClassExA(
-            [In] in WndClassExA wndClassEx
+            [In] in WNDCLASSEXA wndClassEx
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
@@ -49,7 +49,7 @@ namespace Titan.Windows.Win32.Native
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool PeekMessageA(
-            [Out] out Msg lpMsg,
+            [Out] out MSG lpMsg,
             [In] HWND hWnd,
             [In] uint wMsgFilterMin,
             [In] uint wMsgFilterMax,
@@ -59,12 +59,12 @@ namespace Titan.Windows.Win32.Native
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TranslateMessage(
-            [In] in Msg lpMsg
+            [In] in MSG lpMsg
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern nint DispatchMessage(
-            [In] in Msg lpMsg
+            [In] in MSG lpMsg
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
@@ -88,7 +88,7 @@ namespace Titan.Windows.Win32.Native
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetCursorPos(
-            [Out] out Point lpPoint
+            [Out] out POINT lpPoint
         );
         
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
@@ -107,13 +107,13 @@ namespace Titan.Windows.Win32.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ScreenToClient(
             [In] HWND hWnd,
-            [In, Out] ref Point lpPoint
+            [In, Out] ref POINT lpPoint
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AdjustWindowRect(
-            [In] ref Rect lpRect,
+            [In] ref RECT lpRect,
             [In] WindowStyles dwStyle,
             [In, MarshalAs(UnmanagedType.Bool)] bool bMenu
         );
@@ -130,7 +130,5 @@ namespace Titan.Windows.Win32.Native
             [In] HWND hwnd,
             [In] int nIndex
         );
-
-
     }
 }

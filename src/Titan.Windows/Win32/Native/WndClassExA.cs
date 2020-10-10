@@ -1,9 +1,10 @@
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
 
 namespace Titan.Windows.Win32.Native
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct WndClassExA
+    internal struct WNDCLASSEXA
     {
         internal uint CbSize;
         internal uint Style;

@@ -1,15 +1,16 @@
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
 
 namespace Titan.Windows.Win32.Native
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct Msg
+    internal struct MSG
     {
-        internal nint Hwnd;
+        internal HWND Hwnd;
         internal WindowsMessage Message;
         internal nuint WParam;
         internal nuint LParam;
         internal int Time;
-        internal Point Point;
+        internal POINT Point;
     }
 }

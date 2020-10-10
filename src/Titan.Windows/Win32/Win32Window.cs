@@ -20,13 +20,12 @@ namespace Titan.Windows.Win32
 
             var className = $"{nameof(Win32Window)}_class_" + Guid.NewGuid().ToString().Substring(0, 4);
             // Create the Window Class EX
-            var wndClassExA = new WndClassExA
+            var wndClassExA = new WNDCLASSEXA
             {
                 CbClsExtra = 0,
-                CbSize = (uint)Marshal.SizeOf<WndClassExA>(),
+                CbSize = (uint)Marshal.SizeOf<WNDCLASSEXA>(),
                 HCursor = 0,
                 HIcon = 0,
-                //LpFnWndProc = (delegate*<nint, WindowsMessage, nuint, nuint, nint>)wndProcPointer.ToPointer(),
                 LpFnWndProc = &StaticWindowProc,
                 CbWndExtra = 0,
                 HIconSm = 0,
@@ -42,13 +41,12 @@ namespace Titan.Windows.Win32
 
             // Adjust the window size to take into account for the menu etc
             const WindowStyles wsStyle = WindowStyles.OverlappedWindow | WindowStyles.Visible;
-            Rect windowRect = default;
+            RECT windowRect = default;
             windowRect.Left = 100;
             windowRect.Right = width + windowRect.Left;
             windowRect.Top = 100;
             windowRect.Bottom = height + windowRect.Top;
             AdjustWindowRect(ref windowRect, wsStyle, false);
-
 
             // Create the Window
             Handle = CreateWindowExA(
@@ -78,7 +76,6 @@ namespace Titan.Windows.Win32
         public void SetTitle(string title) => SetWindowTextA(Handle, title);
         public void Hide() => ShowWindow(Handle, ShowWindowCommand.Hide);
         public void Show() => ShowWindow(Handle, ShowWindowCommand.Show);
-
 
         private static unsafe nint StaticWindowProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
         {

@@ -25,8 +25,6 @@ using var window = Bootstrapper
 
 unsafe
 {
-    
-
     ID3D11Device * device;
     ID3D11DeviceContext * deviceContext;
     IDXGISwapChain* swapChain;
@@ -222,16 +220,16 @@ unsafe
     }
 
 
-
-
     Console.WriteLine($"Release: {vertexBuffer->Release()}");
     Console.WriteLine($"Release: {vertexShader->Release()}");
     Console.WriteLine($"Release: {pixelShader->Release()}");
     Console.WriteLine($"Release: {indexBuffer->Release()}");
+    Console.WriteLine($"Release: {inputLayout->Release()}");
     Console.WriteLine($"Release: {renderTargetView->Release()}");
     Console.WriteLine($"Release: {swapChain->Release()}");
     Console.WriteLine($"Release: {deviceContext->Release()}");
     
+
     //{
     //    ID3D11Debug* d3dDebug;
     //    fixed (Guid* debugGuidPtr = &D3D11Debug)
@@ -241,7 +239,7 @@ unsafe
     //    }
 
     //    {
-    //        var result = d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_SUMMARY);
+    //        var result = d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL);
     //        if (FAILED(result)) throw new InvalidOperationException($"Failed to ReportLiveDeviceObjects: {result}");
     //    }
 
