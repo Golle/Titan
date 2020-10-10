@@ -6,16 +6,16 @@ using static Titan.Windows.Win32.D3D11.D3D11Common;
 
 namespace Titan.Graphics.D3D11
 {
-    public unsafe class D3D11GraphicsDevice : ID3D11GraphicsDevice
+    public unsafe class GraphicsDevice : IGraphicsDevice
     {
-        ID3D11Device* ID3D11GraphicsDevice.Ptr => _device.Get();
-        ID3D11DeviceContext* ID3D11GraphicsDevice.ImmediateContextPtr => _immediateContext.Get();
+        ID3D11Device* IGraphicsDevice.Ptr => _device.Get();
+        ID3D11DeviceContext* IGraphicsDevice.ImmediateContextPtr => _immediateContext.Get();
 
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
         private ComPtr<ID3D11DeviceContext> _immediateContext;
 
-        public D3D11GraphicsDevice(IWindow window, uint refreshRate = 144, bool debug = true)
+        public GraphicsDevice(IWindow window, uint refreshRate = 144, bool debug = true)
         {
             var flags = debug ? 2u : 0u;
             var featureLevel = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1;

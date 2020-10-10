@@ -11,7 +11,7 @@ namespace Titan.Graphics.D3D11
     {
         private ComPtr<ID3D11Buffer> _buffer;
 
-        public VertexBuffer(ID3D11GraphicsDevice device, uint numberOfVertices)
+        public VertexBuffer(IGraphicsDevice device, uint numberOfVertices)
         {
             D3D11_BUFFER_DESC desc;
             desc.BindFlags = D3D11_BIND_FLAG.D3D11_BIND_VERTEX_BUFFER;

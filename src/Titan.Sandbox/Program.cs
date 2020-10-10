@@ -24,7 +24,7 @@ using var window = Bootstrapper
 
 
 {
-    using var d3dDevice = new D3D11GraphicsDevice(window);
+    using var d3dDevice = new GraphicsDevice(window);
 
     using var vertexBuffer1 = new VertexBuffer<Vertex>(d3dDevice, numberOfVertices: 1000);
 }
