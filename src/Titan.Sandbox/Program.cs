@@ -22,11 +22,15 @@ using var window = Bootstrapper
     .GetInstance<IWindowFactory>()
     .Create(1920, 1080, "Donkey box #2!");
 
-
+unsafe
 {
     using var d3dDevice = new GraphicsDevice(window);
 
     using var vertexBuffer1 = new VertexBuffer<Vertex>(d3dDevice, numberOfVertices: 1000);
+    using var vertexBuffer2 = new VertexBuffer<Vertex>(d3dDevice, new Vertex[10]);
+
+    var vertices = stackalloc Vertex[10];
+    using var vertexBuffer3 = new VertexBuffer<Vertex>(d3dDevice, vertices, 10);
 }
 
 
