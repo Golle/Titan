@@ -1,8 +1,10 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.VisualBasic.CompilerServices;
 using Titan;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
@@ -43,47 +45,26 @@ unsafe
 
     using var indexBuffer = new IndexBuffer<ushort>(device, indices, 3);
 
-    var floats = stackalloc float[4];
-    floats[0] = 1f;
-    floats[1] = 0.4f;
-    floats[2] = 0.1f;
-    floats[3] = 1f;
-
-    ID3D11VertexShader *vertexShader;
-    ID3D11InputLayout* inputLayout;
+    
+    
+    ID3DBlob* vertexShaderBlob;
+    ID3DBlob* errors1 = null;
+    fixed (byte* entryPoint = "main".AsBytes())
+    fixed (byte* target = "vs_5_0".AsBytes())
+    fixed (char* vertexShaderBlobPath = vertexShaderPath)
     {
-        ID3DBlob* vertexShaderBlob;
-        ID3DBlob* errors = null;
-        fixed (byte* entryPoint = "main".AsBytes())
-        fixed (byte* target = "vs_5_0".AsBytes())
-        fixed (char* vertexShaderBlobPath = vertexShaderPath)
-        {
-            var result = D3DCompileFromFile(vertexShaderBlobPath, null, null, (sbyte*)entryPoint, (sbyte*)target, 0, 0, &vertexShaderBlob, &errors);
-            if (FAILED(result)) throw new Win32Exception(result, $"Failed to compile vertex shader: {result}");
-        }
-        {
-            var result = device.Ptr->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), null, &vertexShader);
-            if (FAILED(result)) throw new Win32Exception(result, $"Failed to create vertex shader: {result}");
-        }
-        {
-            var inputDescs = stackalloc D3D11_INPUT_ELEMENT_DESC[2];
-            inputDescs[0].Format = DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT;
-            fixed (byte* semanticName = "Position".AsBytes())
-            {
-                inputDescs[0].SemanticName = (sbyte*)semanticName;
-            }
-
-            inputDescs[1].AlignedByteOffset = (uint)sizeof(Vector3);
-            inputDescs[1].Format = DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT;
-            fixed (byte* semanticName = "Color".AsBytes())
-            {
-                inputDescs[1].SemanticName = (sbyte*)semanticName;
-            }
-            var result = device.Ptr->CreateInputLayout(inputDescs, 2, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &inputLayout);
-            if (FAILED(result)) throw new Win32Exception(result, $"Failed to create input layout: {result}");
-        }
-        vertexShaderBlob->Release();
+        CheckAndThrow(D3DCompileFromFile(vertexShaderBlobPath, null, null, (sbyte*)entryPoint, (sbyte*)target, 0, 0, &vertexShaderBlob, &errors1), "D3DCompileFromFile");
     }
+
+    ID3D11VertexShader* vertexShader;
+    CheckAndThrow(device.Ptr->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), null, &vertexShader), "CreateVertexShader");
+
+    using var inputLayout = new InputLayout(device, vertexShaderBlob, new[]
+    {
+        new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT),
+        new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT)
+    });
+    vertexShaderBlob->Release();
 
     ID3D11PixelShader* pixelShader;
     {
@@ -121,21 +102,31 @@ unsafe
     deviceContext->RSSetViewports(1, &viewport);
     
     var drawIndexed = true;
+    
+    var floats = stackalloc float[4];
+    floats[0] = 1f;
+    floats[1] = 0.4f;
+    floats[2] = 0.1f;
+    floats[3] = 1f;
+
+    var clearColor = Color.Red;
+
     using var immediateContext = new ImmediateContext(device);
+    using var backbuffer = new BackBufferRenderTargetView(device);
+
     while (window.Update())
     {
-        deviceContext->ClearRenderTargetView(device.BackBuffer.Get(), floats);
-        //deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-        immediateContext.SetVertexBuffer(vertexBuffer, 0);
-        immediateContext.SetVertexBuffer(vertexBuffer, 1);
-        //deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        immediateContext.ClearRenderTargetView(backbuffer, clearColor);
+        immediateContext.SetVertexBuffer(vertexBuffer);
+        immediateContext.SetInputLayout(inputLayout);
+        immediateContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        deviceContext->IASetInputLayout(inputLayout);
-        deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         deviceContext->VSSetShader(vertexShader, null, 0u);
         deviceContext->PSSetShader(pixelShader, null, 0u);
+        
+        // Bind BackBuffer rendertarget be
+        // fore anything is drawn
 
-        // Bind BackBuffer rendertarget before anything is drawn
         deviceContext->OMSetRenderTargets(1, device.BackBuffer.GetAddressOf(), pDepthStencilView: null);
         if (drawIndexed)
         {
@@ -167,7 +158,6 @@ unsafe
     //}
     pixelShader->Release();
     vertexShader->Release();
-    inputLayout->Release();
 }
 
 
@@ -178,26 +168,6 @@ public unsafe struct Vertex
     public Color Color;
 }
 
-public struct Color
-{
-    public float R;
-    public float G;
-    public float B;
-    public float A;
-
-    public Color(float r, float g, float b, float a = 1f)
-    {
-        R = r;
-        G = g;
-        B = b;
-        A = a;
-    }
-    public static readonly Color Red = new Color(1f,0, 0);
-    public static readonly Color Green = new Color(0, 1f, 0);
-    public static readonly Color Blue = new Color(0, 0, 1f);
-    public static readonly Color White = new Color(1f, 1f, 1f);
-    public static readonly Color Black = new Color(0f, 0, 0);
-}
 [StructLayout(LayoutKind.Sequential, Size = 16)]
 struct TehConstants
 {

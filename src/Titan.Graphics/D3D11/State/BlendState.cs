@@ -6,7 +6,7 @@ using static Titan.Windows.Win32.D3D11.D3D11_BLEND;
 using static Titan.Windows.Win32.D3D11.D3D11_BLEND_OP;
 using static Titan.Windows.Win32.D3D11.D3D11_COLOR_WRITE_ENABLE;
 
-namespace Titan.Graphics.D3D11
+namespace Titan.Graphics.D3D11.State
 {
     public unsafe class BlendState : IDisposable
     {

@@ -5,12 +5,12 @@ using static Titan.Windows.Win32.D3D11.D3D11Common;
 using static Titan.Windows.Win32.D3D11.D3D11_FILTER;
 using static Titan.Windows.Win32.D3D11.D3D11_TEXTURE_ADDRESS_MODE;
 
-namespace Titan.Graphics.D3D11
+namespace Titan.Graphics.D3D11.State
 {
-    public unsafe class Sampler : IDisposable
+    public unsafe class SamplerState : IDisposable
     {
         private ComPtr<ID3D11SamplerState> _samplerState;
-        public Sampler(IGraphicsDevice device)
+        public SamplerState(IGraphicsDevice device)
         {
             D3D11_SAMPLER_DESC samplerDesc;
             samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
@@ -25,6 +25,5 @@ namespace Titan.Graphics.D3D11
         {
             _samplerState.Dispose();
         }
-
     }
 }
