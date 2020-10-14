@@ -1,18 +1,20 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.VisualBasic.CompilerServices;
 using Titan;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Sandbox;
 using Titan.Windows;
+using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
+using Titan.Windows.Win32.Native;
+using Titan.Windows.Win32.WIC;
 using static Titan.Windows.Win32.D3D11.D3D11Common;
+using static Titan.Windows.Win32.Native.GENERIC_RIGHTS;
 
 var pixelShaderPath = @"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl";
 var vertexShaderPath = @"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl";
@@ -27,8 +29,29 @@ using var window = container
     .Create(1920, 1080, "Donkey box #2!");
 
 
+
 unsafe
 {
+
+
+
+
+    ComPtr<IWICImagingFactory> imagingFactory = default;
+    fixed (Guid* clsid = &CLSID.CLSID_WICImagingFactory2)
+    {
+        var riid = typeof(IWICImagingFactory).GUID;
+        CheckAndThrow(Ole32.CoCreateInstance(clsid, null, CLSCTX.CLSCTX_INPROC_SERVER, &riid, (void**) imagingFactory.GetAddressOf()), "CoCreateInstance");
+    }
+
+    ComPtr<IWICBitmapDecoder> decoder = default;
+    fixed (char* filename = @"F:\Git\GameDev\resources\spnza_bricks_a_diff.png")
+    {
+        CheckAndThrow(imagingFactory.Get()->CreateDecoderFromFilename(filename, null, (uint)GENERIC_READ, WICDecodeOptions.WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), "CreateDecoderFromFilename");
+    }
+        
+
+
+
     using var device = (IGraphicsDevice)new GraphicsDevice(window);
     
     using var vertexBuffer = new VertexBuffer<Vertex>(device, new[]
