@@ -10,8 +10,8 @@ namespace Titan.Windows.Win32.D3D11
         public DXGI_FORMAT Format;
         public DXGI_SAMPLE_DESC SampleDesc;
         public D3D11_USAGE Usage;
-        public uint BindFlags;
-        public uint CpuAccessFlags;
-        public uint MiscFlags;
+        public D3D11_BIND_FLAG BindFlags;
+        public D3D11_CPU_ACCESS_FLAG CpuAccessFlags;
+        public D3D11_RESOURCE_MISC_FLAG MiscFlags;
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -7,14 +8,13 @@ using Titan;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.D3D11.State;
+using Titan.Graphics.Textures;
 using Titan.Sandbox;
 using Titan.Windows;
-using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
-using Titan.Windows.Win32.Native;
-using Titan.Windows.Win32.WIC;
 using static Titan.Windows.Win32.D3D11.D3D11Common;
-using static Titan.Windows.Win32.Native.GENERIC_RIGHTS;
+using static Titan.Windows.Win32.Common;
 
 var pixelShaderPath = @"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl";
 var vertexShaderPath = @"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl";
@@ -28,45 +28,42 @@ using var window = container
     .GetInstance<IWindowFactory>()
     .Create(1920, 1080, "Donkey box #2!");
 
-
-
 unsafe
 {
-
-
-
-
-    ComPtr<IWICImagingFactory> imagingFactory = default;
-    fixed (Guid* clsid = &CLSID.CLSID_WICImagingFactory2)
-    {
-        var riid = typeof(IWICImagingFactory).GUID;
-        CheckAndThrow(Ole32.CoCreateInstance(clsid, null, CLSCTX.CLSCTX_INPROC_SERVER, &riid, (void**) imagingFactory.GetAddressOf()), "CoCreateInstance");
-    }
-
-    ComPtr<IWICBitmapDecoder> decoder = default;
-    fixed (char* filename = @"F:\Git\GameDev\resources\spnza_bricks_a_diff.png")
-    {
-        CheckAndThrow(imagingFactory.Get()->CreateDecoderFromFilename(filename, null, (uint)GENERIC_READ, WICDecodeOptions.WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), "CreateDecoderFromFilename");
-    }
-        
-
-
-
     using var device = (IGraphicsDevice)new GraphicsDevice(window);
+
+    using var factory = new ImagingFactory();
+
+    //using var decoder = factory.CreateDecoderFromFilename(@"F:\Git\GameDev\resources\temp_models\sponza\textures\sponza_curtain_blue_diff.png");
+    using var decoder = factory.CreateDecoderFromFilename(@"F:\Git\GameDev\resources\link.png");
+    
+    var buffer = Marshal.AllocHGlobal((int) decoder.ImageSize);
+    decoder.CopyPixels(buffer, decoder.ImageSize);
+    
+    using var texture = new Texture2D(device, decoder.Width, decoder.Height, (byte*) buffer.ToPointer(), decoder.ImageSize);
+    using var textureView = new ShaderResourceView(device, texture);
+
+    Marshal.FreeHGlobal(buffer);
+
     
     using var vertexBuffer = new VertexBuffer<Vertex>(device, new[]
     {
-        new Vertex{Position = new Vector3(-1f,-1f, 0f), Color = Color.Blue},
-        new Vertex{Position = new Vector3(0f, 1f, 0f), Color = Color.Green},
-        new Vertex{Position = new Vector3(1f, -1f, 0f), Color = Color.Red},
+        new Vertex{Position = new Vector3(-1f,-1f, 0f), Color = Color.Blue, Texture = new Vector2(0,1)},
+        new Vertex{Position = new Vector3(-1f, 1f, 0f), Color = Color.Green, Texture = new Vector2(0,0)},
+        new Vertex{Position = new Vector3(1f, 1f, 0f), Color = Color.White, Texture = new Vector2(1,0)},
+        new Vertex{Position = new Vector3(1f, -1f, 0f), Color = Color.Red, Texture = new Vector2(1,1)},
+        
     });
 
-    var indices = stackalloc ushort[3];
+    var indices = stackalloc ushort[6];
     indices[0] = 0;
     indices[1] = 1;
     indices[2] = 2;
+    indices[3] = 0;
+    indices[4] = 2;
+    indices[5] = 3;
 
-    using var indexBuffer = new IndexBuffer<ushort>(device, indices, 3);
+    using var indexBuffer = new IndexBuffer<ushort>(device, indices, 6);
 
     
     
@@ -85,6 +82,7 @@ unsafe
     using var inputLayout = new InputLayout(device, vertexShaderBlob, new[]
     {
         new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT),
+        new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT),
         new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT)
     });
     vertexShaderBlob->Release();
@@ -133,6 +131,7 @@ unsafe
     floats[3] = 1f;
 
     var clearColor = Color.Red;
+    using var samplerState = new SamplerState(device);
 
     using var immediateContext = new ImmediateContext(device);
     using var backbuffer = new BackBufferRenderTargetView(device);
@@ -146,7 +145,8 @@ unsafe
 
         deviceContext->VSSetShader(vertexShader, null, 0u);
         deviceContext->PSSetShader(pixelShader, null, 0u);
-        
+        deviceContext->PSSetSamplers(0, 1, samplerState.Ptr.GetAddressOf());
+        deviceContext->PSSetShaderResources(0, 1, textureView.Ptr.GetAddressOf());
         // Bind BackBuffer rendertarget be
         // fore anything is drawn
 
@@ -154,7 +154,7 @@ unsafe
         if (drawIndexed)
         {
             deviceContext->IASetIndexBuffer(indexBuffer.Buffer.Get(), indexBuffer.Format, 0);
-            deviceContext->DrawIndexed(3, 0, 0);
+            deviceContext->DrawIndexed(6, 0, 0);
         }
         else
         {
@@ -184,10 +184,11 @@ unsafe
 }
 
 
-[StructLayout(LayoutKind.Sequential, Size = 32)]
+[StructLayout(LayoutKind.Sequential)]
 public unsafe struct Vertex
 {
     public Vector3 Position;
+    public Vector2 Texture;
     public Color Color;
 }
 

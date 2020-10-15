@@ -24,7 +24,7 @@ namespace Titan.Windows.Win32.WIC
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public HRESULT CreateDecoderFromFilename(char* wzFilename, Guid* pguidVendor, uint dwDesiredAccess, WICDecodeOptions metadataOptions, IWICBitmapDecoder** ppIDecoder)
-        => ((delegate* unmanaged[Stdcall]<void*, char*, Guid*, uint, WICDecodeOptions, IWICBitmapDecoder**,  HRESULT>)_vtbl[2])(Unsafe.AsPointer(ref this), wzFilename, pguidVendor, dwDesiredAccess, metadataOptions, ppIDecoder);
+        => ((delegate* unmanaged[Stdcall]<void*, char*, Guid*, uint, WICDecodeOptions, IWICBitmapDecoder**,  HRESULT>)_vtbl[3])(Unsafe.AsPointer(ref this), wzFilename, pguidVendor, dwDesiredAccess, metadataOptions, ppIDecoder);
 
         //HRESULT(STDMETHODCALLTYPE* CreateDecoderFromStream)(
         // __RPC__in IWICImagingFactory * This,
@@ -39,11 +39,9 @@ namespace Titan.Windows.Win32.WIC
         //    /* [unique][in] */ __RPC__in_opt const GUID* pguidVendor,
         //    /* [in] */ WICDecodeOptions metadataOptions,
         //    /* [retval][out] */ __RPC__deref_out_opt IWICBitmapDecoder **ppIDecoder);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateComponentInfo)(
-        // __RPC__in IWICImagingFactory * This,
-        // /* [in] */ __RPC__in REFCLSID clsidComponent,
-        // /* [out] */ __RPC__deref_out_opt IWICComponentInfo** ppIInfo);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateComponentInfo(Guid* clsidComponent, IWICComponentInfo** ppIInfo)
+            => ((delegate* unmanaged[Stdcall]<void*, Guid*, IWICComponentInfo**, HRESULT>)_vtbl[6])(Unsafe.AsPointer(ref this), clsidComponent, ppIInfo);
 
         //HRESULT(STDMETHODCALLTYPE* CreateDecoder)(
         // __RPC__in IWICImagingFactory * This,

@@ -14,19 +14,6 @@ namespace Titan.Windows.Win32.D3D11
         public static readonly Guid D3D11InfoQueue = new Guid("6543dbb6-1b48-42f5-ab82-e97ec74326f6");
         public static readonly Guid D3D11Debug = new Guid("79cf2233-7536-4948-9d36-1e4692dc5760");
 
-        public static bool FAILED(in HRESULT result) => result.Value != 0;
-        public static bool SUCCEEDED(in HRESULT result) => result.Value == 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CheckAndThrow(in HRESULT result, string functionName, string message = null)
-        {
-            if (FAILED(result))
-            {
-                throw new Win32Exception(result, message ?? $"Call to {functionName} failed with HRESULT {result}");
-            }
-        }
-
-        
         [DllImport("d3d11", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern HRESULT D3D11CreateDevice(
             [In] IDXGIAdapter* pAdapter,

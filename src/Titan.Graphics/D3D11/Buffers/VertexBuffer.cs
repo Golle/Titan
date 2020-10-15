@@ -1,18 +1,10 @@
-using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
-using static Titan.Windows.Win32.D3D11.D3D11Common;
+using static Titan.Windows.Win32.Common;
 
 namespace Titan.Graphics.D3D11.Buffers
 {
-    public interface IVertexBuffer : IDisposable
-    {
-        uint Stride { get; }
-        internal ref readonly ComPtr<ID3D11Buffer> Buffer { get; }
-    }
-
     public unsafe class VertexBuffer<T> : IVertexBuffer where T : unmanaged
     {
         private ComPtr<ID3D11Buffer> _buffer;
@@ -76,11 +68,7 @@ namespace Titan.Graphics.D3D11.Buffers
 
         private void InitBuffer(IGraphicsDevice device, D3D11_BUFFER_DESC* desc, D3D11_SUBRESOURCE_DATA* data = null)
         {
-            var result = device.Ptr->CreateBuffer(desc, data, _buffer.GetAddressOf());
-            if (FAILED(result))
-            {
-                throw new Win32Exception(result, $"Call to CreateBuffer failed with HRESULT {result}");
-            }
+            CheckAndThrow(device.Ptr->CreateBuffer(desc, data, _buffer.GetAddressOf()), "CreateBuffer");
         }
 
         public void Dispose()

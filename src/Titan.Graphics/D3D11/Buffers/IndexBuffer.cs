@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
-using static Titan.Windows.Win32.D3D11.D3D11Common;
+using static Titan.Windows.Win32.Common;
 
 namespace Titan.Graphics.D3D11.Buffers
 {
@@ -80,11 +80,7 @@ namespace Titan.Graphics.D3D11.Buffers
 
         private void InitBuffer(ID3D11Device* device, D3D11_BUFFER_DESC* desc, D3D11_SUBRESOURCE_DATA* data = null)
         {
-            var result = device->CreateBuffer(desc, data, _buffer.GetAddressOf());
-            if (FAILED(result))
-            {
-                throw new Win32Exception(result, $"Call to CreateBuffer failed with HRESULT {result}");
-            }
+            CheckAndThrow(device->CreateBuffer(desc, data, _buffer.GetAddressOf()), "CreateBuffer");
         }
 
         public void Dispose()

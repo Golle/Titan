@@ -1,7 +1,7 @@
 using System;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
-using static Titan.Windows.Win32.D3D11.D3D11Common;
+using static Titan.Windows.Win32.Common;
 using static Titan.Windows.Win32.D3D11.D3D11_BLEND;
 using static Titan.Windows.Win32.D3D11.D3D11_BLEND_OP;
 using static Titan.Windows.Win32.D3D11.D3D11_COLOR_WRITE_ENABLE;

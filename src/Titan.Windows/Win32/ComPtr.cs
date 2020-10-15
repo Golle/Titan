@@ -61,5 +61,8 @@ namespace Titan.Windows.Win32
                 _ptr = null;
             }
         }
+
+
+        
     }
 }

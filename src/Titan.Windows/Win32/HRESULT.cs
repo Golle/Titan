@@ -8,7 +8,7 @@ namespace Titan.Windows.Win32
 
     [SkipLocalsInit]
     [StructLayout(LayoutKind.Sequential)]
-    public struct HRESULT
+    public unsafe struct HRESULT
     {
         public int Value;
         public override string ToString() => $"0x{Value:X}";

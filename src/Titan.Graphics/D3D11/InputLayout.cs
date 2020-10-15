@@ -3,7 +3,7 @@ using System.Numerics;
 using Titan.Core;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
-using static Titan.Windows.Win32.D3D11.D3D11Common;
+using static Titan.Windows.Win32.Common;
 
 namespace Titan.Graphics.D3D11
 {
