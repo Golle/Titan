@@ -5,12 +5,12 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Titan;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Textures;
-using Titan.Sandbox;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.D3D11.D3D11Common;
@@ -32,19 +32,13 @@ unsafe
 {
     using var device = (IGraphicsDevice)new GraphicsDevice(window);
 
-    using var factory = new ImagingFactory();
+    container.RegisterSingleton(device);
 
+    var textureLoader = container.GetInstance<ITextureLoader>();
+
+    using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\link.png");
+    
     //using var decoder = factory.CreateDecoderFromFilename(@"F:\Git\GameDev\resources\temp_models\sponza\textures\sponza_curtain_blue_diff.png");
-    using var decoder = factory.CreateDecoderFromFilename(@"F:\Git\GameDev\resources\link.png");
-    
-    var buffer = Marshal.AllocHGlobal((int) decoder.ImageSize);
-    decoder.CopyPixels(buffer, decoder.ImageSize);
-    
-    using var texture = new Texture2D(device, decoder.Width, decoder.Height, (byte*) buffer.ToPointer(), decoder.ImageSize);
-    using var textureView = new ShaderResourceView(device, texture);
-
-    Marshal.FreeHGlobal(buffer);
-
     
     using var vertexBuffer = new VertexBuffer<Vertex>(device, new[]
     {
@@ -65,7 +59,6 @@ unsafe
 
     using var indexBuffer = new IndexBuffer<ushort>(device, indices, 6);
 
-    
     
     ID3DBlob* vertexShaderBlob;
     ID3DBlob* errors1 = null;
@@ -105,10 +98,6 @@ unsafe
         pixelShaderBlob->Release();
     }
 
-
-    var stride = (uint)sizeof(Vertex);
-    var offset = 0u;
-
     var viewport = new D3D11_VIEWPORT
     {
         TopLeftX = 0,
@@ -146,7 +135,7 @@ unsafe
         deviceContext->VSSetShader(vertexShader, null, 0u);
         deviceContext->PSSetShader(pixelShader, null, 0u);
         deviceContext->PSSetSamplers(0, 1, samplerState.Ptr.GetAddressOf());
-        deviceContext->PSSetShaderResources(0, 1, textureView.Ptr.GetAddressOf());
+        deviceContext->PSSetShaderResources(0, 1, texture.ResourceView.Ptr.GetAddressOf());
         // Bind BackBuffer rendertarget be
         // fore anything is drawn
 
@@ -198,16 +187,5 @@ struct TehConstants
 
 }
 
-
-namespace Titan.Sandbox
-{
-    static class StringExtensions
-    {
-        public static byte[] AsBytes(this string s) => Encoding.ASCII.GetBytes(s);
-    }
-
-    
-    
-}
 
 

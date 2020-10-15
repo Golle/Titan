@@ -1,6 +1,6 @@
 Texture2D tex : register(t0);
 
-SamplerState splr : register(s0);
+SamplerState splr;
 
 struct PS_INPUT
 {

@@ -13,6 +13,12 @@ namespace Titan.Graphics.D3D11
         public DXGI_FORMAT Format { get; }
         public ref readonly ComPtr<ID3D11Texture2D> Ptr => ref _texture2D;
         private  ComPtr<ID3D11Texture2D> _texture2D;
+
+        public Texture2D(IGraphicsDevice device, uint width, uint height, IntPtr buffer, uint size) 
+            : this(device, width, height,(byte*) buffer.ToPointer(), size)
+        {
+        }
+
         public Texture2D(IGraphicsDevice device, uint width, uint height, byte* buffer, uint size)
         {
             D3D11_TEXTURE2D_DESC desc;
