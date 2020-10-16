@@ -1,24 +1,18 @@
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text;
 using Titan;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Textures;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
-using static Titan.Windows.Win32.D3D11.D3D11Common;
-using static Titan.Windows.Win32.Common;
 
 var pixelShaderPath = @"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl";
 var vertexShaderPath = @"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl";
-
 
 var container = Bootstrapper.Container;
 
@@ -35,6 +29,7 @@ unsafe
     container.RegisterSingleton(device);
 
     var textureLoader = container.GetInstance<ITextureLoader>();
+    var shaderCompiler = container.GetInstance<IShaderCompiler>();
 
     using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\link.png");
     
@@ -46,7 +41,6 @@ unsafe
         new Vertex{Position = new Vector3(-1f, 1f, 0f), Color = Color.Green, Texture = new Vector2(0,0)},
         new Vertex{Position = new Vector3(1f, 1f, 0f), Color = Color.White, Texture = new Vector2(1,0)},
         new Vertex{Position = new Vector3(1f, -1f, 0f), Color = Color.Red, Texture = new Vector2(1,1)},
-        
     });
 
     var indices = stackalloc ushort[6];
@@ -59,44 +53,22 @@ unsafe
 
     using var indexBuffer = new IndexBuffer<ushort>(device, indices, 6);
 
-    
-    ID3DBlob* vertexShaderBlob;
-    ID3DBlob* errors1 = null;
-    fixed (byte* entryPoint = "main".AsBytes())
-    fixed (byte* target = "vs_5_0".AsBytes())
-    fixed (char* vertexShaderBlobPath = vertexShaderPath)
-    {
-        CheckAndThrow(D3DCompileFromFile(vertexShaderBlobPath, null, null, (sbyte*)entryPoint, (sbyte*)target, 0, 0, &vertexShaderBlob, &errors1), "D3DCompileFromFile");
-    }
 
-    ID3D11VertexShader* vertexShader;
-    CheckAndThrow(device.Ptr->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), null, &vertexShader), "CreateVertexShader");
-
-    using var inputLayout = new InputLayout(device, vertexShaderBlob, new[]
+    // Vertex Shader
+    using var compiledVertexShader = shaderCompiler.CompileShaderFromFile(vertexShaderPath, "main", "vs_5_0");
+    using var vertexShader = new VertexShader(device, compiledVertexShader);
+    using var inputLayout = new InputLayout(device, compiledVertexShader, new[]
     {
         new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT),
         new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT),
         new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT)
     });
-    vertexShaderBlob->Release();
 
-    ID3D11PixelShader* pixelShader;
-    {
-        ID3DBlob* pixelShaderBlob;
-        ID3DBlob* errors = null;
-        fixed (byte* entryPoint = "main".AsBytes())
-        fixed (byte* target = "ps_5_0".AsBytes())
-        fixed (char* pixelShaderBlobPath = pixelShaderPath)
-        {
-            var result = D3DCompileFromFile(pixelShaderBlobPath, null, null, (sbyte*)entryPoint, (sbyte*)target, 0, 0, &pixelShaderBlob, &errors);
-            if (FAILED(result)) throw new Win32Exception(result, $"Failed to compile pixel shader: {result}");
-        }
-        {
-            var result = device.Ptr->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), null, &pixelShader);
-            if (FAILED(result)) throw new Win32Exception(result, $"Failed to create pixel shader: {result}");
-        }
-        pixelShaderBlob->Release();
-    }
+
+    // Pixel Shader
+    using var compiledPixelShader = shaderCompiler.CompileShaderFromFile(pixelShaderPath, "main", "ps_5_0");
+    using var pixelShader = new PixelShader(device, compiledPixelShader);
+
 
     var viewport = new D3D11_VIEWPORT
     {
@@ -132,14 +104,13 @@ unsafe
         immediateContext.SetInputLayout(inputLayout);
         immediateContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        deviceContext->VSSetShader(vertexShader, null, 0u);
-        deviceContext->PSSetShader(pixelShader, null, 0u);
-        deviceContext->PSSetSamplers(0, 1, samplerState.Ptr.GetAddressOf());
-        deviceContext->PSSetShaderResources(0, 1, texture.ResourceView.Ptr.GetAddressOf());
-        // Bind BackBuffer rendertarget be
-        // fore anything is drawn
+        immediateContext.SetPixelShader(pixelShader);
+        immediateContext.SetVertexShader(vertexShader);
+        immediateContext.SetPixelShaderSampler(samplerState);
+        immediateContext.SetPixelShaderResource(texture.ResourceView);
 
         deviceContext->OMSetRenderTargets(1, device.BackBuffer.GetAddressOf(), pDepthStencilView: null);
+
         if (drawIndexed)
         {
             deviceContext->IASetIndexBuffer(indexBuffer.Buffer.Get(), indexBuffer.Format, 0);
@@ -147,7 +118,7 @@ unsafe
         }
         else
         {
-            deviceContext->Draw(3, 0);
+            deviceContext->Draw(4, 0);
         }
         device.SwapChain.Get()->Present(1, 0);
         GC.Collect();
@@ -168,8 +139,6 @@ unsafe
 
     //    d3dDebug->Release();
     //}
-    pixelShader->Release();
-    vertexShader->Release();
 }
 
 

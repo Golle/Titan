@@ -21,7 +21,7 @@ namespace Titan.Graphics.Textures
             var buffer = Marshal.AllocHGlobal((int) size);
             try
             {
-                decoder.CopyPixels(buffer, decoder.ImageSize);
+                decoder.CopyPixels(buffer, size);
                 var texture2D = new Texture2D(_graphicsDevice, decoder.Width, decoder.Height, buffer, size);
                 var resourceView = new ShaderResourceView(_graphicsDevice, texture2D);
                 return new Texture

@@ -12,7 +12,7 @@ namespace Titan.Graphics.D3D11
         private ComPtr<ID3D11InputLayout> _inputLayout;
         internal ref readonly ComPtr<ID3D11InputLayout> Pointer => ref _inputLayout;
 
-        public InputLayout(IGraphicsDevice device, ID3DBlob* vertexShaderBlob, in InputLayoutDescriptor[] descriptors)
+        public InputLayout(IGraphicsDevice device, CompiledShader vertexShader, in InputLayoutDescriptor[] descriptors)
         {
             var inputDescs = stackalloc D3D11_INPUT_ELEMENT_DESC[descriptors.Length];
             var size = 0u;
@@ -34,7 +34,7 @@ namespace Titan.Graphics.D3D11
                 size += GetSize(descriptor.Format);
             }
             
-            CheckAndThrow(device.Ptr->CreateInputLayout(inputDescs, (uint)descriptors.Length, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), _inputLayout.GetAddressOf()), "CreateInputLayout");
+            CheckAndThrow(device.Ptr->CreateInputLayout(inputDescs, (uint)descriptors.Length, vertexShader.Buffer, vertexShader.BufferSize, _inputLayout.GetAddressOf()), "CreateInputLayout");
         }
 
         private static uint GetSize(DXGI_FORMAT format) =>

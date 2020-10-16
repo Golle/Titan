@@ -1,3 +1,4 @@
+// ReSharper disable InconsistentNaming
 namespace Titan.Windows.Win32.D3D11
 {
     public unsafe struct D3D_SHADER_MACRO
