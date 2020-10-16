@@ -108,8 +108,7 @@ unsafe
         immediateContext.SetVertexShader(vertexShader);
         immediateContext.SetPixelShaderSampler(samplerState);
         immediateContext.SetPixelShaderResource(texture.ResourceView);
-
-        deviceContext->OMSetRenderTargets(1, device.BackBuffer.GetAddressOf(), pDepthStencilView: null);
+        immediateContext.SetRenderTarget(backbuffer);
 
         if (drawIndexed)
         {

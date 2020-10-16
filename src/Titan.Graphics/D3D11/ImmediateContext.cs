@@ -35,6 +35,12 @@ namespace Titan.Graphics.D3D11
             _context.Get()->IASetVertexBuffers(slot, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetRenderTarget(RenderTargetView renderTarget, DepthStencilView depthStencilView) => _context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), depthStencilView.Ptr.Get());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetRenderTarget(RenderTargetView renderTarget) => _context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), null);
+
         // TODO: add methods for multiple shader resources in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u) => _context.Get()->PSSetShaderResources(slot, 1u, resource.Ptr.GetAddressOf());
