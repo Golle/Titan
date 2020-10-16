@@ -70,33 +70,16 @@ unsafe
     using var pixelShader = new PixelShader(device, compiledPixelShader);
 
 
-    var viewport = new D3D11_VIEWPORT
-    {
-        TopLeftX = 0,
-        TopLeftY = 0,
-        Width = window.Width,
-        Height = window.Height,
-        MinDepth = 0f,
-        MaxDepth = 1f
-    };
-
-    var deviceContext = device.ImmediateContextPtr;
-    deviceContext->RSSetViewports(1, &viewport);
+    //var deviceContext = device.ImmediateContextPtr;
+    //deviceContext->RSSetViewports(1, &viewport);
     
-    var drawIndexed = true;
-    
-    var floats = stackalloc float[4];
-    floats[0] = 1f;
-    floats[1] = 0.4f;
-    floats[2] = 0.1f;
-    floats[3] = 1f;
-
     var clearColor = Color.Red;
     using var samplerState = new SamplerState(device);
 
     using var immediateContext = new ImmediateContext(device);
-    using var backbuffer = new BackBufferRenderTargetView(device);
+    immediateContext.SetViewport(new Viewport(window.Width/2f, window.Height));
 
+    using var backbuffer = new BackBufferRenderTargetView(device);
     while (window.Update())
     {
         immediateContext.ClearRenderTargetView(backbuffer, clearColor);
@@ -109,17 +92,11 @@ unsafe
         immediateContext.SetPixelShaderSampler(samplerState);
         immediateContext.SetPixelShaderResource(texture.ResourceView);
         immediateContext.SetRenderTarget(backbuffer);
+        immediateContext.SetIndexBuffer(indexBuffer);
+        immediateContext.DrawIndexed(6);
 
-        if (drawIndexed)
-        {
-            deviceContext->IASetIndexBuffer(indexBuffer.Buffer.Get(), indexBuffer.Format, 0);
-            deviceContext->DrawIndexed(6, 0, 0);
-        }
-        else
-        {
-            deviceContext->Draw(4, 0);
-        }
         device.SwapChain.Get()->Present(1, 0);
+
         GC.Collect();
     }
 
@@ -154,6 +131,3 @@ struct TehConstants
 {
 
 }
-
-
-
