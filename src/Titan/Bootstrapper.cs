@@ -7,19 +7,9 @@ namespace Titan
 {
     public class Bootstrapper
     {
-        public static IContainer Container { get; } = InitializeContainer();
-        private static IContainer InitializeContainer()
-        {
-            return new Container()
-                    
-                    .AddRegistry<CoreRegistry>()
-
-                    .AddRegistry<WindowsRegistry>()
-
-                    .AddRegistry<GraphicsRegistry>()
-                
-                ;
-
-        }
+        public static IContainer CreateContainer() => new Container()
+            .AddRegistry<CoreRegistry>()
+            .AddRegistry<WindowsRegistry>()
+            .AddRegistry<GraphicsRegistry>();
     }
 }

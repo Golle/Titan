@@ -3,13 +3,11 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan;
-using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Textures;
-using Titan.Windows;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -18,20 +16,19 @@ var pixelShaderPath = @"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl";
 var vertexShaderPath = @"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl";
 var instanceVertexShaderPath = @"F:\Git\Titan\resources\shaders\InstancedVertexShader.hlsl";
 
-var container = Bootstrapper.Container;
 
-LOGGER.InitializeLogger(container.GetInstance<ILog>());
+using var engine = EngineBuilder.CreateDefaultBuilder()
+    .ConfigureResourcesBasePath(() => @"F:\Git\Titan\resources\")
+    .ConfigureWindow(1920, 1080, "Donkey box #2")
+    .Build();
 
-using var window = container
-    .GetInstance<IWindowFactory>()
-    .Create(1920, 1080, "Donkey box #2!");
+
+var window = engine.Window;
+var device = engine.Device;
+var container = engine.Container;
 
 unsafe
 {
-    using var device = (IGraphicsDevice)new GraphicsDevice(window);
-
-    container.RegisterSingleton(device);
-
     var textureLoader = container.GetInstance<ITextureLoader>();
     var shaderCompiler = container.GetInstance<IShaderCompiler>();
 
@@ -145,7 +142,7 @@ unsafe
 
         immediateContext.SetRenderTarget(backbuffer);
         immediateContext.SetPixelShader(pixelShader);
-
+        
         var ss = Stopwatch.StartNew();
         immediateContext.SetPixelShaderResource(texture.ResourceView);
         ss.Stop();
