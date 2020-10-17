@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan;
@@ -9,7 +10,9 @@ using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Textures;
 using Titan.Windows;
+using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
+using static Titan.Windows.Win32.Common;
 
 var pixelShaderPath = @"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl";
 var vertexShaderPath = @"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl";
@@ -70,6 +73,9 @@ unsafe
     using var immediateContext = new ImmediateContext(device);
     immediateContext.SetViewport(new Viewport(window.Width, window.Height));
 
+    using var deferredContext = new DeferredContext(device);
+    deferredContext.SetViewport(new Viewport(window.Width, window.Height));
+
     using var backbuffer = new BackBufferRenderTargetView(device);
     using var tempTexture = new Texture2D(device, (uint) window.Width, (uint) window.Height);
     using var tempTextureView = new ShaderResourceView(device, tempTexture);
@@ -77,9 +83,25 @@ unsafe
 
     while (window.Update())
     {
-        // Render to a texture
-        immediateContext.ClearRenderTargetView(textureRenderTarget, new Color(0,1,1));
-        
+        var s = Stopwatch.StartNew();
+        // Render the texture to the backbuffer in a deferred context
+        deferredContext.SetViewport(new Viewport(window.Width, window.Height));
+        deferredContext.ClearRenderTargetView(backbuffer, new Color(1, 0, 0));
+        deferredContext.SetInputLayout(inputLayout);
+        deferredContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        deferredContext.SetPixelShader(pixelShader);
+        deferredContext.SetVertexShader(vertexShader);
+        deferredContext.SetRenderTarget(backbuffer);
+        deferredContext.SetVertexBuffer(vertexBuffer2);
+        deferredContext.SetPixelShaderSampler(samplerState);
+        deferredContext.SetPixelShaderResource(tempTextureView);
+        deferredContext.SetIndexBuffer(indexBuffer);
+        deferredContext.DrawIndexed(6);
+        using var commandList = deferredContext.FinishCommandList();
+
+        //// Render to a texture
+        immediateContext.SetViewport(new Viewport(window.Width, window.Height));
+        immediateContext.ClearRenderTargetView(textureRenderTarget, new Color(0, 1, 1));
         immediateContext.SetRenderTarget(textureRenderTarget);
         immediateContext.SetVertexBuffer(vertexBuffer);
         immediateContext.SetInputLayout(inputLayout);
@@ -91,33 +113,35 @@ unsafe
         immediateContext.SetIndexBuffer(indexBuffer);
         immediateContext.DrawIndexed(6);
 
-        // Render the texture to the backbuffer
-        immediateContext.ClearRenderTargetView(backbuffer, new Color(1, 0, 0));
-        immediateContext.SetRenderTarget(backbuffer);
-        immediateContext.SetVertexBuffer(vertexBuffer2);
-        immediateContext.SetPixelShaderResource(tempTextureView);
-        immediateContext.DrawIndexed(6);
+        immediateContext.ExecuteCommandList(commandList);
+        // Render to the backbuffer
+        //immediateContext.ClearRenderTargetView(backbuffer, new Color(1, 0, 0));
+        //immediateContext.SetRenderTarget(backbuffer);
+        //immediateContext.SetVertexBuffer(vertexBuffer);
+        //immediateContext.SetInputLayout(inputLayout);
+        //immediateContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        //immediateContext.SetPixelShader(pixelShader);
+        //immediateContext.SetVertexShader(vertexShader);
+        //immediateContext.SetPixelShaderSampler(samplerState);
+        //immediateContext.SetPixelShaderResource(texture.ResourceView);
+        //immediateContext.SetIndexBuffer(indexBuffer);
+        //immediateContext.DrawIndexed(6);
+
 
         device.SwapChain.Get()->Present(1, 0);
-
-        GC.Collect();
+        s.Stop();
+        //Console.WriteLine($"FPS: {1000.0/s.Elapsed.TotalMilliseconds}");
+        //GC.Collect();
     }
 
-    //{
-    //    ID3D11Debug* d3dDebug;
-    //    fixed (Guid* debugGuidPtr = &D3D11Debug)
-    //    {
-    //        var result = device->QueryInterface(debugGuidPtr, (void**)&d3dDebug);
-    //        if (FAILED(result)) throw new InvalidOperationException($"Failed to query for debug interface: {result}");
-    //    }
-
-    //    {
-    //        var result = d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL);
-    //        if (FAILED(result)) throw new InvalidOperationException($"Failed to ReportLiveDeviceObjects: {result}");
-    //    }
-
-    //    d3dDebug->Release();
-    //}
+    {
+        using ComPtr<ID3D11Debug> d3dDebug = default;
+        fixed (Guid* debugGuidPtr = &D3D11Common.D3D11Debug)
+        {
+            CheckAndThrow(device.Ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
+        }
+        CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]

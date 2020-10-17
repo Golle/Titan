@@ -168,12 +168,8 @@ namespace Titan.Windows.Win32.D3D11
         //// _In_  const D3D11_COUNTER_DESC* pCounterDesc,
         //// /* [annotation] */
         //// _COM_Outptr_opt_  ID3D11Counter** ppCounter);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateDeferredContext)(
-        // ID3D11Device* This,
-        // UINT ContextFlags,
-        // /* [annotation] */
-        // _COM_Outptr_opt_ ID3D11DeviceContext ** ppDeferredContext);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateDeferredContext(uint contextFlags, ID3D11DeviceContext ** ppDeferredContext) =>  ((delegate* unmanaged[Stdcall]<void*, uint, ID3D11DeviceContext**, HRESULT>)_vtbl[27])(Unsafe.AsPointer(ref this), contextFlags, ppDeferredContext);
 
         ////HRESULT(STDMETHODCALLTYPE* OpenSharedResource)(
         //// ID3D11Device* This,

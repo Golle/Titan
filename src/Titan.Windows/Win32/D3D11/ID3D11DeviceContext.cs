@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 
@@ -328,12 +329,8 @@ namespace Titan.Windows.Win32.D3D11
         //    _In_  UINT SrcSubresource,
         //    /* [annotation] */
         //    _In_  DXGI_FORMAT Format);
-
-        //void (STDMETHODCALLTYPE* ExecuteCommandList ) (
-        //    ID3D11DeviceContext* This,
-        //    /* [annotation] */
-        //    _In_ ID3D11CommandList * pCommandList,
-        //    BOOL RestoreContextState);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ExecuteCommandList(ID3D11CommandList * pCommandList, int restoreContextState) => ((delegate* unmanaged[Stdcall]<void*, ID3D11CommandList*, int, void>)_vtbl[58])(Unsafe.AsPointer(ref this), pCommandList, restoreContextState);
 
         //void (STDMETHODCALLTYPE* HSSetShaderResources ) (
         //    ID3D11DeviceContext* This,
@@ -779,13 +776,7 @@ namespace Titan.Windows.Win32.D3D11
 
         //UINT(STDMETHODCALLTYPE* GetContextFlags)(
         // ID3D11DeviceContext* This);
-
-        //HRESULT(STDMETHODCALLTYPE* FinishCommandList)(
-        // ID3D11DeviceContext* This,
-        // BOOL RestoreDeferredContextState,
-        // /* [annotation] */
-        // _COM_Outptr_opt_ ID3D11CommandList ** ppCommandList);
-
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT FinishCommandList(int restoreDeferredContextState, ID3D11CommandList ** ppCommandList) => ((delegate* unmanaged[Stdcall]<void*, int, ID3D11CommandList**, HRESULT>)_vtbl[114])(Unsafe.AsPointer(ref this), restoreDeferredContextState, ppCommandList);
     }
 }
