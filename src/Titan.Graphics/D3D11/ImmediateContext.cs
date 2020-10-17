@@ -11,13 +11,9 @@ namespace Titan.Graphics.D3D11
     public unsafe class ImmediateContext : IDisposable
     {
         protected ComPtr<ID3D11DeviceContext> Context;
-
         protected ImmediateContext() { }
 
-        public ImmediateContext(IGraphicsDevice device)
-        {
-            Context = new ComPtr<ID3D11DeviceContext>(device.ImmediateContextPtr);
-        }
+        public ImmediateContext(IGraphicsDevice device) => Context = new ComPtr<ID3D11DeviceContext>(device.ImmediateContextPtr);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ClearRenderTargetView(RenderTargetView renderTargetView, in Color color)
@@ -31,6 +27,7 @@ namespace Titan.Graphics.D3D11
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetViewport(Viewport viewport) => Context.Get()->RSSetViewports(1, (D3D11_VIEWPORT*)&viewport);
         // TODO: is this the best way to do it? 
+        // TODO: Add support for multiple vertex buffers in a single call (same behavior can be achieved by calling this method and increase the slot, but it requires multiple calls instead of a single call)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetVertexBuffer(IVertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u)
         {
@@ -45,7 +42,13 @@ namespace Titan.Graphics.D3D11
         public void SetRenderTarget(RenderTargetView renderTarget) => Context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), null);
         // TODO: add methods for multiple shader resources in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u) => Context.Get()->PSSetShaderResources(slot, 1u, resource.Ptr.GetAddressOf());
+        public void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u)
+        {
+            var views = stackalloc ID3D11ShaderResourceView*[1];
+            views[0] = resource.Ptr.Get();
+            Context.Get()->PSSetShaderResources(slot, 1u, views);
+        }
+
         // TODO: add methods for multiple samplers in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShaderSampler(SamplerState samplerState, uint slot = 0u) => Context.Get()->PSSetSamplers(slot, 1, samplerState.Ptr.GetAddressOf());
@@ -61,7 +64,8 @@ namespace Titan.Graphics.D3D11
         public void SetInputLayout(InputLayout inputLayout) => Context.Get()->IASetInputLayout(inputLayout.Pointer.Get());
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DrawIndexed(uint indexCount, uint startIndexLocation = 0u, int baseVertexLocation = 0) => Context.Get()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DrawIndexedInstanced(uint indexCountPerInstance, uint instanceCount, uint startIndexLocation = 0u, int baseVertexLocation = 0, uint startInstanceLocation = 0u) => Context.Get()->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ExecuteCommandList(in CommandList commandList, bool restoreContextState = false) => Context.Get()->ExecuteCommandList(commandList.Ptr, restoreContextState ? 1 : 0);
         public void Dispose() => Context.Dispose();

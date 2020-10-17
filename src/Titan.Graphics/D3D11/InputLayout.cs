@@ -25,10 +25,12 @@ namespace Titan.Graphics.D3D11
                     desc.SemanticName = (sbyte*)name;
                 }
                 
-                desc.InstanceDataStepRate = 0;// not sure about this one
-                desc.InputSlot = 0;     // not sure about this one
-                desc.SemanticIndex = 0; // not sure about this one
-                desc.AlignedByteOffset = size;
+                // This needs some changes to support it properly
+                desc.InstanceDataStepRate = descriptor.Classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0;
+                desc.InputSlot = descriptor.Classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0;
+                desc.InputSlotClass = descriptor.Classification;
+                desc.SemanticIndex = descriptor.Classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0;
+                desc.AlignedByteOffset = descriptor.Classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 0 : size;
                 desc.Format = descriptor.Format;
                 
                 size += GetSize(descriptor.Format);
