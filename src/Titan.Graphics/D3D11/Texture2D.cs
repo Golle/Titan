@@ -40,13 +40,15 @@ namespace Titan.Graphics.D3D11
             Common.CheckAndThrow(device.Ptr->CreateTexture2D(&desc, &data, _texture2D.GetAddressOf()), "CreateTexture2D");
         }
 
-        public Texture2D(IGraphicsDevice device, uint width, uint height)
+        public Texture2D(IGraphicsDevice device, uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag)
         {
             D3D11_TEXTURE2D_DESC desc;
             desc.Width = width;
             desc.Height = height;
-            desc.Format = Format = DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT;
-            desc.BindFlags = D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE;
+            desc.Format = Format = format;
+            desc.BindFlags = bindFlag;
+            //desc.Format = Format = DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT;
+            //desc.BindFlags = D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE;
             desc.CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED;
             desc.Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT;
             desc.MiscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED;

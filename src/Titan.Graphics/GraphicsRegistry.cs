@@ -1,4 +1,5 @@
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Meshes;
 using Titan.Graphics.Textures;
 using Titan.IOC;
 
@@ -13,6 +14,8 @@ namespace Titan.Graphics
 
                 .Register<IImagingFactory, ImagingFactory>()
                 .Register<ITextureLoader, TextureLoader>()
+
+                .Register<IMeshLoader, MeshLoader>()
                 ;
         }
     }

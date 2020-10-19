@@ -11,6 +11,9 @@ namespace Titan.Graphics.D3D11
     public unsafe class ImmediateContext : IDisposable
     {
         protected ComPtr<ID3D11DeviceContext> Context;
+        
+
+
         protected ImmediateContext() { }
 
         public ImmediateContext(IGraphicsDevice device) => Context = new ComPtr<ID3D11DeviceContext>(device.ImmediateContextPtr);
@@ -26,6 +29,12 @@ namespace Titan.Graphics.D3D11
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetViewport(Viewport viewport) => Context.Get()->RSSetViewports(1, (D3D11_VIEWPORT*)&viewport);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetBlendState(BlendState blendState) => Context.Get()->OMSetBlendState(blendState.Ptr.Get(), blendState.BlendFactor, blendState.SampleMask);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetVertexShaderConstantBuffer(IConstantBuffer constantBuffer) => Context.Get()->VSSetConstantBuffers(0, 1, constantBuffer.Ptr.GetAddressOf());
+
         // TODO: is this the best way to do it? 
         // TODO: Add support for multiple vertex buffers in a single call (same behavior can be achieved by calling this method and increase the slot, but it requires multiple calls instead of a single call)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -35,20 +44,16 @@ namespace Titan.Graphics.D3D11
             Context.Get()->IASetVertexBuffers(slot, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetIndexBuffer<T>(IndexBuffer<T> indexBuffer, uint offset = 0u) where T : unmanaged => Context.Get()->IASetIndexBuffer(indexBuffer.Buffer.Get(), indexBuffer.Format, offset);
+        public void SetIndexBuffer(IIndexBuffer indexBuffer, uint offset = 0u) => Context.Get()->IASetIndexBuffer(indexBuffer.Buffer.Get(), indexBuffer.Format, offset);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRenderTarget(RenderTargetView renderTarget, DepthStencilView depthStencilView) => Context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), depthStencilView.Ptr.Get());
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetDepthStencilState(DepthStencilState depthStencilState) => Context.Get()->OMSetDepthStencilState(depthStencilState.Ptr.Get(), 1u);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRenderTarget(RenderTargetView renderTarget) => Context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), null);
         // TODO: add methods for multiple shader resources in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u)
-        {
-            var views = stackalloc ID3D11ShaderResourceView*[1];
-            views[0] = resource.Ptr.Get();
-            Context.Get()->PSSetShaderResources(slot, 1u, views);
-        }
-
+        public void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u) => Context.Get()->PSSetShaderResources(slot, 1u, resource.Ptr.GetAddressOf());
         // TODO: add methods for multiple samplers in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShaderSampler(SamplerState samplerState, uint slot = 0u) => Context.Get()->PSSetSamplers(slot, 1, samplerState.Ptr.GetAddressOf());

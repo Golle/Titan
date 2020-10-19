@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
@@ -7,16 +6,18 @@ using static Titan.Windows.Win32.Common;
 
 namespace Titan.Graphics.D3D11.Buffers
 {
-    public unsafe class IndexBuffer<T> : IDisposable where T : unmanaged
+    public unsafe class IndexBuffer<T> : IIndexBuffer  where T : unmanaged
     {
         public DXGI_FORMAT Format { get; } = typeof(T) == typeof(ushort) ? DXGI_FORMAT.DXGI_FORMAT_R16_UINT : DXGI_FORMAT.DXGI_FORMAT_R32_UINT;
-        internal ref readonly ComPtr<ID3D11Buffer> Buffer => ref _buffer;
+        public uint NumberOfIndices { get; }
+        ref readonly ComPtr<ID3D11Buffer> IIndexBuffer.Buffer => ref _buffer;
         
         private ComPtr<ID3D11Buffer> _buffer;
         public IndexBuffer(IGraphicsDevice device, uint count, D3D11_USAGE usage = D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG cpuAccess = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_RESOURCE_MISC_FLAG miscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED)
         {
             Debug.Assert(typeof(T) == typeof(ushort) || typeof(T) == typeof(uint), "Currently supported formats are ushort and uint");
             Debug.Assert(count > 0, "Must be atleast 1 index");
+            NumberOfIndices = count;
             var desc = new D3D11_BUFFER_DESC
             {
                 BindFlags = D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER,
@@ -26,7 +27,6 @@ namespace Titan.Graphics.D3D11.Buffers
                 MiscFlags = miscFlags,
                 Usage = usage,
             };
-
             InitBuffer(device.Ptr, &desc);
         }
 
@@ -34,7 +34,7 @@ namespace Titan.Graphics.D3D11.Buffers
         {
             Debug.Assert(typeof(T) == typeof(ushort) || typeof(T) == typeof(uint), "Currently supported formats are ushort and uint");
             Debug.Assert(indices != null, "Indices can't be null");
-
+            NumberOfIndices = (uint) indices.Length;
             var desc = new D3D11_BUFFER_DESC
             {
                 BindFlags = D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER,
@@ -60,6 +60,7 @@ namespace Titan.Graphics.D3D11.Buffers
             Debug.Assert(typeof(T) == typeof(ushort) || typeof(T) == typeof(uint), "Currently supported formats are ushort and uint");
             Debug.Assert(indices != null, "Indices can't be null");
             Debug.Assert(count > 0, "Must be atleast 1 index in the data");
+            NumberOfIndices = count;
 
             var desc = new D3D11_BUFFER_DESC
             {
@@ -83,9 +84,6 @@ namespace Titan.Graphics.D3D11.Buffers
             CheckAndThrow(device->CreateBuffer(desc, data, _buffer.GetAddressOf()), "CreateBuffer");
         }
 
-        public void Dispose()
-        {
-            _buffer.Dispose();
-        }
+        public void Dispose() => _buffer.Dispose();
     }
 }

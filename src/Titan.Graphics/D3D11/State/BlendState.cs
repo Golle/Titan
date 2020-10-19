@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -13,20 +14,42 @@ namespace Titan.Graphics.D3D11.State
         internal ref readonly ComPtr<ID3D11BlendState> Ptr => ref _blendState;
 
         private ComPtr<ID3D11BlendState> _blendState;
+        internal uint SampleMask { get; }
+        internal float* BlendFactor => (float*) Unsafe.AsPointer(ref _blendFactor);
+        private Color _blendFactor;
+
 
         public BlendState(IGraphicsDevice device)
         {
             D3D11_BLEND_DESC desc = default;
-            ref var renderTarget = ref desc.RenderTarget[0];
-            renderTarget.BlendEnable = true;
-            renderTarget.RenderTargetWriteMask = (byte)D3D11_COLOR_WRITE_ENABLE_ALL;
-            renderTarget.SrcBlend = D3D11_BLEND_SRC_ALPHA;
-            renderTarget.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-            renderTarget.SrcBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
-            renderTarget.DestBlendAlpha = D3D11_BLEND_ONE;
-            renderTarget.BlendOpAlpha = D3D11_BLEND_OP_ADD;
-            
+            for (var i = 0; i < 8; ++i)
+            {
+                ref var renderTarget = ref desc.RenderTarget[i];
+                renderTarget.BlendEnable = false;
+                renderTarget.BlendOp = D3D11_BLEND_OP_ADD;
+                renderTarget.RenderTargetWriteMask = (byte)D3D11_COLOR_WRITE_ENABLE_ALL;
+                renderTarget.SrcBlend = D3D11_BLEND_ONE;
+                renderTarget.DestBlend = D3D11_BLEND_ZERO;
+                renderTarget.SrcBlendAlpha = D3D11_BLEND_ONE;
+                renderTarget.DestBlendAlpha = D3D11_BLEND_ZERO;
+                renderTarget.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+            }
+
+            desc.RenderTarget[0].BlendEnable = true;
+            desc.RenderTarget[0].RenderTargetWriteMask = (byte)D3D11_COLOR_WRITE_ENABLE_ALL;
+            desc.RenderTarget[0].SrcBlend = D3D11_BLEND_INV_SRC_ALPHA;
+            desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+
+            desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
+            desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+            desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+
+
             CheckAndThrow(device.Ptr->CreateBlendState(&desc, _blendState.GetAddressOf()), "CreateBlendState");
+
+            _blendFactor = new Color(1f, 1f, 1f, 1f);
+            SampleMask = 0xffffffff;
         }
 
         public void Dispose()

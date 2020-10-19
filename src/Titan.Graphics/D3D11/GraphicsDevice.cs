@@ -54,9 +54,10 @@ namespace Titan.Graphics.D3D11
             var featureLevel = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1;
             DXGI_SWAP_CHAIN_DESC desc;
             desc.BufferCount = 2;
+            //desc.BufferCount = 1;
             desc.BufferDesc.Width = (uint) window.Width;
             desc.BufferDesc.Height = (uint) window.Height;
-            desc.BufferDesc.Format = DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM;
+            desc.BufferDesc.Format = DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM;
             desc.BufferDesc.RefreshRate.Denominator = refreshRate;
             desc.BufferDesc.Scaling = DXGI_MODE_SCALING.DXGI_MODE_SCALING_UNSPECIFIED;
             desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER.DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -70,8 +71,9 @@ namespace Titan.Graphics.D3D11
             //desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_DISCARD;
             desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_FLIP_DISCARD;
             desc.Flags = DXGI_SWAP_CHAIN_FLAG.DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+            
 
-            var result = D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, flags, &featureLevel, 1, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _immediateContext.GetAddressOf());
+            var result = D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, flags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _immediateContext.GetAddressOf());
             if (FAILED(result))
             {
                 throw new Win32Exception(result,
@@ -86,9 +88,9 @@ namespace Titan.Graphics.D3D11
             {
                 CheckAndThrow(_swapChain.Get()->GetBuffer(0, resourcePointer, (void**) &backBuffer), "GetBuffer");
             }
-            backBuffer->Release();
-
             CheckAndThrow(_device.Get()->CreateRenderTargetView((ID3D11Resource*) backBuffer, null, _backBuffer.GetAddressOf()), "CreateRenderTargetView");
+
+            backBuffer->Release();
         }
 
         public void Dispose()
