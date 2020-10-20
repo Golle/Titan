@@ -259,7 +259,6 @@ unsafe
                 ref var subset = ref mesh.SubSets[i];
                 //immediateContext.SetPixelShaderResource(_sponzaTextures[subset.MaterialIndex]);
                 immediateContext.DrawIndexed((uint)subset.Count, (uint)subset.StartIndex, 0);
-
             }
         }
         else
@@ -269,6 +268,8 @@ unsafe
 
 
         device.SwapChain.Get()->Present(1, 0);
+
+        GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
     }
 
     //{
