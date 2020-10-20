@@ -4,21 +4,23 @@ using System.Runtime.InteropServices;
 using Titan.Windows.Win32.Native;
 
 using static Titan.Windows.Win32.Native.User32;
+using static Titan.Windows.Win32.Native.WindowsMessage;
 
 namespace Titan.Windows.Win32
 {
     internal class Win32Window : IWindow
     {
+        private readonly IWindowEventHandler _windowEventHandler;
         public HWND Handle { get; }
         public int Height { get; }
         public int Width { get; }
         public bool Windowed => true;
 
-        public unsafe Win32Window(int width, int height, string title)
+        public unsafe Win32Window(int width, int height, string title, IWindowEventHandler windowEventHandler)
         {
+            _windowEventHandler = windowEventHandler;
             Width = width;
             Height = height;
-
 
             var className = $"{nameof(Win32Window)}_class_" + Guid.NewGuid().ToString().Substring(0, 4);
             // Create the Window Class EX
@@ -63,7 +65,7 @@ namespace Titan.Windows.Win32
                 0,
                 0,
                 wndClassExA.HInstance,
-                ((IntPtr)GCHandle.Alloc(this)).ToPointer()
+                ((IntPtr)GCHandle.Alloc(_windowEventHandler)).ToPointer()
             );
 
             if (Handle == 0)
@@ -82,29 +84,19 @@ namespace Titan.Windows.Win32
         private static unsafe nint StaticWindowProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
         {
             var handle = GetWindowLongPtrA(hWnd, GWLP_USERDATA);
-            var window = handle == 0 ? null : (Win32Window)GCHandle.FromIntPtr(handle).Target;
-            if (window != null)
-            {
-                return window.WindowProcedure(hWnd, message, wParam, lParam);
-            }
+            var eventHandler = handle == 0 ? null : (IWindowEventHandler)GCHandle.FromIntPtr(handle).Target;
 
             switch (message)
             {
-                case WindowsMessage.Create:
+                case WM_CREATE:
                 {
-                    var pCreateStruct = (CREATESTRUCTA*)lParam;
-                    _ = SetWindowLongPtrA(hWnd, GWLP_USERDATA, (nint)pCreateStruct->lpCreateParams);
+                    var createParams = (nint)((CREATESTRUCTA*)lParam)->lpCreateParams;
+                    _ = SetWindowLongPtrA(hWnd, GWLP_USERDATA, createParams);
+                    ((IWindowEventHandler)GCHandle.FromIntPtr(createParams).Target)?.OnCreate();
                     return 0;
                 }
-            }
-            return DefWindowProcA(hWnd, message, wParam, lParam);
-        }
-
-        private nint WindowProcedure(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
-        {
-            switch (message)
-            {
-                case WindowsMessage.Close:
+                case WM_CLOSE:
+                    eventHandler?.OnClose();
                     PostQuitMessage(0);
                     return 0;
             }
@@ -115,7 +107,7 @@ namespace Titan.Windows.Win32
         {
             while (PeekMessageA(out var msg, 0, 0, 0, 1)) // pass IntPtr.Zero as HWND to detect mouse movement outside of the window
             {
-                if (msg.Message == WindowsMessage.Quit)
+                if (msg.Message == WM_QUIT)
                 {
                     var pHandle = SetWindowLongPtrA(Handle, GWLP_USERDATA, 0);
                     if (pHandle != 0)
@@ -134,9 +126,6 @@ namespace Titan.Windows.Win32
             return true;
         }
 
-        public void Dispose()
-        {
-            
-        }
+        public void Dispose() => DestroyWindow(Handle);
     }
 }

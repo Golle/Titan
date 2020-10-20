@@ -9,6 +9,7 @@ namespace Titan.Windows
         {
             container
                 .Register<IWindowFactory, Win32WindowFactory>()
+                .Register<IWindowEventHandler, WindowEventHandler>()
 
                 ;
         }
