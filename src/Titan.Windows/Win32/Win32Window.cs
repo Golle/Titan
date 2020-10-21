@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Windows.Win32.Native;
@@ -24,15 +25,16 @@ namespace Titan.Windows.Win32
         public POINT Center { get; private set; }
         public bool Windowed => true;
 
-        private readonly UserData _userData;
-        private GCHandle _userDataHandle;
+        private readonly unsafe UserData * _userData;
+        private POINT _mousePosition;
+
 
         public unsafe Win32Window(int width, int height, string title, IWindowEventHandler windowEventHandler)
         {
             _windowEventHandler = windowEventHandler;
-            _userData.EventHandler = (IntPtr) GCHandle.Alloc(_windowEventHandler);
-            _userData.Window = (IntPtr) GCHandle.Alloc(this);
-            _userDataHandle = GCHandle.Alloc(_userData, GCHandleType.Pinned);
+            _userData = (UserData*)Marshal.AllocHGlobal(sizeof(UserData));
+            _userData->EventHandler = (IntPtr) GCHandle.Alloc(_windowEventHandler);
+            _userData->Window = (IntPtr) GCHandle.Alloc(this);
 
             Width = width;
             Height = height;
@@ -80,7 +82,7 @@ namespace Titan.Windows.Win32
                 0,
                 0,
                 wndClassExA.HInstance,
-                Unsafe.AsPointer(ref _userData)
+                _userData
             );
 
             if (Handle == 0)
@@ -122,31 +124,31 @@ namespace Titan.Windows.Win32
                     break;
                 case WM_SIZE:
                 {
-                    var width = (int)(lParam & 0xffff);
-                    var height = (int)((lParam >> 16) & 0xffff);
+                    var width = (int) (lParam & 0xffff);
+                    var height = (int) ((lParam >> 16) & 0xffff);
                     if (window != null)
                     {
                         window.Height = height;
                         window.Width = width;
-                        window.Center = new POINT {X = window.Width / 2, Y = window.Height};
+                        window.Center = new POINT {X = window.Width / 2, Y = window.Height / 2};
                     }
-                    eventHandler?.OnWindowResize(width, height);
                 }
-                    
                     break;
                 case WM_EXITSIZEMOVE:
+                    eventHandler?.OnWindowResize(window.Width, window.Height);
                     break;
-
                 case WM_LBUTTONDOWN:
+                    eventHandler?.OnLeftMouseButtonDown();
                     break;
                 case WM_LBUTTONUP:
+                    eventHandler?.OnLeftMouseButtonUp();
                     break;
                 case WM_RBUTTONDOWN:
+                    eventHandler?.OnRightMouseButtonDown();
                     break;
                 case WM_RBUTTONUP:
+                    eventHandler?.OnRightMouseButtonUp();
                     break;
-
-                
                 case WM_MOUSELEAVE:
                     break;
                 case WM_MOUSEWHEEL:
@@ -176,8 +178,12 @@ namespace Titan.Windows.Win32
             var userData = (UserData*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
             if (userData != null)
             {
-                eventHandler = (IWindowEventHandler) GCHandle.FromIntPtr(userData->EventHandler).Target;
-                window = (Win32Window) GCHandle.FromIntPtr(userData->Window).Target;
+                var eventHandlerHandle = GCHandle.FromIntPtr(userData->EventHandler);
+                eventHandler = eventHandlerHandle.IsAllocated ? (IWindowEventHandler) eventHandlerHandle.Target : null;
+                var windowHandle = GCHandle.FromIntPtr(userData->Window);
+                window = windowHandle.IsAllocated ? (Win32Window)windowHandle.Target : null;
+
+                Debug.Assert(window is not null && eventHandler is not null, "Handles are unavailable");
             }
             else
             {
@@ -198,14 +204,36 @@ namespace Titan.Windows.Win32
                 TranslateMessage(msg);
                 DispatchMessage(msg);
             }
+            UpdateMousePosition();
             return true;
+        }
+
+        private unsafe void UpdateMousePosition()
+        {
+            POINT point;
+            if (!GetCursorPos(&point))
+            {
+                return;
+            }
+            if (!ScreenToClient(Handle, &point))
+            {
+                return;
+            }
+            if (_mousePosition.X != point.X || _mousePosition.Y != point.Y)
+            {
+                _mousePosition = point;
+                _windowEventHandler.OnMouseMove(point);
+            }
         }
 
         public void Dispose()
         {
-            GCHandle.FromIntPtr(_userData.EventHandler).Free();
-            GCHandle.FromIntPtr(_userData.Window).Free();
-            _userDataHandle.Free();
+            unsafe
+            {
+                GCHandle.FromIntPtr(_userData->EventHandler).Free();
+                GCHandle.FromIntPtr(_userData->Window).Free();
+                Marshal.FreeHGlobal((nint)_userData);
+            }
 
             DestroyWindow(Handle);
         }

@@ -29,17 +29,9 @@ using var engine = EngineBuilder.CreateDefaultBuilder()
     .ConfigureWindow(1920, 1080, "Donkey box #2")
     .Build();
 
-
-
-
 var window = engine.Window;
 var device = engine.Device;
 var container = engine.Container;
-
-
-
-
-
 
 
 unsafe
@@ -133,7 +125,6 @@ unsafe
     //using var pixelShader = new PixelShader(device, compiledPixelShader);
 
     using var samplerState = new SamplerState(device);
-
     using var immediateContext = new ImmediateContext(device);
     immediateContext.SetViewport(new Viewport(window.Width, window.Height));
 

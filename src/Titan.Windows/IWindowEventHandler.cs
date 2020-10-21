@@ -1,5 +1,6 @@
 using Titan.Core.Logging;
 using Titan.Windows.Win32;
+using Titan.Windows.Win32.Native;
 
 namespace Titan.Windows
 {
@@ -12,6 +13,11 @@ namespace Titan.Windows
         void OnKeyUp(KeyCode code);
         void OnCharTyped(char character);
         void OnWindowResize(int width, int height);
+        void OnLeftMouseButtonDown();
+        void OnLeftMouseButtonUp();
+        void OnRightMouseButtonDown();
+        void OnRightMouseButtonUp();
+        void OnMouseMove(in POINT position);
     }
 
     internal class WindowEventHandler : IWindowEventHandler
@@ -54,6 +60,31 @@ namespace Titan.Windows
         public void OnWindowResize(int width, int height)
         {
             LOGGER.Debug($"Window resized to {width} x {height}");
+        }
+
+        public void OnLeftMouseButtonDown()
+        {
+            LOGGER.Debug($"Left mouse button down");
+        }
+
+        public void OnLeftMouseButtonUp()
+        {
+            LOGGER.Debug($"Left mouse button up");
+        }
+
+        public void OnRightMouseButtonDown()
+        {
+            LOGGER.Debug($"Right mouse button down");
+        }
+
+        public void OnRightMouseButtonUp()
+        {
+            LOGGER.Debug($"Right mouse button up");
+        }
+
+        public void OnMouseMove(in POINT position)
+        {
+            LOGGER.Debug($"Mouse moved [{position.X},{position.Y}] ");
         }
     }
 }
