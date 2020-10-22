@@ -28,7 +28,6 @@ namespace Titan.Windows.Win32
         private readonly unsafe UserData * _userData;
         private POINT _mousePosition;
 
-
         public unsafe Win32Window(int width, int height, string title, IWindowEventHandler windowEventHandler)
         {
             _windowEventHandler = windowEventHandler;
