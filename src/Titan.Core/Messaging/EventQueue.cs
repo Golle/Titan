@@ -20,7 +20,7 @@ namespace Titan.Core.Messaging
                 var method = messageQueueType.GetMethod("Swap", BindingFlags.NonPublic | BindingFlags.Static)?.CreateDelegate<SwapDelegate>();
                 Debug.Assert(method != null, "Failed to find a static non public Swap method on the internal event queue.");
                 _swaps.Add(method);
-                LOGGER.Debug("EventQueue: EventType {0} added", type);
+                LOGGER.Debug("{0} registered", type);
             }
         }
 

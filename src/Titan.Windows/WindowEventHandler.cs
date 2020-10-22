@@ -1,4 +1,5 @@
-using Titan.Core.Logging;
+using Titan.Core.Messaging;
+using Titan.Windows.Events;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.Native;
 
@@ -6,69 +7,30 @@ namespace Titan.Windows
 {
     internal class WindowEventHandler : IWindowEventHandler
     {
-        public WindowEventHandler()
+        private readonly IEventQueue _eventQueue;
+
+        public WindowEventHandler(IEventQueue eventQueue)
         {
-            
+            _eventQueue = eventQueue;
         }
 
-        public void OnCreate()
+        public void OnCreate() => _eventQueue.Push(new WindowCreatedEvent());
+        public void OnClose() => _eventQueue.Push(new WindowClosedEvent());
+        public void OnLostFocus() => _eventQueue.Push(new WindowLostFocusEvent());
+        public void OnKeyUp(nuint code) => _eventQueue.Push(new KeyUpEvent((KeyCode)code));
+        public void OnCharTyped(nuint character) => _eventQueue.Push(new CharacterTypedEvent((char)character));
+        public void OnWindowResize(int width, int height) => _eventQueue.Push(new WindowResizedEvent(width, height));
+        public void OnLeftMouseButtonDown() => _eventQueue.Push(new MouseButtonDownEvent(MouseButton.Left));
+        public void OnLeftMouseButtonUp() => _eventQueue.Push(new MouseButtonUpEvent(MouseButton.Left));
+        public void OnRightMouseButtonDown() => _eventQueue.Push(new MouseButtonDownEvent(MouseButton.Right));
+        public void OnRightMouseButtonUp() => _eventQueue.Push(new MouseButtonUpEvent(MouseButton.Right));
+        public void OnMouseMove(in POINT position) => _eventQueue.Push(new MouseMovedEvent(position.X, position.Y));
+        public void OnKeyDown(nuint wParam, nuint lParam)
         {
-            LOGGER.Debug("Window created");
-        }
+            var repeat = (lParam & 0x40000000) > 0;
+            var code = (KeyCode)wParam;
 
-        public void OnClose()
-        {
-            LOGGER.Debug("Window closed");
-        }
-
-        public void OnLostFocus()
-        {
-            LOGGER.Debug("Window lost focus");
-        }
-
-        public void OnKeyDown(KeyCode code, bool repeat)
-        {
-            LOGGER.Debug($"Key {code} down. Repeat: {repeat}");
-        }
-
-        public void OnKeyUp(KeyCode code)
-        {
-            LOGGER.Debug($"Key {code} up.");
-        }
-
-        public void OnCharTyped(char character)
-        {
-            LOGGER.Debug($"Char typed {character}");
-        }
-
-        public void OnWindowResize(int width, int height)
-        {
-            LOGGER.Debug($"Window resized to {width} x {height}");
-        }
-
-        public void OnLeftMouseButtonDown()
-        {
-            LOGGER.Debug($"Left mouse button down");
-        }
-
-        public void OnLeftMouseButtonUp()
-        {
-            LOGGER.Debug($"Left mouse button up");
-        }
-
-        public void OnRightMouseButtonDown()
-        {
-            LOGGER.Debug($"Right mouse button down");
-        }
-
-        public void OnRightMouseButtonUp()
-        {
-            LOGGER.Debug($"Right mouse button up");
-        }
-
-        public void OnMouseMove(in POINT position)
-        {
-            //LOGGER.Debug($"Mouse moved [{position.X},{position.Y}] ");
+            _eventQueue.Push(new KeyDownEvent(code, repeat));
         }
     }
 }

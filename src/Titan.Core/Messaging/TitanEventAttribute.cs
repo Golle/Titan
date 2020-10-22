@@ -6,7 +6,7 @@ namespace Titan.Core.Messaging
     /// The TitanEventAttribute is used for marking an Event type so the scanner can find it.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
-    internal class TitanEventAttribute : Attribute
+    public class TitanEventAttribute : Attribute
     {
     }
 }

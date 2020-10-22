@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Windows.Win32.Native;
 
@@ -101,69 +100,72 @@ namespace Titan.Windows.Win32
         {
             GetUserData(hWnd, out var eventHandler, out var window);
 
+            if (eventHandler == null || window == null)
+            {
+                goto EndHandler;
+            }
+
             switch (message)
             {
                 case WM_KILLFOCUS:
-                    eventHandler?.OnLostFocus();
+                    eventHandler.OnLostFocus();
                     break;
                 case WM_KEYDOWN:
                 case WM_SYSKEYDOWN:
-                    {
-                        var repeat = (lParam & 0x40000000) > 0;
-                        var code = (KeyCode)wParam;
-                        eventHandler?.OnKeyDown(code, repeat);
-                    }
+                    eventHandler.OnKeyDown(wParam,lParam);
                     break;
                 case WM_KEYUP:
                 case WM_SYSKEYUP:
-                    eventHandler?.OnKeyUp((KeyCode)wParam);
+                    eventHandler.OnKeyUp(wParam);
                     break;
                 case WM_CHAR:
-                    eventHandler?.OnCharTyped((char)wParam);
+                    eventHandler.OnCharTyped(wParam);
                     break;
                 case WM_SIZE:
                 {
                     var width = (int) (lParam & 0xffff);
                     var height = (int) ((lParam >> 16) & 0xffff);
-                    if (window != null)
-                    {
-                        window.Height = height;
-                        window.Width = width;
-                        window.Center = new POINT {X = window.Width / 2, Y = window.Height / 2};
-                    }
+                    window.Height = height;
+                    window.Width = width;
+                    window.Center = new POINT {X = window.Width / 2, Y = window.Height / 2};
                 }
                     break;
                 case WM_EXITSIZEMOVE:
-                    eventHandler?.OnWindowResize(window.Width, window.Height);
+                    eventHandler.OnWindowResize(window.Width, window.Height);
                     break;
                 case WM_LBUTTONDOWN:
-                    eventHandler?.OnLeftMouseButtonDown();
+                    eventHandler.OnLeftMouseButtonDown();
                     break;
                 case WM_LBUTTONUP:
-                    eventHandler?.OnLeftMouseButtonUp();
+                    eventHandler.OnLeftMouseButtonUp();
                     break;
                 case WM_RBUTTONDOWN:
-                    eventHandler?.OnRightMouseButtonDown();
+                    eventHandler.OnRightMouseButtonDown();
                     break;
                 case WM_RBUTTONUP:
-                    eventHandler?.OnRightMouseButtonUp();
+                    eventHandler.OnRightMouseButtonUp();
                     break;
                 case WM_MOUSELEAVE:
                     break;
                 case WM_MOUSEWHEEL:
-
                     break;
-                case WM_CREATE:
-                    {
-                        var userData = (UserData*)((CREATESTRUCTA*)lParam)->lpCreateParams;
-                        _ = SetWindowLongPtrA(hWnd, GWLP_USERDATA, (nint) userData);
-                        if (userData != null)
-                        {
-                            ((IWindowEventHandler)GCHandle.FromIntPtr(userData->EventHandler).Target)?.OnCreate();
-                        }
-                        return 0;
-                    }
                 
+            }
+
+EndHandler:
+            switch (message)
+            {
+                case WM_CREATE:
+                {
+                    var userData = (UserData*) ((CREATESTRUCTA*) lParam)->lpCreateParams;
+                    _ = SetWindowLongPtrA(hWnd, GWLP_USERDATA, (nint) userData);
+                    if (userData != null)
+                    {
+                        ((IWindowEventHandler) GCHandle.FromIntPtr(userData->EventHandler).Target)?.OnCreate();
+                    }
+
+                    return 0;
+                }
                 case WM_CLOSE:
                     eventHandler?.OnClose();
                     PostQuitMessage(0);

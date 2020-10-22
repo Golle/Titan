@@ -8,14 +8,15 @@ namespace Titan.Windows
         void OnCreate();
         void OnClose();
         void OnLostFocus();
-        void OnKeyDown(KeyCode code, bool repeat);
-        void OnKeyUp(KeyCode code);
-        void OnCharTyped(char character);
+        void OnKeyDown(nuint wParam, nuint lParam);
+        void OnKeyUp(nuint code);
+        void OnCharTyped(nuint character);
         void OnWindowResize(int width, int height);
         void OnLeftMouseButtonDown();
         void OnLeftMouseButtonUp();
         void OnRightMouseButtonDown();
         void OnRightMouseButtonUp();
         void OnMouseMove(in POINT position);
+        
     }
 }
