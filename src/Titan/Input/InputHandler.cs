@@ -50,11 +50,12 @@ namespace Titan.Input
             }
 
             // Update the key states
-            Array.Copy(_keyState, _previousKeyState, _keyState.Length);
-            Array.Fill(_keyState, false);
+            Array.Fill(_previousKeyState, false);
             foreach (ref readonly var @event in _eventQueue.GetEvents<KeyEvent>())
             {
-                _keyState[@event.Code] = @event.Down;
+                ref var state = ref _keyState[@event.Code];
+                _previousKeyState[@event.Code] = state;
+                state = @event.Down;
             }
 
             // Update the character queue
