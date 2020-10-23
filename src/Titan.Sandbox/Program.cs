@@ -12,6 +12,7 @@ using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Textures;
+using Titan.Input;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -39,6 +40,9 @@ unsafe
     var textureLoader = container.GetInstance<ITextureLoader>();
     var shaderCompiler = container.GetInstance<IShaderCompiler>();
     var meshLoader = container.GetInstance<IMeshLoader>();
+    var input = container.GetInstance<IInputHandler>();
+    var eventQueue = container.GetInstance<IEventQueue>();
+    
 
     using var mesh = meshLoader.LoadMesh(simpleMesh);
     //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\temp_models\door\print2.png");
@@ -156,14 +160,37 @@ unsafe
     var projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, window.Height / (float)window.Width, 0.5f, 10000f);
     while (window.Update())
     {
-        _rotation.X += 0.01f;
-        _rotation.Y += 0.02f;
+
+        // Begin engine stuff
+        // Should be handled by engine class 
+        eventQueue.Update();
+        input.Update();
+        // End engine stuff
+
+
+        ref readonly var delta = ref input.MouseDeltaPosition;
+        const float constant = 0.003f;
+        if (input.RightMouseButtonDown)
+        {
+            _rotation.X += delta.X * constant;
+            _rotation.Y -= delta.Y * constant;
+        }
+
+        if (input.LeftMouseButtonDown)
+        {
+            _rotation.X += 0.03f;
+            _rotation.Y -= 0.02f;
+        }
+
+        foreach (ref readonly var character in input.GetCharacters())
+        {
+            Console.WriteLine($"Character typed: {character}");
+        }
+        window.SetTitle($"[{input.MousePosition.X}, {input.MousePosition.Y}]");
+
         var rotation = Quaternion.CreateFromYawPitchRoll(3, 0, 0);
         var modelRotation = Quaternion.CreateFromYawPitchRoll(_rotation.X, _rotation.Y, 0);
-        //var rotation = Quaternion.Identity;
-        //rotation.W = 1f;
-        //modelPosition.Z += 0.1f;
-        //position.Z -= 1f;
+        
         var forward = Vector3.Transform(new Vector3(0, 0, 1f), rotation);
         var up = Vector3.Transform(new Vector3(0, 1, 0), rotation);
 
@@ -180,7 +207,7 @@ unsafe
             Matrix4x4.CreateTranslation(modelPosition))
         //ViewProjectMatrix = Matrix4x4.Identity
         //ViewProjectMatrix = viewProjectionMatrix
-    };
+        };
         using var cameraBuffer = new ConstantBuffer<Camera>(device, camera);
 
         //// Render the texture to the backbuffer in a deferred context

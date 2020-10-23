@@ -1,5 +1,5 @@
 // ReSharper disable InconsistentNaming
-namespace Titan.Windows.Win32
+namespace Titan.Input
 {
     public enum KeyCode
     {

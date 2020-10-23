@@ -4,14 +4,16 @@ using Titan.Windows.Win32;
 namespace Titan.Windows.Events
 {
     [TitanEvent]
-    public readonly struct KeyDownEvent
+    public readonly struct KeyEvent
     {
-        public readonly KeyCode Code;
+        public readonly int Code;
         public readonly bool Repeat;
+        public readonly bool Down;
 
-        public KeyDownEvent(KeyCode code, bool repeat)
+        public KeyEvent(int code, bool down, bool repeat)
         {
             Code = code;
+            Down = down;
             Repeat = repeat;
         }
     }

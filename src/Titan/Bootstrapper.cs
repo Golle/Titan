@@ -1,5 +1,6 @@
 using Titan.Core;
 using Titan.Graphics;
+using Titan.Input;
 using Titan.IOC;
 using Titan.Windows;
 
@@ -10,6 +11,11 @@ namespace Titan
         public static IContainer CreateContainer() => new Container()
             .AddRegistry<CoreRegistry>()
             .AddRegistry<WindowsRegistry>()
-            .AddRegistry<GraphicsRegistry>();
+            .AddRegistry<GraphicsRegistry>()
+        
+        
+        
+            .Register<IInputHandler, InputHandler>()
+            ;
     }
 }

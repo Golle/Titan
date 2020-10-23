@@ -19,7 +19,7 @@ namespace Titan.Core.Messaging
 
         static EventQueueInternal()
         {
-            _maxEvents = 1000;
+            _maxEvents = 100;
             _messages = new T[_maxEvents * 2];
         }
         
@@ -27,7 +27,7 @@ namespace Titan.Core.Messaging
         public static void Push(in T @event) => _messages[Interlocked.Increment(ref _count) - 1] = @event;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<T> GetEvents() => new ReadOnlySpan<T>(_messages, _start, _length);
+        public static ReadOnlySpan<T> GetEvents() =>  _length > 0 ? new ReadOnlySpan<T>(_messages, _start, _length) : default;
 
         // ReSharper disable once UnusedMember.Local
         private static void Swap()
