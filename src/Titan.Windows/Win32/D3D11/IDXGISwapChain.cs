@@ -12,7 +12,6 @@ namespace Titan.Windows.Win32.D3D11
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint Release() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[2])(Unsafe.AsPointer(ref this));
 
-
         //HRESULT(STDMETHODCALLTYPE* SetPrivateData)(
         //  IDXGISwapChain* This,
         //  /* [annotation][in] */
@@ -71,19 +70,10 @@ namespace Titan.Windows.Win32.D3D11
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public HRESULT GetDesc(DXGI_SWAP_CHAIN_DESC * pDesc) => ((delegate* unmanaged[Stdcall]<void*, DXGI_SWAP_CHAIN_DESC*, HRESULT>)_vtbl[12])(Unsafe.AsPointer(ref this), pDesc);
-
-        //HRESULT(STDMETHODCALLTYPE* ResizeBuffers)(
-        // IDXGISwapChain* This,
-        // /* [in] */ UINT BufferCount,
-        // /* [in] */ UINT Width,
-        // /* [in] */ UINT Height,
-        // /* [in] */ DXGI_FORMAT NewFormat,
-        // /* [in] */ UINT SwapChainFlags);
-
-        //HRESULT(STDMETHODCALLTYPE* ResizeTarget)(
-        // IDXGISwapChain* This,
-        // /* [annotation][in] */
-        // _In_  const DXGI_MODE_DESC* pNewTargetParameters);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT ResizeBuffers(uint bufferCount, uint width, uint height, DXGI_FORMAT newFormat, uint swapChainFlags) => ((delegate* unmanaged[Stdcall]<void*, uint, uint, uint, DXGI_FORMAT, uint, HRESULT>)_vtbl[13])(Unsafe.AsPointer(ref this), bufferCount, width, height, newFormat, swapChainFlags);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT ResizeTarget(DXGI_MODE_DESC* pNewTargetParameters) => ((delegate* unmanaged[Stdcall]<void*, DXGI_MODE_DESC*, HRESULT>)_vtbl[14])(Unsafe.AsPointer(ref this), pNewTargetParameters);
 
         //HRESULT(STDMETHODCALLTYPE* GetContainingOutput)(
         // IDXGISwapChain* This,

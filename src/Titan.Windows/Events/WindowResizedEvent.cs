@@ -3,7 +3,7 @@ using Titan.Core.Messaging;
 namespace Titan.Windows.Events
 {
     [TitanEvent]
-    internal readonly struct WindowResizedEvent
+    public readonly struct WindowResizedEvent
     {
         public readonly int Width;
         public readonly int Height;

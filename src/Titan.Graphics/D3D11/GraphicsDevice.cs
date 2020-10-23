@@ -41,6 +41,12 @@ namespace Titan.Graphics.D3D11
             get => ref _swapChain;
         }
 
+        public void ResizeBuffers()
+        {
+            _backBuffer.Dispose();
+            CheckAndThrow(_swapChain.Get()->ResizeBuffers(0, 0, 0, DXGI_FORMAT.DXGI_FORMAT_UNKNOWN, 0), "IDXGISwapChain::ResizeBuffers");
+            InitBackBuffer();
+        }
 
         public GraphicsDevice(IWindow window, uint refreshRate = 144, bool debug = true)
         {

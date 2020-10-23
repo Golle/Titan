@@ -13,6 +13,7 @@ using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Textures;
 using Titan.Input;
+using Titan.Windows.Events;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -135,7 +136,7 @@ unsafe
     //using var deferredContext = new DeferredContext(device);
     //deferredContext.SetViewport(new Viewport(window.Width, window.Height));
 
-    using var backbuffer = new BackBufferRenderTargetView(device);
+    var backbuffer = new BackBufferRenderTargetView(device);
     using var swapchain = new Swapchain(device, true);
     //using var tempTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
     //using var tempTextureView = new ShaderResourceView(device, tempTexture);
@@ -151,22 +152,36 @@ unsafe
     ////immediateContext.SetBlendState(blendState);
 
 
+    var desc = swapchain.GetDesc();
     var modelPosition = new Vector3(0, 0, 0);
     
-
     var modelRot = new Vector2();
     var cameraRot = new Vector2();
 
     var position = new Vector3(0, 0, -5);
-    
+    var projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, window.Height / (float)window.Width, 0.5f, 10000f);
     while (window.Update())
     {
-        var projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, window.Height / (float)window.Width, 0.5f, 10000f);
         // Begin engine stuff
         // Should be handled by engine class 
         eventQueue.Update();
         input.Update();
         // End engine stuff
+
+
+        foreach (ref readonly var @event in eventQueue.GetEvents<WindowResizedEvent>())
+        {
+            // if the window is resized release the current backbuffer object
+            backbuffer.Dispose();
+            // Resize the buffers on the device
+            device.ResizeBuffers();
+            // Update viewport
+            immediateContext.SetViewport(new Viewport(@event.Width, @event.Height));
+            // Update camera matrix
+            projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, @event.Height / (float)@event.Width, 0.5f, 10000f);
+            // Create a new backbuffer render target
+            backbuffer = new BackBufferRenderTargetView(device);
+        }
 
         var speed = 0.1f;
         var distance = Vector3.Zero;
@@ -297,7 +312,7 @@ unsafe
         {
             immediateContext.DrawIndexed(mesh.IndexBuffer.NumberOfIndices, 0, 0);
         }
-
+        
         swapchain.Present();
 
         //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
@@ -311,6 +326,7 @@ unsafe
     //    }
     //    CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
     //}
+    backbuffer.Dispose();
 }
 
 

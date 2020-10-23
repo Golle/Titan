@@ -6,6 +6,8 @@ namespace Titan.Graphics.D3D11
 {
     public interface IGraphicsDevice : IDisposable
     {
+        public void ResizeBuffers();
+
         internal unsafe ID3D11Device* Ptr { get; }
         internal unsafe ID3D11DeviceContext* ImmediateContextPtr { get; }
         internal ref readonly ComPtr<ID3D11RenderTargetView> BackBuffer { get; }
