@@ -136,7 +136,7 @@ unsafe
     //deferredContext.SetViewport(new Viewport(window.Width, window.Height));
 
     using var backbuffer = new BackBufferRenderTargetView(device);
-
+    using var swapchain = new Swapchain(device, true);
     //using var tempTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
     //using var tempTextureView = new ShaderResourceView(device, tempTexture);
     //using var textureRenderTarget = new RenderTargetView(device, tempTexture);
@@ -158,10 +158,10 @@ unsafe
     var cameraRot = new Vector2();
 
     var position = new Vector3(0, 0, -5);
-    var projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, window.Height / (float)window.Width, 0.5f, 10000f);
+    
     while (window.Update())
     {
-
+        var projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, window.Height / (float)window.Width, 0.5f, 10000f);
         // Begin engine stuff
         // Should be handled by engine class 
         eventQueue.Update();
@@ -192,6 +192,8 @@ unsafe
             modelRot.Y -= 0.02f;
         }
         
+        
+
 
         //foreach (ref readonly var character in input.GetCharacters())
         //{
@@ -199,7 +201,8 @@ unsafe
         //}
         window.SetTitle($"[{input.MousePosition.X}, {input.MousePosition.Y}]");
 
-        var rotation = Quaternion.CreateFromYawPitchRoll(cameraRot.X, cameraRot.Y, 0);
+        //var rotation = Quaternion.CreateFromYawPitchRoll(cameraRot.X, cameraRot.Y, 0);
+        var rotation = Quaternion.CreateFromYawPitchRoll(3,0, 0);
         var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
         
         var forward = Vector3.Transform(new Vector3(0, 0, 1f), rotation);
@@ -257,7 +260,7 @@ unsafe
         immediateContext.SetRenderTarget(backbuffer);
 
 
-
+        immediateContext.SetViewport(new Viewport(window.Width, window.Height));
         //immediateContext.SetVertexBuffer(instanceDataVertexBuffer, 1);
 
         //immediateContext.SetRenderTarget(backbuffer);
@@ -295,8 +298,7 @@ unsafe
             immediateContext.DrawIndexed(mesh.IndexBuffer.NumberOfIndices, 0, 0);
         }
 
-
-        device.SwapChain.Get()->Present(1, 0);
+        swapchain.Present();
 
         //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
     }

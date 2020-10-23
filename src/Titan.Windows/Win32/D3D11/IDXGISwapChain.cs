@@ -69,10 +69,8 @@ namespace Titan.Windows.Win32.D3D11
         // /* [annotation][out] */
         // _COM_Outptr_opt_result_maybenull_  IDXGIOutput** ppTarget);
 
-        //HRESULT(STDMETHODCALLTYPE* GetDesc)(
-        // IDXGISwapChain* This,
-        // /* [annotation][out] */
-        // _Out_ DXGI_SWAP_CHAIN_DESC * pDesc);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT GetDesc(DXGI_SWAP_CHAIN_DESC * pDesc) => ((delegate* unmanaged[Stdcall]<void*, DXGI_SWAP_CHAIN_DESC*, HRESULT>)_vtbl[12])(Unsafe.AsPointer(ref this), pDesc);
 
         //HRESULT(STDMETHODCALLTYPE* ResizeBuffers)(
         // IDXGISwapChain* This,
