@@ -154,7 +154,8 @@ unsafe
     var modelPosition = new Vector3(0, 0, 0);
     
 
-    var _rotation = new Vector2();
+    var modelRot = new Vector2();
+    var cameraRot = new Vector2();
 
     var position = new Vector3(0, 0, -5);
     var projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, window.Height / (float)window.Width, 0.5f, 10000f);
@@ -167,33 +168,43 @@ unsafe
         input.Update();
         // End engine stuff
 
+        var speed = 0.1f;
+        var distance = Vector3.Zero;
+        if (input.IsKeyDown(KeyCode.W)) distance.Z -= speed; 
+        if (input.IsKeyDown(KeyCode.S)) distance.Z += speed; 
+        if (input.IsKeyDown(KeyCode.A)) distance.X += speed; 
+        if (input.IsKeyDown(KeyCode.D)) distance.X -= speed; 
+        if (input.IsKeyDown(KeyCode.V)) distance.Y += speed; 
+        if (input.IsKeyDown(KeyCode.C)) distance.Y -= speed; 
+
 
         ref readonly var delta = ref input.MouseDeltaPosition;
         const float constant = 0.003f;
-        if (input.RightMouseButtonDown)
+        if (delta.X != 0 && delta.Y != 0)
         {
-            _rotation.X += delta.X * constant;
-            _rotation.Y -= delta.Y * constant;
+            cameraRot.X -= delta.X * constant;
+            cameraRot.Y += delta.Y * constant;
         }
 
-        if (input.LeftMouseButtonDown)
+        //if (input.LeftMouseButtonDown)
         {
-            _rotation.X += 0.03f;
-            _rotation.Y -= 0.02f;
+            modelRot.X += 0.03f;
+            modelRot.Y -= 0.02f;
         }
+        
 
-        foreach (ref readonly var character in input.GetCharacters())
-        {
-            Console.WriteLine($"Character typed: {character}");
-        }
+        //foreach (ref readonly var character in input.GetCharacters())
+        //{
+        //    Console.WriteLine($"Character typed: {character}");
+        //}
         window.SetTitle($"[{input.MousePosition.X}, {input.MousePosition.Y}]");
 
-        var rotation = Quaternion.CreateFromYawPitchRoll(3, 0, 0);
-        var modelRotation = Quaternion.CreateFromYawPitchRoll(_rotation.X, _rotation.Y, 0);
+        var rotation = Quaternion.CreateFromYawPitchRoll(cameraRot.X, cameraRot.Y, 0);
+        var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
         
         var forward = Vector3.Transform(new Vector3(0, 0, 1f), rotation);
         var up = Vector3.Transform(new Vector3(0, 1, 0), rotation);
-
+        position += Vector3.Transform(distance, rotation);
         var viewMatrix = Matrix4x4.CreateLookAt(position, position + forward, up);
         var viewProjectionMatrix = viewMatrix * projectionMatrix;
         //var viewProjectionMatrix = new Matrix4x4(-1, 0, 0, 0, 0, 1.77777779f, 0, 0, 0, 0, -1.00005f, -1, 0, 0, -0.5f, 0);
@@ -287,7 +298,7 @@ unsafe
 
         device.SwapChain.Get()->Present(1, 0);
 
-        GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
+        //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
     }
 
     //{
