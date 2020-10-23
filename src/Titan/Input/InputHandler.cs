@@ -32,7 +32,7 @@ namespace Titan.Input
         public bool IsKeyDown(KeyCode key) => _keyState[(int)key];
         public bool IsKeyPressed(KeyCode key) => IsKeyUp(key) && _previousKeyState[(int)key];
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<char> GetCharacters() => new ReadOnlySpan<char>(_characters, 0, _characterCount);
+        public ReadOnlySpan<char> GetCharacters() => _characterCount > 0 ? new ReadOnlySpan<char>(_characters, 0, _characterCount) : default;
 
         void IInputHandler.Update()
         {
