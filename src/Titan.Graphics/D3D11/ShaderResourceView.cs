@@ -10,10 +10,10 @@ namespace Titan.Graphics.D3D11
         public ref readonly ComPtr<ID3D11ShaderResourceView> Ptr => ref _resource;
         private ComPtr<ID3D11ShaderResourceView> _resource;
 
-        public ShaderResourceView(IGraphicsDevice device, IResource resource)
+        public ShaderResourceView(IGraphicsDevice device, IResource resource, DXGI_FORMAT format = DXGI_FORMAT.DXGI_FORMAT_UNKNOWN)
         {
             D3D11_SHADER_RESOURCE_VIEW_DESC desc = default;
-            desc.Format = resource.Format;
+            desc.Format = format == DXGI_FORMAT.DXGI_FORMAT_UNKNOWN ? resource.Format : format;
             desc.ViewDimension = D3D_SRV_DIMENSION.D3D11_SRV_DIMENSION_TEXTURE2D;
             desc.Texture2D.MipLevels = 1;
             desc.Texture2D.MostDetailedMip = 0;

@@ -18,14 +18,14 @@ using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
 
-var pixelShaderPath = @"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl";
-var vertexShaderPath = @"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl";
-var instanceVertexShaderPath = @"F:\Git\Titan\resources\shaders\InstancedVertexShader.hlsl";
 
-var meshVertexShaderPath = @"F:\Git\Titan\resources\shaders\MeshVertexShader.hlsl";
-var meshPixelShaderPath = @"F:\Git\Titan\resources\shaders\MeshPixelShader.hlsl";
+var gBufferVertexShaderPath = @"F:\Git\Titan\resources\shaders\GBufferVertexShader.hlsl";
+var gBufferPixelShaderPath = @"F:\Git\Titan\resources\shaders\GBufferPixelShader.hlsl";
+
+var backbufferVertexShaderPath = @"F:\Git\Titan\resources\shaders\BackbufferVertexShader.hlsl";
+var backbufferPixelShaderPath = @"F:\Git\Titan\resources\shaders\BackbufferPixelShader.hlsl";
+
 var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
-//var simpleMesh = @"F:\Git\GameDev\resources\models\sponza.dat";
 
 using var engine = EngineBuilder.CreateDefaultBuilder()
     .ConfigureResourcesBasePath(() => @"F:\Git\Titan\resources\")
@@ -38,74 +38,21 @@ var container = engine.Container;
 
 unsafe
 {
+
+
     var textureLoader = container.GetInstance<ITextureLoader>();
     var shaderCompiler = container.GetInstance<IShaderCompiler>();
     var meshLoader = container.GetInstance<IMeshLoader>();
     var input = container.GetInstance<IInputHandler>();
     var eventQueue = container.GetInstance<IEventQueue>();
-    
 
     using var mesh = meshLoader.LoadMesh(simpleMesh);
-    //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\temp_models\door\print2.png");
-    //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
-    //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\temp_models\sponza\textures\spnza_bricks_a_diff.png");
     using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\tree01.png");
 
 
-
-    //using var testVertexBuffer = new VertexBuffer<Titan.Graphics.Meshes.Vertex>(device, new[]
-    //{
-    //    new Titan.Graphics.Meshes.Vertex{Position = new Vector3(-1f,-1f, 1f), Texture = new Vector2(0,1)},
-    //    new Titan.Graphics.Meshes.Vertex{Position = new Vector3(-1f, 1f, 1f), Texture = new Vector2(0,0)},
-    //    new Titan.Graphics.Meshes.Vertex{Position = new Vector3(1f, 1f, 1f),  Texture = new Vector2(1,0)},
-    //    new Titan.Graphics.Meshes.Vertex{Position = new Vector3(1f, -1f, 1f), Texture = new Vector2(1,1)},
-    //});
-
-
-    //using var vertexBuffer = new VertexBuffer<Vertex>(device, new[]
-    //{
-    //    new Vertex{Position = new Vector3(-1f,-1f, 0f),  Texture = new Vector2(0,1)},
-    //    new Vertex{Position = new Vector3(-1f, 1f, 0f),  Texture = new Vector2(0,0)},
-    //    new Vertex{Position = new Vector3(1f, 1f, 0f), Texture = new Vector2(1,0)},
-    //    new Vertex{Position = new Vector3(1f, -1f, 0f), Texture = new Vector2(1,1)},
-    //});
-    //using var vertexBuffer2 = new VertexBuffer<Vertex>(device, new[]
-    //{
-    //    new Vertex{Position = new Vector3(-1f,-1f, 0f)/3f, Color = Color.Blue, Texture = new Vector2(0,1)},
-    //    new Vertex{Position = new Vector3(-1f, 1f, 0f)/3f, Color = Color.Green, Texture = new Vector2(0,0)},
-    //    new Vertex{Position = new Vector3(1f, 1f, 0f)/3f, Color = Color.White, Texture = new Vector2(1,0)},
-    //    new Vertex{Position = new Vector3(1f, -1f, 0f)/3f, Color = Color.Red, Texture = new Vector2(1,1)},
-    //});
-
-    //using var indexBuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 1, 2, 0, 2, 3 });
-    //using var indexBuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 2, 1, 0, 3, 2 });
-
-    //// Vertex Shader
-    //using var compiledVertexShader = shaderCompiler.CompileShaderFromFile(vertexShaderPath, "main", "vs_5_0");
-    //using var vertexShader = new VertexShader(device, compiledVertexShader);
-    //using var inputLayout = new InputLayout(device, compiledVertexShader, new[]
-    //{
-    //    new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT),
-    //    new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT),
-    //    new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT)
-    //});
-
-
-
-    //using var compiledInstancedVertexShader = shaderCompiler.CompileShaderFromFile(instanceVertexShaderPath, "main", "vs_5_0");
-    //using var instancedVertexShader = new VertexShader(device, compiledInstancedVertexShader);
-    //using var instancedInputLayout = new InputLayout(device, compiledInstancedVertexShader, new[]
-    //{
-    //    new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT),
-    //    new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT),
-    //    new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT),
-    //    new InputLayoutDescriptor("InstancePosition", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT, D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA)
-    //});
-
-
-    using var compiledMeshVertexShader = shaderCompiler.CompileShaderFromFile(meshVertexShaderPath, "main", "vs_5_0");
-    using var meshVertexShader = new VertexShader(device, compiledMeshVertexShader);
-    using var meshInputLayout = new InputLayout(device, compiledMeshVertexShader, new[]
+    using var gBufferCompiledVertexShader = shaderCompiler.CompileShaderFromFile(gBufferVertexShaderPath, "main", "vs_5_0");
+    using var gBuffferVertexShader = new VertexShader(device, gBufferCompiledVertexShader);
+    using var gBufferInputLayout = new InputLayout(device, gBufferCompiledVertexShader, new[]
     {
         new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT),
         new InputLayoutDescriptor("Normal", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT),
@@ -113,55 +60,88 @@ unsafe
     });
 
 
-    using var compiledMeshPixelShader = shaderCompiler.CompileShaderFromFile(meshPixelShaderPath, "main", "ps_5_0");
-    using var meshPixelShader = new PixelShader(device, compiledMeshPixelShader);
-
-
-    //var instanceVector = new Vector3[10000];
-    //var random = new Random();
-    //for (var i = 0; i < instanceVector.Length; ++i)
-    //{
-    //    instanceVector[i] = new Vector3(random.Next(-1000, 1000) / 1000f, random.Next(-1000, 1000) / 1000f, 0f);
-    //}
-    //using var instanceDataVertexBuffer = new VertexBuffer<Vector3>(device, instanceVector);
-
-    // Pixel Shader
-    //using var compiledPixelShader = shaderCompiler.CompileShaderFromFile(pixelShaderPath, "main", "ps_5_0");
-    //using var pixelShader = new PixelShader(device, compiledPixelShader);
-
+    using var gBufferCompiledPixelShader = shaderCompiler.CompileShaderFromFile(gBufferPixelShaderPath, "main", "ps_5_0");
+    using var gBufferPixelShader = new PixelShader(device, gBufferCompiledPixelShader);
     using var samplerState = new SamplerState(device);
+    
     using var immediateContext = new ImmediateContext(device);
     immediateContext.SetViewport(new Viewport(window.Width, window.Height));
 
-    //using var deferredContext = new DeferredContext(device);
-    //deferredContext.SetViewport(new Viewport(window.Width, window.Height));
-
-    var backbuffer = new BackBufferRenderTargetView(device);
-    using var swapchain = new Swapchain(device, true);
-    //using var tempTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-    //using var tempTextureView = new ShaderResourceView(device, tempTexture);
-    //using var textureRenderTarget = new RenderTargetView(device, tempTexture);
-
-    //using var depthStencilState = new DepthStencilState(device);
-    //immediateContext.SetDepthStencilState(depthStencilState);
-
-    //var depthStencilTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_D32_FLOAT, D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL);
-    //using var depthStencilView = new DepthStencilView(device, depthStencilTexture);
-
-    ////using var blendState = new BlendState(device);
-    ////immediateContext.SetBlendState(blendState);
-
-
-    var desc = swapchain.GetDesc();
-    var modelPosition = new Vector3(0, 0, 0);
     
+    
+    using var gBufferNormals = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+    using var gBufferNormalsTarget = new RenderTargetView(device, gBufferNormals);
+    using var gBufferNormalsView = new ShaderResourceView(device, gBufferNormals);
+
+    using var gBufferAlbedo = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+    using var gBufferAlbedoTarget = new RenderTargetView(device, gBufferAlbedo);
+    using var gBufferAlbedoView = new ShaderResourceView(device, gBufferAlbedo);
+
+    using var gBufferDepth = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+    using var gBufferDepthTarget = new RenderTargetView(device, gBufferDepth);
+    using var gBufferDepthView = new ShaderResourceView(device, gBufferDepth);
+
+
+
+    using var depthStencilState = new DepthStencilState(device);
+    immediateContext.SetDepthStencilState(depthStencilState);
+
+    var depthStencilTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+    using var depthStencilView = new DepthStencilView(device, depthStencilTexture);
+    using var depthStencilView2 = new ShaderResourceView(device, depthStencilTexture, DXGI_FORMAT.DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
+
+    #region MoreHiddenStuff
+    var modelPosition = new Vector3(0, 0, 0);
     var modelRot = new Vector2();
     var cameraRot = new Vector2();
-
     var position = new Vector3(0, 0, -5);
     var projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, window.Height / (float)window.Width, 0.5f, 10000f);
+
+
+    #endregion
+    var backbuffer = new BackBufferRenderTargetView(device);
+    var gBufferRenderTargets = stackalloc ID3D11RenderTargetView*[3];
+    gBufferRenderTargets[0] = gBufferAlbedoTarget.Ptr.Get();
+    //gBufferRenderTargets[0] = backbuffer.Ptr.Get();
+    gBufferRenderTargets[1] = gBufferNormalsTarget.Ptr.Get();
+    gBufferRenderTargets[2] = gBufferDepthTarget.Ptr.Get();
+
+    
+    // full screen stuff 
+    using var backbufferVertexBuffer = new VertexBuffer<BackbufferVertex>(device, new BackbufferVertex[]
+    {
+        new BackbufferVertex{Position = new Vector2(-1, 0), Texture = new Vector2(0, 1)},
+        new BackbufferVertex{Position = new Vector2(-1, 1), Texture = new Vector2(0, 0)},
+        new BackbufferVertex{Position = new Vector2(0, 1), Texture = new Vector2(1, 0)},
+        new BackbufferVertex{Position = new Vector2(0, 0), Texture = new Vector2(1, 1)},
+        new BackbufferVertex{Position = new Vector2(0, 0), Texture = new Vector2(0, 1)},
+        new BackbufferVertex{Position = new Vector2(0, 1), Texture = new Vector2(0, 0)},
+        new BackbufferVertex{Position = new Vector2(1, 1), Texture = new Vector2(1, 0)},
+        new BackbufferVertex{Position = new Vector2(1, 0), Texture = new Vector2(1, 1)},
+        new BackbufferVertex{Position = new Vector2(-1, -1), Texture = new Vector2(0, 1)},
+        new BackbufferVertex{Position = new Vector2(-1, 0), Texture = new Vector2(0, 0)},
+        new BackbufferVertex{Position = new Vector2(0, 0), Texture = new Vector2(1, 0)},
+        new BackbufferVertex{Position = new Vector2(0, -1), Texture = new Vector2(1, 1)}
+    });
+    using var backbufferIndexBuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8,9,10, 8, 10, 11 });
+
+    using var backbufferCompiledVertexShader = shaderCompiler.CompileShaderFromFile(backbufferVertexShaderPath, "main", "vs_5_0");
+    using var backbufferVertexShader = new VertexShader(device, backbufferCompiledVertexShader);
+    using var backbufferInputLayout = new InputLayout(device, backbufferCompiledVertexShader, new[]
+    {
+        new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT),
+        new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT)
+    });
+    using var backbufferCompiledPixelShader = shaderCompiler.CompileShaderFromFile(backbufferPixelShaderPath, "main", "ps_5_0");
+    using var backbufferPixelShader = new PixelShader(device, backbufferCompiledPixelShader);
+
+    
+    using var swapchain = new Swapchain(device, true);
+
+
     while (window.Update())
     {
+        #region HiddenEventLogic
         // Begin engine stuff
         // Should be handled by engine class 
         eventQueue.Update();
@@ -201,25 +181,16 @@ unsafe
             cameraRot.Y += delta.Y * constant;
         }
 
-        //if (input.LeftMouseButtonDown)
         {
             modelRot.X += 0.03f;
             modelRot.Y -= 0.02f;
         }
-        
-        
 
-
-        //foreach (ref readonly var character in input.GetCharacters())
-        //{
-        //    Console.WriteLine($"Character typed: {character}");
-        //}
         window.SetTitle($"[{input.MousePosition.X}, {input.MousePosition.Y}]");
 
         //var rotation = Quaternion.CreateFromYawPitchRoll(cameraRot.X, cameraRot.Y, 0);
         var rotation = Quaternion.CreateFromYawPitchRoll(3,0, 0);
         var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
-        
         var forward = Vector3.Transform(new Vector3(0, 0, 1f), rotation);
         var up = Vector3.Transform(new Vector3(0, 1, 0), rotation);
         position += Vector3.Transform(distance, rotation);
@@ -229,90 +200,100 @@ unsafe
         var camera = new Camera
         {
             ViewMatrix = viewMatrix,
-            ViewProjectMatrix = Matrix4x4.Transpose(viewProjectionMatrix),
-            WorldMatrix = 
-            Matrix4x4.Transpose(Matrix4x4.CreateScale(new Vector3(1, 1, 1)) *
-            Matrix4x4.CreateFromQuaternion(modelRotation) *
-            Matrix4x4.CreateTranslation(modelPosition))
-        //ViewProjectMatrix = Matrix4x4.Identity
-        //ViewProjectMatrix = viewProjectionMatrix
+            ViewProjectMatrix = Matrix4x4.Transpose(viewProjectionMatrix)
         };
         using var cameraBuffer = new ConstantBuffer<Camera>(device, camera);
 
-        //// Render the texture to the backbuffer in a deferred context
-        //deferredContext.SetViewport(new Viewport(window.Width, window.Height));
-        //deferredContext.ClearRenderTargetView(backbuffer, new Color(1, 0, 0));
-        //deferredContext.SetInputLayout(inputLayout);
-        //deferredContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        //deferredContext.SetPixelShader(pixelShader);
-        //deferredContext.SetVertexShader(vertexShader);
-        //deferredContext.SetRenderTarget(backbuffer);
-        //deferredContext.SetVertexBuffer(vertexBuffer2);
-        //deferredContext.SetPixelShaderSampler(samplerState);
-        //deferredContext.SetPixelShaderResource(tempTextureView);
-        //deferredContext.SetIndexBuffer(indexBuffer);
-        //deferredContext.DrawIndexed(6);
-        //using var commandList = deferredContext.FinishCommandList();
+        var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(new Vector3(1, 1, 1)) *
+                                              Matrix4x4.CreateFromQuaternion(modelRotation) *
+                                              Matrix4x4.CreateTranslation(modelPosition));
+        using var modelBuffer = new ConstantBuffer<Matrix4x4>(device, modelMatrix);
 
+        #endregion
+        {
+            //// Render the texture to the backbuffer in a deferred context
+            //deferredContext.SetViewport(new Viewport(window.Width, window.Height));
+            //deferredContext.ClearRenderTargetView(backbuffer, new Color(1, 0, 0));
+            //deferredContext.SetInputLayout(inputLayout);
+            //deferredContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            //deferredContext.SetPixelShader(pixelShader);
+            //deferredContext.SetVertexShader(vertexShader);
+            //deferredContext.SetRenderTarget(backbuffer);
+            //deferredContext.SetVertexBuffer(vertexBuffer2);
+            //deferredContext.SetPixelShaderSampler(samplerState);
+            //deferredContext.SetPixelShaderResource(tempTextureView);
+            //deferredContext.SetIndexBuffer(indexBuffer);
+            //deferredContext.DrawIndexed(6);
+            //using var commandList = deferredContext.FinishCommandList();
+}
         ////// Render to a texture
-        //immediateContext.SetViewport(new Viewport(window.Width, window.Height));
-        //immediateContext.ClearRenderTargetView(textureRenderTarget, new Color(0, 1, 1));
-        //immediateContext.SetRenderTarget(textureRenderTarget);
-        //immediateContext.SetVertexBuffer(vertexBuffer);
-        //immediateContext.SetInputLayout(inputLayout);
-        //immediateContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        //immediateContext.SetPixelShader(pixelShader);
-        //immediateContext.SetVertexShader(vertexShader);
-        //immediateContext.SetPixelShaderSampler(samplerState);
-        //immediateContext.SetPixelShaderResource(texture.ResourceView);
-        //immediateContext.SetIndexBuffer(indexBuffer);
-        //immediateContext.DrawIndexed(6);
+        device.ImmediateContextPtr->ClearDepthStencilView(depthStencilView.Ptr.Get(), 1, 1, 0);
+        
+        immediateContext.ClearRenderTargetView(gBufferAlbedoTarget, new Color(0.1f, 0.2f, 0.3f));
+        immediateContext.ClearRenderTargetView(gBufferNormalsTarget, Color.Black);
+        immediateContext.ClearRenderTargetView(gBufferDepthTarget, Color.White);
+        //immediateContext.SetRenderTarget(backbuffer, depthStencilView);
+        device.ImmediateContextPtr->OMSetRenderTargets(3, gBufferRenderTargets, depthStencilView.Ptr.Get());
+
+        immediateContext.SetVertexBuffer(mesh.VertexBuffer);
+        immediateContext.SetInputLayout(gBufferInputLayout);
+        immediateContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        immediateContext.SetPixelShader(gBufferPixelShader);
+        immediateContext.SetVertexShader(gBuffferVertexShader);
+        immediateContext.SetPixelShaderSampler(samplerState);
+        immediateContext.SetPixelShaderResource(texture.ResourceView);
+        immediateContext.SetPixelShaderResource(depthStencilView2, 1);
+        immediateContext.SetIndexBuffer(mesh.IndexBuffer);
+
+        immediateContext.SetVertexShaderConstantBuffer(cameraBuffer);
+        immediateContext.SetVertexShaderConstantBuffer(modelBuffer, 1);
+
+        immediateContext.DrawIndexed(mesh.IndexBuffer.NumberOfIndices, 0, 0);
 
         //immediateContext.ExecuteCommandList(commandList);
         // Render to the backbuffer
         immediateContext.ClearRenderTargetView(backbuffer, new Color(0.3f, 0, 0));
-        //immediateContext.SetRenderTarget(backbuffer, depthStencilView);
         immediateContext.SetRenderTarget(backbuffer);
-
-
-        immediateContext.SetViewport(new Viewport(window.Width, window.Height));
-        //immediateContext.SetVertexBuffer(instanceDataVertexBuffer, 1);
-
-        //immediateContext.SetRenderTarget(backbuffer);
-        immediateContext.SetPixelShader(meshPixelShader);
-        //immediateContext.SetPixelShader(meshPixelShader);
-
-        immediateContext.SetPixelShaderResource(texture.ResourceView);
-        immediateContext.SetIndexBuffer(mesh.IndexBuffer);
-        immediateContext.SetVertexBuffer(mesh.VertexBuffer);
-        //immediateContext.SetIndexBuffer(indexBuffer);
-        //immediateContext.SetVertexBuffer(vertexBuffer);
-
-        immediateContext.SetInputLayout(meshInputLayout);
-        //immediateContext.SetInputLayout(instancedInputLayout);
-        immediateContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        immediateContext.SetVertexShader(meshVertexShader);
-        //immediateContext.SetVertexShader(instancedVertexShader);
+        immediateContext.SetIndexBuffer(backbufferIndexBuffer);
+        immediateContext.SetVertexBuffer(backbufferVertexBuffer);
+        immediateContext.SetPixelShader(backbufferPixelShader);
+        immediateContext.SetVertexShader(backbufferVertexShader);
         immediateContext.SetPixelShaderSampler(samplerState);
-        immediateContext.SetVertexShaderConstantBuffer(cameraBuffer);
-        //immediateContext.DrawIndexedInstanced(indexBuffer.NumberOfIndices, (uint) instanceVector.Length);
-        //immediateContext.DrawIndexed(6);
 
-        if (mesh.SubSets.Length > 1)
-        {
-            for (var i = 0; i < mesh.SubSets.Length; ++i)
-            {
-                ref var subset = ref mesh.SubSets[i];
-                //immediateContext.SetPixelShaderResource(_sponzaTextures[subset.MaterialIndex]);
-                immediateContext.DrawIndexed((uint)subset.Count, (uint)subset.StartIndex, 0);
-            }
-        }
-        else
-        {
-            immediateContext.DrawIndexed(mesh.IndexBuffer.NumberOfIndices, 0, 0);
-        }
+        //if (input.IsKeyDown(KeyCode.Space))
+        //{
+        //    immediateContext.SetPixelShaderResource(gBufferNormalsView);
+        //}
+        //else
+        //{
+        //    immediateContext.SetPixelShaderResource(gBufferAlbedoView);
+        //}
         
+        
+        //immediateContext.SetPixelShaderResource(texture.ResourceView);
+
+        immediateContext.SetInputLayout(backbufferInputLayout);
+        immediateContext.SetPixelShaderResource(gBufferNormalsView);
+        immediateContext.DrawIndexed(6, 0);
+        immediateContext.SetPixelShaderResource(gBufferAlbedoView);
+        immediateContext.DrawIndexed(6, 6);
+        immediateContext.SetPixelShaderResource(gBufferDepthView);
+        immediateContext.DrawIndexed(6, 12);
+
+        //if (mesh.SubSets.Length > 1)
+        //{
+        //    for (var i = 0; i < mesh.SubSets.Length; ++i)
+        //    {
+        //        ref var subset = ref mesh.SubSets[i];
+        //        //immediateContext.SetPixelShaderResource(_sponzaTextures[subset.MaterialIndex]);
+        //        immediateContext.DrawIndexed((uint)subset.Count, (uint)subset.StartIndex, 0);
+        //    }
+        //}
+        //else
+        //{
+        //    immediateContext.DrawIndexed(mesh.IndexBuffer.NumberOfIndices, 0, 0);
+        //}
+
         swapchain.Present();
 
         //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
@@ -337,5 +318,12 @@ struct Camera
     public Matrix4x4 ViewMatrix;
     //[FieldOffset(64)]
     public Matrix4x4 ViewProjectMatrix;
-    public Matrix4x4 WorldMatrix;
+    //public Matrix4x4 WorldMatrix;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct BackbufferVertex
+{
+    public Vector2 Position;
+    public Vector2 Texture;
 }

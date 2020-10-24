@@ -14,7 +14,8 @@ namespace Titan.Graphics.D3D11
         {
             D3D11_DEPTH_STENCIL_VIEW_DESC desc = default;
             desc.Texture2D.MipSlice = 0;
-            desc.Format = DXGI_FORMAT.DXGI_FORMAT_D32_FLOAT;
+            //desc.Format = resource.Format;
+            desc.Format = DXGI_FORMAT.DXGI_FORMAT_D24_UNORM_S8_UINT;
             desc.ViewDimension = D3D11_DSV_DIMENSION.D3D11_DSV_DIMENSION_TEXTURE2D;
 
             CheckAndThrow(device.Ptr->CreateDepthStencilView(resource.AsResourcePointer(), &desc, _depthStencil.GetAddressOf()), "CreateDepthStencilView");
