@@ -34,6 +34,8 @@ namespace Titan.Graphics.D3D11
         public void SetBlendState(BlendState blendState) => Context.Get()->OMSetBlendState(blendState.Ptr.Get(), blendState.BlendFactor, blendState.SampleMask);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetVertexShaderConstantBuffer(IConstantBuffer constantBuffer, uint slot = 0) => Context.Get()->VSSetConstantBuffers(slot, 1, constantBuffer.Ptr.GetAddressOf());
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPixelShaderConstantBuffer(IConstantBuffer constantBuffer, uint slot = 0) => Context.Get()->PSSetConstantBuffers(slot, 1, constantBuffer.Ptr.GetAddressOf());
 
         // TODO: is this the best way to do it? 
         // TODO: Add support for multiple vertex buffers in a single call (same behavior can be achieved by calling this method and increase the slot, but it requires multiple calls instead of a single call)

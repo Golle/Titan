@@ -1,8 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Titan;
 using Titan.Core.Common;
 using Titan.Core.Messaging;
@@ -25,7 +27,10 @@ var gBufferPixelShaderPath = @"F:\Git\Titan\resources\shaders\GBufferPixelShader
 var backbufferVertexShaderPath = @"F:\Git\Titan\resources\shaders\BackbufferVertexShader.hlsl";
 var backbufferPixelShaderPath = @"F:\Git\Titan\resources\shaders\BackbufferPixelShader.hlsl";
 
-var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
+var deferredShadingPixelShaderPath = @"F:\Git\Titan\resources\shaders\DeferredShadingPixelShader.hlsl";
+
+//var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
+var simpleMesh = @"F:\Git\GameDev\resources\models\sphere.dat";
 
 using var engine = EngineBuilder.CreateDefaultBuilder()
     .ConfigureResourcesBasePath(() => @"F:\Git\Titan\resources\")
@@ -47,8 +52,11 @@ unsafe
     var eventQueue = container.GetInstance<IEventQueue>();
 
     using var mesh = meshLoader.LoadMesh(simpleMesh);
-    using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\tree01.png");
+    //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\tree01.png");
+    using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
 
+
+    #region GBUFFER
 
     using var gBufferCompiledVertexShader = shaderCompiler.CompileShaderFromFile(gBufferVertexShaderPath, "main", "vs_5_0");
     using var gBuffferVertexShader = new VertexShader(device, gBufferCompiledVertexShader);
@@ -60,15 +68,12 @@ unsafe
     });
 
 
-    using var gBufferCompiledPixelShader = shaderCompiler.CompileShaderFromFile(gBufferPixelShaderPath, "main", "ps_5_0");
-    using var gBufferPixelShader = new PixelShader(device, gBufferCompiledPixelShader);
+    
     using var samplerState = new SamplerState(device);
     
     using var immediateContext = new ImmediateContext(device);
     immediateContext.SetViewport(new Viewport(window.Width, window.Height));
 
-    
-    
     using var gBufferNormals = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
     using var gBufferNormalsTarget = new RenderTargetView(device, gBufferNormals);
     using var gBufferNormalsView = new ShaderResourceView(device, gBufferNormals);
@@ -77,18 +82,12 @@ unsafe
     using var gBufferAlbedoTarget = new RenderTargetView(device, gBufferAlbedo);
     using var gBufferAlbedoView = new ShaderResourceView(device, gBufferAlbedo);
 
-    using var gBufferDepth = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-    using var gBufferDepthTarget = new RenderTargetView(device, gBufferDepth);
-    using var gBufferDepthView = new ShaderResourceView(device, gBufferDepth);
-
-
-
     using var depthStencilState = new DepthStencilState(device);
     immediateContext.SetDepthStencilState(depthStencilState);
 
-    var depthStencilTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+    using var depthStencilTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
     using var depthStencilView = new DepthStencilView(device, depthStencilTexture);
-    using var depthStencilView2 = new ShaderResourceView(device, depthStencilTexture, DXGI_FORMAT.DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
+    using var depthStencilResourceView = new ShaderResourceView(device, depthStencilTexture, DXGI_FORMAT.DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
 
     #region MoreHiddenStuff
     var modelPosition = new Vector3(0, 0, 0);
@@ -100,11 +99,15 @@ unsafe
 
     #endregion
     var backbuffer = new BackBufferRenderTargetView(device);
-    var gBufferRenderTargets = stackalloc ID3D11RenderTargetView*[3];
+    var gBufferRenderTargets = stackalloc ID3D11RenderTargetView*[2];
     gBufferRenderTargets[0] = gBufferAlbedoTarget.Ptr.Get();
-    //gBufferRenderTargets[0] = backbuffer.Ptr.Get();
     gBufferRenderTargets[1] = gBufferNormalsTarget.Ptr.Get();
-    gBufferRenderTargets[2] = gBufferDepthTarget.Ptr.Get();
+    #endregion
+
+
+    #region BACKBUFFER
+
+    
 
     
     // full screen stuff 
@@ -121,9 +124,13 @@ unsafe
         new BackbufferVertex{Position = new Vector2(-1, -1), Texture = new Vector2(0, 1)},
         new BackbufferVertex{Position = new Vector2(-1, 0), Texture = new Vector2(0, 0)},
         new BackbufferVertex{Position = new Vector2(0, 0), Texture = new Vector2(1, 0)},
-        new BackbufferVertex{Position = new Vector2(0, -1), Texture = new Vector2(1, 1)}
+        new BackbufferVertex{Position = new Vector2(0, -1), Texture = new Vector2(1, 1)},
+        new BackbufferVertex{Position = new Vector2(0, -1), Texture = new Vector2(0, 1)},
+        new BackbufferVertex{Position = new Vector2(0, 0), Texture = new Vector2(0, 0)},
+        new BackbufferVertex{Position = new Vector2(1, 0), Texture = new Vector2(1, 0)},
+        new BackbufferVertex{Position = new Vector2(1, -1), Texture = new Vector2(1, 1)}
     });
-    using var backbufferIndexBuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8,9,10, 8, 10, 11 });
+    using var backbufferIndexBuffer = new IndexBuffer<ushort>(device, new ushort[] {0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15});
 
     using var backbufferCompiledVertexShader = shaderCompiler.CompileShaderFromFile(backbufferVertexShaderPath, "main", "vs_5_0");
     using var backbufferVertexShader = new VertexShader(device, backbufferCompiledVertexShader);
@@ -132,12 +139,76 @@ unsafe
         new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT),
         new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT)
     });
-    using var backbufferCompiledPixelShader = shaderCompiler.CompileShaderFromFile(backbufferPixelShaderPath, "main", "ps_5_0");
-    using var backbufferPixelShader = new PixelShader(device, backbufferCompiledPixelShader);
+    
+    #endregion
 
+
+    #region DEFERRED SHADING
+
+    using var deferredShadingTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+    using var deferredShadingRenderTarget = new RenderTargetView(device, deferredShadingTexture);
+    using var deferredShadingResourceView = new ShaderResourceView(device, deferredShadingTexture);
+
+    
+
+    using var deferredShadingVertexBuffer = new VertexBuffer<BackbufferVertex>(device, new[]
+    {
+        new BackbufferVertex{Position = new Vector2(-1, -1), Texture = new Vector2(0, 1)},
+        new BackbufferVertex{Position = new Vector2(-1, 1), Texture = new Vector2(0, 0)},
+        new BackbufferVertex{Position = new Vector2(1, 1), Texture = new Vector2(1, 0)},
+        new BackbufferVertex{Position = new Vector2(1, -1), Texture = new Vector2(1, 1)},
+    });
+    using var deferredShadingIndexbuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 1, 2, 0, 2, 3});
+
+
+    #endregion
+    using var deferredContext = new DeferredContext(device);
+
+    using var deferredShading = new DeferredContext(device);
     
     using var swapchain = new Swapchain(device, true);
 
+
+    //using var gBufferCompiledPixelShader = shaderCompiler.CompileShaderFromFile(gBufferPixelShaderPath, "main", "ps_5_0");
+    //using var gBufferPixelShader = new PixelShader(device, gBufferCompiledPixelShader);
+    //using var backbufferCompiledPixelShader = shaderCompiler.CompileShaderFromFile(backbufferPixelShaderPath, "main", "ps_5_0");
+    //using var backbufferPixelShader = new PixelShader(device, backbufferCompiledPixelShader);
+
+    var gBufferPixelShader = CompilePixelShader(shaderCompiler, null, gBufferPixelShaderPath);
+    var backbufferPixelShader = CompilePixelShader(shaderCompiler, null, backbufferPixelShaderPath);
+    var deferredShadingPixelShader = CompilePixelShader(shaderCompiler, null, deferredShadingPixelShaderPath);
+
+    using var watcher = new FileSystemWatcher();
+    watcher.Path = Path.GetDirectoryName(deferredShadingPixelShaderPath);
+    watcher.Filter = "*.hlsl";
+    watcher.NotifyFilter = NotifyFilters.Size;
+
+    var previousSave = DateTime.MinValue;
+    watcher.Changed += (sender, args) =>
+    {
+        Task.Run(() =>
+        {
+            Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
+            var lastWrite = File.GetLastWriteTime(args.FullPath);
+            if (lastWrite != previousSave)
+            {
+                previousSave = lastWrite;
+                if (args.FullPath.Equals(gBufferPixelShaderPath))
+                {
+                    gBufferPixelShader = CompilePixelShader(shaderCompiler, gBufferPixelShader, gBufferPixelShaderPath);
+                }
+                else if (args.FullPath.Equals(deferredShadingPixelShaderPath))
+                {
+                    deferredShadingPixelShader = CompilePixelShader(shaderCompiler, deferredShadingPixelShader, deferredShadingPixelShaderPath);
+                }
+                else if (args.FullPath.Equals(backbufferPixelShaderPath))
+                {
+                    backbufferPixelShader = CompilePixelShader(shaderCompiler, backbufferPixelShader, backbufferPixelShaderPath);
+                }
+            }
+        });
+    };
+    watcher.EnableRaisingEvents = true;
 
     while (window.Update())
     {
@@ -225,15 +296,68 @@ unsafe
             //deferredContext.SetIndexBuffer(indexBuffer);
             //deferredContext.DrawIndexed(6);
             //using var commandList = deferredContext.FinishCommandList();
-}
+        }
+
+        if (input.IsKeyPressed(KeyCode.Backspace))
+        {
+            gBufferPixelShader = CompilePixelShader(shaderCompiler, gBufferPixelShader, gBufferPixelShaderPath);
+        }
+
+        using var lightSource = new ConstantBuffer<LightSource>(device, new LightSource {Position = new Vector3(0, 0, -2f)});
+
+        // Render to the backbuffer (set up command list for drawing 3 squares)
+        {
+            deferredContext.SetViewport(new Viewport(window.Width, window.Height));
+            deferredContext.ClearRenderTargetView(backbuffer, new Color(0.3f, 0, 0));
+            deferredContext.SetRenderTarget(backbuffer);
+            deferredContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            deferredContext.SetInputLayout(backbufferInputLayout);
+            deferredContext.SetIndexBuffer(backbufferIndexBuffer);
+            deferredContext.SetVertexBuffer(backbufferVertexBuffer);
+            deferredContext.SetPixelShader(backbufferPixelShader);
+            deferredContext.SetVertexShader(backbufferVertexShader);
+            deferredContext.SetPixelShaderSampler(samplerState);
+            deferredContext.SetPixelShaderResource(gBufferNormalsView);
+            deferredContext.DrawIndexed(6, 0);
+            deferredContext.SetPixelShaderResource(gBufferAlbedoView);
+            deferredContext.DrawIndexed(6, 6);
+            deferredContext.SetPixelShaderResource(depthStencilResourceView);
+            deferredContext.DrawIndexed(6, 12);
+            deferredContext.SetPixelShaderResource(deferredShadingResourceView);
+            deferredContext.DrawIndexed(6, 18);
+        }
+        using var commandList = deferredContext.FinishCommandList();
+
+        {
+            deferredShading.SetViewport(new Viewport(window.Width, window.Height));
+            deferredShading.ClearRenderTargetView(deferredShadingRenderTarget, new Color(0, 0.2f, 0.2f));
+            deferredShading.SetVertexShader(backbufferVertexShader);
+            deferredShading.SetVertexBuffer(deferredShadingVertexBuffer);
+            deferredShading.SetIndexBuffer(deferredShadingIndexbuffer);
+            deferredShading.SetInputLayout(backbufferInputLayout);
+            deferredShading.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            deferredShading.SetPixelShader(deferredShadingPixelShader);
+            deferredShading.SetPixelShaderSampler(samplerState);
+            deferredShading.SetPixelShaderResource(gBufferAlbedoView);
+            deferredShading.SetPixelShaderResource(gBufferNormalsView, 1u);
+            deferredShading.SetRenderTarget(deferredShadingRenderTarget);
+            deferredShading.SetPixelShaderConstantBuffer(lightSource);
+
+            deferredShading.DrawIndexed(deferredShadingIndexbuffer.NumberOfIndices, 0, 0);
+        }
+        using var deferredShadingCommandList = deferredShading.FinishCommandList();
+
+
+        
+
         ////// Render to a texture
         device.ImmediateContextPtr->ClearDepthStencilView(depthStencilView.Ptr.Get(), 1, 1, 0);
         
         immediateContext.ClearRenderTargetView(gBufferAlbedoTarget, new Color(0.1f, 0.2f, 0.3f));
         immediateContext.ClearRenderTargetView(gBufferNormalsTarget, Color.Black);
-        immediateContext.ClearRenderTargetView(gBufferDepthTarget, Color.White);
+        immediateContext.SetViewport(new Viewport(window.Width, window.Height));
         //immediateContext.SetRenderTarget(backbuffer, depthStencilView);
-        device.ImmediateContextPtr->OMSetRenderTargets(3, gBufferRenderTargets, depthStencilView.Ptr.Get());
+        device.ImmediateContextPtr->OMSetRenderTargets(2, gBufferRenderTargets, depthStencilView.Ptr.Get());
 
         immediateContext.SetVertexBuffer(mesh.VertexBuffer);
         immediateContext.SetInputLayout(gBufferInputLayout);
@@ -242,7 +366,6 @@ unsafe
         immediateContext.SetVertexShader(gBuffferVertexShader);
         immediateContext.SetPixelShaderSampler(samplerState);
         immediateContext.SetPixelShaderResource(texture.ResourceView);
-        immediateContext.SetPixelShaderResource(depthStencilView2, 1);
         immediateContext.SetIndexBuffer(mesh.IndexBuffer);
 
         immediateContext.SetVertexShaderConstantBuffer(cameraBuffer);
@@ -250,35 +373,13 @@ unsafe
 
         immediateContext.DrawIndexed(mesh.IndexBuffer.NumberOfIndices, 0, 0);
 
-        //immediateContext.ExecuteCommandList(commandList);
-        // Render to the backbuffer
-        immediateContext.ClearRenderTargetView(backbuffer, new Color(0.3f, 0, 0));
-        immediateContext.SetRenderTarget(backbuffer);
-        immediateContext.SetIndexBuffer(backbufferIndexBuffer);
-        immediateContext.SetVertexBuffer(backbufferVertexBuffer);
-        immediateContext.SetPixelShader(backbufferPixelShader);
-        immediateContext.SetVertexShader(backbufferVertexShader);
-        immediateContext.SetPixelShaderSampler(samplerState);
+        immediateContext.ExecuteCommandList(deferredShadingCommandList);
 
-        //if (input.IsKeyDown(KeyCode.Space))
-        //{
-        //    immediateContext.SetPixelShaderResource(gBufferNormalsView);
-        //}
-        //else
-        //{
-        //    immediateContext.SetPixelShaderResource(gBufferAlbedoView);
-        //}
+        immediateContext.ExecuteCommandList(commandList);
         
         
-        //immediateContext.SetPixelShaderResource(texture.ResourceView);
 
-        immediateContext.SetInputLayout(backbufferInputLayout);
-        immediateContext.SetPixelShaderResource(gBufferNormalsView);
-        immediateContext.DrawIndexed(6, 0);
-        immediateContext.SetPixelShaderResource(gBufferAlbedoView);
-        immediateContext.DrawIndexed(6, 6);
-        immediateContext.SetPixelShaderResource(gBufferDepthView);
-        immediateContext.DrawIndexed(6, 12);
+       
 
         //if (mesh.SubSets.Length > 1)
         //{
@@ -296,7 +397,7 @@ unsafe
 
         swapchain.Present();
 
-        //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
+        GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
     }
 
     //{
@@ -307,9 +408,29 @@ unsafe
     //    }
     //    CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
     //}
+    //deferredShadingPixelShader.Dispose();
     backbuffer.Dispose();
 }
 
+
+PixelShader CompilePixelShader(IShaderCompiler shaderCompiler, PixelShader previous, string path)
+{
+    Console.WriteLine($"recompiling shader at path: {path}");
+    try
+    {
+        using var compiledShader = shaderCompiler.CompileShaderFromFile(path, "main", "ps_5_0");
+        var shader = new PixelShader(device, compiledShader);
+        previous?.Dispose();
+        return shader;
+    }
+    catch(Exception e)
+    {
+        Console.WriteLine($"Failed to compiled shader at: {path} {e.Message}");
+        if (previous == null)
+            throw new InvalidOperationException("NO base shader..");
+    }
+    return previous;
+}
 
 [StructLayout(LayoutKind.Sequential)]
 struct Camera
@@ -326,4 +447,10 @@ public struct BackbufferVertex
 {
     public Vector2 Position;
     public Vector2 Texture;
+}
+
+[StructLayout(LayoutKind.Sequential, Size = 48)]
+public struct LightSource
+{
+    public Vector3 Position;
 }

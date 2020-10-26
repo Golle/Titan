@@ -7,7 +7,7 @@ cbuffer PerFrameBuffer : register(b0)
 cbuffer PerObjectBuffer : register(b1)
 {
     matrix World;
-} ;
+};
 
 struct VS_OUTPUT {
     float3 Normal: Normal;
@@ -26,7 +26,7 @@ VS_OUTPUT main(VS_INPUT input) {
 
     float4 position = mul(float4(input.Position, 1.0f), World);
     output.Position = mul(position, ViewProjection);
-    output.Normal = input.Normal;
+    output.Normal = mul(input.Normal, (float3x3) World);
     output.Texture = input.Texture;
 
     return output;
