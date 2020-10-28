@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Titan.Graphics.Pipeline.Graph;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
 
@@ -19,5 +20,7 @@ namespace Titan.Graphics.D3D11
             CheckAndThrow(Context.Get()->FinishCommandList(restoreDeferredContextState ? 1 : 0, &pCommandList), "FinishCommandList");
             return new CommandList(pCommandList);
         }
+
+        
     }
 }

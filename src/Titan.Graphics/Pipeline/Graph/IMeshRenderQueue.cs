@@ -5,6 +5,8 @@ namespace Titan.Graphics.Pipeline.Graph
 {
     public interface IMeshRenderQueue
     {
+
+        void Submit(in Mesh mesh);
         ReadOnlySpan<Renderable> GetRenderables();
     }
     

@@ -26,7 +26,7 @@ float4 main(float2 textureCoords: Texture) : SV_TARGET
     // TODO: add light calculations
     
     
-    float4 lightDirection = float4(1.0, 0.0, -2.0, 1.0);
+    float3 lightDirection = Position;
 
     float distance = length(lightDirection);
     float diffuseLightPercentage = saturate(dot(normal.xyz, normalize(lightDirection.xyz)));

@@ -28,12 +28,12 @@ namespace Titan.Graphics.Pipeline.Graph
             return new RenderBuffer(renderTargetView, shaderResourceView, texture);
         }
 
-        public DepthStencil GetDepthStencil(DXGI_FORMAT format = DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_FLAG bindFlag = D3D11_BIND_DEPTH_STENCIL)
+        public DepthStencil GetDepthStencil(DXGI_FORMAT format = DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_FLAG bindFlag = D3D11_BIND_DEPTH_STENCIL, DXGI_FORMAT shaderResourceFormat = DXGI_FORMAT_UNKNOWN)
         {
             Debug.Assert((bindFlag & D3D11_BIND_DEPTH_STENCIL) != 0, "BindFlag must contain D3D11_BIND_DEPTH_STENCIL");
 
             var resource = new Texture2D(_device, (uint)_window.Width, (uint)_window.Height, format, bindFlag);
-            var shaderResourceView = (bindFlag & D3D11_BIND_SHADER_RESOURCE) != 0 ? new ShaderResourceView(_device, resource) : null;
+            var shaderResourceView = (bindFlag & D3D11_BIND_SHADER_RESOURCE) != 0 ? new ShaderResourceView(_device, resource, shaderResourceFormat) : null;
             var depthStencilView = new DepthStencilView(_device, resource);
             return new DepthStencil(depthStencilView, shaderResourceView, resource);
         }

@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
+using Titan.Graphics.Pipeline.Graph;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -28,6 +29,12 @@ namespace Titan.Graphics.D3D11
             {
                 Context.Get()->ClearRenderTargetView(renderTargetView.Ptr.Get(), (float*)ptr);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ClearDepthStencilView(DepthStencilView depthStencilView)
+        {
+            Context.Get()->ClearDepthStencilView(depthStencilView.AsPointer(), 1, 1, 0);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

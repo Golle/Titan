@@ -19,6 +19,7 @@ namespace Titan.Graphics
                 .Register<IMeshLoader, MeshLoader>()
                 .Register<IMeshRenderQueue, NaiveMeshRenderQueue>()
                 .Register<IBufferManager, BufferManager>()
+                .Register<IShaderManager, ShaderManager>()
                 ;
         }
     }
