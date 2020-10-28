@@ -13,6 +13,7 @@ using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Meshes;
+using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Textures;
 using Titan.Input;
 using Titan.Windows.Events;
@@ -41,6 +42,8 @@ var window = engine.Window;
 var device = engine.Device;
 var container = engine.Container;
 
+
+new RenderGraphTester().Run();
 unsafe
 {
 
@@ -57,6 +60,20 @@ unsafe
 
 
     #region GBUFFER
+
+    {
+        var defines = new []{new ShaderDefines("NORMAL_MAP", "")};
+        using var gBufferCompiledVertexShader1 = shaderCompiler.CompileShaderFromFile(gBufferVertexShaderPath, "main", "vs_5_0", defines);
+        using var gBuffferVertexShader1 = new VertexShader(device, gBufferCompiledVertexShader1);
+        using var gBufferInputLayout1 = new InputLayout(device, gBufferCompiledVertexShader1, new[]
+        {
+            new InputLayoutDescriptor("Position", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT),
+            new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT)
+        });
+
+        using var compiledShader = shaderCompiler.CompileShaderFromFile(gBufferPixelShaderPath, "main", "ps_5_0", defines);
+        using var pshader = new PixelShader(device, compiledShader);
+    }
 
     using var gBufferCompiledVertexShader = shaderCompiler.CompileShaderFromFile(gBufferVertexShaderPath, "main", "vs_5_0");
     using var gBuffferVertexShader = new VertexShader(device, gBufferCompiledVertexShader);
@@ -145,7 +162,7 @@ unsafe
 
     #region DEFERRED SHADING
 
-    using var deferredShadingTexture = new Texture2D(device, (uint)window.Width, (uint)window.Height, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+    using var deferredShadingTexture = new Texture2D(device, (uint)window.Width/8, (uint)window.Height / 8, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
     using var deferredShadingRenderTarget = new RenderTargetView(device, deferredShadingTexture);
     using var deferredShadingResourceView = new ShaderResourceView(device, deferredShadingTexture);
 
@@ -329,7 +346,8 @@ unsafe
         using var commandList = deferredContext.FinishCommandList();
 
         {
-            deferredShading.SetViewport(new Viewport(window.Width, window.Height));
+            deferredShading.SetViewport(new Viewport(window.Width / 8f, window.Height / 8f));
+            //deferredShading.SetViewport(new Viewport(window.Width, window.Height));
             deferredShading.ClearRenderTargetView(deferredShadingRenderTarget, new Color(0, 0.2f, 0.2f));
             deferredShading.SetVertexShader(backbufferVertexShader);
             deferredShading.SetVertexBuffer(deferredShadingVertexBuffer);
@@ -359,15 +377,18 @@ unsafe
         //immediateContext.SetRenderTarget(backbuffer, depthStencilView);
         device.ImmediateContextPtr->OMSetRenderTargets(2, gBufferRenderTargets, depthStencilView.Ptr.Get());
 
-        immediateContext.SetVertexBuffer(mesh.VertexBuffer);
         immediateContext.SetInputLayout(gBufferInputLayout);
-        immediateContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        // can vary between meshes? normal map vs vertex normals
         immediateContext.SetPixelShader(gBufferPixelShader);
         immediateContext.SetVertexShader(gBuffferVertexShader);
+
+        // mesh stuff
+        immediateContext.SetVertexBuffer(mesh.VertexBuffer);
+        immediateContext.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         immediateContext.SetPixelShaderSampler(samplerState);
         immediateContext.SetPixelShaderResource(texture.ResourceView);
         immediateContext.SetIndexBuffer(mesh.IndexBuffer);
-
         immediateContext.SetVertexShaderConstantBuffer(cameraBuffer);
         immediateContext.SetVertexShaderConstantBuffer(modelBuffer, 1);
 

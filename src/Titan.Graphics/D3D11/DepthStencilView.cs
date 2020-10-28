@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -8,8 +9,11 @@ namespace Titan.Graphics.D3D11
 {
     public unsafe class DepthStencilView : IDisposable
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ID3D11DepthStencilView* AsPointer() => _depthStencil.Get();
         public ref readonly ComPtr<ID3D11DepthStencilView> Ptr => ref _depthStencil;
         private ComPtr<ID3D11DepthStencilView> _depthStencil;
+
         public DepthStencilView(IGraphicsDevice device, IResource resource)
         {
             D3D11_DEPTH_STENCIL_VIEW_DESC desc = default;

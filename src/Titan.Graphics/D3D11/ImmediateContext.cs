@@ -10,10 +10,13 @@ namespace Titan.Graphics.D3D11
 {
     public unsafe class ImmediateContext : IDisposable
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal ID3D11DeviceContext* AsPointer() => Context.Get();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal ref readonly ComPtr<ID3D11DeviceContext> AsComPointer() => ref Context;
+
         protected ComPtr<ID3D11DeviceContext> Context;
         
-
-
         protected ImmediateContext() { }
 
         public ImmediateContext(IGraphicsDevice device) => Context = new ComPtr<ID3D11DeviceContext>(device.ImmediateContextPtr);

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -6,6 +7,10 @@ namespace Titan.Graphics.D3D11
 {
     public unsafe class RenderTargetView : IDisposable
     {
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal ID3D11RenderTargetView* AsPointer() => _renderTargetView.Get();
+
         private ComPtr<ID3D11RenderTargetView> _renderTargetView;
         internal ref readonly ComPtr<ID3D11RenderTargetView> Ptr => ref _renderTargetView;
 
