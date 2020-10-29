@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Shaders;
+using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.D3D11.D3D11_BIND_FLAG;
 using static Titan.Windows.Win32.D3D11.DXGI_FORMAT;
@@ -7,6 +9,10 @@ using static Titan.Windows.Win32.D3D11.D3D_PRIMITIVE_TOPOLOGY;
 
 namespace Titan.Graphics.Pipeline.Graph
 {
+
+
+    
+
     public class GBufferRenderPass : IRenderPass
     {
         private readonly IMeshRenderQueue _meshRenderQueue;
@@ -22,12 +28,7 @@ namespace Titan.Graphics.Pipeline.Graph
 
         private readonly Color _clearColor = Color.Black;
         
-        private readonly VertexShader _vertexShader;
-        private readonly InputLayout _inputLayout;
-        private readonly PixelShader _pixelShader;
-
-        private const string GBufferVertexShaderPath = @"F:\Git\Titan\resources\shaders\GBufferVertexShader.hlsl";
-        private const string GBufferPixelShaderPath = @"F:\Git\Titan\resources\shaders\GBufferPixelShader.hlsl";
+        private readonly ShaderProgram _program;
 
         public GBufferRenderPass(IMeshRenderQueue meshRenderQueue, IBufferManager bufferManager, IShaderManager shaderManager)
         {
@@ -37,13 +38,7 @@ namespace Titan.Graphics.Pipeline.Graph
             
             _depthStencil = bufferManager.GetDepthStencil(bindFlag: D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL, shaderResourceFormat: DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
 
-            (_vertexShader, _inputLayout) = shaderManager.GetVertexShader(GBufferVertexShaderPath, new[]
-            {
-                new InputLayoutDescriptor("Position", DXGI_FORMAT_R32G32B32_FLOAT),
-                new InputLayoutDescriptor("Normal", DXGI_FORMAT_R32G32B32_FLOAT),
-                new InputLayoutDescriptor("Texture", DXGI_FORMAT_R32G32_FLOAT)
-            });
-            _pixelShader = shaderManager.GetPixelShader(GBufferPixelShaderPath);
+            _program = shaderManager.Get(shaderManager.GetHandle("GBufferDefault"));
         }
 
 
@@ -63,9 +58,10 @@ namespace Titan.Graphics.Pipeline.Graph
 
             // This wont work when we have different types of geometry
             context.SetPritimiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            context.SetPixelShader(_pixelShader);
-            context.SetVertexShader(_vertexShader);
-            context.SetInputLayout(_inputLayout);
+            _program.Bind(context);
+            //context.SetPixelShader(_pixelShader);
+            //context.SetVertexShader(_vertexShader);
+            //context.SetInputLayout(_inputLayout);
         }
 
         public void Render(ImmediateContext context)
@@ -103,6 +99,33 @@ namespace Titan.Graphics.Pipeline.Graph
             _albedoBuffer.Dispose();
             _depthStencil.Dispose();
         }
+    }
+
+
+    public enum CommandType : byte
+    {
+        SetVertexBuffer,
+        SetIndexBuffer,
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct DrawCommand
+    {
+        [FieldOffset(0)]
+        public readonly CommandType Type;
+        [FieldOffset(sizeof(CommandType))]
+        public SetVertexBufferCommand VertexBuffer;
+        [FieldOffset(sizeof(CommandType))]
+        public SetVertexBufferCommand IndexBuffer;
+
+
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SetVertexBufferCommand
+    {
+        public uint BufferId;
+        public uint Offset;
     }
 }
 

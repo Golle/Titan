@@ -1,0 +1,96 @@
+{
+    "ShaderPrograms": [
+        {
+            "Name": "GBufferNormalMap",
+            "PixelShader": {
+                "Filename": "shaders/GBufferPixelShader.hlsl",
+                "Defines": [
+                    {
+                        "Name": "NORMAL_MAP",
+                        "Value": ""
+                    }
+                ]
+            },
+            "VertexShader": {
+                "Filename": "shaders/GBufferVertexShader.hlsl",
+                "Defines": [
+                    {
+                        "Name": "NORMAL_MAP",
+                        "Value": ""
+                    }
+                ]
+            },
+            "Layout": [
+                {
+                    "Name": "Position",
+                    "Format": "DXGI_FORMAT_R32G32B32_FLOAT"
+                },
+                {
+                    "Name": "Texture",
+                    "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                }
+            ]
+        },
+        {
+            "Name": "GBufferDefault",
+            "PixelShader": {
+                "Filename": "shaders/GBufferPixelShader.hlsl"
+            },
+            "VertexShader": {
+                "Filename": "shaders/GBufferVertexShader.hlsl"
+            },
+            "Layout": [
+                {
+                    "Name": "Position",
+                    "Format": "DXGI_FORMAT_R32G32B32_FLOAT"
+                },
+                {
+                    "Name": "Normal",
+                    "Format": "DXGI_FORMAT_R32G32B32_FLOAT"
+                },
+                {
+                    "Name": "Texture",
+                    "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                }
+            ]
+        },
+        {
+            "Name": "BackbufferDefault",
+            "PixelShader": {
+                "Filename": "shaders/BackbufferPixelShader.hlsl"
+            },
+            "VertexShader": {
+                "Filename": "shaders/BackbufferVertexShader.hlsl"
+            },
+            "Layout": [
+                {
+                    "Name": "Position",
+                    "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                },
+                {
+                    "Name": "Texture",
+                    "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                }
+            ]
+        },
+        {
+            "Name": "DeferredShadingDefault",
+            "PixelShader": {
+                "Filename": "shaders/DeferredShadingPixelShader.hlsl"
+            },
+            "VertexShader": {
+                "Filename": "shaders/BackbufferVertexShader.hlsl"
+            },
+            "Layout": [
+                {
+                    "Name": "Position",
+                    "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                },
+                {
+                    "Name": "Texture",
+                    "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                }
+            ]
+        }
+    ]
+}

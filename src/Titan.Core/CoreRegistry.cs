@@ -14,7 +14,8 @@ namespace Titan.Core
                 .Register<ILogFormatter, TimeLogFormatter>()
                 .Register<ILog, ConsoleLogger>()
                 .Register<IEventQueue, EventQueue>()
-                
+                .Register<IFileReader, FileReader>()
+                .Register<IJsonSerializer, JsonSerializerWrapper>()
                 ;
         }
     }

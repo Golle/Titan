@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Meshes;
 
@@ -60,10 +61,12 @@ namespace Titan.Graphics.Pipeline.Graph
     public struct Renderable
     {
         public Mesh Mesh;
+        public Matrix4x4 World;
     }
 
     public interface IRenderPass : IDisposable
     {
+
     }
 
 
