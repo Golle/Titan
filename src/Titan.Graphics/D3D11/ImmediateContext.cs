@@ -1,15 +1,16 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
-using Titan.Graphics.Pipeline.Graph;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
+using static Titan.Windows.Win32.Common;
 
 namespace Titan.Graphics.D3D11
 {
-    public unsafe class ImmediateContext : IDisposable
+    public unsafe class ImmediateContext : IDisposable, IRenderContext
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal ID3D11DeviceContext* AsPointer() => Context.Get();
@@ -87,6 +88,24 @@ namespace Titan.Graphics.D3D11
         public void DrawIndexedInstanced(uint indexCountPerInstance, uint instanceCount, uint startIndexLocation = 0u, int baseVertexLocation = 0, uint startInstanceLocation = 0u) => Context.Get()->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ExecuteCommandList(in CommandList commandList, bool restoreContextState = false) => Context.Get()->ExecuteCommandList(commandList.Ptr, restoreContextState ? 1 : 0);
+
+        public void MapResource<T>(ID3D11Resource* resource, in T value) where T : unmanaged
+        {
+            var context = Context.Get();
+            D3D11_MAPPED_SUBRESOURCE mappedResource;
+#if DEBUG
+            CheckAndThrow(context->Map(resource, 0, D3D11_MAP.D3D11_MAP_WRITE_DISCARD, 0, &mappedResource), "Failed to Map Resource");
+#else
+            context->Map(resource, 0, D3D11_MAP.D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+#endif
+            fixed (void* pData = &value)
+            {
+                var size = sizeof(T);
+                Buffer.MemoryCopy(pData, mappedResource.pData, size, size);
+            }
+            context->Unmap(resource, 0);
+        }
+
         public void Dispose() => Context.Dispose();
     }
 }

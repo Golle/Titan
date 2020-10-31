@@ -1,4 +1,4 @@
-// ReSharper disable UnusedMember.Global
+// ReSharper disable InconsistentNaming
 namespace Titan.Windows.Win32.D3D11
 {
     public enum D3D_PRIMITIVE_TOPOLOGY

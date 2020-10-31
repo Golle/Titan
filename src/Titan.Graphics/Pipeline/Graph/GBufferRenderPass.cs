@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Shaders;
+using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.D3D11.D3D11_BIND_FLAG;
@@ -15,7 +16,7 @@ namespace Titan.Graphics.Pipeline.Graph
 
     public class GBufferRenderPass : IRenderPass
     {
-        private readonly IMeshRenderQueue _meshRenderQueue;
+        private readonly DefaultSceneRenderer _renderer;
 
         public ShaderResourceView NormalResourceView => _normalsBuffer.ShaderResourceView;
         public ShaderResourceView AlbedoResourceView => _albedoBuffer.ShaderResourceView;
@@ -30,9 +31,9 @@ namespace Titan.Graphics.Pipeline.Graph
         
         private readonly ShaderProgram _program;
 
-        public GBufferRenderPass(IMeshRenderQueue meshRenderQueue, IBufferManager bufferManager, IShaderManager shaderManager)
+        public GBufferRenderPass(IBufferManager bufferManager, IShaderManager shaderManager, DefaultSceneRenderer renderer)
         {
-            _meshRenderQueue = meshRenderQueue;
+            _renderer = renderer;
             _normalsBuffer = bufferManager.GetBuffer(DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
             _albedoBuffer = bufferManager.GetBuffer(DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
             
@@ -42,54 +43,24 @@ namespace Titan.Graphics.Pipeline.Graph
         }
 
 
-        public void Begin(ImmediateContext context)
+        public CommandList Render(IRenderContext context)
         {
             context.ClearRenderTargetView(_normalsBuffer.RenderTargetView, _clearColor);
             context.ClearRenderTargetView(_albedoBuffer.RenderTargetView, _clearColor);
             context.ClearDepthStencilView(_depthStencil.View);
-            
+
             unsafe
             {
                 var renderTargets = stackalloc ID3D11RenderTargetView*[2];
                 renderTargets[0] = _albedoBuffer.RenderTargetView.AsPointer();
                 renderTargets[1] = _normalsBuffer.RenderTargetView.AsPointer();
-                context.AsPointer()->OMSetRenderTargets(2, renderTargets, _depthStencil.View.AsPointer());
+                ((ImmediateContext)context).AsPointer()->OMSetRenderTargets(2, renderTargets, _depthStencil.View.AsPointer());
             }
 
-            // This wont work when we have different types of geometry
-            context.SetPritimiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             _program.Bind(context);
-            //context.SetPixelShader(_pixelShader);
-            //context.SetVertexShader(_vertexShader);
-            //context.SetInputLayout(_inputLayout);
-        }
 
-        public void Render(ImmediateContext context)
-        {
-            foreach (ref readonly var renderable in _meshRenderQueue.GetRenderables())
-            {
-                var (vertexBuffer, indexBuffer, subSets) = renderable.Mesh;
-                
-                context.SetVertexBuffer(vertexBuffer);
-                context.SetIndexBuffer(indexBuffer);
-                if (subSets.Length > 0)
-                {
-                    for (var i = 0; i < subSets.Length; ++i)
-                    {
-                        ref readonly var subset = ref subSets[i];
-                        context.DrawIndexed((uint) subset.Count, (uint) subset.StartIndex);
-                    }
-                }
-                else
-                {
-                    context.DrawIndexed(indexBuffer.NumberOfIndices);
-                }
-            }
-        }
-
-        public CommandList End(DeferredContext context)
-        {
-            return context.FinishCommandList();
+            _renderer.Render(context);
+            return ((DeferredContext)context).FinishCommandList();
         }
 
 

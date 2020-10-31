@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -10,8 +11,16 @@ namespace Titan.Graphics.D3D11.Buffers
 {
     public unsafe class ConstantBuffer<T> : IConstantBuffer where T : unmanaged
     {
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal ID3D11Buffer* AsPointer() => _buffer.Get();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ID3D11Resource* AsResourcePointer() => (ID3D11Resource*) _buffer.Get();
+
         private ComPtr<ID3D11Buffer> _buffer;
+
         ref readonly ComPtr<ID3D11Buffer> IConstantBuffer.Ptr => ref _buffer;
+
         public ConstantBuffer(IGraphicsDevice device, D3D11_USAGE usage = D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG cpuAccess = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_RESOURCE_MISC_FLAG miscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED)
         {
             Debug.Assert(sizeof(T) % 16 == 0, "ConstantBuffer must be 16 byte aligned");
@@ -66,7 +75,5 @@ namespace Titan.Graphics.D3D11.Buffers
         {
             _buffer.Dispose();
         }
-
-        
     }
 }

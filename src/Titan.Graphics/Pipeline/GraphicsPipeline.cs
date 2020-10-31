@@ -25,11 +25,39 @@ namespace Titan.Graphics.Pipeline
             var configuration = _loader.Load(path);
             LOGGER.Debug("Adding ShaderPrograms {0}", configuration.ShaderPrograms.Length);
 
-            foreach (var program in configuration.ShaderPrograms)
+            foreach (var (name, vertexShader, pixelShader, layout) in configuration.ShaderPrograms)
             {
-                LOGGER.Debug("Compiling shader program {0}", program.Name);
-                _shaderManager.AddShaderProgram(program.Name, program.VertexShader, program.PixelShader, program.Layout);
+                LOGGER.Debug("Compiling shader program {0}", name);
+                _shaderManager.AddShaderProgram(name, vertexShader, pixelShader, layout);
+            }
+
+            var builder = new RenderGraphBuilder();
+            foreach (var renderPass in configuration.RenderPasses)
+            {
+                builder.AddPass(renderPass);
             }
         }
     }
+
+    internal class RenderGraphBuilder
+    {
+        public void AddPass(RenderPassConfiguration config)
+        {
+            //throw new System.NotImplementedException();
+        }
+
+        public RenderGraph Compile()
+        {
+            return null;
+        }
+    }
+
+    internal class RenderGraph
+    {
+        
+    }
+
+
+    public class FullScreenRenderPass {}
+    public class SceneRenderPass{}
 }

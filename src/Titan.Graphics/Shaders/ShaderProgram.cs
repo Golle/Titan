@@ -18,7 +18,7 @@ namespace Titan.Graphics.Shaders
             _pixelShader = pixelShader;
         }
 
-        public void Bind(ImmediateContext context)
+        public void Bind(IRenderContext context)
         {
             context.SetInputLayout(_inputLayout);
             context.SetPixelShader(_pixelShader);

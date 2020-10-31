@@ -15,6 +15,7 @@ using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Graph;
+using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Shaders;
 using Titan.Graphics.Textures;
 using Titan.Input;
@@ -121,7 +122,7 @@ unsafe
     var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
     meshRenderQueue.Submit(mesh, Matrix4x4.Identity);
 
-    var gbufferRenderPass = new GBufferRenderPass(meshRenderQueue, container.GetInstance<IBufferManager>(), container.GetInstance<IShaderManager>());
+    var gbufferRenderPass = new GBufferRenderPass(container.GetInstance<IBufferManager>(), container.GetInstance<IShaderManager>(), container.GetInstance<DefaultSceneRenderer>());
 
     var lightPosition = new Vector3(0, 0, -1);
     var lightVelocity = 0.05f;
@@ -176,22 +177,22 @@ unsafe
         }
 
         window.SetTitle($"[{input.MousePosition.X}, {input.MousePosition.Y}]");
-
-        //var rotation = Quaternion.CreateFromYawPitchRoll(cameraRot.X, cameraRot.Y, 0);
-        var rotation = Quaternion.CreateFromYawPitchRoll(3,0, 0);
         var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
-        var forward = Vector3.Transform(new Vector3(0, 0, 1f), rotation);
-        var up = Vector3.Transform(new Vector3(0, 1, 0), rotation);
-        position += Vector3.Transform(distance, rotation);
-        var viewMatrix = Matrix4x4.CreateLookAt(position, position + forward, up);
-        var viewProjectionMatrix = viewMatrix * projectionMatrix;
-        //var viewProjectionMatrix = new Matrix4x4(-1, 0, 0, 0, 0, 1.77777779f, 0, 0, 0, 0, -1.00005f, -1, 0, 0, -0.5f, 0);
-        var camera = new Camera
-        {
-            ViewMatrix = viewMatrix,
-            ViewProjectMatrix = Matrix4x4.Transpose(viewProjectionMatrix)
-        };
-        using var cameraBuffer = new ConstantBuffer<Camera>(device, camera);
+
+        ////var rotation = Quaternion.CreateFromYawPitchRoll(cameraRot.X, cameraRot.Y, 0);
+        //var rotation = Quaternion.CreateFromYawPitchRoll(3,0, 0);
+        //var forward = Vector3.Transform(new Vector3(0, 0, 1f), rotation);
+        //var up = Vector3.Transform(new Vector3(0, 1, 0), rotation);
+        //position += Vector3.Transform(distance, rotation);
+        //var viewMatrix = Matrix4x4.CreateLookAt(position, position + forward, up);
+        //var viewProjectionMatrix = viewMatrix * projectionMatrix;
+        ////var viewProjectionMatrix = new Matrix4x4(-1, 0, 0, 0, 0, 1.77777779f, 0, 0, 0, 0, -1.00005f, -1, 0, 0, -0.5f, 0);
+        //var camera = new Camera
+        //{
+        //    ViewMatrix = viewMatrix,
+        //    ViewProjectMatrix = Matrix4x4.Transpose(viewProjectionMatrix)
+        //};
+        //using var cameraBuffer = new ConstantBuffer<Camera>(device, camera);
 
         var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(new Vector3(1, 1, 1)) *
                                               Matrix4x4.CreateFromQuaternion(modelRotation) *
@@ -253,16 +254,12 @@ unsafe
 
 
         // render the GBuffer
-        gbufferRenderPass.Begin(gbufferDeferredContext);
         gbufferDeferredContext.SetViewport(new Viewport(window.Width, window.Height));
         gbufferDeferredContext.SetPixelShaderSampler(samplerState);
         gbufferDeferredContext.SetPixelShaderResource(texture.ResourceView);
-        gbufferDeferredContext.SetVertexShaderConstantBuffer(cameraBuffer);
         gbufferDeferredContext.SetVertexShaderConstantBuffer(modelBuffer, 1);
         
-        gbufferRenderPass.Render(gbufferDeferredContext);
-        
-        using var gbufferCommandList = gbufferRenderPass.End(gbufferDeferredContext);
+        using var gbufferCommandList = gbufferRenderPass.Render(gbufferDeferredContext);
         using var deferredShadingCommandList = deferredShading.FinishCommandList();
         using var backbufferCommandList = deferredContext.FinishCommandList();
 

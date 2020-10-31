@@ -132,5 +132,11 @@
                 "GBuffer"
             ]
         }
+    ],
+    "Renderers": [
+        {
+            "Name" : "Scene",
+            "Type" : "Titan.Graphics., Titan.Graphics"
+        }
     ]
 }
