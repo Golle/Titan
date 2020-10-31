@@ -92,5 +92,45 @@
                 }
             ]
         }
+    ],
+    "RenderPasses": [
+        {
+            "Name": "GBuffer",
+            "Renderer": "Scene",
+            "DepthStencil": {},
+            "RenderTargets": [
+                {
+                    "Name": "GBufferAlbedo",
+                    "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT"
+                },
+                {
+                    "Name": "GBufferNormal",
+                    "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT"
+                }
+            ]
+        },
+        {
+            "Name": "Backbuffer",
+            "Renderer": "Fullscreen",
+            "DepthStencil": {},
+            "Resources": [
+                {
+                    "Name": "GBufferAlbedo",
+                    "Type": "PixelShader"
+                },
+                {
+                    "Name": "GBufferNormal",
+                    "Type": "PixelShader"
+                }
+            ],
+            "RenderTargets": [
+                {
+                    "Name": "$.Backbuffer"
+                }
+            ],
+            "Dependencies": [
+                "GBuffer"
+            ]
+        }
     ]
 }
