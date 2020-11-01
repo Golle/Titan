@@ -10,7 +10,7 @@ namespace Titan.Graphics.Shaders
 {
     public interface IShaderManager : IDisposable
     {
-        void AddShaderProgram(string name, VertexShaderDescriptor vsDescriptor, PixelShaderDescriptor psDescriptor, in InputLayoutDescriptor[] inputLayoutDescriptor);
+        uint AddShaderProgram(string name, VertexShaderDescriptor vsDescriptor, PixelShaderDescriptor psDescriptor, in InputLayoutDescriptor[] inputLayoutDescriptor);
 
         uint GetHandle(string name);
         ShaderProgram Get(uint handle);
@@ -36,7 +36,7 @@ namespace Titan.Graphics.Shaders
             _loader = loader;
         }
 
-        public void AddShaderProgram(string name, VertexShaderDescriptor vsDescriptor, PixelShaderDescriptor psDescriptor, in InputLayoutDescriptor[] inputLayoutDescriptor)
+        public uint AddShaderProgram(string name, VertexShaderDescriptor vsDescriptor, PixelShaderDescriptor psDescriptor, in InputLayoutDescriptor[] inputLayoutDescriptor)
         {
             Debug.Assert(!_shaderPrograms.Take((int) _shaderProgramsCount).Any(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase)), $"ShaderProgram with name {name} already exists.");
 
@@ -64,8 +64,10 @@ namespace Titan.Graphics.Shaders
                 }
                 _vertexShaders.Add(vsKey, vertexShader);
             }
-            
-            _shaderPrograms[_shaderProgramsCount++] = new ShaderProgram(name, inputLayout, vertexShader, pixelShader);
+
+            var handle = _shaderProgramsCount++;
+            _shaderPrograms[handle] = new ShaderProgram(name, inputLayout, vertexShader, pixelShader);
+            return handle;
         }
 
         public uint GetHandle(string name)

@@ -16,8 +16,9 @@ namespace Titan
         private readonly GraphicsDevice _device;
         
         private readonly IContainer _container;
+        private readonly IGraphicsPipeline _pipeline;
 
-        public Engine(EngineConfiguration configuration, IWindowFactory windowFactory, IEventQueue eventQueue,  ILog log, IContainer container)
+        public Engine(EngineConfiguration configuration, IWindowFactory windowFactory, IEventQueue eventQueue, ILog log, IContainer container)
         {
             LOGGER.InitializeLogger(log);
             LOGGER.Debug("Initialize EventQueue with {0}", typeof(ScanningEventTypeProvider));
@@ -30,19 +31,18 @@ namespace Titan
                 .RegisterSingleton<IGraphicsDevice>(_device)
                 .RegisterSingleton(_window)
                 .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath));
-
+            
+            _pipeline = container.GetInstance<IGraphicsPipeline>();
             LOGGER.Debug("Initialize GraphicsPipeline");
-            container
-                .GetInstance<IGraphicsPipeline>()
-                .Initialize("render_pipeline.json");
+            _pipeline.Initialize("render_pipeline.json");
 
 
             _container = container;
         }
 
-
         public void Dispose()
         {
+            _pipeline.Dispose();
             _device.Dispose();
             _window.Dispose();
         }

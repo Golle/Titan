@@ -10,10 +10,6 @@ using static Titan.Windows.Win32.D3D11.D3D_PRIMITIVE_TOPOLOGY;
 
 namespace Titan.Graphics.Pipeline.Graph
 {
-
-
-    
-
     public class GBufferRenderPass : IRenderPass
     {
         private readonly DefaultSceneRenderer _renderer;
@@ -70,33 +66,6 @@ namespace Titan.Graphics.Pipeline.Graph
             _albedoBuffer.Dispose();
             _depthStencil.Dispose();
         }
-    }
-
-
-    public enum CommandType : byte
-    {
-        SetVertexBuffer,
-        SetIndexBuffer,
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
-    public struct DrawCommand
-    {
-        [FieldOffset(0)]
-        public readonly CommandType Type;
-        [FieldOffset(sizeof(CommandType))]
-        public SetVertexBufferCommand VertexBuffer;
-        [FieldOffset(sizeof(CommandType))]
-        public SetVertexBufferCommand IndexBuffer;
-
-
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct SetVertexBufferCommand
-    {
-        public uint BufferId;
-        public uint Offset;
     }
 }
 

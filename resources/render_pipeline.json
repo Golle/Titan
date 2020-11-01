@@ -97,22 +97,28 @@
         {
             "Name": "GBuffer",
             "Renderer": "Scene",
-            "DepthStencil": {},
+            "DepthStencil": {
+                "Name": "Depth"
+            },
             "RenderTargets": [
                 {
                     "Name": "GBufferAlbedo",
-                    "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT"
+                    "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT",
+                    "Clear": true,
+                    "Color": "#ff000000"
                 },
                 {
                     "Name": "GBufferNormal",
-                    "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT"
+                    "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT",
+                    "Clear": true,
+                    "Color": "#7F007FAA"
                 }
             ]
         },
         {
             "Name": "Backbuffer",
             "Renderer": "Fullscreen",
-            "DepthStencil": {},
+            "DepthStencil": null,
             "Resources": [
                 {
                     "Name": "GBufferAlbedo",
@@ -125,7 +131,7 @@
             ],
             "RenderTargets": [
                 {
-                    "Name": "$.Backbuffer"
+                    "Name": "$Backbuffer"
                 }
             ],
             "Dependencies": [
@@ -136,7 +142,11 @@
     "Renderers": [
         {
             "Name" : "Scene",
-            "Type" : "Titan.Graphics., Titan.Graphics"
+            "Type" : "Titan.Graphics.Pipeline.Renderers.DefaultSceneRenderer, Titan.Graphics"
+        },
+        {
+            "Name" : "Fullscreen",
+            "Type" : "Titan.Graphics.Pipeline.Renderers.DefaultFullscreenRenderer, Titan.Graphics"
         }
     ]
 }

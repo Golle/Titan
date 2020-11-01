@@ -106,6 +106,9 @@ namespace Titan.Graphics.D3D11
             context->Unmap(resource, 0);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetRenderTargets(ID3D11RenderTargetView** renderTargets, uint numViews, ID3D11DepthStencilView* depthStencilView) => Context.Get()->OMSetRenderTargets(numViews, renderTargets, depthStencilView);
+
         public void Dispose() => Context.Dispose();
     }
 }

@@ -81,7 +81,7 @@ namespace Titan.Graphics.Pipeline.Renderers
                     for (var i = 0; i < subsets.Length; ++i)
                     {
                         ref readonly var subset = ref subsets[i];
-                        context.DrawIndexed((uint)subset.Count, (uint)subset.StartIndex);
+                        context.DrawIndexed(subset.Count, subset.StartIndex);
                     }
                 }
                 else
