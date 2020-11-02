@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Pipeline.Renderers;
 
 namespace Titan.Graphics.Pipeline
 {
-    internal class RenderGraphBuilder
+    internal class RenderPassBuilder
     {
         private readonly BackBufferRenderTargetView _backBuffer;
 
@@ -17,8 +18,9 @@ namespace Titan.Graphics.Pipeline
         private readonly IDictionary<string, uint> _shaderProgramHandles = new Dictionary<string, uint>();
         private readonly IDictionary<string, RenderBuffer> _buffers = new Dictionary<string, RenderBuffer>();
         private readonly IDictionary<string, DepthStencil> _depthStencils = new Dictionary<string, DepthStencil>();
+        private readonly IDictionary<string, SamplerState> _samplers = new Dictionary<string, SamplerState>();
 
-        public RenderGraphBuilder(BackBufferRenderTargetView backBuffer)
+        public RenderPassBuilder(BackBufferRenderTargetView backBuffer)
         {
             _backBuffer = backBuffer;
         }
@@ -69,40 +71,66 @@ namespace Titan.Graphics.Pipeline
             _depthStencils.Add(name, depthStencil);
         }
 
-        public RenderGraph Compile()
+        public void AddSampler(string name, SamplerState samplerState)
+        {
+            if (_samplers.ContainsKey(name))
+            {
+                throw new InvalidOperationException($"Sampler with name {name} has already been added to the Render Graph");
+            }
+            _samplers.Add(name, samplerState);
+        }
+
+        public RenderPass[] Compile()
         {
             var renderPasses = new List<RenderPass>();
             
             foreach (var pass in _renderPasses.Values)
             {
                 var commandList = new List<RenderPassCommand>();
-                
-                commandList.AddRange(CreateRenderTargetCommand(pass.RenderTargets).ToArray());
-
                 if (pass.DepthStencil != null)
                 {
                     commandList.Add(new RenderPassCommand{Type = CommandType.ClearDepthStencil, DepthStencil = _depthStencils[pass.DepthStencil.Name].View});
                 }
 
-                foreach (var (name, type) in pass.Resources ?? Enumerable.Empty<RenderPassResourceConfiguration>())
-                {
-                    var resourceView = _buffers[name].ShaderResourceView;
-                    commandList.Add(type switch
-                    {
-                        RenderPassResourceTypes.VertexShader => new RenderPassCommand { Type = CommandType.SetVertexShaderResource, ShaderResourceView = resourceView },
-                        RenderPassResourceTypes.PixelShader => new RenderPassCommand { Type = CommandType.SetPixelShaderResource, ShaderResourceView = resourceView },
-                        _ => throw new NotSupportedException("The resource type is not supported")
-                    });
-                }
+                commandList.AddRange(CreateResourcesCommands(pass.Resources));
+                commandList.AddRange(CreateSamplerCommands(pass.Samplers).ToArray());
 
+                commandList.AddRange(CreateRenderTargetCommand(pass.RenderTargets).ToArray());
                 commandList.Add(new RenderPassCommand {Type = CommandType.Render, Renderer = _renderers[pass.Renderer]});
 
                 renderPasses.Add(new RenderPass(pass.Name, commandList.ToArray()));
             }
-            return new RenderGraph(renderPasses.ToArray())
-            {
+            
+            return renderPasses.ToArray();
+        }
 
-            };
+        private IEnumerable<RenderPassCommand> CreateSamplerCommands(RenderPassSamplerConfiguration[] samplers)
+        {
+            if (samplers == null)
+            {
+                yield break;
+            }
+
+            for (var i = 0u; i < samplers.Length; ++i)
+            {
+                var (name, type) = samplers[i];
+                var resourceType = type == SamplerType.PixelShader ? CommandType.SetPixelShaderSampler : CommandType.SetVertexShaderSampler;
+                yield return new RenderPassCommand {Type = resourceType, SamplerState = new SetSamplerStateCommand {Sampler = _samplers[name], Slot = i}};
+            }
+        }
+
+        private IEnumerable<RenderPassCommand> CreateResourcesCommands(RenderPassResourceConfiguration[] resources)
+        {
+            if (resources == null)
+            {
+                yield break;
+            }
+            for (var i = 0u; i < resources.Length; ++i)
+            {
+                var (name, type) = resources[i];
+                var resourceType = type == RenderPassResourceTypes.PixelShader ? CommandType.SetPixelShaderResource : CommandType.SetVertexShaderResource;
+                yield return new RenderPassCommand {Type = resourceType, ShaderResource = new SetShaderResourceCommand {View = _buffers[name].ShaderResourceView, Slot = i}};
+            }
         }
 
         private IEnumerable<RenderPassCommand> CreateRenderTargetCommand(RenderTargetConfiguration[] renderTargets)
@@ -125,7 +153,6 @@ namespace Titan.Graphics.Pipeline
                     var renderTarget = renderTargets[i];
                     var renderTargetView = renderTarget.IsGlobal() ? _backBuffer : _buffers[renderTarget.Name].RenderTargetView;
                     command.Set(i, renderTargetView);
-                    
                     if (renderTarget.Clear)
                     {
                         yield return new RenderPassCommand { Type = CommandType.ClearRenderTarget, ClearRenderTarget = new ClearRenderTargetCommand { RenderTarget = renderTargetView, Color = Color.Parse(renderTarget.Color) } };

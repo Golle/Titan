@@ -2,7 +2,9 @@ using System.Numerics;
 using Titan.Core.Common;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Graph;
+using Titan.Graphics.Shaders;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
 
@@ -12,20 +14,25 @@ namespace Titan.Graphics.Pipeline.Renderers
     {
         private readonly IMeshRenderQueue _renderQueue;
         private readonly IWindow _window;
+        private readonly IShaderManager _shaderManager;
         private readonly ConstantBuffer<Matrix4x4> _perObjectBuffer;
         private readonly ConstantBuffer<CameraBuffer> _camera;
+        private readonly SamplerState _sampler;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager)
         {
             _renderQueue = renderQueue;
             _window = window;
+            _shaderManager = shaderManager;
 
             _perObjectBuffer = new ConstantBuffer<Matrix4x4>(device, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
             _camera = new ConstantBuffer<CameraBuffer>(device, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
+            _sampler = new SamplerState(device);
         }
 
         private Vector3 modelPosition = new Vector3(0, 0, 0);
         private Vector2 modelRot = new Vector2(0, 0);
+
         public unsafe void Render(IRenderContext context)
         {
             // update camera
@@ -61,10 +68,13 @@ namespace Titan.Graphics.Pipeline.Renderers
                                                   Matrix4x4.CreateTranslation(modelPosition));
             #endregion
 
+            _shaderManager.Get(_shaderManager.GetHandle("GBufferDefault")).Bind(context);
+
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             context.MapResource(_camera.AsResourcePointer(), camera); // only needs to be done when the camera changes 
             
             context.SetVertexShaderConstantBuffer(_camera);
+            context.SetPixelShaderSampler(_sampler);
             foreach (ref readonly var renderable in _renderQueue.GetRenderables())
             {
                 //context.MapResource(_perObjectBuffer.AsResourcePointer(), renderable.World);
@@ -99,8 +109,9 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         public void Dispose()
         {
-            _perObjectBuffer?.Dispose();
-            _camera?.Dispose();
+            _sampler.Dispose();
+            _perObjectBuffer.Dispose();
+            _camera.Dispose();
         }
     }
 }

@@ -18,8 +18,11 @@ namespace Titan.Graphics.Pipeline
 
         public void Render(IRenderContext renderContext)
         {
-            foreach (var command in _commands)
+
+            for (var i = 0; i < _commands.Length; i++)
             {
+                ref readonly var command = ref _commands[i];
+
                 switch (command.Type)
                 {
                     case CommandType.ClearRenderTarget:
@@ -43,6 +46,18 @@ namespace Titan.Graphics.Pipeline
                     case CommandType.Render:
                         command.Renderer.Render(renderContext);
                         break;
+                    case CommandType.SetVertexShaderResource:
+                        renderContext.SetVertexShaderResource(command.ShaderResource.View, command.ShaderResource.Slot);
+                        break;
+                    case CommandType.SetPixelShaderResource:
+                        renderContext.SetPixelShaderResource(command.ShaderResource.View, command.ShaderResource.Slot);
+                        break;
+                    case CommandType.SetVertexShaderSampler:
+                        renderContext.SetVertexShaderSampler(command.SamplerState.Sampler, command.SamplerState.Slot);
+                        break;
+                    case CommandType.SetPixelShaderSampler:
+                        renderContext.SetPixelShaderSampler(command.SamplerState.Sampler, command.SamplerState.Slot);
+                        break;
                     default:
                         throw new InvalidOperationException("Render command not found.");
                 }
@@ -54,7 +69,7 @@ namespace Titan.Graphics.Pipeline
         {
             fixed (ulong* pRenderTargets = command.Pointers)
             {
-                context.SetRenderTargets((ID3D11RenderTargetView**)&pRenderTargets, command.Count, command.DepthStencilView);
+                context.SetRenderTargets((ID3D11RenderTargetView**)pRenderTargets, command.Count, command.DepthStencilView);
             }
         }
     }

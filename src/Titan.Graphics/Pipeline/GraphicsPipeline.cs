@@ -4,6 +4,7 @@ using System.Linq;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Pipeline.Renderers;
@@ -24,6 +25,10 @@ namespace Titan.Graphics.Pipeline
         private readonly IGraphicsDevice _device;
 
         private readonly IList<IRenderer> _renderers = new List<IRenderer>();
+        
+        private RenderGraph _renderGraph;
+        private SamplerState _samplerState;
+
         public GraphicsPipeline(TitanConfiguration configuration, IPipelineConfigurationLoader loader, IShaderManager shaderManager, IBufferManager bufferManager,  IContainer container, IGraphicsDevice device)
         {
             _configuration = configuration;
@@ -32,11 +37,16 @@ namespace Titan.Graphics.Pipeline
             _bufferManager = bufferManager;
             _container = container;
             _device = device;
+            _samplerState = new SamplerState(_device); // TODO: this is a temp solution until we have a sampler state manager where samplers can be shared.
         }
 
         public void Initialize(string filename)
         {
-            var builder = new RenderGraphBuilder(new BackBufferRenderTargetView(_device));
+            if (_renderGraph != null)
+            {
+                throw new InvalidOperationException("Graphics Pipeline has already been initialized.");
+            }
+            var builder = new RenderPassBuilder(new BackBufferRenderTargetView(_device));
             
             var path = _configuration.GetPath(filename);
             LOGGER.Debug("Loading Pipeline configuration from {0}", path);
@@ -74,11 +84,21 @@ namespace Titan.Graphics.Pipeline
                     var stencil = _bufferManager.GetDepthStencil(bindFlag: D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL, shaderResourceFormat: DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
                     builder.AddDepthStencil(renderPass.DepthStencil.Name, stencil);
                 }
+
+                if (renderPass.Samplers != null)
+                {
+                    foreach (var sampler in renderPass.Samplers)
+                    {
+                        // TODO: replace this with some kind of a sampler definition in the pipeline. Default should be a global sample
+                        LOGGER.Debug("Creating SamplerState {0}", sampler);
+                        builder.AddSampler(sampler.Name, _samplerState);
+                    }
+                }
+                
                 builder.AddPass(renderPass);
             }
 
-            var apa = builder.Compile();
-            
+            _renderGraph = new RenderGraph(builder.Compile(), _device);
         }
 
         private static bool IsResource(RenderPassConfiguration[] passes, RenderTargetConfiguration target) => passes.Any(p => p.Resources?.Any(r => r.Name == target.Name) ?? false);
@@ -113,6 +133,12 @@ namespace Titan.Graphics.Pipeline
             }
         }
 
+        public void Execute()
+        {
+            // temp
+            _renderGraph.Execute();
+        }
+
         public void Dispose()
         {
             // TODO: move this to a renderer manager so the clenaup can be done there
@@ -122,15 +148,4 @@ namespace Titan.Graphics.Pipeline
             }
         }
     }
-
-
-    internal class RenderGraph
-    {
-        private readonly RenderPass[] _renderPasses;
-        public RenderGraph(RenderPass[] renderPasses)
-        {
-            _renderPasses = renderPasses;
-        }
-    }
-
 }

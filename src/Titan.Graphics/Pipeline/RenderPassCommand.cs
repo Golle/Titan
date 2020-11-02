@@ -19,7 +19,9 @@ namespace Titan.Graphics.Pipeline
         [FieldOffset(8)]
         public DepthStencilView DepthStencil;
         [FieldOffset(8)] 
-        public ShaderResourceView ShaderResourceView;
+        public SetShaderResourceCommand ShaderResource;
+        [FieldOffset(8)]
+        public SetSamplerStateCommand SamplerState;
         [FieldOffset(8)]
         public IRenderer Renderer;
         [FieldOffset(8)]

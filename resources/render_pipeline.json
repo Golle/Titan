@@ -119,6 +119,12 @@
             "Name": "Backbuffer",
             "Renderer": "Fullscreen",
             "DepthStencil": null,
+            "Samplers": [
+                {
+                    "Name": "Default",
+                    "Type": "PixelShader"
+                }
+            ],
             "Resources": [
                 {
                     "Name": "GBufferAlbedo",
@@ -141,12 +147,12 @@
     ],
     "Renderers": [
         {
-            "Name" : "Scene",
-            "Type" : "Titan.Graphics.Pipeline.Renderers.DefaultSceneRenderer, Titan.Graphics"
+            "Name": "Scene",
+            "Type": "Titan.Graphics.Pipeline.Renderers.DefaultSceneRenderer, Titan.Graphics"
         },
         {
-            "Name" : "Fullscreen",
-            "Type" : "Titan.Graphics.Pipeline.Renderers.DefaultFullscreenRenderer, Titan.Graphics"
+            "Name": "Fullscreen",
+            "Type": "Titan.Graphics.Pipeline.Renderers.DefaultFullscreenRenderer, Titan.Graphics"
         }
     ]
 }

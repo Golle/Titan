@@ -69,6 +69,9 @@ namespace Titan.Graphics.D3D11
         // TODO: add methods for multiple shader resources in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u) => Context.Get()->PSSetShaderResources(slot, 1u, resource.Ptr.GetAddressOf());
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetVertexShaderResource(ShaderResourceView resource, uint slot = 0) => Context.Get()->VSSetShaderResources(slot, 1u, resource.Ptr.GetAddressOf());
+
         // TODO: add methods for multiple samplers in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShaderSampler(SamplerState samplerState, uint slot = 0u) => Context.Get()->PSSetSamplers(slot, 1, samplerState.Ptr.GetAddressOf());

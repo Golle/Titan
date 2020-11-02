@@ -1,7 +1,6 @@
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
-using Titan.Graphics.Pipeline.Renderers;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.D3D11
@@ -20,6 +19,7 @@ namespace Titan.Graphics.D3D11
         void SetDepthStencilState(DepthStencilState depthStencilState);
         void SetRenderTarget(RenderTargetView renderTarget);
         void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u);
+        void SetVertexShaderResource(ShaderResourceView resource, uint slot = 0u);
         void SetPixelShaderSampler(SamplerState samplerState, uint slot = 0u);
         void SetVertexShaderSampler(SamplerState samplerState, uint slot = 0u);
         void SetPixelShader(PixelShader pixelShader);
