@@ -55,7 +55,7 @@
             ]
         },
         {
-            "Name": "BackbufferDefault",
+            "Name": "FullscreenDefault",
             "PixelShader": {
                 "Filename": "shaders/BackbufferPixelShader.hlsl"
             },
@@ -111,7 +111,7 @@
                     "Name": "GBufferNormal",
                     "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT",
                     "Clear": true,
-                    "Color": "#7F007FAA"
+                    "Color": "#00000000"
                 }
             ]
         },
@@ -137,7 +137,9 @@
             ],
             "RenderTargets": [
                 {
-                    "Name": "$Backbuffer"
+                    "Name": "$Backbuffer",
+                    "Clear": true,
+                    "Color": "#ff0000ff"
                 }
             ],
             "Dependencies": [

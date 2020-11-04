@@ -121,7 +121,7 @@ unsafe
     //var gbufferDeferredContext = new DeferredContext(device);
 
     var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
-    meshRenderQueue.Submit(mesh, Matrix4x4.Identity);
+    meshRenderQueue.Submit(mesh, Matrix4x4.Identity, texture);
 
     //var gbufferRenderPass = new GBufferRenderPass(container.GetInstance<IBufferManager>(), container.GetInstance<IShaderManager>(), container.GetInstance<DefaultSceneRenderer>());
 

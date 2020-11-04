@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Meshes;
+using Titan.Graphics.Textures;
 
 namespace Titan.Graphics.Pipeline.Graph
 {
@@ -17,6 +18,7 @@ namespace Titan.Graphics.Pipeline.Graph
 
     public struct Renderable
     {
+        public Texture Texture;
         public Mesh Mesh;
         public Matrix4x4 World;
     }

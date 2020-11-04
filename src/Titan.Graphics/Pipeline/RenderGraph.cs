@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Titan.Graphics.D3D11;
 
 namespace Titan.Graphics.Pipeline
@@ -22,12 +23,20 @@ namespace Titan.Graphics.Pipeline
 
         public void Execute()
         {
-            
+            using var def = new DeferredContext(_device);
+            var l = new List<CommandList>();
             foreach (var renderPass in _renderPasses)
             {
-                renderPass.Render(_context);
+                def.SetViewport(new Viewport(1920, 1080));
+
+                renderPass.Render(def);
+                l.Add(def.FinishCommandList());
             }
 
+            foreach (var commandList in l)
+            {
+                _context.ExecuteCommandList(commandList);
+            }
             _swapchain.Present();
         }
 

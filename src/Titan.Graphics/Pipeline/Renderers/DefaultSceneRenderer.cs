@@ -80,13 +80,16 @@ namespace Titan.Graphics.Pipeline.Renderers
                 //context.MapResource(_perObjectBuffer.AsResourcePointer(), renderable.World);
                 context.MapResource(_perObjectBuffer.AsResourcePointer(), modelMatrix);
                 context.SetVertexShaderConstantBuffer(_perObjectBuffer, 1u);
+                context.SetPixelShaderResource(renderable.Texture.ResourceView);
 
                 var mesh = renderable.Mesh;
+
                 
                 mesh.Bind(context);
+
                 
                 var subsets = mesh.SubSets;
-                if (subsets.Length > 0)
+                if (subsets.Length > 1)
                 {
                     for (var i = 0; i < subsets.Length; ++i)
                     {

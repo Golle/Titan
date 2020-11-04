@@ -1,13 +1,15 @@
 using System;
 using System.Numerics;
+using Titan.Graphics.D3D11;
 using Titan.Graphics.Meshes;
+using Titan.Graphics.Textures;
 
 namespace Titan.Graphics.Pipeline.Graph
 {
     public interface IMeshRenderQueue
     {
 
-        void Submit(in Mesh mesh, in Matrix4x4 worldMatrix);
+        void Submit(in Mesh mesh, in Matrix4x4 worldMatrix, Texture texture);
         ReadOnlySpan<Renderable> GetRenderables();
     }
     
@@ -16,11 +18,12 @@ namespace Titan.Graphics.Pipeline.Graph
         private readonly Renderable[] _renderables = new Renderable[10_000];
         private int _count;
 
-        public void Submit(in Mesh mesh, in Matrix4x4 worldMatrix)
+        public void Submit(in Mesh mesh, in Matrix4x4 worldMatrix, Texture texture)
         {
             ref var renderable = ref _renderables[_count++];
             renderable.Mesh = mesh;
             renderable.World = worldMatrix;
+            renderable.Texture = texture;
         }
        
         public ReadOnlySpan<Renderable> GetRenderables() => new ReadOnlySpan<Renderable>(_renderables, 0, _count);
