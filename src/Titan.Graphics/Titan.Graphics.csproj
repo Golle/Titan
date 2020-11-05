@@ -12,6 +12,10 @@
     <ProjectReference Include="..\Titan.Windows\Titan.Windows.csproj" />
   </ItemGroup>
 
+  <!--<ItemGroup>
+    <ProjectReference Include="..\Titan.SourceGenerators\Titan.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>-->
+
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Titan.Sandbox</_Parameter1>
