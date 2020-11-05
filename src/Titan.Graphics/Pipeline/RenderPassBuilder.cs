@@ -98,10 +98,37 @@ namespace Titan.Graphics.Pipeline
                 commandList.AddRange(CreateRenderTargetCommand(pass.RenderTargets).ToArray());
                 commandList.Add(new RenderPassCommand {Type = CommandType.Render, Renderer = _renderers[pass.Renderer]});
 
+                
+                if (pass.UnbindRenderTargets)
+                {
+                    commandList.Add(new RenderPassCommand{Type = CommandType.UnbindRenderTargets });
+                }
+
+                if (pass.UnbindResources)
+                {
+                    commandList.AddRange(CreateUnbindResourcesCommands(pass.Resources));
+                }
+
                 renderPasses.Add(new RenderPass(pass.Name, commandList.ToArray()));
             }
             
             return renderPasses.ToArray();
+        }
+
+        private static IEnumerable<RenderPassCommand> CreateUnbindResourcesCommands(RenderPassResourceConfiguration[] resources)
+        {
+            var pixelShaderResourceCount = resources.Count(r => r.Type == RenderPassResourceTypes.PixelShader);
+            var vertexShaderResourceCount = resources.Count(r => r.Type == RenderPassResourceTypes.VertexShader);
+
+            if (pixelShaderResourceCount > 0)
+            {
+                yield return new RenderPassCommand {Type = CommandType.UnbindPixelShaderResources, Count = (uint) pixelShaderResourceCount};
+            }
+
+            if (vertexShaderResourceCount > 0)
+            {
+                yield return new RenderPassCommand {Type = CommandType.UnbindVertexShaderResources, Count = (uint) vertexShaderResourceCount};
+            }
         }
 
         private IEnumerable<RenderPassCommand> CreateSamplerCommands(RenderPassSamplerConfiguration[] samplers)

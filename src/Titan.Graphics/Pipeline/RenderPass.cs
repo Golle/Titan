@@ -58,10 +58,40 @@ namespace Titan.Graphics.Pipeline
                     case CommandType.SetPixelShaderSampler:
                         renderContext.SetPixelShaderSampler(command.SamplerState.Sampler, command.SamplerState.Slot);
                         break;
+                    case CommandType.UnbindRenderTargets:
+                        UnbindRenderTargets(renderContext);
+                        break;
+                    case CommandType.UnbindPixelShaderResources:
+                        UnbindPixelShaderResources(renderContext, command.Count);
+                        break;
+                    case CommandType.UnbindVertexShaderResources:
+                        UnbindVertexShaderResources(renderContext, command.Count);
+                        break;
                     default:
                         throw new InvalidOperationException("Render command not found.");
                 }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static unsafe void UnbindVertexShaderResources(IRenderContext context, uint numViews)
+        {
+            var resources = stackalloc ID3D11ShaderResourceView*[(int)numViews];
+            context.SetVertexShaderResources(resources, numViews, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static unsafe void UnbindPixelShaderResources(IRenderContext context, uint numViews)
+        {
+            var resources = stackalloc ID3D11ShaderResourceView*[(int)numViews];
+            context.SetPixelShaderResources(resources, numViews, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static unsafe void  UnbindRenderTargets(IRenderContext context)
+        {
+            var renderTargets = stackalloc ID3D11RenderTargetView*[1];
+            context.SetRenderTargets(renderTargets, 1, null);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

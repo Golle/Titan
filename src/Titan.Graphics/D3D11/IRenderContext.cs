@@ -29,8 +29,10 @@ namespace Titan.Graphics.D3D11
         void DrawIndexed(uint indexCount, uint startIndexLocation = 0u, int baseVertexLocation = 0);
         void DrawIndexedInstanced(uint indexCountPerInstance, uint instanceCount, uint startIndexLocation = 0u, int baseVertexLocation = 0, uint startInstanceLocation = 0u);
         void ExecuteCommandList(in CommandList commandList, bool restoreContextState = false);
-        unsafe void MapResource<T>(ID3D11Resource* resource, in T value) where T : unmanaged;
         
+        unsafe void MapResource<T>(ID3D11Resource* resource, in T value) where T : unmanaged;
         unsafe void SetRenderTargets(ID3D11RenderTargetView** renderTargets, uint numViews, ID3D11DepthStencilView* depthStencilView);
+        unsafe void SetPixelShaderResources(ID3D11ShaderResourceView** resources, uint numViews, uint startSlot = 0u);
+        unsafe void SetVertexShaderResources(ID3D11ShaderResourceView** resources, uint numViews, uint startSlot = 0u);
     }
 }

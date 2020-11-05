@@ -113,7 +113,8 @@
                     "Clear": true,
                     "Color": "#00000000"
                 }
-            ]
+            ],
+            "UnbindRenderTargets": true
         },
         {
             "Name": "Backbuffer",
@@ -144,7 +145,8 @@
             ],
             "Dependencies": [
                 "GBuffer"
-            ]
+            ],
+            "UnbindResources": true
         }
     ],
     "Renderers": [

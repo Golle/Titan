@@ -12,6 +12,9 @@ namespace Titan.Graphics.Pipeline
         SetPixelShaderResource,
         SetVertexShaderSampler,
         SetPixelShaderSampler,
-        Render
+        Render,
+        UnbindRenderTargets,  
+        UnbindPixelShaderResources,
+        UnbindVertexShaderResources
     }
 }

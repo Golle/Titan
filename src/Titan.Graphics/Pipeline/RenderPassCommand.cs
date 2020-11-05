@@ -28,5 +28,7 @@ namespace Titan.Graphics.Pipeline
         public ClearRenderTargetCommand ClearRenderTarget;
         [FieldOffset(16)]
         public SetMultipleRenderTargetViewCommand MultipleRenderTargets;
+        [FieldOffset(16)]
+        public uint Count;
     }
 }

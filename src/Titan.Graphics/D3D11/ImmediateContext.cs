@@ -112,6 +112,11 @@ namespace Titan.Graphics.D3D11
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRenderTargets(ID3D11RenderTargetView** renderTargets, uint numViews, ID3D11DepthStencilView* depthStencilView) => Context.Get()->OMSetRenderTargets(numViews, renderTargets, depthStencilView);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPixelShaderResources(ID3D11ShaderResourceView** resources, uint numViews, uint startSlot = 0u) => Context.Get()->PSSetShaderResources(startSlot, numViews, resources);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetVertexShaderResources(ID3D11ShaderResourceView** resources, uint numViews, uint startSlot = 0u) => Context.Get()->VSSetShaderResources(startSlot, numViews, resources);
+
         public void Dispose() => Context.Dispose();
     }
 }

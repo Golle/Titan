@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Titan.Graphics.D3D11;
 
 namespace Titan.Graphics.Pipeline
@@ -18,25 +17,26 @@ namespace Titan.Graphics.Pipeline
 
             _context = new ImmediateContext(device);
             _context.SetViewport(new Viewport(1920, 1080));
-            _swapchain = new Swapchain(device, true, 0);
+            _swapchain = new Swapchain(device, false, 0);
         }
 
         public void Execute()
         {
-            using var def = new DeferredContext(_device);
-            var l = new List<CommandList>();
+            //using var def = new DeferredContext(_device);
+            //var l = new List<CommandList>();
             foreach (var renderPass in _renderPasses)
             {
-                def.SetViewport(new Viewport(1920, 1080));
+                //def.SetViewport(new Viewport(1920, 1080));
 
-                renderPass.Render(def);
-                l.Add(def.FinishCommandList());
+                //renderPass.Render(def);
+                renderPass.Render(_context);
+                //l.Add(def.FinishCommandList());
             }
 
-            foreach (var commandList in l)
-            {
-                _context.ExecuteCommandList(commandList);
-            }
+            //foreach (var commandList in l)
+            //{
+            //    _context.ExecuteCommandList(commandList);
+            //}
             _swapchain.Present();
         }
 
