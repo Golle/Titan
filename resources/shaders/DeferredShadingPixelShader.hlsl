@@ -12,10 +12,9 @@ static const float4 AmbientLightColor = float4(0.2f, 0.2f, 0.2f, 1.0f);
 static const float4 DiffuseLightColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 
 static const float3 DiffuseLightColor3 = float3(1.0f, 1.0f, 1.0f);
-static const float3 AmbientLightColor3 = float3(0.2f, 0.2f, 0.2f);
+static const float3 AmbientLightColor3 = float3(0.1f, 0.1f, 0.1f);
 
-static const float intensity = 0.8f;
-
+static const float intensity = 0.7f;
 
 
 float4 main(float2 textureCoords: Texture) : SV_TARGET

@@ -59,13 +59,11 @@ namespace Titan.Graphics.Pipeline.Renderers
             #region TEMP MODEL SPIN
 
             {
-                modelRot.X += 0.03f;
-                modelRot.Y -= 0.02f;
+                modelRot.X += 0.006f;
+                modelRot.Y -= 0.004f;
             }
             var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
-            var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(new Vector3(1, 1, 1)) *
-                                                  Matrix4x4.CreateFromQuaternion(modelRotation) *
-                                                  Matrix4x4.CreateTranslation(modelPosition));
+            
             #endregion
 
             _shaderManager.Get(_shaderManager.GetHandle("GBufferDefault")).Bind(context);
@@ -78,6 +76,11 @@ namespace Titan.Graphics.Pipeline.Renderers
             foreach (ref readonly var renderable in _renderQueue.GetRenderables())
             {
                 //context.MapResource(_perObjectBuffer.AsResourcePointer(), renderable.World);
+                var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(new Vector3(1, 1, 1)) *
+                                                      Matrix4x4.CreateFromQuaternion(modelRotation) *
+                                                      renderable.World);
+
+
                 context.MapResource(_perObjectBuffer.AsResourcePointer(), modelMatrix);
                 context.SetVertexShaderConstantBuffer(_perObjectBuffer, 1u);
                 context.SetPixelShaderResource(renderable.Texture.ResourceView);

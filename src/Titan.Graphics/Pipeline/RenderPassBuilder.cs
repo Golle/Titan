@@ -73,8 +73,10 @@ namespace Titan.Graphics.Pipeline
 
         public void AddSampler(string name, SamplerState samplerState)
         {
+
             if (_samplers.ContainsKey(name))
             {
+                return;
                 throw new InvalidOperationException($"Sampler with name {name} has already been added to the Render Graph");
             }
             _samplers.Add(name, samplerState);

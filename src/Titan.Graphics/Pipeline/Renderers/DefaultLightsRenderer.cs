@@ -34,18 +34,18 @@ namespace Titan.Graphics.Pipeline.Renderers
 
 
         private Vector3 _lightPosition = new Vector3(0,0,-1);
-        private float _lightVelocity = 0.05f;
+        private float _lightVelocity = 0.02f;
         public void Render(IRenderContext context)
         {
-            if (_lightPosition.X > 5.0f)
+            if (_lightPosition.X > 3.0f)
             {
-                _lightPosition.X = 4.99f;
-                _lightVelocity = -0.05f;
+                _lightPosition.X = 2.99f;
+                _lightVelocity = -0.02f;
             }
-            else if (_lightPosition.X < -5.0f)
+            else if (_lightPosition.X < -3.0f)
             {
-                _lightPosition.X = -4.99f;
-                _lightVelocity = 0.05f;
+                _lightPosition.X = -2.99f;
+                _lightVelocity = 0.02f;
             }
 
             _lightPosition.X += _lightVelocity;
