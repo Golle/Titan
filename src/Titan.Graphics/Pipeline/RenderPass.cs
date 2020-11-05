@@ -18,6 +18,7 @@ namespace Titan.Graphics.Pipeline
 
         public void Render(IRenderContext renderContext)
         {
+            // TODO: replace the generation of this with a SourceGenerator (C# 9)
 
             for (var i = 0; i < _commands.Length; i++)
             {

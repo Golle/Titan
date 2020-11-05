@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;

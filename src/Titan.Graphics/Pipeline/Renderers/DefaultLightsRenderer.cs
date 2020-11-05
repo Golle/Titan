@@ -37,6 +37,7 @@ namespace Titan.Graphics.Pipeline.Renderers
         private float _lightVelocity = 0.02f;
         public void Render(IRenderContext context)
         {
+            #region TEMP LIGHT CALCULATIONS
             if (_lightPosition.X > 3.0f)
             {
                 _lightPosition.X = 2.99f;
@@ -49,6 +50,10 @@ namespace Titan.Graphics.Pipeline.Renderers
             }
 
             _lightPosition.X += _lightVelocity;
+
+
+            #endregion
+
             unsafe
             {
                 context.MapResource(_lightSource.AsResourcePointer(), new LightSource {Position = _lightPosition});
@@ -85,6 +90,5 @@ namespace Titan.Graphics.Pipeline.Renderers
             public Vector2 Position;
             public Vector2 UV;
         }
-
     }
 }

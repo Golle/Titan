@@ -22,21 +22,11 @@ namespace Titan.Graphics.Pipeline
 
         public void Execute()
         {
-            //using var def = new DeferredContext(_device);
-            //var l = new List<CommandList>();
             foreach (var renderPass in _renderPasses)
             {
-                //def.SetViewport(new Viewport(1920, 1080));
-
-                //renderPass.Render(def);
                 renderPass.Render(_context);
-                //l.Add(def.FinishCommandList());
             }
 
-            //foreach (var commandList in l)
-            //{
-            //    _context.ExecuteCommandList(commandList);
-            //}
             _swapchain.Present();
         }
 

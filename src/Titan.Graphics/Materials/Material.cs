@@ -1,4 +1,3 @@
-using System;
 using Titan.Graphics.D3D11;
 
 namespace Titan.Graphics.Materials
@@ -17,14 +16,4 @@ namespace Titan.Graphics.Materials
 
         public ShaderResourceView Texture;
     }
-
-
-    internal struct Renderable
-    {
-        public uint ShaderProgramHandle;
-        public uint MaterialHandle;
-        public uint MeshHandle;
-    }
-
-    
 }
