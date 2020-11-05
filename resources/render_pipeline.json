@@ -117,8 +117,8 @@
             "UnbindRenderTargets": true
         },
         {
-            "Name": "Backbuffer",
-            "Renderer": "Fullscreen",
+            "Name": "DeferredShading",
+            "Renderer": "Lights",
             "DepthStencil": null,
             "Samplers": [
                 {
@@ -138,13 +138,37 @@
             ],
             "RenderTargets": [
                 {
+                    "Name": "ShadedOutput",
+                    "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT",
+                    "Clear": true,
+                    "Color": "#00000000"
+                }
+            ],
+            "UnbindResources": true,
+            "UnbindRenderTargets": true
+        },
+        {
+            "Name": "Backbuffer",
+            "Renderer": "Fullscreen",
+            "DepthStencil": null,
+            "Samplers": [
+                {
+                    "Name": "Default",
+                    "Type": "PixelShader"
+                }
+            ],
+            "Resources": [
+                {
+                    "Name": "ShadedOutput",
+                    "Type": "PixelShader"
+                }
+            ],
+            "RenderTargets": [
+                {
                     "Name": "$Backbuffer",
                     "Clear": true,
                     "Color": "#ff0000ff"
                 }
-            ],
-            "Dependencies": [
-                "GBuffer"
             ],
             "UnbindResources": true
         }
@@ -157,6 +181,10 @@
         {
             "Name": "Fullscreen",
             "Type": "Titan.Graphics.Pipeline.Renderers.DefaultFullscreenRenderer, Titan.Graphics"
+        },
+        {
+            "Name": "Lights",
+            "Type": "Titan.Graphics.Pipeline.Renderers.DefaultLightsRenderer, Titan.Graphics"
         }
     ]
 }

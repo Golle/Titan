@@ -14,7 +14,7 @@ static const float4 DiffuseLightColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 static const float3 DiffuseLightColor3 = float3(1.0f, 1.0f, 1.0f);
 static const float3 AmbientLightColor3 = float3(0.2f, 0.2f, 0.2f);
 
-static const float intensity = 1.5f;
+static const float intensity = 0.8f;
 
 
 
