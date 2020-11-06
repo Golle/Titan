@@ -2,11 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using Titan;
+using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Graph;
-using Titan.Graphics.Shaders;
+using Titan.Graphics.Resources;
 using Titan.Graphics.Textures;
 using Titan.Input;
 
@@ -21,12 +22,21 @@ using var engine = EngineBuilder.CreateDefaultBuilder()
 
 var window = engine.Window;
 var container = engine.Container;
-
+var device = engine.Device;
 var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>();
+
+
 
 
 unsafe
 {
+    var manager = (IVertexBufferManager)new VertexBufferManager(device.Ptr, container.GetInstance<IMemoryManager>());
+    var handle1 = manager.CreateVertexBuffer(1000, (uint) sizeof(Vertex), null);
+    var handle2 = manager.CreateVertexBuffer(2000, (uint) sizeof(Vertex), null);
+    manager.DestroyBuffer(handle2);
+    var handle3 = manager.CreateVertexBuffer(3000, (uint) sizeof(Vertex), null);
+
+    manager.Dispose();
     var textureLoader = container.GetInstance<ITextureLoader>();
     var meshLoader = container.GetInstance<IMeshLoader>();
     var input = container.GetInstance<IInputHandler>();

@@ -3,6 +3,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <Lang>preview</Lang>
     <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

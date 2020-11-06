@@ -2,11 +2,14 @@ using System;
 using System.IO;
 using Titan.Core;
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Pipeline;
+using Titan.Graphics.Resources;
 using Titan.IOC;
 using Titan.Windows;
+using Titan.Windows.Win32.D3D11;
 
 namespace Titan
 {
@@ -31,13 +34,30 @@ namespace Titan
                 .RegisterSingleton<IGraphicsDevice>(_device)
                 .RegisterSingleton(_window)
                 .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath));
-            
+
+
+            InitializeMemoryManager(container);
+
+
             _pipeline = container.GetInstance<IGraphicsPipeline>();
             LOGGER.Debug("Initialize GraphicsPipeline");
             _pipeline.Initialize("render_pipeline.json");
 
 
             _container = container;
+        }
+
+        private unsafe void InitializeMemoryManager(IContainer container)
+        {
+            LOGGER.Debug("Initialize memory manager");
+            // TODO: not sure how to do this yet. Could have each manager "request" a memory chunk.
+            var memoryManager = new MemoryManager(new[]
+            {
+                new ChunkDescriptor("VertexBuffer", (uint) sizeof(VertexBuffer), 2048),
+                new ChunkDescriptor("IndexBuffer", (uint) sizeof(ID3D11Buffer), 2048),
+                new ChunkDescriptor("Texture2D", (uint) sizeof(ID3D11Texture2D), 2048),
+            });
+            container.RegisterSingleton<IMemoryManager>(memoryManager);
         }
 
         public void Dispose()

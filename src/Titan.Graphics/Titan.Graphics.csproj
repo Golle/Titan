@@ -20,6 +20,9 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Titan.Sandbox</_Parameter1>
     </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Titan</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>
