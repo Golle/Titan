@@ -1,4 +1,3 @@
-using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Resources;
@@ -12,8 +11,8 @@ namespace Titan.Graphics.D3D11
         void ClearDepthStencilView(DepthStencilView depthStencilView);
         void SetViewport(Viewport viewport);
         void SetBlendState(BlendState blendState);
-        void SetVertexShaderConstantBuffer(IConstantBuffer constantBuffer, uint slot = 0);
-        void SetPixelShaderConstantBuffer(IConstantBuffer constantBuffer, uint slot = 0);
+        void SetVertexShaderConstantBuffer(in ConstantBuffer constantBuffer, uint slot = 0);
+        void SetPixelShaderConstantBuffer(in ConstantBuffer constantBuffer, uint slot = 0);
         void SetVertexBuffer(in VertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u);
         void SetIndexBuffer(in IndexBuffer indexBuffer, uint offset = 0u);
         void SetRenderTarget(RenderTargetView renderTarget, DepthStencilView depthStencilView);

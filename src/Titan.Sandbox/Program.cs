@@ -40,8 +40,27 @@ unsafe
     using var texture = textureLoader.LoadTexture(@"F:\tmp\globe.png");
 
     var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
-    meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);
+    //meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);
     meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1,0,0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(2,0,0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(3,0,0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-1,0,0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-2,0,0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-3,0,0), texture);
+
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1, 1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(2, 1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(3, 1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-1, 1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-2, 1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-3, 1, 0), texture);
+
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1, -1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(2, -1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(3, -1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-1, -1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-2, -1, 0), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-3, -1, 0), texture);
 
     var s = Stopwatch.StartNew();
     var frames = 0;
@@ -53,7 +72,18 @@ unsafe
 
         pipeline.Execute();
 
-        GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
+        frames++;
+        if (s.Elapsed.TotalSeconds > 2.0f)
+        {
+            s.Stop();
+            Console.WriteLine($"FPS: {frames/s.Elapsed.TotalSeconds:##}");
+            
+            s.Restart();
+            frames = 0;
+        }
+        
+
+        //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
     }
 
     //{

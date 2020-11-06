@@ -1,7 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
@@ -10,20 +9,23 @@ namespace Titan.Graphics.Pipeline.Renderers
 {
     internal class DefaultLightsRenderer : IRenderer
     {
-        private readonly ConstantBuffer<LightSource> _lightSource;
         private readonly IShaderManager _shaderManager;
+        
         private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IIndexBufferManager _indexBufferManager;
+        private readonly IConstantBufferManager _constantBufferManager;
 
 
         private readonly VertexBufferHandle _vertexBufferHandle;
         private readonly IndexBufferHandle _indexBufferHandle;
+        private readonly ConstantBufferHandle _lightSourceHandle;
 
-        public unsafe DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
+        public unsafe DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager)
         {
             _shaderManager = shaderManager;
             _vertexBufferManager = vertexBufferManager;
             _indexBufferManager = indexBufferManager;
+            _constantBufferManager = constantBufferManager;
 
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex { Position = new Vector2(-1, -1), UV = new Vector2(0, 1) };
@@ -40,7 +42,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             indices[4] = 2;
             indices[5] = 3;
             _indexBufferHandle = _indexBufferManager.CreateIndexBuffer<ushort>(6, indices);
-            _lightSource = new ConstantBuffer<LightSource>(device, new LightSource
+            _lightSourceHandle = _constantBufferManager.CreateConstantBuffer(new LightSource
             {
                 Position = new Vector3(0, 0, -1)
             }, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
@@ -70,12 +72,14 @@ namespace Titan.Graphics.Pipeline.Renderers
 
             #endregion
 
+
+            ref readonly var lightSource = ref _constantBufferManager[_lightSourceHandle];
             unsafe
             {
-                context.MapResource(_lightSource.AsResourcePointer(), new LightSource {Position = _lightPosition});
+                context.MapResource(lightSource.Resource, new LightSource {Position = _lightPosition});
             }
-
-            context.SetPixelShaderConstantBuffer(_lightSource);
+            
+            context.SetPixelShaderConstantBuffer(lightSource);
 
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
@@ -89,7 +93,7 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         public void Dispose()
         {
-            _lightSource.Dispose();
+            _constantBufferManager.DestroyBuffer(_lightSourceHandle);
             _vertexBufferManager.DestroyBuffer(_vertexBufferHandle);
             _indexBufferManager.DestroyBuffer(_indexBufferHandle);
         }

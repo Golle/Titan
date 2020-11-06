@@ -42,6 +42,21 @@ namespace Titan.Graphics.Resources
     }
 
     [Handle, DebuggerDisplay("{" + nameof(Value) + "}")]
+    public readonly partial struct ConstantBufferHandle
+    {
+        public readonly int Value;
+        public ConstantBufferHandle(int value)
+        {
+            Value = value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator int(in ConstantBufferHandle handle) => handle.Value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator ConstantBufferHandle(in int handle) => new ConstantBufferHandle(handle);
+    }
+
+    [Handle, DebuggerDisplay("{" + nameof(Value) + "}")]
     public readonly partial struct TextureHandle
     {
         public readonly int Value;

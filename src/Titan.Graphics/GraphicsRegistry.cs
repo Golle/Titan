@@ -33,6 +33,7 @@ namespace Titan.Graphics
 
                 .Register<IVertexBufferManager, VertexBufferManager>()
                 .Register<IIndexBufferManager, IndexBufferManager>()
+                .Register<IConstantBufferManager, ConstantBufferManager>()
 
 
                 .Register<DefaultSceneRenderer>()

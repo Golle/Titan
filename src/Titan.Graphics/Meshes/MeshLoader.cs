@@ -3,7 +3,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Titan.Core.Common;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.Resources;
 
 namespace Titan.Graphics.Meshes
