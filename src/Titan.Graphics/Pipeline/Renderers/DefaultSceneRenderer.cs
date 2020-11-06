@@ -17,16 +17,18 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IWindow _window;
         private readonly IShaderManager _shaderManager;
         private readonly IVertexBufferManager _vertexBufferManager;
+        private readonly IIndexBufferManager _indexBufferManager;
         private readonly ConstantBuffer<Matrix4x4> _perObjectBuffer;
         private readonly ConstantBuffer<CameraBuffer> _camera;
         private readonly SamplerState _sampler;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
         {
             _renderQueue = renderQueue;
             _window = window;
             _shaderManager = shaderManager;
             _vertexBufferManager = vertexBufferManager;
+            _indexBufferManager = indexBufferManager;
 
             _perObjectBuffer = new ConstantBuffer<Matrix4x4>(device, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
             _camera = new ConstantBuffer<CameraBuffer>(device, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
@@ -76,7 +78,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             
             context.SetVertexShaderConstantBuffer(_camera);
             context.SetPixelShaderSampler(_sampler);
-            var buffers = stackalloc ID3D11Buffer*[1];
+
             foreach (ref readonly var renderable in _renderQueue.GetRenderables())
             {
                 //context.MapResource(_perObjectBuffer.AsResourcePointer(), renderable.World);
@@ -91,7 +93,8 @@ namespace Titan.Graphics.Pipeline.Renderers
 
                 var mesh = renderable.Mesh;
 
-                context.SetIndexBuffer(mesh.IndexBuffer);
+                ref readonly var indexBuffer = ref _indexBufferManager[mesh.IndexBufferHandle];
+                context.SetIndexBuffer(indexBuffer);
                 context.SetVertexBuffer(_vertexBufferManager[mesh.VertexBufferHandle]);
 
                 var subsets = mesh.SubSets;
@@ -105,7 +108,7 @@ namespace Titan.Graphics.Pipeline.Renderers
                 }
                 else
                 {
-                    context.DrawIndexed(mesh.NumberOfIndices);
+                    context.DrawIndexed(indexBuffer.NumberOfIndices);
                 }
             }
         }

@@ -59,7 +59,8 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetIndexBuffer(IIndexBuffer indexBuffer, uint offset = 0u) => Context.Get()->IASetIndexBuffer(indexBuffer.Buffer.Get(), indexBuffer.Format, offset);
+        public void SetIndexBuffer(in IndexBuffer indexBuffer, uint offset = 0u) => Context.Get()->IASetIndexBuffer(indexBuffer.Raw, indexBuffer.Format, offset);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRenderTarget(RenderTargetView renderTarget, DepthStencilView depthStencilView) => Context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), depthStencilView.Ptr.Get());
 

@@ -15,7 +15,7 @@ namespace Titan.Graphics.D3D11
         void SetVertexShaderConstantBuffer(IConstantBuffer constantBuffer, uint slot = 0);
         void SetPixelShaderConstantBuffer(IConstantBuffer constantBuffer, uint slot = 0);
         void SetVertexBuffer(in VertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u);
-        void SetIndexBuffer(IIndexBuffer indexBuffer, uint offset = 0u);
+        void SetIndexBuffer(in IndexBuffer indexBuffer, uint offset = 0u);
         void SetRenderTarget(RenderTargetView renderTarget, DepthStencilView depthStencilView);
         void SetDepthStencilState(DepthStencilState depthStencilState);
         void SetRenderTarget(RenderTargetView renderTarget);
@@ -35,5 +35,6 @@ namespace Titan.Graphics.D3D11
         unsafe void SetRenderTargets(ID3D11RenderTargetView** renderTargets, uint numViews, ID3D11DepthStencilView* depthStencilView);
         unsafe void SetPixelShaderResources(ID3D11ShaderResourceView** resources, uint numViews, uint startSlot = 0u);
         unsafe void SetVertexShaderResources(ID3D11ShaderResourceView** resources, uint numViews, uint startSlot = 0u);
+        
     }
 }

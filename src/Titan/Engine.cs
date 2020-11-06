@@ -54,7 +54,7 @@ namespace Titan
             var memoryManager = new MemoryManager(new[]
             {
                 new ChunkDescriptor("VertexBuffer", (uint) sizeof(VertexBuffer), 2048),
-                new ChunkDescriptor("IndexBuffer", (uint) sizeof(ID3D11Buffer), 2048),
+                new ChunkDescriptor("IndexBuffer", (uint) sizeof(IndexBuffer), 2048),
                 new ChunkDescriptor("Texture2D", (uint) sizeof(ID3D11Texture2D), 2048),
             });
             container.RegisterSingleton<IMemoryManager>(memoryManager);

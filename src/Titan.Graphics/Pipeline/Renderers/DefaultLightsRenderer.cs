@@ -13,24 +13,33 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly ConstantBuffer<LightSource> _lightSource;
         private readonly IShaderManager _shaderManager;
         private readonly IVertexBufferManager _vertexBufferManager;
-        private readonly IndexBuffer<ushort> _indexBuffer;
+        private readonly IIndexBufferManager _indexBufferManager;
 
-        private VertexBufferHandle _handle;
 
-        public unsafe DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager)
+        private readonly VertexBufferHandle _vertexBufferHandle;
+        private readonly IndexBufferHandle _indexBufferHandle;
+
+        public unsafe DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
         {
             _shaderManager = shaderManager;
             _vertexBufferManager = vertexBufferManager;
-            
+            _indexBufferManager = indexBufferManager;
+
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex { Position = new Vector2(-1, -1), UV = new Vector2(0, 1) };
             vertices[1] = new FullscreenVertex { Position = new Vector2(-1, 1), UV = new Vector2(0, 0) };
             vertices[2] = new FullscreenVertex { Position = new Vector2(1, 1), UV = new Vector2(1, 0) };
             vertices[3] = new FullscreenVertex { Position = new Vector2(1, -1), UV = new Vector2(1, 1) };
-            _handle = _vertexBufferManager.CreateVertexBuffer(4u, (uint)sizeof(FullscreenVertex), vertices);
-
+            _vertexBufferHandle = _vertexBufferManager.CreateVertexBuffer(4u, (uint)sizeof(FullscreenVertex), vertices);
             
-            _indexBuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 1, 2, 0, 2, 3 });
+            var indices = stackalloc ushort[6];
+            indices[0] = 0;
+            indices[1] = 1;
+            indices[2] = 2;
+            indices[3] = 0;
+            indices[4] = 2;
+            indices[5] = 3;
+            _indexBufferHandle = _indexBufferManager.CreateIndexBuffer<ushort>(6, indices);
             _lightSource = new ConstantBuffer<LightSource>(device, new LightSource
             {
                 Position = new Vector3(0, 0, -1)
@@ -69,8 +78,9 @@ namespace Titan.Graphics.Pipeline.Renderers
             context.SetPixelShaderConstantBuffer(_lightSource);
 
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            context.SetVertexBuffer(_vertexBufferManager[_handle]);
-            context.SetIndexBuffer(_indexBuffer);
+            context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
+            context.SetIndexBuffer(_indexBufferManager[_indexBufferHandle]);
+
             _shaderManager.Get(_shaderManager.GetHandle("DeferredShadingDefault")).Bind(context);
 
             context.DrawIndexed(6);
@@ -80,8 +90,8 @@ namespace Titan.Graphics.Pipeline.Renderers
         public void Dispose()
         {
             _lightSource.Dispose();
-            _vertexBufferManager.DestroyBuffer(_handle);
-            _indexBuffer.Dispose();
+            _vertexBufferManager.DestroyBuffer(_vertexBufferHandle);
+            _indexBufferManager.DestroyBuffer(_indexBufferHandle);
         }
 
 

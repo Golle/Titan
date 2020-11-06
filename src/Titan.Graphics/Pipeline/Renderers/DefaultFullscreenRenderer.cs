@@ -11,30 +11,39 @@ namespace Titan.Graphics.Pipeline.Renderers
     {
         private readonly IShaderManager _shaderManager;
         private readonly IVertexBufferManager _vertexBufferManager;
-        private readonly IndexBuffer<ushort> _indexBuffer;
+        private readonly IIndexBufferManager _indexBufferManager;
 
-        private readonly VertexBufferHandle _handle;
-        public DefaultFullscreenRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager)
+        private readonly VertexBufferHandle _vertexBufferHandle;
+        private readonly IndexBufferHandle _indexBufferHandle;
+        public DefaultFullscreenRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
         {
             _shaderManager = shaderManager;
             _vertexBufferManager = vertexBufferManager;
+            _indexBufferManager = indexBufferManager;
 
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex {Position = new Vector2(-1, -1), UV = new Vector2(0, 1)};
             vertices[1] = new FullscreenVertex {Position = new Vector2(-1, 1), UV = new Vector2(0, 0)};
             vertices[2] = new FullscreenVertex {Position = new Vector2(1, 1), UV = new Vector2(1, 0)};
             vertices[3] = new FullscreenVertex {Position = new Vector2(1, -1), UV = new Vector2(1, 1)};
-            _handle = _vertexBufferManager.CreateVertexBuffer(4u, (uint) sizeof(FullscreenVertex), vertices);
+            _vertexBufferHandle = _vertexBufferManager.CreateVertexBuffer(4u, (uint) sizeof(FullscreenVertex), vertices);
 
-            _indexBuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 1, 2, 0, 2, 3});
+            var indices = stackalloc ushort[6];
+            indices[0] = 0;
+            indices[1] = 1;
+            indices[2] = 2;
+            indices[3] = 0;
+            indices[4] = 2;
+            indices[5] = 3;
+            _indexBufferHandle = _indexBufferManager.CreateIndexBuffer<ushort>(6, indices);
         }
 
         public void Render(IRenderContext context)
         {
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             
-            context.SetIndexBuffer(_indexBuffer);
-            context.SetVertexBuffer(_vertexBufferManager[_handle]);
+            context.SetIndexBuffer(_indexBufferManager[_indexBufferHandle]);
+            context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
 
 
             _shaderManager.Get(_shaderManager.GetHandle("FullscreenDefault")).Bind(context);
@@ -44,8 +53,8 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         public void Dispose()
         {
-            _vertexBufferManager.DestroyBuffer(_handle);
-            _indexBuffer.Dispose();
+            _vertexBufferManager.DestroyBuffer(_vertexBufferHandle);
+            _indexBufferManager.DestroyBuffer(_indexBufferHandle);
         }
 
         private struct FullscreenVertex

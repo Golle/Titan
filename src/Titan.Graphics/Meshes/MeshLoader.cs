@@ -12,16 +12,18 @@ namespace Titan.Graphics.Meshes
     {
         private readonly IGraphicsDevice _device;
         private readonly IVertexBufferManager _vertexBufferManager;
+        private readonly IIndexBufferManager _indexBufferManager;
 
-        public MeshLoader(IGraphicsDevice device, IVertexBufferManager vertexBufferManager)
+        public MeshLoader(IGraphicsDevice device, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
         {
             _device = device;
             _vertexBufferManager = vertexBufferManager;
+            _indexBufferManager = indexBufferManager;
         }
 
         public Mesh LoadMesh(string filename)
         {
-            IIndexBuffer indexBuffer;
+            IndexBufferHandle indexBuffer;
             VertexBufferHandle vertexBuffer;
 
             using var reader = new ByteReader(File.OpenRead(filename));
@@ -65,10 +67,10 @@ namespace Titan.Graphics.Meshes
             return new Mesh(vertexBuffer, indexBuffer, submeshes);
         }
 
-        private unsafe IIndexBuffer CreateIndexBuffer<T>(ByteReader reader, void* pIndices, uint count) where T : unmanaged
+        private unsafe IndexBufferHandle CreateIndexBuffer<T>(ByteReader reader, void* pIndices, uint count) where T : unmanaged
         {
             reader.Read<T>(pIndices, count);
-            return new IndexBuffer<T>(_device, (T*) pIndices, count);
+            return _indexBufferManager.CreateIndexBuffer<T>(count, pIndices);
         }
     }
 }

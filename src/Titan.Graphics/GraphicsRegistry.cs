@@ -32,6 +32,7 @@ namespace Titan.Graphics
                 .Register<IPipelineConfigurationLoader, PipelineConfigurationLoader>()
 
                 .Register<IVertexBufferManager, VertexBufferManager>()
+                .Register<IIndexBufferManager, IndexBufferManager>()
 
 
                 .Register<DefaultSceneRenderer>()
