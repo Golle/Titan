@@ -26,24 +26,15 @@ var device = engine.Device;
 var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>();
 
 
-
-
 unsafe
 {
-    var manager = (IVertexBufferManager)new VertexBufferManager(device.Ptr, container.GetInstance<IMemoryManager>());
-    var handle1 = manager.CreateVertexBuffer(1000, (uint) sizeof(Vertex), null);
-    var handle2 = manager.CreateVertexBuffer(2000, (uint) sizeof(Vertex), null);
-    manager.DestroyBuffer(handle2);
-    var handle3 = manager.CreateVertexBuffer(3000, (uint) sizeof(Vertex), null);
-
-    manager.Dispose();
     var textureLoader = container.GetInstance<ITextureLoader>();
     var meshLoader = container.GetInstance<IMeshLoader>();
     var input = container.GetInstance<IInputHandler>();
     var eventQueue = container.GetInstance<IEventQueue>();
 
-    using var mesh = meshLoader.LoadMesh(simpleMesh);
-    using var mesh1 = meshLoader.LoadMesh(simpleMesh1);
+    var mesh = meshLoader.LoadMesh(simpleMesh);
+    var mesh1 = meshLoader.LoadMesh(simpleMesh1);
     //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
     //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\tree01.png");
     using var texture = textureLoader.LoadTexture(@"F:\tmp\globe.png");

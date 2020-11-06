@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
+using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -17,9 +18,10 @@ namespace Titan.Graphics.Resources
 
         private readonly ConcurrentQueue<int> _freeHandles = new ConcurrentQueue<int>();
 
-        public VertexBufferManager(ID3D11Device* device, IMemoryManager memoryManager)
+        //public VertexBufferManager(ID3D11Device* device, IMemoryManager memoryManager) // TODO: use this when all managers are handled by the device.
+        public VertexBufferManager(IGraphicsDevice device, IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device);
+            _device = new ComPtr<ID3D11Device>(device.Ptr);
             
             var memory = memoryManager.GetMemoryChunk("VertexBuffer");
             Debug.Assert(memory.Stride == sizeof(VertexBuffer), "The stride of the memory chunk is not matching the expected size");
@@ -49,6 +51,7 @@ namespace Titan.Graphics.Resources
             ref var vertexBuffer = ref _buffers[handle];
             vertexBuffer.CpuAccessFlag = desc.CpuAccessFlags;
             vertexBuffer.Usage = desc.Usage;
+            vertexBuffer.Stride = desc.StructureByteStride;
 
             if (initialData == null)
             {

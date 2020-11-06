@@ -1,29 +1,21 @@
-using System;
 using System.Runtime.CompilerServices;
-using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.Resources;
 
 namespace Titan.Graphics.Meshes
 {
-    public record Mesh(IVertexBuffer VertexBuffer, IIndexBuffer IndexBuffer, SubMesh[] SubSets) : IDisposable
+    public record Mesh(VertexBufferHandle VertexBufferHandle, IIndexBuffer IndexBuffer, SubMesh[] SubSets)
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Bind(IRenderContext context)
-        {
-            context.SetVertexBuffer(VertexBuffer);
-            context.SetIndexBuffer(IndexBuffer);
-        }
-
         public uint NumberOfIndices
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => IndexBuffer.NumberOfIndices;
         }
 
-        public void Dispose()
-        {
-            VertexBuffer.Dispose();
-            IndexBuffer.Dispose();
-        }
+        //public void Dispose()
+        //{
+        //    VertexBuffer.Dispose();
+        //    IndexBuffer.Dispose();
+        //}
     }
 }

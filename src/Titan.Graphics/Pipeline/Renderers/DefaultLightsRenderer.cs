@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
 
@@ -11,21 +12,25 @@ namespace Titan.Graphics.Pipeline.Renderers
     {
         private readonly ConstantBuffer<LightSource> _lightSource;
         private readonly IShaderManager _shaderManager;
-        private readonly VertexBuffer<FullscreenVertex> _vertexBuffer;
+        private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IndexBuffer<ushort> _indexBuffer;
 
-        public DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager)
+        private VertexBufferHandle _handle;
+
+        public unsafe DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager)
         {
             _shaderManager = shaderManager;
-            _vertexBuffer = new VertexBuffer<FullscreenVertex>(device, new[]
-            {
-                new FullscreenVertex {Position = new Vector2(-1, -1), UV = new Vector2(0, 1)},
-                new FullscreenVertex {Position = new Vector2(-1, 1), UV = new Vector2(0, 0)},
-                new FullscreenVertex {Position = new Vector2(1, 1), UV = new Vector2(1, 0)},
-                new FullscreenVertex {Position = new Vector2(1, -1), UV = new Vector2(1, 1)},
-            });
-            _indexBuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 1, 2, 0, 2, 3 });
+            _vertexBufferManager = vertexBufferManager;
+            
+            var vertices = stackalloc FullscreenVertex[4];
+            vertices[0] = new FullscreenVertex { Position = new Vector2(-1, -1), UV = new Vector2(0, 1) };
+            vertices[1] = new FullscreenVertex { Position = new Vector2(-1, 1), UV = new Vector2(0, 0) };
+            vertices[2] = new FullscreenVertex { Position = new Vector2(1, 1), UV = new Vector2(1, 0) };
+            vertices[3] = new FullscreenVertex { Position = new Vector2(1, -1), UV = new Vector2(1, 1) };
+            _handle = _vertexBufferManager.CreateVertexBuffer(4u, (uint)sizeof(FullscreenVertex), vertices);
 
+            
+            _indexBuffer = new IndexBuffer<ushort>(device, new ushort[] { 0, 1, 2, 0, 2, 3 });
             _lightSource = new ConstantBuffer<LightSource>(device, new LightSource
             {
                 Position = new Vector3(0, 0, -1)
@@ -35,6 +40,8 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         private Vector3 _lightPosition = new Vector3(0,0,-1);
         private float _lightVelocity = 0.02f;
+        
+
         public void Render(IRenderContext context)
         {
             #region TEMP LIGHT CALCULATIONS
@@ -62,7 +69,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             context.SetPixelShaderConstantBuffer(_lightSource);
 
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            context.SetVertexBuffer(_vertexBuffer);
+            context.SetVertexBuffer(_vertexBufferManager[_handle]);
             context.SetIndexBuffer(_indexBuffer);
             _shaderManager.Get(_shaderManager.GetHandle("DeferredShadingDefault")).Bind(context);
 
@@ -73,7 +80,7 @@ namespace Titan.Graphics.Pipeline.Renderers
         public void Dispose()
         {
             _lightSource.Dispose();
-            _vertexBuffer.Dispose();
+            _vertexBufferManager.DestroyBuffer(_handle);
             _indexBuffer.Dispose();
         }
 

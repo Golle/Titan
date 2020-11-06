@@ -4,26 +4,29 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Graph;
+using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline.Renderers
 {
-    public class DefaultSceneRenderer : IRenderer
+    internal class DefaultSceneRenderer : IRenderer
     {
         private readonly IMeshRenderQueue _renderQueue;
         private readonly IWindow _window;
         private readonly IShaderManager _shaderManager;
+        private readonly IVertexBufferManager _vertexBufferManager;
         private readonly ConstantBuffer<Matrix4x4> _perObjectBuffer;
         private readonly ConstantBuffer<CameraBuffer> _camera;
         private readonly SamplerState _sampler;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager)
         {
             _renderQueue = renderQueue;
             _window = window;
             _shaderManager = shaderManager;
+            _vertexBufferManager = vertexBufferManager;
 
             _perObjectBuffer = new ConstantBuffer<Matrix4x4>(device, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
             _camera = new ConstantBuffer<CameraBuffer>(device, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
@@ -73,6 +76,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             
             context.SetVertexShaderConstantBuffer(_camera);
             context.SetPixelShaderSampler(_sampler);
+            var buffers = stackalloc ID3D11Buffer*[1];
             foreach (ref readonly var renderable in _renderQueue.GetRenderables())
             {
                 //context.MapResource(_perObjectBuffer.AsResourcePointer(), renderable.World);
@@ -87,10 +91,9 @@ namespace Titan.Graphics.Pipeline.Renderers
 
                 var mesh = renderable.Mesh;
 
-                
-                mesh.Bind(context);
+                context.SetIndexBuffer(mesh.IndexBuffer);
+                context.SetVertexBuffer(_vertexBufferManager[mesh.VertexBufferHandle]);
 
-                
                 var subsets = mesh.SubSets;
                 if (subsets.Length > 1)
                 {

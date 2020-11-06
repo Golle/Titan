@@ -6,10 +6,10 @@ namespace Titan.Graphics.Meshes
     internal struct Header
     {
         public ushort Version;
-        public int VertexSize;
-        public int VertexCount;
-        public int IndexSize;
-        public int IndexCount;
-        public int SubMeshCount;
+        public uint VertexSize;
+        public uint VertexCount;
+        public uint IndexSize;
+        public uint IndexCount;
+        public uint SubMeshCount;
     }
 }

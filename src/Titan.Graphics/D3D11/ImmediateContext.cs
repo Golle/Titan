@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
+using Titan.Graphics.Resources;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -47,14 +48,16 @@ namespace Titan.Graphics.D3D11
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShaderConstantBuffer(IConstantBuffer constantBuffer, uint slot = 0) => Context.Get()->PSSetConstantBuffers(slot, 1, constantBuffer.Ptr.GetAddressOf());
 
-        // TODO: is this the best way to do it? 
-        // TODO: Add support for multiple vertex buffers in a single call (same behavior can be achieved by calling this method and increase the slot, but it requires multiple calls instead of a single call)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexBuffer(IVertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u)
+        public void SetVertexBuffer(in VertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u)
         {
             var stride = vertexBuffer.Stride;
-            Context.Get()->IASetVertexBuffers(slot, 1, vertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+            fixed (ID3D11Buffer** pBuffer = &vertexBuffer.Raw)
+            {
+                Context.Get()->IASetVertexBuffers(slot, 1, pBuffer, &stride, &offset);
+            }
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetIndexBuffer(IIndexBuffer indexBuffer, uint offset = 0u) => Context.Get()->IASetIndexBuffer(indexBuffer.Buffer.Get(), indexBuffer.Format, offset);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

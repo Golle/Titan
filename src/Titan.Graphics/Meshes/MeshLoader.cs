@@ -4,21 +4,25 @@ using System.Runtime.InteropServices;
 using Titan.Core.Common;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.Resources;
 
 namespace Titan.Graphics.Meshes
 {
     internal class MeshLoader : IMeshLoader
     {
         private readonly IGraphicsDevice _device;
+        private readonly IVertexBufferManager _vertexBufferManager;
 
-        public MeshLoader(IGraphicsDevice device)
+        public MeshLoader(IGraphicsDevice device, IVertexBufferManager vertexBufferManager)
         {
             _device = device;
+            _vertexBufferManager = vertexBufferManager;
         }
+
         public Mesh LoadMesh(string filename)
         {
             IIndexBuffer indexBuffer;
-            IVertexBuffer vertexBuffer;
+            VertexBufferHandle vertexBuffer;
 
             using var reader = new ByteReader(File.OpenRead(filename));
             reader.Read<Header>(out var header);
@@ -26,14 +30,14 @@ namespace Titan.Graphics.Meshes
             var submeshes = new SubMesh[header.SubMeshCount];
             reader.Read(ref submeshes);
 
-            var vertices = Marshal.AllocHGlobal(header.VertexCount * header.VertexSize);
+            var vertices = Marshal.AllocHGlobal((int) (header.VertexCount * header.VertexSize)); // TODO: only do a single allocation for both vertices+indices
             try
             {
                 unsafe
                 {
                     var pVertices = vertices.ToPointer();
                     reader.Read<Vertex>(pVertices, header.VertexCount);
-                    vertexBuffer = new VertexBuffer<Vertex>(_device, pVertices, (uint)header.VertexCount);
+                    vertexBuffer = _vertexBufferManager.CreateVertexBuffer(header.VertexCount, header.VertexSize, pVertices);
                 }
             }
             finally
@@ -41,7 +45,7 @@ namespace Titan.Graphics.Meshes
                 Marshal.FreeHGlobal(vertices);
             }
             
-            var indices = Marshal.AllocHGlobal(header.IndexCount * header.IndexSize);
+            var indices = Marshal.AllocHGlobal((int) (header.IndexCount * header.IndexSize));
             try
             {
                 unsafe
@@ -61,10 +65,10 @@ namespace Titan.Graphics.Meshes
             return new Mesh(vertexBuffer, indexBuffer, submeshes);
         }
 
-        private unsafe IIndexBuffer CreateIndexBuffer<T>(ByteReader reader, void* pIndices, int count) where T : unmanaged
+        private unsafe IIndexBuffer CreateIndexBuffer<T>(ByteReader reader, void* pIndices, uint count) where T : unmanaged
         {
             reader.Read<T>(pIndices, count);
-            return new IndexBuffer<T>(_device, (T*) pIndices, (uint)count);
+            return new IndexBuffer<T>(_device, (T*) pIndices, count);
         }
     }
 }
