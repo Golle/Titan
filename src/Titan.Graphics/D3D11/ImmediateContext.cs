@@ -64,14 +64,14 @@ namespace Titan.Graphics.D3D11
         public void SetVertexBuffer(in VertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u)
         {
             var stride = vertexBuffer.Stride;
-            fixed (ID3D11Buffer** pBuffer = &vertexBuffer.Raw)
+            fixed (ID3D11Buffer** pBuffer = &vertexBuffer.Pointer)
             {
                 Context.Get()->IASetVertexBuffers(slot, 1, pBuffer, &stride, &offset);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetIndexBuffer(in IndexBuffer indexBuffer, uint offset = 0u) => Context.Get()->IASetIndexBuffer(indexBuffer.Raw, indexBuffer.Format, offset);
+        public void SetIndexBuffer(in IndexBuffer indexBuffer, uint offset = 0u) => Context.Get()->IASetIndexBuffer(indexBuffer.Pointer, indexBuffer.Format, offset);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRenderTarget(RenderTargetView renderTarget, DepthStencilView depthStencilView) => Context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), depthStencilView.Ptr.Get());

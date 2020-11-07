@@ -40,7 +40,7 @@ unsafe
     using var texture = textureLoader.LoadTexture(@"F:\tmp\globe.png");
 
     var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
-    //meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);
+    meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);
     meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1,0,0), texture);
     //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(2,0,0), texture);
     //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(3,0,0), texture);

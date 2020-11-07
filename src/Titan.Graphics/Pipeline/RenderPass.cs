@@ -18,7 +18,8 @@ namespace Titan.Graphics.Pipeline
 
         public void Render(IRenderContext renderContext)
         {
-            // TODO: replace the generation of this with a SourceGenerator (C# 9)
+            // TODO: replace the generation of this with a SourceGenerator (C# 9) - not good since the engine needs to be re-compiled if we change a variable.
+            // TODO: Use dynamic methods for this instead, create the IL code. 
 
             for (var i = 0; i < _commands.Length; i++)
             {
