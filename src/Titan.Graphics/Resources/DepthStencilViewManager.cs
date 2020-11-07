@@ -18,8 +18,6 @@ namespace Titan.Graphics.Resources
 
         public DepthStencilViewManager(ID3D11Device* device, IMemoryManager memoryManager)
         {
-            
-
             _device = new ComPtr<ID3D11Device>(device);
             
             var memory = memoryManager.GetMemoryChunk("DepthStencilView");

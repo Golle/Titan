@@ -1,6 +1,7 @@
 using System;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
+using Titan.Graphics.States;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -15,7 +16,7 @@ namespace Titan.Graphics
         IConstantBufferManager ConstantBufferManager { get; }
         IRenderTargetViewManager RenderTargetViewManager{ get; }
         IDepthStencilViewManager DepthStencilViewManager { get; }
-
+        IDepthStencilStateManager DepthStencilStateManager { get; }
         IRenderContext ImmediateContext { get; }
 
 

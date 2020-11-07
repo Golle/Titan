@@ -88,14 +88,14 @@ unsafe
         //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
     }
 
-    {
-        using ComPtr<ID3D11Debug> d3dDebug = default;
-        fixed (Guid* debugGuidPtr = &D3D11Common.D3D11Debug)
-        {
-            Common.CheckAndThrow(device.Ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
-        }
-        Common.CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
-    }
+    //{
+    //    using ComPtr<ID3D11Debug> d3dDebug = default;
+    //    fixed (Guid* debugGuidPtr = &D3D11Common.D3D11Debug)
+    //    {
+    //        Common.CheckAndThrow(device.Ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
+    //    }
+    //    Common.CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
+    //}
     //deferredShadingPixelShader.Dispose();
     //backbuffer.Dispose();
 }

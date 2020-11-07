@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Resources;
+using Titan.Graphics.States;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -83,7 +84,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetDepthStencilState(DepthStencilState depthStencilState) => _context.Get()->OMSetDepthStencilState(depthStencilState.Ptr.Get(), 1u);
+        public void SetDepthStencilState(in DepthStencilState depthStencilState) => _context.Get()->OMSetDepthStencilState(depthStencilState.Pointer, 1u);
 
         // TODO: add methods for multiple shader resources in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

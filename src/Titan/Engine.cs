@@ -7,6 +7,7 @@ using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Resources;
+using Titan.Graphics.States;
 using Titan.IOC;
 using Titan.Windows;
 using DepthStencilView = Titan.Graphics.Resources.DepthStencilView;
@@ -62,6 +63,7 @@ namespace Titan
                 new ChunkDescriptor("ShaderResourceView", (uint) sizeof(ShaderResourceView), 1024),
                 new ChunkDescriptor("RenderTargetView", (uint) sizeof(RenderTargetView), 1024),
                 new ChunkDescriptor("DepthStencilView", (uint) sizeof(DepthStencilView), 10),
+                new ChunkDescriptor("DepthStencilState", (uint) sizeof(DepthStencilState), 10),
             });
         }
 
