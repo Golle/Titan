@@ -158,6 +158,7 @@ namespace Titan.Graphics.Pipeline
             {
                 renderer.Dispose();
             }
+            _renderGraph.Dispose();
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
@@ -15,15 +16,12 @@ namespace Titan.Graphics
         IRenderTargetViewManager RenderTargetViewManager{ get; }
         IDepthStencilViewManager DepthStencilViewManager { get; }
 
-        public void ResizeBuffers();
-
-
-
+        IRenderContext ImmediateContext { get; }
 
 
         unsafe ID3D11Device* Ptr { get; }
-        unsafe ID3D11DeviceContext* ImmediateContextPtr { get; }
-        ref readonly ComPtr<ID3D11RenderTargetView> BackBuffer { get; }
         ref readonly ComPtr<IDXGISwapChain> SwapChain { get; }
+
+        public void ResizeBuffers();
     }
 }

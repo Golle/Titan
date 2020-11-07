@@ -7,7 +7,6 @@ namespace Titan.Graphics.Pipeline
     {
         private readonly RenderPass[] _renderPasses;
         private readonly IGraphicsDevice _device;
-        private readonly ImmediateContext _context;
         private readonly Swapchain _swapchain;
 
         public RenderGraph(RenderPass[] renderPasses, IGraphicsDevice device)
@@ -15,8 +14,7 @@ namespace Titan.Graphics.Pipeline
             _renderPasses = renderPasses;
             _device = device;
 
-            _context = new ImmediateContext(device);
-            _context.SetViewport(new Viewport(1920, 1080));
+            _device.ImmediateContext.SetViewport(new Viewport(1920, 1080));
             _swapchain = new Swapchain(device, true, 0);
         }
 
@@ -24,14 +22,13 @@ namespace Titan.Graphics.Pipeline
         {
             foreach (var renderPass in _renderPasses)
             {
-                renderPass.Render(_context);
+                renderPass.Render(_device.ImmediateContext);
             }
             _swapchain.Present();
         }
 
         public void Dispose()
         {
-            _context.Dispose();
             _swapchain.Dispose();
         }
     }

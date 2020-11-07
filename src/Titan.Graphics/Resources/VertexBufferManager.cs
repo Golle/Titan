@@ -16,8 +16,6 @@ namespace Titan.Graphics.Resources
         private int _numberOfBuffers;
 
         private readonly ConcurrentQueue<int> _freeHandles = new ConcurrentQueue<int>();
-
-        //public VertexBufferManager(ID3D11Device* device, IMemoryManager memoryManager) // TODO: use this when all managers are handled by the device.
         public VertexBufferManager(ID3D11Device* device, IMemoryManager memoryManager)
         {
             _device = new ComPtr<ID3D11Device>(device);
@@ -87,13 +85,17 @@ namespace Titan.Graphics.Resources
 
         public void Dispose()
         {
-            _device.Dispose();
             for (var i = 0; i < _numberOfBuffers; ++i)
             {
-                _buffers[i].Pointer->Release();
-                _buffers[i].Pointer = null;
+                ref var buffer = ref _buffers[i];
+                if (buffer.Pointer != null)
+                {
+                    buffer.Pointer->Release();
+                    buffer.Pointer = null;
+                }
             }
             _numberOfBuffers = 0;
+            _device.Dispose();
         }
     }
 }

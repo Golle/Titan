@@ -7,7 +7,7 @@ namespace Titan.Graphics.Resources
     public unsafe struct ConstantBuffer
     {
         [FieldOffset(0)]
-        public ID3D11Buffer* Buffer;
+        public ID3D11Buffer* Pointer;
         [FieldOffset(0)]
         public ID3D11Resource* Resource;
     }

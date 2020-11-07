@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using Titan.Core.Memory;
 using Titan.Graphics.Resources;
 using Titan.Windows;
@@ -14,35 +13,31 @@ namespace Titan.Graphics.D3D11
     {
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
-        private ComPtr<ID3D11DeviceContext> _immediateContext;
-        private ComPtr<ID3D11RenderTargetView> _backBuffer;
 
         public IShaderResourceViewManager ShaderResourceViewManager { get; }
         public ITextureManager TextureManager { get; }
         public IVertexBufferManager VertexBufferManager { get; }
         public IIndexBufferManager IndexBufferManager { get; }
         public IConstantBufferManager ConstantBufferManager { get; }
-        public IRenderTargetViewManager RenderTargetViewManager { get; }
+        public IRenderTargetViewManager RenderTargetViewManager { get; private set; }
         public IDepthStencilViewManager DepthStencilViewManager { get; }
-
+        public IRenderContext ImmediateContext { get; private set; }
 
         public ID3D11Device* Ptr => _device.Get();
-        public ID3D11DeviceContext* ImmediateContextPtr => _immediateContext.Get();
-        public ref readonly ComPtr<ID3D11RenderTargetView> BackBuffer => ref _backBuffer;
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
 
         public void ResizeBuffers()
         {
             // TODO: this will crash because RenderTargetViewManager has a reference to backbuffer. Move the backbuffer to the manager and implement resize for all buffers.
-            _backBuffer.Dispose();
-            CheckAndThrow(_swapChain.Get()->ResizeBuffers(0, 0, 0, DXGI_FORMAT.DXGI_FORMAT_UNKNOWN, 0), "IDXGISwapChain::ResizeBuffers");
-            InitBackBuffer();
+            //_backBuffer.Dispose();
+            //CheckAndThrow(_swapChain.Get()->ResizeBuffers(0, 0, 0, DXGI_FORMAT.DXGI_FORMAT_UNKNOWN, 0), "IDXGISwapChain::ResizeBuffers");
+            //InitBackBuffer(null);
         }
 
         public GraphicsDevice(IWindow window, IMemoryManager memoryManager, uint refreshRate = 144, bool debug = true)
         {
             InitDeviceAndSwapChain(window, refreshRate, debug);
-            InitBackBuffer();
+            InitBackBuffer(memoryManager);
 
             var pDevice = _device.Get();
             TextureManager = new TextureManager(pDevice, memoryManager);
@@ -50,7 +45,6 @@ namespace Titan.Graphics.D3D11
             ShaderResourceViewManager = new ShaderResourceViewManager(pDevice, memoryManager);
             VertexBufferManager = new VertexBufferManager(pDevice, memoryManager);
             ConstantBufferManager = new ConstantBufferManager(pDevice, memoryManager);
-            RenderTargetViewManager = new RenderTargetViewManager(pDevice, _backBuffer.Get(), memoryManager);
             DepthStencilViewManager = new DepthStencilViewManager(pDevice, memoryManager);
         }
 
@@ -78,33 +72,37 @@ namespace Titan.Graphics.D3D11
             //desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_DISCARD;
             desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_FLIP_DISCARD;
             desc.Flags = DXGI_SWAP_CHAIN_FLAG.DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-            
 
-            var result = D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, flags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _immediateContext.GetAddressOf());
-            if (FAILED(result))
-            {
-                throw new Win32Exception(result,
-                    $"Call to {nameof(D3D11CreateDeviceAndSwapChain)} failed with HRESULT {result}");
-            }
+            using var context = new ComPtr<ID3D11DeviceContext>();
+            CheckAndThrow(D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, flags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, context.GetAddressOf()), "D3D11CreateDeviceAndSwapChain");
+            ImmediateContext = new RenderContext(context.Get());
         }
 
-        private void InitBackBuffer()
+        private void InitBackBuffer(IMemoryManager memoryManager)
         {
-            ID3D11Buffer* backBuffer;
+            using var renderTarget = new ComPtr<ID3D11RenderTargetView>();
+            using var backbuffer = new ComPtr<ID3D11Buffer>();
             fixed (Guid* resourcePointer = &D3D11Resource)
             {
-                CheckAndThrow(_swapChain.Get()->GetBuffer(0, resourcePointer, (void**) &backBuffer), "GetBuffer");
+                CheckAndThrow(_swapChain.Get()->GetBuffer(0, resourcePointer, (void**) backbuffer.GetAddressOf()), "GetBuffer");
             }
-            CheckAndThrow(_device.Get()->CreateRenderTargetView((ID3D11Resource*) backBuffer, null, _backBuffer.GetAddressOf()), "CreateRenderTargetView");
-
-            backBuffer->Release();
+            CheckAndThrow(_device.Get()->CreateRenderTargetView((ID3D11Resource*) backbuffer.Get(), null, renderTarget.GetAddressOf()), "CreateRenderTargetView");
+            
+            RenderTargetViewManager = new RenderTargetViewManager(_device.Get(), renderTarget.Get(), memoryManager);
         }
 
         public void Dispose()
         {
-            _backBuffer.Dispose();
+            TextureManager.Dispose();
+            IndexBufferManager.Dispose();
+            ShaderResourceViewManager.Dispose();
+            VertexBufferManager.Dispose();
+            ConstantBufferManager.Dispose();
+            RenderTargetViewManager.Dispose();
+            DepthStencilViewManager.Dispose();
+            ((RenderContext)ImmediateContext).Dispose();
+
             _swapChain.Dispose();
-            _immediateContext.Dispose();
             _device.Dispose();
         }
     }

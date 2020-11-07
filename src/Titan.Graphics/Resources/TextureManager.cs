@@ -78,6 +78,17 @@ namespace Titan.Graphics.Resources
 
         public void Dispose()
         {
+            
+            for (var i = 0; i < _numberOfTextures; ++i)
+            {
+                ref var texture = ref _textures[i];
+                if (texture.Pointer != null)
+                {
+                    texture.Pointer->Release();
+                    texture.Pointer = null;
+                }
+            }
+            _numberOfTextures = 0;
             _device.Dispose();
         }
     }

@@ -6,8 +6,11 @@ using Titan.Core.Messaging;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Graph;
+using Titan.Graphics.Shaders;
 using Titan.Graphics.Textures;
 using Titan.Input;
+using Titan.Windows.Win32;
+using Titan.Windows.Win32.D3D11;
 
 //var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
 var simpleMesh = @"F:\Git\GameDev\resources\models\sphere.dat";
@@ -21,11 +24,12 @@ using var engine = EngineBuilder.CreateDefaultBuilder()
 var window = engine.Window;
 var container = engine.Container;
 var device = engine.Device;
-var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>();
+using var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>();
 
 
 unsafe
 {
+    using var shaderManager = container.GetInstance<IShaderManager>();
     var textureLoader = container.GetInstance<ITextureLoader>();
     var meshLoader = container.GetInstance<IMeshLoader>();
     var input = container.GetInstance<IInputHandler>();
@@ -84,14 +88,14 @@ unsafe
         //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
     }
 
-    //{
-    //    using ComPtr<ID3D11Debug> d3dDebug = default;
-    //    fixed (Guid* debugGuidPtr = &D3D11Common.D3D11Debug)
-    //    {
-    //        CheckAndThrow(device.Ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
-    //    }
-    //    CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
-    //}
+    {
+        using ComPtr<ID3D11Debug> d3dDebug = default;
+        fixed (Guid* debugGuidPtr = &D3D11Common.D3D11Debug)
+        {
+            Common.CheckAndThrow(device.Ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
+        }
+        Common.CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
+    }
     //deferredShadingPixelShader.Dispose();
     //backbuffer.Dispose();
 }

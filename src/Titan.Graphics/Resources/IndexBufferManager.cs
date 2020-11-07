@@ -89,8 +89,11 @@ namespace Titan.Graphics.Resources
             _device.Dispose();
             for (var i = 0; i < _numberOfBuffers; ++i)
             {
-                _buffers[i].Pointer->Release();
-                _buffers[i].Pointer = null;
+                if (_buffers->Pointer != null)
+                {
+                    _buffers[i].Pointer->Release();
+                    _buffers[i].Pointer = null;
+                }
             }
             _numberOfBuffers = 0;
         }

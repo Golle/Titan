@@ -53,7 +53,7 @@ namespace Titan.Graphics.Resources
                 {
                     pSysMem = pData,
                 };
-                Common.CheckAndThrow(_device.Get()->CreateBuffer(&desc, &subresourceData, &_buffers[handle].Buffer), "CreateBuffer");
+                Common.CheckAndThrow(_device.Get()->CreateBuffer(&desc, &subresourceData, &_buffers[handle].Pointer), "CreateBuffer");
             }
             return handle;
         }
@@ -61,10 +61,10 @@ namespace Titan.Graphics.Resources
         public void DestroyBuffer(in ConstantBufferHandle handle)
         {
             ref var buffer = ref _buffers[handle];
-            if (buffer.Buffer != null)
+            if (buffer.Pointer != null)
             {
-                buffer.Buffer->Release();
-                buffer.Buffer = null;
+                buffer.Pointer->Release();
+                buffer.Pointer = null;
                 _freeHandles.Enqueue(handle);
             }
         }
@@ -74,8 +74,12 @@ namespace Titan.Graphics.Resources
             _device.Dispose();
             for (var i = 0; i < _numberOfBuffers; ++i)
             {
-                _buffers[i].Buffer->Release();
-                _buffers[i].Buffer = null;
+                ref var buffer = ref _buffers[i];
+                if (buffer.Pointer != null)
+                {
+                    buffer.Pointer->Release();
+                    buffer.Pointer = null;
+                }
             }
             _numberOfBuffers = 0;
         }

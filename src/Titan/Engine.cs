@@ -68,9 +68,11 @@ namespace Titan
         public void Dispose()
         {
             _pipeline.Dispose();
-            _memoryManager.Dispose();
             _device.Dispose();
             _window.Dispose();
+
+            // memory manager must be cleared last
+            _memoryManager.Dispose();
         }
 
         public void Start()
