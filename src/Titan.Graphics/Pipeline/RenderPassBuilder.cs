@@ -4,7 +4,6 @@ using System.Linq;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Configuration;
-using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
 
@@ -18,7 +17,7 @@ namespace Titan.Graphics.Pipeline
         private readonly IDictionary<string, RenderTargetViewHandle> _renderTargets = new Dictionary<string, RenderTargetViewHandle>();
         private readonly IDictionary<string, ShaderResourceViewHandle> _shaderResources = new Dictionary<string, ShaderResourceViewHandle>();
 
-        private readonly IDictionary<string, DepthStencil> _depthStencils = new Dictionary<string, DepthStencil>();
+        private readonly IDictionary<string, DepthStencilViewHandle> _depthStencils = new Dictionary<string, DepthStencilViewHandle>();
         private readonly IDictionary<string, SamplerState> _samplers = new Dictionary<string, SamplerState>();
         
         private readonly IGraphicsDevice _device;
@@ -74,13 +73,13 @@ namespace Titan.Graphics.Pipeline
             _shaderResources.Add(name, handle);
         }
 
-        public void AddDepthStencil(string name, DepthStencil depthStencil)
+        public void AddDepthStencil(string name, in DepthStencilViewHandle handle)
         {
             if (_depthStencils.ContainsKey(name))
             {
                 throw new InvalidOperationException($"Depth stencil with name {name} has already been added to the Render Graph");
             }
-            _depthStencils.Add(name, depthStencil);
+            _depthStencils.Add(name, handle);
         }
 
         public void AddSampler(string name, SamplerState samplerState)
@@ -103,7 +102,7 @@ namespace Titan.Graphics.Pipeline
                 var commandList = new List<RenderPassCommand>();
                 if (pass.DepthStencil != null)
                 {
-                    commandList.Add(new RenderPassCommand{Type = CommandType.ClearDepthStencil, DepthStencil = _depthStencils[pass.DepthStencil.Name].View});
+                    commandList.Add(new RenderPassCommand{Type = CommandType.ClearDepthStencil, DepthStencil = _depthStencils[pass.DepthStencil.Name]});
                 }
 
                 commandList.AddRange(CreateResourcesCommands(pass.Resources));

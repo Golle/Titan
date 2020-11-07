@@ -8,7 +8,7 @@ namespace Titan.Graphics.D3D11
     public interface IRenderContext
     {
         void ClearRenderTargetView(in RenderTargetView renderTargetView, in Color color);
-        void ClearDepthStencilView(DepthStencilView depthStencilView);
+        void ClearDepthStencilView(in DepthStencilView depthStencilView);
         void SetViewport(Viewport viewport);
         void SetBlendState(BlendState blendState);
         void SetVertexShaderConstantBuffer(in ConstantBuffer constantBuffer, uint slot = 0);
@@ -16,7 +16,7 @@ namespace Titan.Graphics.D3D11
         void SetVertexBuffer(in VertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u);
         void SetIndexBuffer(in IndexBuffer indexBuffer, uint offset = 0u);
         void SetRenderTarget(in RenderTargetView renderTarget);
-        void SetRenderTarget(in RenderTargetView renderTarget, DepthStencilView depthStencilView);
+        void SetRenderTarget(in RenderTargetView renderTarget, in DepthStencilView depthStencilView);
         void SetDepthStencilState(DepthStencilState depthStencilState);
         void SetPixelShaderResource(in ShaderResourceView resource, uint slot = 0u);
         void SetVertexShaderResource(in ShaderResourceView resource, uint slot = 0u);

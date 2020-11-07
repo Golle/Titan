@@ -5,7 +5,6 @@ using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Pipeline.Renderers;
-using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
 using Titan.Graphics.Textures;
 using Titan.IOC;
@@ -24,7 +23,6 @@ namespace Titan.Graphics
 
                 .Register<IMeshLoader, MeshLoader>()
                 .Register<IMeshRenderQueue, NaiveMeshRenderQueue>()
-                .Register<IBufferManager, BufferManager>()
                 .Register<IShaderLoader, ShaderLoader>()
                 .Register<IShaderManager, ShaderManager>()
                 .Register<IMaterialManager, MaterialManager>()

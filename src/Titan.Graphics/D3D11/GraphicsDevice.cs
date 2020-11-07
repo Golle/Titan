@@ -23,6 +23,7 @@ namespace Titan.Graphics.D3D11
         public IIndexBufferManager IndexBufferManager { get; }
         public IConstantBufferManager ConstantBufferManager { get; }
         public IRenderTargetViewManager RenderTargetViewManager { get; }
+        public IDepthStencilViewManager DepthStencilViewManager { get; }
 
 
         public ID3D11Device* Ptr => _device.Get();
@@ -50,6 +51,7 @@ namespace Titan.Graphics.D3D11
             VertexBufferManager = new VertexBufferManager(pDevice, memoryManager);
             ConstantBufferManager = new ConstantBufferManager(pDevice, memoryManager);
             RenderTargetViewManager = new RenderTargetViewManager(pDevice, _backBuffer.Get(), memoryManager);
+            DepthStencilViewManager = new DepthStencilViewManager(pDevice, memoryManager);
         }
 
 

@@ -98,6 +98,22 @@ namespace Titan.Graphics.Resources
         public static implicit operator RenderTargetViewHandle(in int handle) => new RenderTargetViewHandle(handle);
     }
 
+    [Handle, DebuggerDisplay("{" + nameof(Value) + "}")]
+    public readonly partial struct DepthStencilViewHandle
+    {
+        public readonly int Value;
+        public DepthStencilViewHandle(int value)
+        {
+            Value = value;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator int(in DepthStencilViewHandle viewHandle) => viewHandle.Value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator DepthStencilViewHandle(in int handle) => new DepthStencilViewHandle(handle);
+    }
+
+    
+
     //public class Apa : ISourceGenerator
 
     //internal readonly struct Handle

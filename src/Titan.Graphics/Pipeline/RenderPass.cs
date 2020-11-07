@@ -33,10 +33,10 @@ namespace Titan.Graphics.Pipeline
                         renderContext.ClearRenderTargetView(_device.RenderTargetViewManager[command.ClearRenderTarget.RenderTarget], command.ClearRenderTarget.Color);
                         break;
                     case CommandType.ClearDepthStencil:
-                        renderContext.ClearDepthStencilView(command.DepthStencil);
+                        renderContext.ClearDepthStencilView(_device.DepthStencilViewManager[command.DepthStencil]);
                         break;
                     case CommandType.SetRenderTargetAndDepthStencil:
-                        renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget], command.DepthStencil);
+                        renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget], _device.DepthStencilViewManager[command.DepthStencil]);
                         break;
                     case CommandType.SetRenderTarget:
                         renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget]);

@@ -2,12 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using Titan;
-using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Graph;
-using Titan.Graphics.Resources;
 using Titan.Graphics.Textures;
 using Titan.Input;
 

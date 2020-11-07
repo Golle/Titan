@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Configuration;
-using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Shaders;
 using Titan.IOC;
@@ -24,14 +22,13 @@ namespace Titan.Graphics.Pipeline
         private readonly IWindow _window;
         private readonly IContainer _container;
         private readonly IGraphicsDevice _device;
-        private readonly IBufferManager _bufferManager;
 
         private readonly IList<IRenderer> _renderers = new List<IRenderer>();
         
         private RenderGraph _renderGraph;
         private SamplerState _samplerState;
 
-        public GraphicsPipeline(TitanConfiguration configuration, IPipelineConfigurationLoader loader, IShaderManager shaderManager, IContainer container,  IWindow window, IGraphicsDevice device, IBufferManager bufferManager)
+        public GraphicsPipeline(TitanConfiguration configuration, IPipelineConfigurationLoader loader, IShaderManager shaderManager, IContainer container,  IWindow window, IGraphicsDevice device)
         {
             _configuration = configuration;
             _loader = loader;
@@ -39,7 +36,6 @@ namespace Titan.Graphics.Pipeline
             _window = window;
             _container = container;
             _device = device;
-            _bufferManager = bufferManager;
             _samplerState = new SamplerState(_device); // TODO: this is a temp solution until we have a sampler state manager where samplers can be shared.
         }
 
@@ -96,8 +92,9 @@ namespace Titan.Graphics.Pipeline
                 {
                     LOGGER.Debug("Creating DepthStencil {0}", renderPass.DepthStencil.Name);
                     // temp impl
-                    var stencil = _bufferManager.GetDepthStencil(bindFlag: D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL, shaderResourceFormat: DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
-                    builder.AddDepthStencil(renderPass.DepthStencil.Name, stencil);
+                    var stencilTextureHandle = _device.TextureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+                    var stencilHandle = _device.DepthStencilViewManager.Create(_device.TextureManager[stencilTextureHandle].Resource);
+                    builder.AddDepthStencil(renderPass.DepthStencil.Name, stencilHandle);
                 }
 
                 if (renderPass.Samplers != null)

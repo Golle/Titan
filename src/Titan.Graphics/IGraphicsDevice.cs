@@ -13,6 +13,7 @@ namespace Titan.Graphics
         IIndexBufferManager IndexBufferManager { get; }
         IConstantBufferManager ConstantBufferManager { get; }
         IRenderTargetViewManager RenderTargetViewManager{ get; }
+        IDepthStencilViewManager DepthStencilViewManager { get; }
 
         public void ResizeBuffers();
 

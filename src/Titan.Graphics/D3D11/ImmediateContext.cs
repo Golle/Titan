@@ -32,10 +32,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ClearDepthStencilView(DepthStencilView depthStencilView)
-        {
-            Context.Get()->ClearDepthStencilView(depthStencilView.AsPointer(), 1, 1, 0);
-        }
+        public void ClearDepthStencilView(in DepthStencilView depthStencilView) => Context.Get()->ClearDepthStencilView(depthStencilView.Pointer, 1, 1, 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetViewport(Viewport viewport) => Context.Get()->RSSetViewports(1, (D3D11_VIEWPORT*)&viewport);
@@ -82,11 +79,11 @@ namespace Titan.Graphics.D3D11
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRenderTarget(in RenderTargetView renderTarget, DepthStencilView depthStencilView)
+        public void SetRenderTarget(in RenderTargetView renderTarget, in DepthStencilView depthStencilView)
         {
             fixed (ID3D11RenderTargetView** pTarget = &renderTarget.Pointer)
             {
-                Context.Get()->OMSetRenderTargets(1u, pTarget, depthStencilView.Ptr.Get());
+                Context.Get()->OMSetRenderTargets(1u, pTarget, depthStencilView.Pointer);
             }
         }
 

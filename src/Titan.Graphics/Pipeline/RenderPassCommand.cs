@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Titan.Graphics.D3D11;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
@@ -18,7 +16,7 @@ namespace Titan.Graphics.Pipeline
         //[FieldOffset(8)]
         public ShaderProgram ShaderProgram;
         //[FieldOffset(8)]
-        public DepthStencilView DepthStencil;
+        public DepthStencilViewHandle DepthStencil;
         //[FieldOffset(16)] 
         public SetShaderResourceCommand ShaderResource;
         //[FieldOffset(8)]
