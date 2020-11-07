@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using Titan.Core.Memory;
+using Titan.Graphics.Resources;
 using Titan.Windows;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
@@ -16,43 +17,41 @@ namespace Titan.Graphics.D3D11
         private ComPtr<ID3D11DeviceContext> _immediateContext;
         private ComPtr<ID3D11RenderTargetView> _backBuffer;
 
-        ID3D11Device* IGraphicsDevice.Ptr
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _device.Get();
-        }
-
-        ID3D11DeviceContext* IGraphicsDevice.ImmediateContextPtr
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _immediateContext.Get();
-        }
+        public IShaderResourceViewManager ShaderResourceViewManager { get; }
+        public ITextureManager TextureManager { get; }
+        public IVertexBufferManager VertexBufferManager { get; }
+        public IIndexBufferManager IndexBufferManager { get; }
+        public IConstantBufferManager ConstantBufferManager { get; }
+        public IRenderTargetViewManager RenderTargetViewManager { get; }
 
 
-        ref readonly ComPtr<ID3D11RenderTargetView> IGraphicsDevice.BackBuffer
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ref _backBuffer;
-        }
-
-        ref readonly ComPtr<IDXGISwapChain> IGraphicsDevice.SwapChain
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ref _swapChain;
-        }
+        public ID3D11Device* Ptr => _device.Get();
+        public ID3D11DeviceContext* ImmediateContextPtr => _immediateContext.Get();
+        public ref readonly ComPtr<ID3D11RenderTargetView> BackBuffer => ref _backBuffer;
+        public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
 
         public void ResizeBuffers()
         {
+            // TODO: this will crash because RenderTargetViewManager has a reference to backbuffer. Move the backbuffer to the manager and implement resize for all buffers.
             _backBuffer.Dispose();
             CheckAndThrow(_swapChain.Get()->ResizeBuffers(0, 0, 0, DXGI_FORMAT.DXGI_FORMAT_UNKNOWN, 0), "IDXGISwapChain::ResizeBuffers");
             InitBackBuffer();
         }
 
-        public GraphicsDevice(IWindow window, uint refreshRate = 144, bool debug = true)
+        public GraphicsDevice(IWindow window, IMemoryManager memoryManager, uint refreshRate = 144, bool debug = true)
         {
             InitDeviceAndSwapChain(window, refreshRate, debug);
             InitBackBuffer();
+
+            var pDevice = _device.Get();
+            TextureManager = new TextureManager(pDevice, memoryManager);
+            IndexBufferManager = new IndexBufferManager(pDevice, memoryManager);
+            ShaderResourceViewManager = new ShaderResourceViewManager(pDevice, memoryManager);
+            VertexBufferManager = new VertexBufferManager(pDevice, memoryManager);
+            ConstantBufferManager = new ConstantBufferManager(pDevice, memoryManager);
+            RenderTargetViewManager = new RenderTargetViewManager(pDevice, _backBuffer.Get(), memoryManager);
         }
+
 
         private void InitDeviceAndSwapChain(IWindow window, uint refreshRate, bool debug)
         {

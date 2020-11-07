@@ -9,11 +9,13 @@ namespace Titan.Graphics.Pipeline
     {
         private readonly string _name;
         private readonly RenderPassCommand[] _commands;
+        private readonly IGraphicsDevice _device;
 
-        public RenderPass(string name, RenderPassCommand[] commands)
+        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device)
         {
             _name = name;
             _commands = commands;
+            _device = device;
         }
 
         public void Render(IRenderContext renderContext)
@@ -28,16 +30,16 @@ namespace Titan.Graphics.Pipeline
                 switch (command.Type)
                 {
                     case CommandType.ClearRenderTarget:
-                        renderContext.ClearRenderTargetView(command.ClearRenderTarget.RenderTarget, command.ClearRenderTarget.Color);
+                        renderContext.ClearRenderTargetView(_device.RenderTargetViewManager[command.ClearRenderTarget.RenderTarget], command.ClearRenderTarget.Color);
                         break;
                     case CommandType.ClearDepthStencil:
                         renderContext.ClearDepthStencilView(command.DepthStencil);
                         break;
                     case CommandType.SetRenderTargetAndDepthStencil:
-                        renderContext.SetRenderTarget(command.RenderTarget, command.DepthStencil);
+                        renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget], command.DepthStencil);
                         break;
                     case CommandType.SetRenderTarget:
-                        renderContext.SetRenderTarget(command.RenderTarget);
+                        renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget]);
                         break;
                     case CommandType.SetMultipleRenderTarget:
                         SetRenderTargets(renderContext, command.MultipleRenderTargets);
@@ -49,10 +51,10 @@ namespace Titan.Graphics.Pipeline
                         command.Renderer.Render(renderContext);
                         break;
                     case CommandType.SetVertexShaderResource:
-                        renderContext.SetVertexShaderResource(command.ShaderResource.View, command.ShaderResource.Slot);
+                        renderContext.SetVertexShaderResource(_device.ShaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
                         break;
                     case CommandType.SetPixelShaderResource:
-                        renderContext.SetPixelShaderResource(command.ShaderResource.View, command.ShaderResource.Slot);
+                        renderContext.SetPixelShaderResource(_device.ShaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
                         break;
                     case CommandType.SetVertexShaderSampler:
                         renderContext.SetVertexShaderSampler(command.SamplerState.Sampler, command.SamplerState.Slot);
@@ -97,12 +99,14 @@ namespace Titan.Graphics.Pipeline
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        private static unsafe void SetRenderTargets(IRenderContext context, in SetMultipleRenderTargetViewCommand command)
+        private unsafe void SetRenderTargets(IRenderContext context, in SetMultipleRenderTargetViewCommand command)
         {
-            fixed (ulong* pRenderTargets = command.Pointers)
+            var renderTargets = stackalloc ID3D11RenderTargetView*[(int)command.Count];
+            for (var i = 0; i < command.Count; ++i)
             {
-                context.SetRenderTargets((ID3D11RenderTargetView**)pRenderTargets, command.Count, command.DepthStencilView);
+                renderTargets[i] = _device.RenderTargetViewManager[command.Handles[i]].Pointer;
             }
+            context.SetRenderTargets(renderTargets, command.Count, command.DepthStencilView);
         }
     }
 }

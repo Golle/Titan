@@ -7,7 +7,7 @@ namespace Titan.Graphics.D3D11
 {
     public interface IRenderContext
     {
-        void ClearRenderTargetView(RenderTargetView renderTargetView, in Color color);
+        void ClearRenderTargetView(in RenderTargetView renderTargetView, in Color color);
         void ClearDepthStencilView(DepthStencilView depthStencilView);
         void SetViewport(Viewport viewport);
         void SetBlendState(BlendState blendState);
@@ -15,11 +15,11 @@ namespace Titan.Graphics.D3D11
         void SetPixelShaderConstantBuffer(in ConstantBuffer constantBuffer, uint slot = 0);
         void SetVertexBuffer(in VertexBuffer vertexBuffer, uint slot = 0u, uint offset = 0u);
         void SetIndexBuffer(in IndexBuffer indexBuffer, uint offset = 0u);
-        void SetRenderTarget(RenderTargetView renderTarget, DepthStencilView depthStencilView);
+        void SetRenderTarget(in RenderTargetView renderTarget);
+        void SetRenderTarget(in RenderTargetView renderTarget, DepthStencilView depthStencilView);
         void SetDepthStencilState(DepthStencilState depthStencilState);
-        void SetRenderTarget(RenderTargetView renderTarget);
-        void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u);
-        void SetVertexShaderResource(ShaderResourceView resource, uint slot = 0u);
+        void SetPixelShaderResource(in ShaderResourceView resource, uint slot = 0u);
+        void SetVertexShaderResource(in ShaderResourceView resource, uint slot = 0u);
         void SetPixelShaderSampler(SamplerState samplerState, uint slot = 0u);
         void SetVertexShaderSampler(SamplerState samplerState, uint slot = 0u);
         void SetPixelShader(PixelShader pixelShader);

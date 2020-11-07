@@ -37,7 +37,7 @@ unsafe
     var mesh1 = meshLoader.LoadMesh(simpleMesh1);
     //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
     //using var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\tree01.png");
-    using var texture = textureLoader.LoadTexture(@"F:\tmp\globe.png");
+    var texture = textureLoader.LoadTexture(@"F:\tmp\globe.png");
 
     var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
     meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);

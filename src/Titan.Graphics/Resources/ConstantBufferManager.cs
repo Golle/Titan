@@ -18,9 +18,9 @@ namespace Titan.Graphics.Resources
 
         private readonly ConcurrentQueue<int> _freeHandles = new ConcurrentQueue<int>();
 
-        public ConstantBufferManager(IGraphicsDevice device, IMemoryManager memoryManager)
+        public ConstantBufferManager(ID3D11Device* device, IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device.Ptr);
+            _device = new ComPtr<ID3D11Device>(device);
 
             var memory = memoryManager.GetMemoryChunk("ConstantBuffer");
             Debug.Assert(memory.Stride == sizeof(ConstantBuffer), "The stride of the memory chunk is not matching the expected size");

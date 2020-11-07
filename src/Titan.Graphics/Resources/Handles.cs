@@ -70,6 +70,34 @@ namespace Titan.Graphics.Resources
         public static implicit operator TextureHandle(in int handle) => new TextureHandle(handle);
     }
 
+    [Handle, DebuggerDisplay("{" + nameof(Value) + "}")]
+    public readonly partial struct ShaderResourceViewHandle
+    {
+        public readonly int Value;
+        public ShaderResourceViewHandle(int value)
+        {
+            Value = value;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator int(in ShaderResourceViewHandle viewHandle) => viewHandle.Value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator ShaderResourceViewHandle(in int handle) => new ShaderResourceViewHandle(handle);
+    }
+
+    [Handle, DebuggerDisplay("{" + nameof(Value) + "}")]
+    public readonly partial struct RenderTargetViewHandle
+    {
+        public readonly int Value;
+        public RenderTargetViewHandle(int value)
+        {
+            Value = value;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator int(in RenderTargetViewHandle viewHandle) => viewHandle.Value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator RenderTargetViewHandle(in int handle) => new RenderTargetViewHandle(handle);
+    }
+
     //public class Apa : ISourceGenerator
 
     //internal readonly struct Handle

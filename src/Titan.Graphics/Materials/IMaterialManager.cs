@@ -20,7 +20,7 @@ namespace Titan.Graphics.Materials
         {
             return new Material
             {
-                Texture = _texture.ResourceView,
+                //Texture = _texture.ResourceView,
                 Ambient = Color.White,
                 Diffuse = Color.White,
                 Emissive = new Color(0, 0, 0, 0),

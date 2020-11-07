@@ -18,6 +18,7 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IIndexBufferManager _indexBufferManager;
         private readonly IConstantBufferManager _constantBufferManager;
+        private readonly IShaderResourceViewManager _shaderResourceViewManager;
 
 
         private readonly ConstantBufferHandle _perObjectHandle;
@@ -25,17 +26,18 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         private readonly SamplerState _sampler;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager)
         {
             _renderQueue = renderQueue;
             _window = window;
             _shaderManager = shaderManager;
-            _vertexBufferManager = vertexBufferManager;
-            _indexBufferManager = indexBufferManager;
-            _constantBufferManager = constantBufferManager;
+            _vertexBufferManager = device.VertexBufferManager;
+            _indexBufferManager = device.IndexBufferManager;
+            _constantBufferManager = device.ConstantBufferManager;
+            _shaderResourceViewManager = device.ShaderResourceViewManager;
 
-            _perObjectHandle = constantBufferManager.CreateConstantBuffer<Matrix4x4>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
-            _cameraHandle = constantBufferManager.CreateConstantBuffer<CameraBuffer>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
+            _perObjectHandle = _constantBufferManager.CreateConstantBuffer<Matrix4x4>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
+            _cameraHandle = _constantBufferManager.CreateConstantBuffer<CameraBuffer>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
             _sampler = new SamplerState(device);
         }
@@ -97,7 +99,7 @@ namespace Titan.Graphics.Pipeline.Renderers
                 ref readonly var objectBuffer = ref _constantBufferManager[_perObjectHandle];
                 context.MapResource(objectBuffer.Resource, modelMatrix);
                 context.SetVertexShaderConstantBuffer(objectBuffer, 1u);
-                context.SetPixelShaderResource(renderable.Texture.ResourceView);
+                context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
 
                 var mesh = renderable.Mesh;
 

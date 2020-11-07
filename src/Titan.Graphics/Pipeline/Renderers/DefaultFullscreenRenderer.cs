@@ -14,11 +14,11 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         private readonly VertexBufferHandle _vertexBufferHandle;
         private readonly IndexBufferHandle _indexBufferHandle;
-        public DefaultFullscreenRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
+        public DefaultFullscreenRenderer(IGraphicsDevice device, IShaderManager shaderManager)
         {
             _shaderManager = shaderManager;
-            _vertexBufferManager = vertexBufferManager;
-            _indexBufferManager = indexBufferManager;
+            _vertexBufferManager = device.VertexBufferManager;
+            _indexBufferManager = device.IndexBufferManager;
 
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex {Position = new Vector2(-1, -1), UV = new Vector2(0, 1)};
@@ -43,7 +43,6 @@ namespace Titan.Graphics.Pipeline.Renderers
             
             context.SetIndexBuffer(_indexBufferManager[_indexBufferHandle]);
             context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
-
 
             _shaderManager.Get(_shaderManager.GetHandle("FullscreenDefault")).Bind(context);
 

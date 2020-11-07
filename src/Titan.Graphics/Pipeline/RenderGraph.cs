@@ -26,7 +26,6 @@ namespace Titan.Graphics.Pipeline
             {
                 renderPass.Render(_context);
             }
-
             _swapchain.Present();
         }
 

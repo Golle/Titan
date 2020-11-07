@@ -14,6 +14,6 @@ namespace Titan.Graphics.Materials
         public bool HasNormalMap;
         public bool IsTransparent;
 
-        public ShaderResourceView Texture;
+        //public ShaderResourceView Texture;
     }
 }

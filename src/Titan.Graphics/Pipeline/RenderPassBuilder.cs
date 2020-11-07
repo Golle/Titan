@@ -6,23 +6,26 @@ using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Pipeline.Renderers;
+using Titan.Graphics.Resources;
 
 namespace Titan.Graphics.Pipeline
 {
     internal class RenderPassBuilder
     {
-        private readonly BackBufferRenderTargetView _backBuffer;
-
         private readonly IDictionary<string, IRenderer> _renderers = new Dictionary<string, IRenderer>();
         private readonly IDictionary<string, RenderPassConfiguration> _renderPasses = new Dictionary<string, RenderPassConfiguration>();
         private readonly IDictionary<string, uint> _shaderProgramHandles = new Dictionary<string, uint>();
-        private readonly IDictionary<string, RenderBuffer> _buffers = new Dictionary<string, RenderBuffer>();
+        private readonly IDictionary<string, RenderTargetViewHandle> _renderTargets = new Dictionary<string, RenderTargetViewHandle>();
+        private readonly IDictionary<string, ShaderResourceViewHandle> _shaderResources = new Dictionary<string, ShaderResourceViewHandle>();
+
         private readonly IDictionary<string, DepthStencil> _depthStencils = new Dictionary<string, DepthStencil>();
         private readonly IDictionary<string, SamplerState> _samplers = new Dictionary<string, SamplerState>();
+        
+        private readonly IGraphicsDevice _device;
 
-        public RenderPassBuilder(BackBufferRenderTargetView backBuffer)
+        internal RenderPassBuilder(IGraphicsDevice device)
         {
-            _backBuffer = backBuffer;
+            _device = device;
         }
 
         public void AddPass(RenderPassConfiguration config)
@@ -53,13 +56,22 @@ namespace Titan.Graphics.Pipeline
             _shaderProgramHandles.Add(name, handle);
         }
 
-        public void AddBuffer(string name, RenderBuffer buffer)
+        public void AddRenderTarget(string name, in RenderTargetViewHandle handle)
         {
-            if (_buffers.ContainsKey(name))
+            if (_renderTargets.ContainsKey(name))
             {
-                throw new InvalidOperationException($"Buffer with name {name} has already been added to the Render Graph");
+                throw new InvalidOperationException($"RenderTarget with name {name} has already been added");
             }
-            _buffers.Add(name, buffer);
+            _renderTargets.Add(name, handle);
+        }
+
+        public void AddShaderResource(string name, in ShaderResourceViewHandle handle)
+        {
+            if (_shaderResources.ContainsKey(name))
+            {
+                throw new InvalidOperationException($"ShaderResource with name {name} has already been added");
+            }
+            _shaderResources.Add(name, handle);
         }
 
         public void AddDepthStencil(string name, DepthStencil depthStencil)
@@ -111,7 +123,7 @@ namespace Titan.Graphics.Pipeline
                     commandList.AddRange(CreateUnbindResourcesCommands(pass.Resources));
                 }
 
-                renderPasses.Add(new RenderPass(pass.Name, commandList.ToArray()));
+                renderPasses.Add(new RenderPass(pass.Name, commandList.ToArray(), _device));
             }
             
             return renderPasses.ToArray();
@@ -158,7 +170,7 @@ namespace Titan.Graphics.Pipeline
             {
                 var (name, type) = resources[i];
                 var resourceType = type == RenderPassResourceTypes.PixelShader ? CommandType.SetPixelShaderResource : CommandType.SetVertexShaderResource;
-                yield return new RenderPassCommand {Type = resourceType, ShaderResource = new SetShaderResourceCommand {View = _buffers[name].ShaderResourceView, Slot = i}};
+                yield return new RenderPassCommand {Type = resourceType, ShaderResource = new SetShaderResourceCommand {Handle = _shaderResources[name], Slot = i}};
             }
         }
 
@@ -167,7 +179,7 @@ namespace Titan.Graphics.Pipeline
             if (renderTargets.Length == 1)
             {
                 var renderTarget = renderTargets[0];
-                var renderTargetView = renderTarget.IsGlobal() ? _backBuffer : _buffers[renderTarget.Name].RenderTargetView;
+                var renderTargetView = renderTarget.IsGlobal() ? _device.RenderTargetViewManager.BackbufferHandle : _renderTargets[renderTarget.Name];
                 yield return new RenderPassCommand {Type = CommandType.SetRenderTarget, RenderTarget = renderTargetView};
                 if (renderTarget.Clear)
                 {
@@ -180,7 +192,7 @@ namespace Titan.Graphics.Pipeline
                 for (var i = 0; i < renderTargets.Length; ++i)
                 {
                     var renderTarget = renderTargets[i];
-                    var renderTargetView = renderTarget.IsGlobal() ? _backBuffer : _buffers[renderTarget.Name].RenderTargetView;
+                    var renderTargetView = renderTarget.IsGlobal() ? _device.RenderTargetViewManager.BackbufferHandle : _renderTargets[renderTarget.Name];
                     command.Set(i, renderTargetView);
                     if (renderTarget.Clear)
                     {

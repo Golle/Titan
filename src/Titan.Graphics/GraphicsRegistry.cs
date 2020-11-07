@@ -31,11 +31,7 @@ namespace Titan.Graphics
                 .Register<IGraphicsPipeline, GraphicsPipeline>()
                 .Register<IPipelineConfigurationLoader, PipelineConfigurationLoader>()
 
-                .Register<IVertexBufferManager, VertexBufferManager>()
-                .Register<IIndexBufferManager, IndexBufferManager>()
-                .Register<IConstantBufferManager, ConstantBufferManager>()
-
-
+                
                 .Register<DefaultSceneRenderer>()
                 ;
         }

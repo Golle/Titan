@@ -23,11 +23,11 @@ namespace Titan.Graphics.D3D11
         public ImmediateContext(IGraphicsDevice device) => Context = new ComPtr<ID3D11DeviceContext>(device.ImmediateContextPtr);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ClearRenderTargetView(RenderTargetView renderTargetView, in Color color)
+        public void ClearRenderTargetView(in RenderTargetView renderTargetView, in Color color)
         {
             fixed (Color* ptr = &color)
             {
-                Context.Get()->ClearRenderTargetView(renderTargetView.Ptr.Get(), (float*)ptr);
+                Context.Get()->ClearRenderTargetView(renderTargetView.Pointer, (float*)ptr);
             }
         }
 
@@ -74,18 +74,43 @@ namespace Titan.Graphics.D3D11
         public void SetIndexBuffer(in IndexBuffer indexBuffer, uint offset = 0u) => Context.Get()->IASetIndexBuffer(indexBuffer.Pointer, indexBuffer.Format, offset);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRenderTarget(RenderTargetView renderTarget, DepthStencilView depthStencilView) => Context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), depthStencilView.Ptr.Get());
-
+        public void SetRenderTarget(in RenderTargetView renderTarget)
+        {
+            fixed (ID3D11RenderTargetView** pTarget = &renderTarget.Pointer)
+            {
+                Context.Get()->OMSetRenderTargets(1u, pTarget, null);
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetRenderTarget(in RenderTargetView renderTarget, DepthStencilView depthStencilView)
+        {
+            fixed (ID3D11RenderTargetView** pTarget = &renderTarget.Pointer)
+            {
+                Context.Get()->OMSetRenderTargets(1u, pTarget, depthStencilView.Ptr.Get());
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetDepthStencilState(DepthStencilState depthStencilState) => Context.Get()->OMSetDepthStencilState(depthStencilState.Ptr.Get(), 1u);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRenderTarget(RenderTargetView renderTarget) => Context.Get()->OMSetRenderTargets(1u, renderTarget.Ptr.GetAddressOf(), null);
+
         // TODO: add methods for multiple shader resources in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderResource(ShaderResourceView resource, uint slot = 0u) => Context.Get()->PSSetShaderResources(slot, 1u, resource.Ptr.GetAddressOf());
+        public void SetPixelShaderResource(in ShaderResourceView resource, uint slot = 0u)
+        {
+            fixed (ID3D11ShaderResourceView** pResource = &resource.Pointer)
+            {
+                Context.Get()->PSSetShaderResources(slot, 1u, pResource);
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexShaderResource(ShaderResourceView resource, uint slot = 0) => Context.Get()->VSSetShaderResources(slot, 1u, resource.Ptr.GetAddressOf());
+        public void SetVertexShaderResource(in ShaderResourceView resource, uint slot = 0)
+        {
+            fixed (ID3D11ShaderResourceView** pResource = &resource.Pointer)
+            {
+                Context.Get()->VSSetShaderResources(slot, 1u, pResource);
+            }
+        }
 
         // TODO: add methods for multiple samplers in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

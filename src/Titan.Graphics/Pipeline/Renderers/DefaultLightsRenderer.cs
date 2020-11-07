@@ -20,12 +20,12 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IndexBufferHandle _indexBufferHandle;
         private readonly ConstantBufferHandle _lightSourceHandle;
 
-        public unsafe DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager)
+        public unsafe DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager)
         {
             _shaderManager = shaderManager;
-            _vertexBufferManager = vertexBufferManager;
-            _indexBufferManager = indexBufferManager;
-            _constantBufferManager = constantBufferManager;
+            _vertexBufferManager = device.VertexBufferManager;
+            _indexBufferManager = device.IndexBufferManager;
+            _constantBufferManager = device.ConstantBufferManager;
 
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex { Position = new Vector2(-1, -1), UV = new Vector2(0, 1) };

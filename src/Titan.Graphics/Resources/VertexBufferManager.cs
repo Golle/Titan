@@ -19,9 +19,9 @@ namespace Titan.Graphics.Resources
         private readonly ConcurrentQueue<int> _freeHandles = new ConcurrentQueue<int>();
 
         //public VertexBufferManager(ID3D11Device* device, IMemoryManager memoryManager) // TODO: use this when all managers are handled by the device.
-        public VertexBufferManager(IGraphicsDevice device, IMemoryManager memoryManager)
+        public VertexBufferManager(ID3D11Device* device, IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device.Ptr);
+            _device = new ComPtr<ID3D11Device>(device);
             
             var memory = memoryManager.GetMemoryChunk("VertexBuffer");
             Debug.Assert(memory.Stride == sizeof(VertexBuffer), "The stride of the memory chunk is not matching the expected size");

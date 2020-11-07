@@ -17,9 +17,9 @@ namespace Titan.Graphics.Resources
         private int _numberOfBuffers;
 
         private readonly ConcurrentQueue<int> _freeHandles = new ConcurrentQueue<int>();
-        public IndexBufferManager(IGraphicsDevice device, IMemoryManager memoryManager)
+        public IndexBufferManager(ID3D11Device* device, IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device.Ptr);
+            _device = new ComPtr<ID3D11Device>(device);
 
             var memory = memoryManager.GetMemoryChunk("IndexBuffer");
             Debug.Assert(memory.Stride == sizeof(IndexBuffer), "The stride of the memory chunk is not matching the expected size");
