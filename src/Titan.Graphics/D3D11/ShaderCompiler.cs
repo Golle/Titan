@@ -8,10 +8,13 @@ namespace Titan.Graphics.D3D11
 {
     internal unsafe class ShaderCompiler : IShaderCompiler
     {
-        public CompiledShader CompileShaderFromFile(string filename, string entrypoint, string shaderVersion) => Compile(filename, entrypoint, shaderVersion, null);
-
         public CompiledShader CompileShaderFromFile(string filename, string entrypoint, string shaderVersion, ShaderDefines[] defines)
         {
+            if (defines == null)
+            {
+                return Compile(filename, entrypoint, shaderVersion, null);
+            }
+
             var pDefines = stackalloc D3D_SHADER_MACRO[defines.Length + 1];
             for (var i = 0; i < defines.Length; ++i)
             {

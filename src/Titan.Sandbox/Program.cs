@@ -6,7 +6,6 @@ using Titan.Core.Messaging;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Graph;
-using Titan.Graphics.Shaders;
 using Titan.Graphics.Textures;
 using Titan.Input;
 using Titan.Windows.Win32;
@@ -29,7 +28,6 @@ using var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>(
 
 unsafe
 {
-    using var shaderManager = container.GetInstance<IShaderManager>();
     var textureLoader = container.GetInstance<ITextureLoader>();
     var meshLoader = container.GetInstance<IMeshLoader>();
     var input = container.GetInstance<IInputHandler>();

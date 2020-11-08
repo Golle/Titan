@@ -5,6 +5,7 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
+using Titan.Graphics.Shaders1;
 using Titan.Graphics.States;
 
 namespace Titan.Graphics.Pipeline
@@ -13,7 +14,7 @@ namespace Titan.Graphics.Pipeline
     {
         private readonly IDictionary<string, IRenderer> _renderers = new Dictionary<string, IRenderer>();
         private readonly IDictionary<string, RenderPassConfiguration> _renderPasses = new Dictionary<string, RenderPassConfiguration>();
-        private readonly IDictionary<string, uint> _shaderProgramHandles = new Dictionary<string, uint>();
+        private readonly IDictionary<string, ShaderProgram> _shaderProgramHandles = new Dictionary<string, ShaderProgram>();
         private readonly IDictionary<string, RenderTargetViewHandle> _renderTargets = new Dictionary<string, RenderTargetViewHandle>();
         private readonly IDictionary<string, ShaderResourceViewHandle> _shaderResources = new Dictionary<string, ShaderResourceViewHandle>();
 
@@ -46,13 +47,13 @@ namespace Titan.Graphics.Pipeline
             _renderers.Add(name, renderer);
         }
 
-        public void AddShaderProgram(string name, uint handle)
+        public void AddShaderProgram(string name, in ShaderProgram shaderProgram)
         {
             if (_shaderProgramHandles.ContainsKey(name))
             {
                 throw new InvalidOperationException($"Shader Program with name {name} has already been added to the Render Graph");
             }
-            _shaderProgramHandles.Add(name, handle);
+            _shaderProgramHandles.Add(name, shaderProgram);
         }
 
         public void AddRenderTarget(string name, in RenderTargetViewHandle handle)

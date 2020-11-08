@@ -131,7 +131,7 @@ namespace Titan.Graphics.D3D11
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY topology) => _context.Get()->IASetPrimitiveTopology(topology);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetInputLayout(InputLayout inputLayout) => _context.Get()->IASetInputLayout(inputLayout.Pointer.Get());
+        public void SetInputLayout(in InputLayout inputLayout) => _context.Get()->IASetInputLayout(inputLayout.Pointer);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DrawIndexed(uint indexCount, uint startIndexLocation = 0u, int baseVertexLocation = 0) => _context.Get()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

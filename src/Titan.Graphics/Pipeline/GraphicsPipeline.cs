@@ -6,7 +6,6 @@ using Titan.Core.Logging;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Renderers;
-using Titan.Graphics.Shaders;
 using Titan.IOC;
 using Titan.Windows;
 using static Titan.Windows.Win32.D3D11.D3D11_BIND_FLAG;
@@ -18,7 +17,6 @@ namespace Titan.Graphics.Pipeline
     {
         private readonly TitanConfiguration _configuration;
         private readonly IPipelineConfigurationLoader _loader;
-        private readonly IShaderManager _shaderManager;
         private readonly IWindow _window;
         private readonly IContainer _container;
         private readonly IGraphicsDevice _device;
@@ -27,11 +25,10 @@ namespace Titan.Graphics.Pipeline
         
         private RenderGraph _renderGraph;
 
-        public GraphicsPipeline(TitanConfiguration configuration, IPipelineConfigurationLoader loader, IShaderManager shaderManager, IContainer container,  IWindow window, IGraphicsDevice device)
+        public GraphicsPipeline(TitanConfiguration configuration, IPipelineConfigurationLoader loader, IContainer container,  IWindow window, IGraphicsDevice device)
         {
             _configuration = configuration;
             _loader = loader;
-            _shaderManager = shaderManager;
             _window = window;
             _container = container;
             _device = device;
@@ -66,8 +63,9 @@ namespace Titan.Graphics.Pipeline
             foreach (var (name, vertexShader, pixelShader, layout) in shaderPrograms)
             {
                 LOGGER.Debug("Compiling shader program {0}", name);
-                var handle = _shaderManager.AddShaderProgram(name, vertexShader, pixelShader, layout);
-                builder.AddShaderProgram(name, handle);
+                
+                var program = _device.ShaderManager.GetOrCreate(vertexShader, pixelShader, layout);
+                builder.AddShaderProgram(name, program);
             }
             
             foreach (var renderPass in renderPasses)

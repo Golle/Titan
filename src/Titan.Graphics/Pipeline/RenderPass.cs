@@ -45,7 +45,10 @@ namespace Titan.Graphics.Pipeline
                         SetRenderTargets(renderContext, command.MultipleRenderTargets);
                         break;
                     case CommandType.SetShaderProgram:
-                        command.ShaderProgram.Bind(renderContext);
+                        var shader = command.ShaderProgram;
+                        renderContext.SetInputLayout(_device.ShaderManager[shader.InputLayout]);
+                        renderContext.SetPixelShader(_device.ShaderManager[shader.PixelShader]);
+                        renderContext.SetVertexShader(_device.ShaderManager[shader.VertexShader]);
                         break;
                     case CommandType.Render:
                         command.Renderer.Render(renderContext);

@@ -4,7 +4,7 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders;
+using Titan.Graphics.Shaders1;
 using Titan.Graphics.States;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
@@ -29,11 +29,11 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly SamplerStateHandle _samplerStatehandle;
 
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window)
         {
             _renderQueue = renderQueue;
             _window = window;
-            _shaderManager = shaderManager;
+            _shaderManager = device.ShaderManager;
             _vertexBufferManager = device.VertexBufferManager;
             _indexBufferManager = device.IndexBufferManager;
             _constantBufferManager = device.ConstantBufferManager;
@@ -83,7 +83,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             
             #endregion
 
-            _shaderManager.Get(_shaderManager.GetHandle("GBufferDefault")).Bind(context);
+            //_shaderManager.Get(_shaderManager.GetHandle("GBufferDefault")).Bind(context);
 
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             ref readonly var cameraBuffer = ref _constantBufferManager[_cameraHandle];

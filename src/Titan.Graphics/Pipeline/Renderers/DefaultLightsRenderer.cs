@@ -2,15 +2,12 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline.Renderers
 {
     internal class DefaultLightsRenderer : IRenderer
     {
-        private readonly IShaderManager _shaderManager;
-        
         private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IIndexBufferManager _indexBufferManager;
         private readonly IConstantBufferManager _constantBufferManager;
@@ -20,9 +17,8 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IndexBufferHandle _indexBufferHandle;
         private readonly ConstantBufferHandle _lightSourceHandle;
 
-        public unsafe DefaultLightsRenderer(IGraphicsDevice device, IShaderManager shaderManager)
+        public unsafe DefaultLightsRenderer(IGraphicsDevice device)
         {
-            _shaderManager = shaderManager;
             _vertexBufferManager = device.VertexBufferManager;
             _indexBufferManager = device.IndexBufferManager;
             _constantBufferManager = device.ConstantBufferManager;
@@ -85,7 +81,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
             context.SetIndexBuffer(_indexBufferManager[_indexBufferHandle]);
 
-            _shaderManager.Get(_shaderManager.GetHandle("DeferredShadingDefault")).Bind(context);
+            //_shaderManager.Get(_shaderManager.GetHandle("DeferredShadingDefault")).Bind(context);
 
             context.DrawIndexed(6);
 

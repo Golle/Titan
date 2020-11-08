@@ -26,7 +26,7 @@ namespace Titan.Graphics.D3D11
         void SetPixelShader(in PixelShader pixelShader);
         void SetVertexShader(in VertexShader vertexShader);
         void SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY topology);
-        void SetInputLayout(InputLayout inputLayout);
+        void SetInputLayout(in InputLayout inputLayout);
         void DrawIndexed(uint indexCount, uint startIndexLocation = 0u, int baseVertexLocation = 0);
         void DrawIndexedInstanced(uint indexCountPerInstance, uint instanceCount, uint startIndexLocation = 0u, int baseVertexLocation = 0, uint startInstanceLocation = 0u);
         void ExecuteCommandList(in CommandList commandList, bool restoreContextState = false);
