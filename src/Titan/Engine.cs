@@ -10,18 +10,17 @@ using Titan.Graphics.Resources;
 using Titan.Graphics.States;
 using Titan.IOC;
 using Titan.Windows;
-using DepthStencilView = Titan.Graphics.Resources.DepthStencilView;
 
 namespace Titan
 {
     internal class Engine : IEngine
     {
         private readonly IWindow _window;
-        private readonly GraphicsDevice _device;
+        private readonly IGraphicsDevice _device;
         
         private readonly IContainer _container;
         private readonly IGraphicsPipeline _pipeline;
-        private IMemoryManager _memoryManager;
+        private readonly IMemoryManager _memoryManager;
 
         public Engine(EngineConfiguration configuration, IWindowFactory windowFactory, IEventQueue eventQueue, ILog log, IContainer container)
         {
@@ -29,23 +28,15 @@ namespace Titan
             LOGGER.Debug("Initialize EventQueue with {0}", typeof(ScanningEventTypeProvider));
             eventQueue.Initialize(new ScanningEventTypeProvider());
 
-            _window = windowFactory.Create((int) configuration.Width, (int) configuration.Height, configuration.Title);
-
-
-            _memoryManager = CreateMemoryManager();
-
-            _device = new GraphicsDevice(_window, _memoryManager, configuration.RefreshRate, configuration.Debug);
-            
             container
-                .RegisterSingleton<IGraphicsDevice>(_device)
-                .RegisterSingleton(_window)
-                .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath));
+                .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath, configuration.RefreshRate, configuration.Debug))
+                .RegisterSingleton(_memoryManager = CreateMemoryManager())
+                .RegisterSingleton(_window = windowFactory.Create((int) configuration.Width, (int) configuration.Height, configuration.Title))
+                .RegisterSingleton(_device = container.CreateInstance<GraphicsDevice>())
+                .RegisterSingleton(_pipeline = container.CreateInstance<GraphicsPipeline>());
 
-
-            _pipeline = container.GetInstance<IGraphicsPipeline>();
             LOGGER.Debug("Initialize GraphicsPipeline");
             _pipeline.Initialize("render_pipeline.json");
-
 
             _container = container;
         }
@@ -59,6 +50,7 @@ namespace Titan
                 new ChunkDescriptor("VertexBuffer", (uint) sizeof(VertexBuffer), 2048),
                 new ChunkDescriptor("IndexBuffer", (uint) sizeof(IndexBuffer), 2048),
                 new ChunkDescriptor("ConstantBuffer", (uint) sizeof(ConstantBuffer), 100),
+                new ChunkDescriptor("Shaders", (uint) IntPtr.Size, 1024),
                 new ChunkDescriptor("Texture", (uint) sizeof(Texture), 1024),
                 new ChunkDescriptor("ShaderResourceView", (uint) sizeof(ShaderResourceView), 1024),
                 new ChunkDescriptor("RenderTargetView", (uint) sizeof(RenderTargetView), 1024),

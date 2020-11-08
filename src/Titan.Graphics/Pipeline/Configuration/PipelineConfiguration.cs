@@ -1,5 +1,5 @@
 using Titan.Graphics.D3D11;
-using Titan.Graphics.Shaders;
+using Titan.Graphics.Shaders1;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline.Configuration

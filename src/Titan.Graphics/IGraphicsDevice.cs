@@ -1,6 +1,7 @@
 using System;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
+using Titan.Graphics.Shaders1;
 using Titan.Graphics.States;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
@@ -18,6 +19,7 @@ namespace Titan.Graphics
         IDepthStencilViewManager DepthStencilViewManager { get; }
         IDepthStencilStateManager DepthStencilStateManager { get; }
         ISamplerStateManager SamplerStateManager { get; }
+        IShaderManager ShaderManager { get; }
         IRenderContext ImmediateContext { get; }
 
 

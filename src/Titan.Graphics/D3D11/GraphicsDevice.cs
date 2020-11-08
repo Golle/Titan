@@ -1,6 +1,8 @@
 using System;
+using Titan.Core;
 using Titan.Core.Memory;
 using Titan.Graphics.Resources;
+using Titan.Graphics.Shaders1;
 using Titan.Graphics.States;
 using Titan.Windows;
 using Titan.Windows.Win32;
@@ -25,6 +27,7 @@ namespace Titan.Graphics.D3D11
         public IDepthStencilStateManager DepthStencilStateManager { get; }
         public ISamplerStateManager SamplerStateManager { get; }
         public IRenderContext ImmediateContext { get; private set; }
+        public IShaderManager ShaderManager { get; }
         public ID3D11Device* Ptr => _device.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
 
@@ -36,9 +39,9 @@ namespace Titan.Graphics.D3D11
             //InitBackBuffer(null);
         }
 
-        public GraphicsDevice(IWindow window, IMemoryManager memoryManager, uint refreshRate = 144, bool debug = true)
+        public GraphicsDevice(IWindow window, IMemoryManager memoryManager, IShaderCompiler shaderCompiler, TitanConfiguration configuration)
         {
-            InitDeviceAndSwapChain(window, refreshRate, debug);
+            InitDeviceAndSwapChain(window, configuration.RefreshRate, configuration.Debug);
             InitBackBuffer(memoryManager);
 
             var pDevice = _device.Get();
@@ -50,6 +53,7 @@ namespace Titan.Graphics.D3D11
             DepthStencilViewManager = new DepthStencilViewManager(pDevice, memoryManager);
             DepthStencilStateManager = new DepthStencilStateManager(pDevice, memoryManager);
             SamplerStateManager = new SamplerStateManager(pDevice, memoryManager);
+            ShaderManager = new ShaderManager(pDevice, memoryManager, shaderCompiler, configuration);
         }
 
 
@@ -106,6 +110,7 @@ namespace Titan.Graphics.D3D11
             DepthStencilViewManager.Dispose();
             DepthStencilStateManager.Dispose();
             SamplerStateManager.Dispose();
+            ShaderManager.Dispose();
             (ImmediateContext as IDisposable)?.Dispose();
 
             _swapChain.Dispose();

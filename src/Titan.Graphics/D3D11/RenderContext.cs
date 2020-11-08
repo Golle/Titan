@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.CompilerServices;
-using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Resources;
+using Titan.Graphics.Shaders1;
 using Titan.Graphics.States;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
@@ -125,9 +125,9 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShader(PixelShader pixelShader) => _context.Get()->PSSetShader(pixelShader.Ptr.Get(), null, 0);
+        public void SetPixelShader(in PixelShader pixelShader) => _context.Get()->PSSetShader(pixelShader.Pointer, null, 0);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexShader(VertexShader vertexShader) => _context.Get()->VSSetShader(vertexShader.Ptr.Get(), null, 0);
+        public void SetVertexShader(in VertexShader vertexShader) => _context.Get()->VSSetShader(vertexShader.Pointer, null, 0);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY topology) => _context.Get()->IASetPrimitiveTopology(topology);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
