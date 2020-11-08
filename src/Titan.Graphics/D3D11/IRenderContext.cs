@@ -21,8 +21,8 @@ namespace Titan.Graphics.D3D11
         void SetDepthStencilState(in DepthStencilState depthStencilState);
         void SetPixelShaderResource(in ShaderResourceView resource, uint slot = 0u);
         void SetVertexShaderResource(in ShaderResourceView resource, uint slot = 0u);
-        void SetPixelShaderSampler(SamplerState samplerState, uint slot = 0u);
-        void SetVertexShaderSampler(SamplerState samplerState, uint slot = 0u);
+        void SetPixelShaderSampler(in SamplerState samplerState, uint slot = 0u);
+        void SetVertexShaderSampler(in SamplerState samplerState, uint slot = 0u);
         void SetPixelShader(PixelShader pixelShader);
         void SetVertexShader(VertexShader vertexShader);
         void SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY topology);

@@ -26,7 +26,6 @@ namespace Titan.Graphics.Pipeline
         private readonly IList<IRenderer> _renderers = new List<IRenderer>();
         
         private RenderGraph _renderGraph;
-        private SamplerState _samplerState;
 
         public GraphicsPipeline(TitanConfiguration configuration, IPipelineConfigurationLoader loader, IShaderManager shaderManager, IContainer container,  IWindow window, IGraphicsDevice device)
         {
@@ -36,7 +35,6 @@ namespace Titan.Graphics.Pipeline
             _window = window;
             _container = container;
             _device = device;
-            _samplerState = new SamplerState(_device); // TODO: this is a temp solution until we have a sampler state manager where samplers can be shared.
         }
 
         public unsafe void Initialize(string filename)
@@ -50,13 +48,20 @@ namespace Titan.Graphics.Pipeline
             var path = _configuration.GetPath(filename);
             LOGGER.Debug("Loading Pipeline configuration from {0}", path);
             
-            var (shaderPrograms, renderPasses, renderers) = _loader.Load(path);
+            var (shaderPrograms, renderPasses, renderers, samplers) = _loader.Load(path);
             foreach (var (name, renderer) in InitializeRenderers(renderers, renderPasses))
             {
                 LOGGER.Debug("Created renderer {0} with name {1}", renderer.GetType().Name, name);
                 builder.AddRenderer(name, renderer);
             }
-            
+
+            foreach (var sampler in samplers)
+            {
+                LOGGER.Debug("Creating SamplerState {0}", sampler.Name);
+                var samplerHandle = _device.SamplerStateManager.GetOrCreate(sampler.Filter, sampler.AddressU, sampler.AddressV, sampler.AddressW, sampler.ComparisonFunc);
+                builder.AddSampler(sampler.Name, samplerHandle);
+            }
+
             LOGGER.Debug("Adding ShaderPrograms {0}", shaderPrograms.Length);
             foreach (var (name, vertexShader, pixelShader, layout) in shaderPrograms)
             {
@@ -95,16 +100,6 @@ namespace Titan.Graphics.Pipeline
                     var stencilTextureHandle = _device.TextureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
                     var stencilHandle = _device.DepthStencilViewManager.Create(_device.TextureManager[stencilTextureHandle].Resource);
                     builder.AddDepthStencil(renderPass.DepthStencil.Name, stencilHandle);
-                }
-
-                if (renderPass.Samplers != null)
-                {
-                    foreach (var sampler in renderPass.Samplers)
-                    {
-                        // TODO: replace this with some kind of a sampler definition in the pipeline. Default should be a global sample
-                        LOGGER.Debug("Creating SamplerState {0}", sampler);
-                        builder.AddSampler(sampler.Name, _samplerState);
-                    }
                 }
                 
                 builder.AddPass(renderPass);

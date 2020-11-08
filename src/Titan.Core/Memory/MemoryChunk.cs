@@ -12,4 +12,17 @@ namespace Titan.Core.Memory
             Count = count;
         }
     }
+
+    public readonly unsafe struct MemoryChunk<T> where T : unmanaged
+    {
+        public readonly T* Pointer;
+        public readonly uint Stride;
+        public readonly uint Count;
+        public MemoryChunk(in MemoryChunk memory)
+        {
+            Stride = memory.Stride;
+            Pointer = (T*) memory.Pointer;
+            Count = memory.Count;
+        }
+    }
 }

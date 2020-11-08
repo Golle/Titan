@@ -107,9 +107,23 @@ namespace Titan.Graphics.D3D11
 
         // TODO: add methods for multiple samplers in a single call
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderSampler(SamplerState samplerState, uint slot = 0u) => _context.Get()->PSSetSamplers(slot, 1, samplerState.Ptr.GetAddressOf());
+        public void SetPixelShaderSampler(in SamplerState samplerState, uint slot = 0u)
+        {
+            fixed (ID3D11SamplerState** pSampler = &samplerState.Pointer)
+            {
+                _context.Get()->PSSetSamplers(slot, 1, pSampler);
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexShaderSampler(SamplerState samplerState, uint slot = 0u) => _context.Get()->VSSetSamplers(slot, 1, samplerState.Ptr.GetAddressOf());
+        public void SetVertexShaderSampler(in SamplerState samplerState, uint slot = 0u)
+        {
+            fixed (ID3D11SamplerState** pSampler = &samplerState.Pointer)
+            {
+                _context.Get()->VSSetSamplers(slot, 1, pSampler);
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShader(PixelShader pixelShader) => _context.Get()->PSSetShader(pixelShader.Ptr.Get(), null, 0);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

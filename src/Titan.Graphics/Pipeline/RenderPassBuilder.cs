@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
+using Titan.Graphics.States;
 
 namespace Titan.Graphics.Pipeline
 {
@@ -18,7 +18,7 @@ namespace Titan.Graphics.Pipeline
         private readonly IDictionary<string, ShaderResourceViewHandle> _shaderResources = new Dictionary<string, ShaderResourceViewHandle>();
 
         private readonly IDictionary<string, DepthStencilViewHandle> _depthStencils = new Dictionary<string, DepthStencilViewHandle>();
-        private readonly IDictionary<string, SamplerState> _samplers = new Dictionary<string, SamplerState>();
+        private readonly IDictionary<string, SamplerStateHandle> _samplers = new Dictionary<string, SamplerStateHandle>();
         
         private readonly IGraphicsDevice _device;
 
@@ -82,15 +82,13 @@ namespace Titan.Graphics.Pipeline
             _depthStencils.Add(name, handle);
         }
 
-        public void AddSampler(string name, SamplerState samplerState)
+        public void AddSampler(string name, in SamplerStateHandle handle)
         {
-
             if (_samplers.ContainsKey(name))
             {
-                return;
                 throw new InvalidOperationException($"Sampler with name {name} has already been added to the Render Graph");
             }
-            _samplers.Add(name, samplerState);
+            _samplers.Add(name, handle);
         }
 
         public RenderPass[] Compile()

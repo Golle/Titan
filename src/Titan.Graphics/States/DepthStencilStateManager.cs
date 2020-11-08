@@ -40,6 +40,7 @@ namespace Titan.Graphics.States
             {
                 handle = Interlocked.Increment(ref _numberOfStates) - 1;
                 Common.CheckAndThrow(_device.Get()->CreateDepthStencilState(&desc, &_states[handle].Pointer), "CreateDepthStencilState");
+                _cachedHandles.Add(desc, handle);
             }
             return handle;
         }

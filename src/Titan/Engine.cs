@@ -64,6 +64,7 @@ namespace Titan
                 new ChunkDescriptor("RenderTargetView", (uint) sizeof(RenderTargetView), 1024),
                 new ChunkDescriptor("DepthStencilView", (uint) sizeof(DepthStencilView), 10),
                 new ChunkDescriptor("DepthStencilState", (uint) sizeof(DepthStencilState), 10),
+                new ChunkDescriptor("SamplerState", (uint) sizeof(SamplerState), 20),
             });
         }
 

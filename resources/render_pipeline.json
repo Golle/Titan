@@ -3,6 +3,8 @@
         {
             "Name": "GBufferNormalMap",
             "PixelShader": {
+                "Version": "ps_5_0",
+                "Entrypoint": "main",
                 "Filename": "shaders/GBufferPixelShader.hlsl",
                 "Defines": [
                     {
@@ -12,6 +14,8 @@
                 ]
             },
             "VertexShader": {
+                "Version": "vs_5_0",
+                "Entrypoint": "main",
                 "Filename": "shaders/GBufferVertexShader.hlsl",
                 "Defines": [
                     {
@@ -34,9 +38,13 @@
         {
             "Name": "GBufferDefault",
             "PixelShader": {
+                "Version": "ps_5_0",
+                "Entrypoint": "main",
                 "Filename": "shaders/GBufferPixelShader.hlsl"
             },
             "VertexShader": {
+                "Version": "vs_5_0",
+                "Entrypoint": "main",
                 "Filename": "shaders/GBufferVertexShader.hlsl"
             },
             "Layout": [
@@ -57,9 +65,13 @@
         {
             "Name": "FullscreenDefault",
             "PixelShader": {
+                "Version": "ps_5_0",
+                "Entrypoint": "main",
                 "Filename": "shaders/BackbufferPixelShader.hlsl"
             },
             "VertexShader": {
+                "Version": "vs_5_0",
+                "Entrypoint": "main",
                 "Filename": "shaders/BackbufferVertexShader.hlsl"
             },
             "Layout": [
@@ -76,9 +88,13 @@
         {
             "Name": "DeferredShadingDefault",
             "PixelShader": {
+                "Version": "ps_5_0",
+                "Entrypoint": "main",
                 "Filename": "shaders/DeferredShadingPixelShader.hlsl"
             },
             "VertexShader": {
+                "Version": "vs_5_0",
+                "Entrypoint": "main",
                 "Filename": "shaders/BackbufferVertexShader.hlsl"
             },
             "Layout": [
@@ -185,6 +201,16 @@
         {
             "Name": "Lights",
             "Type": "Titan.Graphics.Pipeline.Renderers.DefaultLightsRenderer, Titan.Graphics"
+        }
+    ],
+    "Samplers": [
+        {
+            "Name": "Default",
+            "Filter": "D3D11_FILTER_MIN_MAG_MIP_LINEAR",
+            "AddressU": "D3D11_TEXTURE_ADDRESS_WRAP",
+            "AddressV": "D3D11_TEXTURE_ADDRESS_WRAP",
+            "AddressW": "D3D11_TEXTURE_ADDRESS_WRAP",
+            "ComparisonFunc": "D3D11_COMPARISON_NEVER"
         }
     ]
 }

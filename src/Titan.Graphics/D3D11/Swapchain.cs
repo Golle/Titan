@@ -27,8 +27,6 @@ namespace Titan.Graphics.D3D11
             return desc;
         }
 
-
-
         public void ResizeTarget(uint width, uint height)
         {
             var swapChainDesc = GetDesc();

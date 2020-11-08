@@ -57,10 +57,10 @@ namespace Titan.Graphics.Pipeline
                         renderContext.SetPixelShaderResource(_device.ShaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
                         break;
                     case CommandType.SetVertexShaderSampler:
-                        renderContext.SetVertexShaderSampler(command.SamplerState.Sampler, command.SamplerState.Slot);
+                        renderContext.SetVertexShaderSampler(_device.SamplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
                         break;
                     case CommandType.SetPixelShaderSampler:
-                        renderContext.SetPixelShaderSampler(command.SamplerState.Sampler, command.SamplerState.Slot);
+                        renderContext.SetPixelShaderSampler(_device.SamplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
                         break;
                     case CommandType.UnbindRenderTargets:
                         UnbindRenderTargets(renderContext);

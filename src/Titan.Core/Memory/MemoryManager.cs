@@ -46,5 +46,14 @@ namespace Titan.Core.Memory
         }
 
         public MemoryChunk GetMemoryChunk(string identifier) => _memory[identifier];
+        public MemoryChunk<T> GetMemoryChunkValidated<T>(string identifier) where T : unmanaged
+        {
+            var chunk = _memory[identifier];
+            if (sizeof(T) != chunk.Stride)
+            {
+                throw new InvalidOperationException($"The stride of the memory chunk is {chunk.Stride} but the size of {typeof(T)} is {sizeof(T)}");
+            }
+            return new MemoryChunk<T>(chunk); ;
+        }
     }
 }

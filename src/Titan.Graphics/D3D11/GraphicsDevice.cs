@@ -23,6 +23,7 @@ namespace Titan.Graphics.D3D11
         public IRenderTargetViewManager RenderTargetViewManager { get; private set; }
         public IDepthStencilViewManager DepthStencilViewManager { get; }
         public IDepthStencilStateManager DepthStencilStateManager { get; }
+        public ISamplerStateManager SamplerStateManager { get; }
         public IRenderContext ImmediateContext { get; private set; }
         public ID3D11Device* Ptr => _device.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
@@ -48,6 +49,7 @@ namespace Titan.Graphics.D3D11
             ConstantBufferManager = new ConstantBufferManager(pDevice, memoryManager);
             DepthStencilViewManager = new DepthStencilViewManager(pDevice, memoryManager);
             DepthStencilStateManager = new DepthStencilStateManager(pDevice, memoryManager);
+            SamplerStateManager = new SamplerStateManager(pDevice, memoryManager);
         }
 
 
@@ -103,7 +105,8 @@ namespace Titan.Graphics.D3D11
             RenderTargetViewManager.Dispose();
             DepthStencilViewManager.Dispose();
             DepthStencilStateManager.Dispose();
-            ((RenderContext)ImmediateContext).Dispose();
+            SamplerStateManager.Dispose();
+            (ImmediateContext as IDisposable)?.Dispose();
 
             _swapChain.Dispose();
             _device.Dispose();

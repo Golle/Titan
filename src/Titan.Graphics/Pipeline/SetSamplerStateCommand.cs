@@ -1,12 +1,12 @@
 using System.Runtime.InteropServices;
-using Titan.Graphics.D3D11.State;
+using Titan.Graphics.States;
 
 namespace Titan.Graphics.Pipeline
 {
     [StructLayout(LayoutKind.Sequential)]
     internal struct SetSamplerStateCommand
     {
-        public SamplerState Sampler;
+        public SamplerStateHandle Sampler;
         public uint Slot;
     }
 }

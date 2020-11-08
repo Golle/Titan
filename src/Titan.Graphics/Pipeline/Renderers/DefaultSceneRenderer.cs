@@ -5,6 +5,7 @@ using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
+using Titan.Graphics.States;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
 
@@ -19,12 +20,14 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IIndexBufferManager _indexBufferManager;
         private readonly IConstantBufferManager _constantBufferManager;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
+        private readonly ISamplerStateManager _samplerStateManager;
 
 
         private readonly ConstantBufferHandle _perObjectHandle;
         private readonly ConstantBufferHandle _cameraHandle;
 
-        private readonly SamplerState _sampler;
+        private readonly SamplerStateHandle _samplerStatehandle;
+
 
         public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window, IShaderManager shaderManager)
         {
@@ -35,16 +38,16 @@ namespace Titan.Graphics.Pipeline.Renderers
             _indexBufferManager = device.IndexBufferManager;
             _constantBufferManager = device.ConstantBufferManager;
             _shaderResourceViewManager = device.ShaderResourceViewManager;
+            _samplerStateManager = device.SamplerStateManager;
 
             _perObjectHandle = _constantBufferManager.CreateConstantBuffer<Matrix4x4>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
             _cameraHandle = _constantBufferManager.CreateConstantBuffer<CameraBuffer>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
-            _sampler = new SamplerState(device);
+            _samplerStatehandle = device.SamplerStateManager.GetOrCreate();
         }
 
         private Vector3 modelPosition = new Vector3(0, 0, 0);
         private Vector2 modelRot = new Vector2(0, 0);
-        
 
 
         public unsafe void Render(IRenderContext context)
@@ -87,7 +90,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             context.MapResource(cameraBuffer.Resource, camera); // only needs to be done when the camera changes 
             
             context.SetVertexShaderConstantBuffer(cameraBuffer);
-            context.SetPixelShaderSampler(_sampler);
+            context.SetPixelShaderSampler(_samplerStateManager[_samplerStatehandle]);
 
             foreach (ref readonly var renderable in _renderQueue.GetRenderables())
             {
@@ -131,7 +134,6 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         public void Dispose()
         {
-            _sampler.Dispose();
             _constantBufferManager.DestroyBuffer(_cameraHandle);
             _constantBufferManager.DestroyBuffer(_perObjectHandle);
         }

@@ -17,6 +17,7 @@ namespace Titan.Graphics
         IRenderTargetViewManager RenderTargetViewManager{ get; }
         IDepthStencilViewManager DepthStencilViewManager { get; }
         IDepthStencilStateManager DepthStencilStateManager { get; }
+        ISamplerStateManager SamplerStateManager { get; }
         IRenderContext ImmediateContext { get; }
 
 
