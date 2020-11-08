@@ -47,7 +47,7 @@ namespace Titan.Graphics.States
 
         public void Dispose()
         {
-            for (var i = 1; i < _numberOfSamplers; ++i)
+            for (var i = 0; i < _numberOfSamplers; ++i)
             {
                 ref var state = ref _samplers[i];
                 if (state.Pointer != null)

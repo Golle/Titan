@@ -68,6 +68,13 @@ namespace Titan
 
             // memory manager must be cleared last
             _memoryManager.Dispose();
+
+            //using ComPtr<ID3D11Debug> d3dDebug = default;
+            //fixed (Guid* debugGuidPtr = &D3D11Common.D3D11Debug)
+            //{
+            //    Common.CheckAndThrow(ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
+            //}
+            //Common.CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
         }
 
         public void Start()
@@ -75,9 +82,7 @@ namespace Titan
             throw new NotImplementedException();
         }
 
-        IGraphicsDevice IEngine.Device => _device;
         IWindow IEngine.Window => _window;
-
         IContainer IEngine.Container => _container;
     }
 

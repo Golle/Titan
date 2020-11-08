@@ -1,4 +1,4 @@
-namespace Titan.Graphics.D3D11
+namespace Titan.Graphics.Shaders
 {
     public interface IShaderCompiler
     {

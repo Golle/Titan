@@ -6,7 +6,6 @@ using System.Numerics;
 using System.Threading;
 using Titan.Core;
 using Titan.Core.Memory;
-using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -22,6 +21,8 @@ namespace Titan.Graphics.Shaders
         private readonly IDictionary<PixelShaderDescriptor, PixelShaderHandle> _pixelShaderCache = new Dictionary<PixelShaderDescriptor, PixelShaderHandle>();
         private readonly IDictionary<VertexShaderDescriptor, VertexShaderHandle> _vertexShaderCache = new Dictionary<VertexShaderDescriptor, VertexShaderHandle>();
         private readonly IDictionary<string, InputLayoutHandle> _inputLayoutCache = new Dictionary<string, InputLayoutHandle>();
+
+        private readonly IDictionary<string, ShaderProgram> _cachedPrograms = new Dictionary<string, ShaderProgram>();
 
 
         private readonly void* _memory;
@@ -42,8 +43,14 @@ namespace Titan.Graphics.Shaders
             _maxHandles = memory.Count;
         }
 
-        public ShaderProgram GetOrCreate(in VertexShaderDescriptor vertexShaderDescriptor, in PixelShaderDescriptor pixelShaderDescriptor, in InputLayoutDescriptor[] layout)
+        public ShaderProgram GetByName(string name) => _cachedPrograms.TryGetValue(name, out var shader) ? shader : throw new KeyNotFoundException($"Shader with name {name} does not exist");
+        public ShaderProgram AddShader(string name, in VertexShaderDescriptor vertexShaderDescriptor, in PixelShaderDescriptor pixelShaderDescriptor, in InputLayoutDescriptor[] layout)
         {
+            if (_cachedPrograms.ContainsKey(name))
+            {
+                throw new InvalidOperationException($"Shader with name {name} has already been registed");
+            }
+
             var inputLayoutKey = CreateInputLayoutKey(layout);
             var hasCachedInputHandle = _inputLayoutCache.TryGetValue(inputLayoutKey, out var inputHandle);
 
@@ -61,7 +68,8 @@ namespace Titan.Graphics.Shaders
             }
 
             var pixelShaderHandle = GetOrCreatePixelShader(pixelShaderDescriptor);
-            return new ShaderProgram(vertexShaderHandle, pixelShaderHandle, inputHandle);
+            
+            return _cachedPrograms[name] = new ShaderProgram(vertexShaderHandle, pixelShaderHandle, inputHandle);
         }
 
         private PixelShaderHandle GetOrCreatePixelShader(PixelShaderDescriptor pixelShaderDescriptor)

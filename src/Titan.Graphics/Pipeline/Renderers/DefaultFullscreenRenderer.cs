@@ -14,6 +14,8 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         private readonly VertexBufferHandle _vertexBufferHandle;
         private readonly IndexBufferHandle _indexBufferHandle;
+        private readonly ShaderProgram _shader;
+
         public DefaultFullscreenRenderer(IGraphicsDevice device)
         {
             _shaderManager = device.ShaderManager;
@@ -35,6 +37,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             indices[4] = 2;
             indices[5] = 3;
             _indexBufferHandle = _indexBufferManager.CreateIndexBuffer<ushort>(6, indices);
+            _shader = _shaderManager.GetByName("FullscreenDefault");
         }
 
         public void Render(IRenderContext context)
@@ -44,7 +47,9 @@ namespace Titan.Graphics.Pipeline.Renderers
             context.SetIndexBuffer(_indexBufferManager[_indexBufferHandle]);
             context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
 
-            //_shaderManager.Get(_shaderManager.GetHandle("FullscreenDefault")).Bind(context);
+            context.SetInputLayout(_shaderManager[_shader.InputLayout]);
+            context.SetVertexShader(_shaderManager[_shader.VertexShader]);
+            context.SetPixelShader(_shaderManager[_shader.PixelShader]);
 
             context.DrawIndexed(6);
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.IOC;
@@ -46,6 +45,18 @@ namespace Titan.Graphics.Pipeline
             LOGGER.Debug("Loading Pipeline configuration from {0}", path);
             
             var (shaderPrograms, renderPasses, renderers, samplers) = _loader.Load(path);
+
+            // Shaders must be compiled first since they are used in the Renderers
+            LOGGER.Debug("Adding ShaderPrograms {0}", shaderPrograms.Length);
+            foreach (var (name, vertexShader, pixelShader, layout) in shaderPrograms)
+            {
+                LOGGER.Debug("Compiling shader program {0}", name);
+
+                var program = _device.ShaderManager.AddShader(name, vertexShader, pixelShader, layout);
+                builder.AddShaderProgram(name, program);
+            }
+
+
             foreach (var (name, renderer) in InitializeRenderers(renderers, renderPasses))
             {
                 LOGGER.Debug("Created renderer {0} with name {1}", renderer.GetType().Name, name);
@@ -59,15 +70,6 @@ namespace Titan.Graphics.Pipeline
                 builder.AddSampler(sampler.Name, samplerHandle);
             }
 
-            LOGGER.Debug("Adding ShaderPrograms {0}", shaderPrograms.Length);
-            foreach (var (name, vertexShader, pixelShader, layout) in shaderPrograms)
-            {
-                LOGGER.Debug("Compiling shader program {0}", name);
-                
-                var program = _device.ShaderManager.GetOrCreate(vertexShader, pixelShader, layout);
-                builder.AddShaderProgram(name, program);
-            }
-            
             foreach (var renderPass in renderPasses)
             {
                 LOGGER.Debug("Creating RenderPass {0}", renderPass.Name);

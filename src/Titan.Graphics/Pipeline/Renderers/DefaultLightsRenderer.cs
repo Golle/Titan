@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
+using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline.Renderers
@@ -11,17 +12,21 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IIndexBufferManager _indexBufferManager;
         private readonly IConstantBufferManager _constantBufferManager;
+        private readonly IShaderManager _shaderManager;
 
 
         private readonly VertexBufferHandle _vertexBufferHandle;
         private readonly IndexBufferHandle _indexBufferHandle;
         private readonly ConstantBufferHandle _lightSourceHandle;
+        private readonly ShaderProgram _shader;
+
 
         public unsafe DefaultLightsRenderer(IGraphicsDevice device)
         {
             _vertexBufferManager = device.VertexBufferManager;
             _indexBufferManager = device.IndexBufferManager;
             _constantBufferManager = device.ConstantBufferManager;
+            _shaderManager = device.ShaderManager;
 
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex { Position = new Vector2(-1, -1), UV = new Vector2(0, 1) };
@@ -42,12 +47,14 @@ namespace Titan.Graphics.Pipeline.Renderers
             {
                 Position = new Vector3(0, 0, -1)
             }, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
-        }
 
+            _shader = device.ShaderManager.GetByName("DeferredShadingDefault");
+        }
 
         private Vector3 _lightPosition = new Vector3(0,0,-1);
         private float _lightVelocity = 0.02f;
         
+
 
         public void Render(IRenderContext context)
         {
@@ -81,10 +88,11 @@ namespace Titan.Graphics.Pipeline.Renderers
             context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
             context.SetIndexBuffer(_indexBufferManager[_indexBufferHandle]);
 
-            //_shaderManager.Get(_shaderManager.GetHandle("DeferredShadingDefault")).Bind(context);
+            context.SetInputLayout(_shaderManager[_shader.InputLayout]);
+            context.SetVertexShader(_shaderManager[_shader.VertexShader]);
+            context.SetPixelShader(_shaderManager[_shader.PixelShader]);
 
             context.DrawIndexed(6);
-
         }
 
         public void Dispose()

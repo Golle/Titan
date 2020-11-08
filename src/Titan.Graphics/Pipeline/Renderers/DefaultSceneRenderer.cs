@@ -28,6 +28,7 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         private readonly SamplerStateHandle _samplerStatehandle;
 
+        private readonly ShaderProgram _shader;
 
         public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window)
         {
@@ -39,17 +40,18 @@ namespace Titan.Graphics.Pipeline.Renderers
             _constantBufferManager = device.ConstantBufferManager;
             _shaderResourceViewManager = device.ShaderResourceViewManager;
             _samplerStateManager = device.SamplerStateManager;
+            
 
             _perObjectHandle = _constantBufferManager.CreateConstantBuffer<Matrix4x4>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
             _cameraHandle = _constantBufferManager.CreateConstantBuffer<CameraBuffer>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
             _samplerStatehandle = device.SamplerStateManager.GetOrCreate();
+            _shader = _shaderManager.GetByName("GBufferDefault");
         }
 
         private Vector3 modelPosition = new Vector3(0, 0, 0);
         private Vector2 modelRot = new Vector2(0, 0);
-
-
+        
         public unsafe void Render(IRenderContext context)
         {
             // update camera
@@ -80,10 +82,12 @@ namespace Titan.Graphics.Pipeline.Renderers
                 modelRot.Y -= 0.004f;
             }
             var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
-            
+
             #endregion
 
-            //_shaderManager.Get(_shaderManager.GetHandle("GBufferDefault")).Bind(context);
+            context.SetInputLayout(_shaderManager[_shader.InputLayout]);
+            context.SetVertexShader(_shaderManager[_shader.VertexShader]);
+            context.SetPixelShader(_shaderManager[_shader.PixelShader]);
 
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             ref readonly var cameraBuffer = ref _constantBufferManager[_cameraHandle];

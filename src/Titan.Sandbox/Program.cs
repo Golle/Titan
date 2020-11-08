@@ -22,8 +22,8 @@ using var engine = EngineBuilder.CreateDefaultBuilder()
 
 var window = engine.Window;
 var container = engine.Container;
-var device = engine.Device;
-using var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>();
+//var device = engine.Device;
+var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>();
 
 
 unsafe
@@ -64,7 +64,7 @@ unsafe
 
     var s = Stopwatch.StartNew();
     var frames = 0;
-    while (window.Update())
+    while (engine.Window.Update())
     {
         eventQueue.Update();
         input.Update();
@@ -81,7 +81,8 @@ unsafe
             s.Restart();
             frames = 0;
         }
-        
+
+
 
         //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
     }
@@ -90,7 +91,7 @@ unsafe
     //    using ComPtr<ID3D11Debug> d3dDebug = default;
     //    fixed (Guid* debugGuidPtr = &D3D11Common.D3D11Debug)
     //    {
-    //        Common.CheckAndThrow(device.Ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
+    //        Common.CheckAndThrow(engine.Device.Ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
     //    }
     //    Common.CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
     //}
