@@ -4,7 +4,7 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders1;
+using Titan.Graphics.Shaders;
 using Titan.Graphics.States;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;

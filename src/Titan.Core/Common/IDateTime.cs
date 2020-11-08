@@ -1,6 +1,6 @@
 using System;
 
-namespace Titan.Core.Logging
+namespace Titan.Core.Common
 {
     internal interface IDateTime
     {

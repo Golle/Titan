@@ -10,7 +10,7 @@ using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
-namespace Titan.Graphics.Shaders1
+namespace Titan.Graphics.Shaders
 {
     internal unsafe class ShaderManager : IShaderManager
     {

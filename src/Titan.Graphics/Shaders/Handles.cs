@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Titan.Graphics.Shaders1
+namespace Titan.Graphics.Shaders
 {
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     public readonly partial struct VertexShaderHandle

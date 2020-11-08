@@ -1,6 +1,6 @@
 using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders1;
+using Titan.Graphics.Shaders;
 using Titan.Graphics.States;
 using Titan.Windows.Win32.D3D11;
 

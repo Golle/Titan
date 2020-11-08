@@ -1,7 +1,7 @@
 using System;
 using Titan.Graphics.D3D11;
 
-namespace Titan.Graphics.Shaders1
+namespace Titan.Graphics.Shaders
 {
     public record VertexShaderDescriptor(string Filename, string Version, string Entrypoint, ShaderDefines[] Defines = default);
     public record PixelShaderDescriptor(string Filename, string Version, string Entrypoint, ShaderDefines[] Defines = default);

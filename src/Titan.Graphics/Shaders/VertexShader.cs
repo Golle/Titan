@@ -1,6 +1,6 @@
-﻿using Titan.Windows.Win32.D3D11;
+using Titan.Windows.Win32.D3D11;
 
-namespace Titan.Graphics.Shaders1
+namespace Titan.Graphics.Shaders
 {
     public unsafe struct VertexShader
     {

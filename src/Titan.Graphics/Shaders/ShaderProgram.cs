@@ -1,4 +1,4 @@
-﻿namespace Titan.Graphics.Shaders1
+namespace Titan.Graphics.Shaders
 {
     public readonly struct ShaderProgram
     {

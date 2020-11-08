@@ -5,7 +5,7 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders1;
+using Titan.Graphics.Shaders;
 using Titan.Graphics.States;
 
 namespace Titan.Graphics.Pipeline

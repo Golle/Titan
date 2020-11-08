@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Titan.Core.Common;
 
 namespace Titan.Core.Logging
 {

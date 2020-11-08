@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders1;
+using Titan.Graphics.Shaders;
 
 namespace Titan.Graphics.Pipeline
 {

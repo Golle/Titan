@@ -2,7 +2,7 @@ using System;
 using Titan.Core;
 using Titan.Core.Memory;
 using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders1;
+using Titan.Graphics.Shaders;
 using Titan.Graphics.States;
 using Titan.Windows;
 using Titan.Windows.Win32;
