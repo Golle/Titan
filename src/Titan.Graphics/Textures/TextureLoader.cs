@@ -16,7 +16,7 @@ namespace Titan.Graphics.Textures
 
         public unsafe Texture LoadTexture(string filename)
         {
-            var decoder = _imagingFactory.CreateDecoderFromFilename(filename);
+            using var decoder = _imagingFactory.CreateDecoderFromFilename(filename);
             var size = decoder.ImageSize;
             var buffer = (byte*)Marshal.AllocHGlobal((int) size);
             try

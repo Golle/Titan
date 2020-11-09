@@ -5,6 +5,7 @@ using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Materials;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Resources;
 using Titan.Graphics.States;
@@ -41,7 +42,7 @@ namespace Titan
             _container = container;
         }
 
-        private unsafe IMemoryManager CreateMemoryManager()
+        private static unsafe IMemoryManager CreateMemoryManager()
         {
             LOGGER.Debug("Initialize memory manager");
             // TODO: not sure how to do this yet. Could have each manager "request" a memory chunk.
@@ -50,6 +51,7 @@ namespace Titan
                 new ChunkDescriptor("VertexBuffer", (uint) sizeof(VertexBuffer), 2048),
                 new ChunkDescriptor("IndexBuffer", (uint) sizeof(IndexBuffer), 2048),
                 new ChunkDescriptor("ConstantBuffer", (uint) sizeof(ConstantBuffer), 100),
+                new ChunkDescriptor("Materials", (uint) sizeof(Material), 256),
                 new ChunkDescriptor("Shaders", (uint) IntPtr.Size, 1024),
                 new ChunkDescriptor("Texture", (uint) sizeof(Texture), 1024),
                 new ChunkDescriptor("ShaderResourceView", (uint) sizeof(ShaderResourceView), 1024),

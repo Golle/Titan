@@ -1,15 +1,15 @@
-using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using Titan;
+using Titan.Core;
 using Titan.Core.Messaging;
+using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Textures;
 using Titan.Input;
-using Titan.Windows.Win32;
-using Titan.Windows.Win32.D3D11;
 
 //var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
 var simpleMesh = @"F:\Git\GameDev\resources\models\sphere.dat";
@@ -32,6 +32,11 @@ unsafe
     var meshLoader = container.GetInstance<IMeshLoader>();
     var input = container.GetInstance<IInputHandler>();
     var eventQueue = container.GetInstance<IEventQueue>();
+    var materialsLoader = container.GetInstance<IMaterialsLoader>();
+    var materialsManager = container.GetInstance<IMaterialsManager>();
+    var configuration = container.GetInstance<TitanConfiguration>();
+    var materialConfigurations = materialsLoader.LoadMaterials(configuration.GetPath("materials.json"));
+    var stuffs = materialConfigurations.Select(m => materialsManager.CreateFromConfiguration(m)).ToArray();
 
     var mesh = meshLoader.LoadMesh(simpleMesh);
     var mesh1 = meshLoader.LoadMesh(simpleMesh1);
@@ -42,25 +47,7 @@ unsafe
     var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
     meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);
     meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1,0,0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(2,0,0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(3,0,0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-1,0,0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-2,0,0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-3,0,0), texture);
-
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1, 1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(2, 1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(3, 1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-1, 1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-2, 1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-3, 1, 0), texture);
-
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1, -1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(2, -1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(3, -1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-1, -1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-2, -1, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(-3, -1, 0), texture);
+    
 
     var s = Stopwatch.StartNew();
     var frames = 0;
@@ -72,15 +59,15 @@ unsafe
 
         pipeline.Execute();
 
-        frames++;
-        if (s.Elapsed.TotalSeconds > 2.0f)
-        {
-            s.Stop();
-            Console.WriteLine($"FPS: {frames/s.Elapsed.TotalSeconds:##}");
+        //frames++;
+        //if (s.Elapsed.TotalSeconds > 2.0f)
+        //{
+        //    s.Stop();
+        //    Console.WriteLine($"FPS: {frames/s.Elapsed.TotalSeconds:##}");
             
-            s.Restart();
-            frames = 0;
-        }
+        //    s.Restart();
+        //    frames = 0;
+        //}
 
 
 

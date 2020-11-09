@@ -1,0 +1,12 @@
+[
+    {
+        "Name": "apa",
+        "Diffuse": "#050505ff",
+        "Ambient": "#ffffffff",
+        "Specular": "#00000000",
+        "Emissive": "#00000000",
+        "NormalMap": null,
+        "IsTextured": true,
+        "IsTransparent": false
+    }
+]

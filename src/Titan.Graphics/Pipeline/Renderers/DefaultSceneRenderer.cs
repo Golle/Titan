@@ -1,7 +1,6 @@
 using System.Numerics;
 using Titan.Core.Common;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.State;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
@@ -47,6 +46,7 @@ namespace Titan.Graphics.Pipeline.Renderers
 
             _samplerStatehandle = device.SamplerStateManager.GetOrCreate();
             _shader = _shaderManager.GetByName("GBufferDefault");
+            //_shader = _shaderManager.GetByName("GBufferDefaultNormalMap");
         }
 
         private Vector3 modelPosition = new Vector3(0, 0, 0);

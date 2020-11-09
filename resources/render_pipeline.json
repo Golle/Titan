@@ -121,7 +121,7 @@
                     "Name": "GBufferAlbedo",
                     "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT",
                     "Clear": true,
-                    "Color": "#ff000000"
+                    "Color": "#fF000000"
                 },
                 {
                     "Name": "GBufferNormal",

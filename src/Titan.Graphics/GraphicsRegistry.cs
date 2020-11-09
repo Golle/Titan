@@ -21,8 +21,10 @@ namespace Titan.Graphics
 
                 .Register<IMeshLoader, MeshLoader>()
                 .Register<IMeshRenderQueue, NaiveMeshRenderQueue>()
-                .Register<IMaterialManager, MaterialManager>()
                 .Register<IPipelineConfigurationLoader, PipelineConfigurationLoader>()
+
+                .Register<IMaterialsLoader, MaterialsLoader>()
+                .Register<IMaterialsManager, MaterialsManager>()
 
                 ;
         }
