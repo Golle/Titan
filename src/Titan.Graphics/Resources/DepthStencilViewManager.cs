@@ -20,9 +20,8 @@ namespace Titan.Graphics.Resources
         {
             _device = new ComPtr<ID3D11Device>(device);
             
-            var memory = memoryManager.GetMemoryChunk("DepthStencilView");
-            Debug.Assert(memory.Stride == sizeof(ShaderResourceView), "The stride of the memory chunk is not matching the expected size");
-            _views = (DepthStencilView*)memory.Pointer;
+            var memory = memoryManager.GetMemoryChunkValidated<DepthStencilView>("DepthStencilView");
+            _views = memory.Pointer;
             _maxViews = memory.Count;
         }
         public DepthStencilViewHandle Create(ID3D11Resource* resource, DXGI_FORMAT format)

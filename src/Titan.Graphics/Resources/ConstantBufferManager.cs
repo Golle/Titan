@@ -21,9 +21,8 @@ namespace Titan.Graphics.Resources
         {
             _device = new ComPtr<ID3D11Device>(device);
 
-            var memory = memoryManager.GetMemoryChunk("ConstantBuffer");
-            Debug.Assert(memory.Stride == sizeof(ConstantBuffer), "The stride of the memory chunk is not matching the expected size");
-            _buffers = (ConstantBuffer*)memory.Pointer;
+            var memory = memoryManager.GetMemoryChunkValidated<ConstantBuffer>("ConstantBuffer");
+            _buffers = memory.Pointer;
             _maxBuffers = memory.Count;
         }
         public ConstantBufferHandle CreateConstantBuffer<T>(in T data = default, D3D11_USAGE usage = default, D3D11_CPU_ACCESS_FLAG cpuAccess = default, D3D11_RESOURCE_MISC_FLAG miscFlags = default) where T : unmanaged

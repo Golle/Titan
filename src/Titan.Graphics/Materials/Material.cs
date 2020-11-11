@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.Resources;
 
 namespace Titan.Graphics.Materials
 {
@@ -18,12 +17,5 @@ namespace Titan.Graphics.Materials
         public bool HasNormalMap;
         public bool IsTransparent;
         private bool NOOP;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct NormalMap
-    {
-        public ShaderResourceViewHandle Handle;
-        public TextureHandle TextureHandle;
     }
 }

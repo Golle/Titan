@@ -20,9 +20,8 @@ namespace Titan.Graphics.Resources
         {
             _device = new ComPtr<ID3D11Device>(device);
 
-            var memory = memoryManager.GetMemoryChunk("IndexBuffer");
-            Debug.Assert(memory.Stride == sizeof(IndexBuffer), "The stride of the memory chunk is not matching the expected size");
-            _buffers = (IndexBuffer*)memory.Pointer;
+            var memory = memoryManager.GetMemoryChunkValidated<IndexBuffer>("IndexBuffer");
+            _buffers = memory.Pointer;
             _maxBuffers = memory.Count;
         }
 

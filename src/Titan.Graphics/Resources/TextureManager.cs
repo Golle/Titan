@@ -19,9 +19,8 @@ namespace Titan.Graphics.Resources
         public TextureManager(ID3D11Device* device, IMemoryManager memoryManager)
         {
             _device = new ComPtr<ID3D11Device>(device);
-            var memory = memoryManager.GetMemoryChunk("Texture");
-            Debug.Assert(memory.Stride == sizeof(Texture), "The stride of the memory chunk is not matching the expected size");
-            _textures = (Texture*) memory.Pointer;
+            var memory = memoryManager.GetMemoryChunkValidated<Texture>("Texture");
+            _textures = memory.Pointer;
             _maxTextures = memory.Count;
         }
 

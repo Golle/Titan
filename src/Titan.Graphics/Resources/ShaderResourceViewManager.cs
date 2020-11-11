@@ -20,9 +20,8 @@ namespace Titan.Graphics.Resources
         public ShaderResourceViewManager(ID3D11Device* device, IMemoryManager memoryManager)
         {
             _device = new ComPtr<ID3D11Device>(device);
-            var memory = memoryManager.GetMemoryChunk("ShaderResourceView");
-            Debug.Assert(memory.Stride == sizeof(ShaderResourceView), "The stride of the memory chunk is not matching the expected size");
-            _resources = (ShaderResourceView*)memory.Pointer;
+            var memory = memoryManager.GetMemoryChunkValidated<ShaderResourceView>("ShaderResourceView");
+            _resources = memory.Pointer;
             _maxResources = memory.Count;
         }
 

@@ -1,7 +1,5 @@
 namespace Titan.Graphics.Materials
 {
-    
-
     public interface IMaterialsManager
     {
         public MaterialHandle CreateFromConfiguration(in MaterialConfiguration materialConfiguration);

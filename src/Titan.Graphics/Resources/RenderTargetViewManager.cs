@@ -20,9 +20,8 @@ namespace Titan.Graphics.Resources
         {
             _device = new ComPtr<ID3D11Device>(device);
             _backbuffer = new ComPtr<ID3D11RenderTargetView>(backbuffer);
-            var memory = memoryManager.GetMemoryChunk("RenderTargetView");
-            Debug.Assert(memory.Stride == sizeof(RenderTargetView), "The stride of the memory chunk is not matching the expected size");
-            _views = (RenderTargetView*)memory.Pointer;
+            var memory = memoryManager.GetMemoryChunkValidated<RenderTargetView>("RenderTargetView");
+            _views = memory.Pointer;
             _maxViews = memory.Count;
 
             _numberOfViews = 1;
