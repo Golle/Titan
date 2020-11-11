@@ -118,10 +118,16 @@
             },
             "RenderTargets": [
                 {
+                    "Name": "GBufferPosition",
+                    "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT",
+                    "Clear": true,
+                    "Color": "#00000000"
+                },
+                {
                     "Name": "GBufferAlbedo",
                     "Format": "DXGI_FORMAT_R32G32B32A32_FLOAT",
                     "Clear": true,
-                    "Color": "#fF000000"
+                    "Color": "#00000000"
                 },
                 {
                     "Name": "GBufferNormal",
@@ -143,6 +149,10 @@
                 }
             ],
             "Resources": [
+                {
+                    "Name": "GBufferPosition",
+                    "Type": "PixelShader"
+                },
                 {
                     "Name": "GBufferAlbedo",
                     "Type": "PixelShader"
@@ -186,7 +196,8 @@
                     "Color": "#ff0000ff"
                 }
             ],
-            "UnbindResources": true
+            "UnbindResources": true,
+            "UnbindRenderTargets": true
         }
     ],
     "Renderers": [

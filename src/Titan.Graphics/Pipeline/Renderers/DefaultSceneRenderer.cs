@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Titan.Graphics.Camera;
 using Titan.Graphics.D3D11;
@@ -9,6 +10,8 @@ using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline.Renderers
 {
+
+    
     internal class DefaultSceneRenderer : IRenderer
     {
         private readonly IMeshRenderQueue _renderQueue;
@@ -19,7 +22,6 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IConstantBufferManager _constantBufferManager;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly ISamplerStateManager _samplerStateManager;
-
 
         private readonly ConstantBufferHandle _perObjectHandle;
         private readonly ConstantBufferHandle _cameraHandle;
@@ -39,7 +41,6 @@ namespace Titan.Graphics.Pipeline.Renderers
             _shaderResourceViewManager = device.ShaderResourceViewManager;
             _samplerStateManager = device.SamplerStateManager;
             
-
             _perObjectHandle = _constantBufferManager.CreateConstantBuffer<Matrix4x4>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
             _cameraHandle = _constantBufferManager.CreateConstantBuffer<CameraBuffer>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
@@ -58,16 +59,6 @@ namespace Titan.Graphics.Pipeline.Renderers
                 View = cam.View,
                 ViewProjection = Matrix4x4.Transpose(cam.ViewProjection)
             };
-
-            #region TEMP MODEL SPIN
-
-            //{
-            //    modelRot.X += 0.006f;
-            //    modelRot.Y -= 0.004f;
-            //}
-            //var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
-
-            #endregion
 
             context.SetInputLayout(_shaderManager[_shader.InputLayout]);
             context.SetVertexShader(_shaderManager[_shader.VertexShader]);

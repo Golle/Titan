@@ -1,10 +1,12 @@
-Texture2D albedoTexture : register(t0);
-Texture2D normalTexture : register(t1);
+Texture2D positionTexture : register(t0);
+Texture2D albedoTexture : register(t1);
+Texture2D normalTexture : register(t2);
 
 SamplerState splr;
 cbuffer LightSource : register(b0)
 {
-    float3 Position;
+    int NumberOfLights;
+    float3 Position[32];
 };
 
 static const float3 DiffuseLightDirection = float3(0.0f, -0.5f, 0.5f);
@@ -25,7 +27,7 @@ float4 main(float2 textureCoords: Texture) : SV_TARGET
     // TODO: add light calculations
     
     
-    float3 lightDirection = Position;
+    float3 lightDirection = Position[0];
 
     float distance = length(lightDirection);
     float diffuseLightPercentage = saturate(dot(normal.xyz, normalize(lightDirection.xyz)));

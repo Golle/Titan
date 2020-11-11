@@ -87,9 +87,12 @@ namespace Titan.Graphics.Pipeline
                     }
                     else
                     {
-                        var textureHandle = _device.TextureManager.CreateTexture((uint)_window.Width, (uint)_window.Height, renderTarget.Format, D3D11_BIND_SHADER_RESOURCE);
-                        var resourceHandle = _device.ShaderResourceViewManager.Create(_device.TextureManager[textureHandle].Resource, renderTarget.Format);
-                        builder.AddShaderResource(renderTarget.Name, resourceHandle);
+                        var textureHandle = _device.TextureManager.CreateTexture((uint)_window.Width, (uint)_window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET);
+                        var resource = _device.TextureManager[textureHandle].Resource;
+                        var renderTargetHandle = _device.RenderTargetViewManager.Create(resource, renderTarget.Format);
+                        builder.AddRenderTarget(renderTarget.Name, renderTargetHandle);
+                        //var resourceHandle = _device.ShaderResourceViewManager.Create(_device.TextureManager[textureHandle].Resource, renderTarget.Format);
+                        //builder.AddShaderResource(renderTarget.Name, resourceHandle);
                     }
                 }
 
@@ -106,6 +109,7 @@ namespace Titan.Graphics.Pipeline
             }
 
             _renderGraph = new RenderGraph(builder.Compile(), _device);
+            
         }
 
         private static bool IsResource(RenderPassConfiguration[] passes, RenderTargetConfiguration target) => passes.Any(p => p.Resources?.Any(r => r.Name == target.Name) ?? false);

@@ -1,6 +1,8 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
@@ -9,6 +11,7 @@ namespace Titan.Graphics.Pipeline.Renderers
 {
     internal class DefaultLightsRenderer : IRenderer
     {
+        private readonly ILigthRenderQueue _ligthRenderQueue;
         private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IIndexBufferManager _indexBufferManager;
         private readonly IConstantBufferManager _constantBufferManager;
@@ -20,9 +23,11 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly ConstantBufferHandle _lightSourceHandle;
         private readonly ShaderProgram _shader;
 
+        
 
-        public unsafe DefaultLightsRenderer(IGraphicsDevice device)
+        public unsafe DefaultLightsRenderer(IGraphicsDevice device, ILigthRenderQueue ligthRenderQueue)
         {
+            _ligthRenderQueue = ligthRenderQueue;
             _vertexBufferManager = device.VertexBufferManager;
             _indexBufferManager = device.IndexBufferManager;
             _constantBufferManager = device.ConstantBufferManager;
@@ -48,38 +53,28 @@ namespace Titan.Graphics.Pipeline.Renderers
                 Position = new Vector3(0, 0, -1)
             }, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
+
             _shader = device.ShaderManager.GetByName("DeferredShadingDefault");
         }
 
-        private Vector3 _lightPosition = new Vector3(0,1,-1);
-        private float _lightVelocity = 0.02f;
-        
-
-
         public void Render(IRenderContext context)
         {
-            #region TEMP LIGHT CALCULATIONS
-            if (_lightPosition.X > 3.0f)
-            {
-                _lightPosition.X = 2.99f;
-                _lightVelocity = -0.02f;
-            }
-            else if (_lightPosition.X < -3.0f)
-            {
-                _lightPosition.X = -2.99f;
-                _lightVelocity = 0.02f;
-            }
-
-            _lightPosition.X += _lightVelocity;
-
-
-            #endregion
-
-
             ref readonly var lightSource = ref _constantBufferManager[_lightSourceHandle];
             unsafe
             {
-                context.MapResource(lightSource.Resource, new LightSource {Position = _lightPosition});
+                var lights = _ligthRenderQueue.GetLights();
+                var light = new Lights {_numberOfLigts = 1};
+                fixed (Light* l = lights)
+                {
+                    Unsafe.CopyBlock(light.LightPositions, (float*)l, (uint)(lights.Length * sizeof(Light)));
+                }
+                
+                for (var i = 0; i < lights.Length; ++i)
+                {
+                    light.Set(i, lights[i].Position);
+                }
+                
+                context.MapResource(lightSource.Resource, light);
             }
             
             context.SetPixelShaderConstantBuffer(lightSource);
@@ -100,6 +95,26 @@ namespace Titan.Graphics.Pipeline.Renderers
             _constantBufferManager.DestroyBuffer(_lightSourceHandle);
             _vertexBufferManager.DestroyBuffer(_vertexBufferHandle);
             _indexBufferManager.DestroyBuffer(_indexBufferHandle);
+        }
+
+        private unsafe struct Lights
+        {
+            public int _numberOfLigts;
+            public fixed float LightPositions[32 * 3];
+
+            public void Set(int index, in Vector3 position)
+            {
+                fixed (Vector3* pPosition = &position)
+                fixed(float* pLights = LightPositions)
+                {
+                    Unsafe.CopyBlock(pPosition,pLights+(index*3), sizeof(float)*3);
+                }
+
+                //var i = index * 3;
+                //LightPositions[i] = position.X;
+                //LightPositions[i+1] = position.Z;
+                //LightPositions[i+2] = position.X;
+            }
         }
 
 

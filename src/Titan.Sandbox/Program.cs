@@ -43,18 +43,19 @@ unsafe
     var materialConfigurations = materialsLoader.LoadMaterials(configuration.GetPath("materials.json"));
     var stuffs = materialConfigurations.Select(m => materialsManager.CreateFromConfiguration(m)).ToArray();
 
-    var mesh = meshLoader.LoadMesh(simpleMesh);
+    //var mesh = meshLoader.LoadMesh(simpleMesh);
     var mesh1 = meshLoader.LoadMesh(simpleMesh1);
     var mesh2 = meshLoader.LoadMesh(simpleMesh2);
     
-    //var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
+    var texture1 = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
     var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\link.png");
     //var texture = textureLoader.LoadTexture(@"F:\tmp\globe.png");
 
+    var lightQueue = container.GetInstance<ILigthRenderQueue>();
     var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
     //meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);
     //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1,0,0), texture);
-    meshRenderQueue.Submit(mesh2, Matrix4x4.CreateTranslation(0,0,0), texture);
+    
     
 
     var s = Stopwatch.StartNew();
@@ -64,12 +65,45 @@ unsafe
     var camera = cameraManager.GetCamera();
 
     var firstPerson = false;
+
+
+    #region LIGHTS
+
+        var lightPosition = new Vector3(0, 1, -1);
+        var lightVelocity = 0.02f;
+
+    #endregion
+
     while (engine.Window.Update())
     {
-        
+        meshRenderQueue.Reset();
+        lightQueue.Reset();
 
         eventQueue.Update();
         input.Update();
+
+        #region LIGHT CALCULATION
+
+        if (lightPosition.X > 3.0f)
+        {
+            lightPosition.X = 2.99f;
+            lightVelocity = -0.02f;
+        }
+        else if (lightPosition.X < -3.0f)
+        {
+            lightPosition.X = -2.99f;
+            lightVelocity = 0.02f;
+        }
+
+        lightPosition.X += lightVelocity;
+
+        lightQueue.Submit(lightPosition);
+
+        #endregion
+
+        meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(lightPosition), texture1);
+        meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(1,1,1)), texture1);
+        //meshRenderQueue.Submit(mesh2, Matrix4x4.CreateTranslation(0, 0, 0), texture);
 
 
         #region TEMP INPUT HANLDING

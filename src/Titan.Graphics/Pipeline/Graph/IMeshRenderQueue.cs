@@ -7,8 +7,8 @@ namespace Titan.Graphics.Pipeline.Graph
 {
     public interface IMeshRenderQueue
     {
-
         void Submit(in Mesh mesh, in Matrix4x4 worldMatrix, Texture texture);
         ReadOnlySpan<Renderable> GetRenderables();
+        void Reset();
     }
 }

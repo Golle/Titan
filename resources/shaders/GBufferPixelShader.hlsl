@@ -9,6 +9,7 @@ SamplerState splr : register(s0);
     struct PS_INPUT
     {
          float2 Texture: Texture;
+         float4 Position: SV_Position;
     };
 
     float4 GetNormal(PS_INPUT input) 
@@ -21,6 +22,7 @@ SamplerState splr : register(s0);
     {
         float3 Normal: Normal;
         float2 Texture: Texture;
+        float4 Position: SV_Position;
     };
     float4 GetNormal(PS_INPUT input) 
     {
@@ -30,13 +32,15 @@ SamplerState splr : register(s0);
 
 struct PS_OUTPUT 
 {
-    float4 Albedo: Color0;
-    float4 Normal: Color1;
+    float4 Position: Color0;
+    float4 Albedo: Color1;
+    float4 Normal: Color2;
 };
 
 PS_OUTPUT main(PS_INPUT input) : SV_TARGET
 {
     PS_OUTPUT output;
+    output.Position = input.Position;
     output.Albedo = tex.Sample(splr, input.Texture);
     output.Normal = GetNormal(input);
 
