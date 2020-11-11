@@ -1,4 +1,3 @@
-using Titan.Graphics.D3D11;
 using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
 

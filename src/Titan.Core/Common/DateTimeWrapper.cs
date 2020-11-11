@@ -1,5 +1,4 @@
 using System;
-using Titan.Core.Logging;
 
 namespace Titan.Core.Common
 {

@@ -1,4 +1,3 @@
-using Titan.Graphics.D3D11;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline.Configuration;
