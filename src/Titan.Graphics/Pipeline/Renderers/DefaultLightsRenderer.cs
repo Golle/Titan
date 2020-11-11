@@ -48,11 +48,8 @@ namespace Titan.Graphics.Pipeline.Renderers
             indices[4] = 2;
             indices[5] = 3;
             _indexBufferHandle = _indexBufferManager.CreateIndexBuffer<ushort>(6, indices);
-            _lightSourceHandle = _constantBufferManager.CreateConstantBuffer(new LightSource
-            {
-                Position = new Vector3(0, 0, -1)
-            }, D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
+            _lightSourceHandle = _constantBufferManager.CreateConstantBuffer(new LightSource(), D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
             _shader = device.ShaderManager.GetByName("DeferredShadingDefault");
         }
@@ -63,22 +60,15 @@ namespace Titan.Graphics.Pipeline.Renderers
             unsafe
             {
                 var lights = _ligthRenderQueue.GetLights();
-                var light = new Lights {_numberOfLigts = 1};
-                fixed (Light* l = lights)
-                {
-                    Unsafe.CopyBlock(light.LightPositions, (float*)l, (uint)(lights.Length * sizeof(Light)));
-                }
-                
-                for (var i = 0; i < lights.Length; ++i)
+                var light = new LightSource {NumberOfLights = lights.Length};
+                for (var i = 0; i < light.NumberOfLights; ++i)
                 {
                     light.Set(i, lights[i].Position);
                 }
-                
                 context.MapResource(lightSource.Resource, light);
             }
             
             context.SetPixelShaderConstantBuffer(lightSource);
-
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
             context.SetIndexBuffer(_indexBufferManager[_indexBufferHandle]);
@@ -97,31 +87,23 @@ namespace Titan.Graphics.Pipeline.Renderers
             _indexBufferManager.DestroyBuffer(_indexBufferHandle);
         }
 
-        private unsafe struct Lights
-        {
-            public int _numberOfLigts;
-            public fixed float LightPositions[32 * 3];
-
-            public void Set(int index, in Vector3 position)
-            {
-                fixed (Vector3* pPosition = &position)
-                fixed(float* pLights = LightPositions)
-                {
-                    Unsafe.CopyBlock(pPosition,pLights+(index*3), sizeof(float)*3);
-                }
-
-                //var i = index * 3;
-                //LightPositions[i] = position.X;
-                //LightPositions[i+1] = position.Z;
-                //LightPositions[i+2] = position.X;
-            }
-        }
-
-
-        [StructLayout(LayoutKind.Sequential, Size = 48)]
+       
+        [StructLayout(LayoutKind.Explicit)]
         private struct LightSource
         {
-            public Vector3 Position;
+            private const int MaxNumberOfLights = 32;
+            [FieldOffset(0)]
+            public int NumberOfLights;
+            [FieldOffset(16)]
+            public unsafe fixed float Position[4*MaxNumberOfLights];
+            public unsafe void Set(int index, in Vector3 position)
+            {
+                fixed (Vector3* pPosition = &position)
+                fixed (float* pLights = Position)
+                {
+                    Unsafe.CopyBlock(pLights + (index * 4), pPosition, (uint) sizeof(Vector3));
+                }
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]

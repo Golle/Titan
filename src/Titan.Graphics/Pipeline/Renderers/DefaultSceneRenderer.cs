@@ -73,13 +73,8 @@ namespace Titan.Graphics.Pipeline.Renderers
 
             foreach (ref readonly var renderable in _renderQueue.GetRenderables())
             {
-                //context.MapResource(_perObjectBuffer.AsResourcePointer(), renderable.World);
-                var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(new Vector3(1, 1, 1)) *
-                                                      Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
-                                                      renderable.World);
-
                 ref readonly var objectBuffer = ref _constantBufferManager[_perObjectHandle];
-                context.MapResource(objectBuffer.Resource, modelMatrix);
+                context.MapResource(objectBuffer.Resource, renderable.World);
                 context.SetVertexShaderConstantBuffer(objectBuffer, 1u);
                 context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
 

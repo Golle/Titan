@@ -56,7 +56,7 @@ namespace Titan.Graphics.Camera
 
         public Camera(IWindow window)
         {
-            _position = new Vector3(0, 0, -5);
+            _position = new Vector3(0, 0, 0);
             _projection = MatrixExtensions.CreatePerspectiveLH(1f, window.Height / (float)window.Width, 0.5f, 10000f);
             _rotation = Quaternion.CreateFromYawPitchRoll(0, 0, 0);
             

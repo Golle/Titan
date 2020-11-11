@@ -9,7 +9,7 @@ SamplerState splr : register(s0);
     struct PS_INPUT
     {
          float2 Texture: Texture;
-         float4 Position: SV_Position;
+         float4 Position: Position;
     };
 
     float4 GetNormal(PS_INPUT input) 
@@ -22,7 +22,7 @@ SamplerState splr : register(s0);
     {
         float3 Normal: Normal;
         float2 Texture: Texture;
-        float4 Position: SV_Position;
+        float4 Position: Position;
     };
     float4 GetNormal(PS_INPUT input) 
     {

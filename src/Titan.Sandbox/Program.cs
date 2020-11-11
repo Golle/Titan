@@ -22,6 +22,11 @@ var simpleMesh1 = @"F:\Git\GameDev\resources\models\sphere1.dat";
 using var engine = EngineBuilder.CreateDefaultBuilder()
     .ConfigureResourcesBasePath(() => @"F:\Git\Titan\resources\")
     .ConfigureWindow(1920, 1080, "Donkey box #2")
+#if DEBUG
+    .ConfigureDebug(() => true)
+#else
+    .ConfigureDebug(() => false)
+#endif
     .Build();
 
 var window = engine.Window;
@@ -44,8 +49,8 @@ unsafe
     var stuffs = materialConfigurations.Select(m => materialsManager.CreateFromConfiguration(m)).ToArray();
 
     //var mesh = meshLoader.LoadMesh(simpleMesh);
-    var mesh1 = meshLoader.LoadMesh(simpleMesh1);
-    var mesh2 = meshLoader.LoadMesh(simpleMesh2);
+    var sphere = meshLoader.LoadMesh(simpleMesh1);
+    var sponza = meshLoader.LoadMesh(simpleMesh2);
     
     var texture1 = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
     var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\link.png");
@@ -69,10 +74,11 @@ unsafe
 
     #region LIGHTS
 
-        var lightPosition = new Vector3(0, 1, -1);
-        var lightVelocity = 0.02f;
-
+        var lightPosition = new Vector3(0, 350, 0);
+        var lightVelocity = 4f;
+        var maxDinstance = 1200f;
     #endregion
+
 
     while (engine.Window.Update())
     {
@@ -84,15 +90,15 @@ unsafe
 
         #region LIGHT CALCULATION
 
-        if (lightPosition.X > 3.0f)
+        if (lightPosition.X > maxDinstance)
         {
-            lightPosition.X = 2.99f;
-            lightVelocity = -0.02f;
+            lightPosition.X = maxDinstance-0.1f;
+            lightVelocity = -lightVelocity;
         }
-        else if (lightPosition.X < -3.0f)
+        else if (lightPosition.X < -maxDinstance)
         {
-            lightPosition.X = -2.99f;
-            lightVelocity = 0.02f;
+            lightPosition.X = -maxDinstance+0.1f;
+            lightVelocity = -lightVelocity;
         }
 
         lightPosition.X += lightVelocity;
@@ -101,9 +107,20 @@ unsafe
 
         #endregion
 
-        meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(lightPosition), texture1);
-        meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(1,1,1)), texture1);
-        //meshRenderQueue.Submit(mesh2, Matrix4x4.CreateTranslation(0, 0, 0), texture);
+        var lightMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(Vector3.One * 10) *
+                                              Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
+                                              Matrix4x4.CreateTranslation(lightPosition));
+
+        meshRenderQueue.Submit(sphere, lightMatrix, texture1);
+
+        var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(Vector3.One) *
+                                              Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
+                                              Matrix4x4.CreateTranslation(Vector3.Zero));
+        meshRenderQueue.Submit(sponza, modelMatrix, texture);
+        //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(1,1,1)), texture1);
+        //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(2,2,1)), texture);
+        //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(3,3,1)), texture1);
+        
 
 
         #region TEMP INPUT HANLDING
@@ -167,15 +184,15 @@ unsafe
             LOGGER.Debug("Escape key pressed, exiting the game.");
             engine.Stop();
         }
-        //frames++;
-        //if (s.Elapsed.TotalSeconds > 2.0f)
-        //{
-        //    s.Stop();
-        //    Console.WriteLine($"FPS: {frames/s.Elapsed.TotalSeconds:##}");
-            
-        //    s.Restart();
-        //    frames = 0;
-        //}
+        frames++;
+        if (s.Elapsed.TotalSeconds > 2.0f)
+        {
+            s.Stop();
+            Console.WriteLine($"FPS: {frames / s.Elapsed.TotalSeconds:##}");
+
+            s.Restart();
+            frames = 0;
+        }
 
 
 

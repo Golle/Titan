@@ -18,6 +18,7 @@ cbuffer PerObjectBuffer : register(b1)
     struct VS_OUTPUT 
     {
         float2 Texture: Texture;
+        float4 WorldPosition: Position;
         float4 Position: SV_Position;
     };
 
@@ -33,6 +34,7 @@ cbuffer PerObjectBuffer : register(b1)
     {
         float3 Normal: Normal;
         float2 Texture: Texture;
+        float4 WorldPosition: Position;
         float4 Position: SV_Position;
     };
 #endif
@@ -42,8 +44,8 @@ VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
 
-    float4 position = mul(float4(input.Position, 1.0f), World);
-    output.Position = mul(position, ViewProjection);
+    output.WorldPosition = mul(float4(input.Position, 1.0f), World);
+    output.Position = mul(output.WorldPosition, ViewProjection);
     
     output.Texture = input.Texture;
 
