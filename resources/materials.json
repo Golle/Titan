@@ -1,7 +1,17 @@
 [
     {
-        "Name": "apa",
-        "Diffuse": "#050505ff",
+        "Name": "DefaultTextured",
+        "Diffuse": "#ffffffff",
+        "Ambient": "#ffffffff",
+        "Specular": "#00000000",
+        "Emissive": "#00000000",
+        "NormalMap": null,
+        "IsTextured": true,
+        "IsTransparent": false
+    },
+    {
+        "Name": "DefaultDiffuse",
+        "Diffuse": "#111111ff",
         "Ambient": "#ffffffff",
         "Specular": "#00000000",
         "Emissive": "#00000000",

@@ -84,6 +84,11 @@ namespace Titan
             throw new NotImplementedException();
         }
 
+        public void Stop()
+        {
+            _window.Exit();
+        }
+
         IWindow IEngine.Window => _window;
         IContainer IEngine.Container => _container;
     }

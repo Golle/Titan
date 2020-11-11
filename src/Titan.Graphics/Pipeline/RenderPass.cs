@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Resources;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline
@@ -41,7 +42,10 @@ namespace Titan.Graphics.Pipeline
                     case CommandType.SetRenderTarget:
                         renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget]);
                         break;
-                    case CommandType.SetMultipleRenderTarget:
+                    case CommandType.SetMultipleRenderTargetAndDepthStencil:
+                        SetRenderTargets(renderContext, command.MultipleRenderTargets, true);
+                        break;
+                    case CommandType.SetMultipleRenderTargets:
                         SetRenderTargets(renderContext, command.MultipleRenderTargets);
                         break;
                     case CommandType.SetShaderProgram:
@@ -102,14 +106,16 @@ namespace Titan.Graphics.Pipeline
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        private unsafe void SetRenderTargets(IRenderContext context, in SetMultipleRenderTargetViewCommand command)
+        private unsafe void SetRenderTargets(IRenderContext context, in SetMultipleRenderTargetViewCommand command, bool hasDepthStencil = false)
         {
             var renderTargets = stackalloc ID3D11RenderTargetView*[(int)command.Count];
             for (var i = 0; i < command.Count; ++i)
             {
                 renderTargets[i] = _device.RenderTargetViewManager[command.Handles[i]].Pointer;
             }
-            context.SetRenderTargets(renderTargets, command.Count, command.DepthStencilView);
+
+            var depthStencilView = hasDepthStencil ? _device.DepthStencilViewManager[command.DepthStencilView].Pointer : null;
+            context.SetRenderTargets(renderTargets, command.Count, depthStencilView);
         }
     }
 }

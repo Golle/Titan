@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using Titan.Windows.Win32.Native;
 
@@ -209,6 +210,29 @@ EndHandler:
             return true;
         }
 
+        public void Exit() => PostQuitMessage(0);
+
+        private bool _cursorVisible = true;
+        private POINT _hideCursorPosition;
+        public unsafe void ToggleMouse()
+        {
+            _cursorVisible = !_cursorVisible;
+            ShowCursor(_cursorVisible);
+            if (_cursorVisible)
+            {
+                SetCursorPos(_hideCursorPosition.X, _hideCursorPosition.Y);
+            }
+            else
+            {
+                POINT pos;
+                if (GetCursorPos(&pos))
+                {
+                    _hideCursorPosition = pos;
+                }
+                SetCursorPos(Width/2, Height/2);
+            }
+        }
+
         private unsafe void UpdateMousePosition()
         {
             POINT point;
@@ -216,15 +240,37 @@ EndHandler:
             {
                 return;
             }
-            if (!ScreenToClient(Handle, &point))
+
+            if (_cursorVisible)
             {
-                return;
+                if (!ScreenToClient(Handle, &point))
+                {
+                    return;
+                }
+                if (_mousePosition.X != point.X || _mousePosition.Y != point.Y)
+                {
+                    _mousePosition = point;
+                    _windowEventHandler.OnMouseMove(point);
+                }
             }
-            if (_mousePosition.X != point.X || _mousePosition.Y != point.Y)
+            else
             {
-                _mousePosition = point;
-                _windowEventHandler.OnMouseMove(point);
+                var mouseMoved = false;
+                var center = new POINT {X = Width / 2, Y = Height / 2};
+                var delta = point - center;
+                if (delta.X != 0 || delta.Y != 0)
+                {
+                    _mousePosition += delta; // TODO: this will cause integer overflow at some point
+                    mouseMoved = true;
+                }
+                SetCursorPos(center.X, center.Y);
+
+                if (mouseMoved)
+                {
+                    _windowEventHandler.OnMouseMove(_mousePosition);
+                }
             }
+            
         }
 
         public void Dispose()

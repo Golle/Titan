@@ -16,5 +16,7 @@ namespace Titan.Windows
         void Show();
 
         bool Update();
+        void Exit();
+        void ToggleMouse();
     }
 }

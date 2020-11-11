@@ -1,3 +1,4 @@
+using System;
 using Titan.Core.Messaging;
 using Titan.Windows.Events;
 using Titan.Windows.Win32.Native;
@@ -24,6 +25,7 @@ namespace Titan.Windows
         public void OnRightMouseButtonDown() => _eventQueue.Push(new MouseButtonEvent(MouseButton.Right, true));
         public void OnRightMouseButtonUp() => _eventQueue.Push(new MouseButtonEvent(MouseButton.Right, false));
         public void OnMouseMove(in POINT position) => _eventQueue.Push(new MouseMovedEvent(position.X, position.Y));
+
         public void OnKeyDown(nuint wParam, nuint lParam)
         {
             var repeat = (lParam & 0x40000000) > 0;

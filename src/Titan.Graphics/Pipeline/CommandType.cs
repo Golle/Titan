@@ -4,7 +4,8 @@ namespace Titan.Graphics.Pipeline
     {
         ClearRenderTarget,
         ClearDepthStencil,
-        SetMultipleRenderTarget,
+        SetMultipleRenderTargets,
+        SetMultipleRenderTargetAndDepthStencil,
         SetRenderTarget,
         SetRenderTargetAndDepthStencil,
         SetShaderProgram,

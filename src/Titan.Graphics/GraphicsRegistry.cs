@@ -1,3 +1,4 @@
+using Titan.Graphics.Camera;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline.Configuration;
@@ -24,6 +25,8 @@ namespace Titan.Graphics
 
                 .Register<IMaterialsLoader, MaterialsLoader>()
                 .Register<IMaterialsManager, MaterialsManager>()
+
+                .Register<ICameraManager, CameraManager>()
 
                 ;
         }

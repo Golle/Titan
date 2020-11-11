@@ -1,11 +1,10 @@
 using System.Numerics;
-using Titan.Core.Common;
+using Titan.Graphics.Camera;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
 using Titan.Graphics.States;
-using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline.Renderers
@@ -13,7 +12,7 @@ namespace Titan.Graphics.Pipeline.Renderers
     internal class DefaultSceneRenderer : IRenderer
     {
         private readonly IMeshRenderQueue _renderQueue;
-        private readonly IWindow _window;
+        private readonly ICameraManager _cameraManager;
         private readonly IShaderManager _shaderManager;
         private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IIndexBufferManager _indexBufferManager;
@@ -29,10 +28,10 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         private readonly ShaderProgram _shader;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, IWindow window)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager)
         {
             _renderQueue = renderQueue;
-            _window = window;
+            _cameraManager = cameraManager;
             _shaderManager = device.ShaderManager;
             _vertexBufferManager = device.VertexBufferManager;
             _indexBufferManager = device.IndexBufferManager;
@@ -49,39 +48,24 @@ namespace Titan.Graphics.Pipeline.Renderers
             //_shader = _shaderManager.GetByName("GBufferDefaultNormalMap");
         }
 
-        private Vector3 modelPosition = new Vector3(0, 0, 0);
         private Vector2 modelRot = new Vector2(0, 0);
         
         public unsafe void Render(IRenderContext context)
         {
-            // update camera
-
-            #region TEMP_CAMERA IMPL
-
-            var position = new Vector3(0, 0, -5);
-            var projectionMatrix = MatrixExtensions.CreatePerspectiveLH(1f, _window.Height / (float)_window.Width, 0.5f, 10000f);
-            var rotation = Quaternion.CreateFromYawPitchRoll(3, 0, 0);
-            var forward = Vector3.Transform(new Vector3(0, 0, 1f), rotation);
-            var up = Vector3.Transform(new Vector3(0, 1, 0), rotation);
-            //position += Vector3.Transform(distance, rotation);
-            var viewMatrix = Matrix4x4.CreateLookAt(position, position + forward, up);
-            var viewProjectionMatrix = viewMatrix * projectionMatrix;
-            //var viewProjectionMatrix = new Matrix4x4(-1, 0, 0, 0, 0, 1.77777779f, 0, 0, 0, 0, -1.00005f, -1, 0, 0, -0.5f, 0);
+            var cam = _cameraManager.GetCamera();
             var camera = new CameraBuffer
             {
-                View = viewMatrix,
-                ViewProjection = Matrix4x4.Transpose(viewProjectionMatrix)
+                View = cam.View,
+                ViewProjection = Matrix4x4.Transpose(cam.ViewProjection)
             };
-
-            #endregion
 
             #region TEMP MODEL SPIN
 
-            {
-                modelRot.X += 0.006f;
-                modelRot.Y -= 0.004f;
-            }
-            var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
+            //{
+            //    modelRot.X += 0.006f;
+            //    modelRot.Y -= 0.004f;
+            //}
+            //var modelRotation = Quaternion.CreateFromYawPitchRoll(modelRot.X, modelRot.Y, 0);
 
             #endregion
 
@@ -100,7 +84,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             {
                 //context.MapResource(_perObjectBuffer.AsResourcePointer(), renderable.World);
                 var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(new Vector3(1, 1, 1)) *
-                                                      Matrix4x4.CreateFromQuaternion(modelRotation) *
+                                                      Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
                                                       renderable.World);
 
                 ref readonly var objectBuffer = ref _constantBufferManager[_perObjectHandle];

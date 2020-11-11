@@ -107,7 +107,7 @@ namespace Titan.Graphics.Pipeline
                 commandList.AddRange(CreateResourcesCommands(pass.Resources));
                 commandList.AddRange(CreateSamplerCommands(pass.Samplers).ToArray());
 
-                commandList.AddRange(CreateRenderTargetCommand(pass.RenderTargets).ToArray());
+                commandList.AddRange(CreateRenderTargetCommand(pass.RenderTargets, pass.DepthStencil).ToArray());
                 commandList.Add(new RenderPassCommand {Type = CommandType.Render, Renderer = _renderers[pass.Renderer]});
 
                 
@@ -172,13 +172,22 @@ namespace Titan.Graphics.Pipeline
             }
         }
 
-        private IEnumerable<RenderPassCommand> CreateRenderTargetCommand(RenderTargetConfiguration[] renderTargets)
+        private IEnumerable<RenderPassCommand> CreateRenderTargetCommand(RenderTargetConfiguration[] renderTargets, DepthStencilConfiguration depthStencil)
         {
             if (renderTargets.Length == 1)
             {
                 var renderTarget = renderTargets[0];
                 var renderTargetView = renderTarget.IsGlobal() ? _device.RenderTargetViewManager.BackbufferHandle : _renderTargets[renderTarget.Name];
-                yield return new RenderPassCommand {Type = CommandType.SetRenderTarget, RenderTarget = renderTargetView};
+
+                if (depthStencil != null)
+                {
+                    yield return new RenderPassCommand { Type = CommandType.SetRenderTargetAndDepthStencil, RenderTarget = renderTargetView, DepthStencil = _depthStencils[depthStencil.Name]};
+                }
+                else
+                {
+                    yield return new RenderPassCommand { Type = CommandType.SetRenderTarget, RenderTarget = renderTargetView };
+                }
+                
                 if (renderTarget.Clear)
                 {
                     yield return new RenderPassCommand {Type = CommandType.ClearRenderTarget, ClearRenderTarget = new ClearRenderTargetCommand {RenderTarget = renderTargetView, Color = Color.Parse(renderTarget.Color)}};
@@ -186,7 +195,14 @@ namespace Titan.Graphics.Pipeline
             }
             else
             {
+                var commandType = CommandType.SetMultipleRenderTargets;
                 var command = new SetMultipleRenderTargetViewCommand { Count = (uint)renderTargets.Length };
+
+                if (depthStencil != null)
+                {
+                    commandType = CommandType.SetMultipleRenderTargetAndDepthStencil;
+                    command.DepthStencilView = _depthStencils[depthStencil.Name];
+                }
                 for (var i = 0; i < renderTargets.Length; ++i)
                 {
                     var renderTarget = renderTargets[i];
@@ -197,7 +213,7 @@ namespace Titan.Graphics.Pipeline
                         yield return new RenderPassCommand { Type = CommandType.ClearRenderTarget, ClearRenderTarget = new ClearRenderTargetCommand { RenderTarget = renderTargetView, Color = Color.Parse(renderTarget.Color) } };
                     }
                 }
-                yield return new RenderPassCommand { Type = CommandType.SetMultipleRenderTarget, MultipleRenderTargets = command };
+                yield return new RenderPassCommand { Type = commandType, MultipleRenderTargets = command };
             }
         }
     }

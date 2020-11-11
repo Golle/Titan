@@ -51,7 +51,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             _shader = device.ShaderManager.GetByName("DeferredShadingDefault");
         }
 
-        private Vector3 _lightPosition = new Vector3(0,0,-1);
+        private Vector3 _lightPosition = new Vector3(0,1,-1);
         private float _lightVelocity = 0.02f;
         
 
