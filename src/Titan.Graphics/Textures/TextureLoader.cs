@@ -23,7 +23,8 @@ namespace Titan.Graphics.Textures
             {
                 decoder.CopyPixels(buffer, size);
 
-                var textureHandle = _device.TextureManager.CreateTexture(decoder.Width, decoder.Height, DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM, buffer, 32, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+                var format = WICToDXGITranslationTable.Convert(decoder.PixelFormat);
+                var textureHandle = _device.TextureManager.CreateTexture(decoder.Width, decoder.Height, format, buffer, decoder.BitsPerPixel, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
                 ref readonly var texture = ref _device.TextureManager[textureHandle];
                 var shaderResourceHandle = _device.ShaderResourceViewManager.Create(texture.Resource, texture.Format);
                 return new Texture(textureHandle, shaderResourceHandle);

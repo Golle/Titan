@@ -38,6 +38,10 @@ var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>();
 
 unsafe
 {
+
+    //var fac = container.GetInstance<IImagingFactory>();
+    //var decoder = fac.CreateDecoderFromFilename(@"F:\Git\Titan\resources\textures\sponza_thorn_ddn.png");
+
     var cameraManager = container.GetInstance<ICameraManager>();
     var textureLoader = container.GetInstance<ITextureLoader>();
     var meshLoader = container.GetInstance<IMeshLoader>();
@@ -46,8 +50,8 @@ unsafe
     var materialsLoader = container.GetInstance<IMaterialsLoader>();
     var materialsManager = container.GetInstance<IMaterialsManager>();
     var configuration = container.GetInstance<TitanConfiguration>();
-    var materialConfigurations = materialsLoader.LoadMaterials(configuration.GetPath("materials.json"));
-    var stuffs = materialConfigurations.Select(m => materialsManager.CreateFromConfiguration(m)).ToArray();
+    //var materialConfigurations = materialsLoader.LoadMaterials(configuration.GetPath("models/sponza.json"));
+    //var sponzaMaterials = materialConfigurations.Select(m => materialsManager.CreateFromConfiguration(m)).ToArray();
 
     //var mesh = meshLoader.LoadMesh(simpleMesh);
     var sphere = meshLoader.LoadMesh(simpleMesh1);

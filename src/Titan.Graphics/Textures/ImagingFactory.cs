@@ -37,28 +37,59 @@ namespace Titan.Graphics.Textures
             Guid pixelFormat;
             CheckAndThrow(frameDecode.Get()->GetPixelFormat(&pixelFormat), "GetPixelFormat");
 
-            using ComPtr<IWICComponentInfo> componentInfo = default;
-            CheckAndThrow(_factory.Get()->CreateComponentInfo(&pixelFormat, componentInfo.GetAddressOf()), "CreateComponentInfo");
 
-            WICComponentType componentType;
-            CheckAndThrow(componentInfo.Get()->GetComponentType(&componentType), "GetComponentType");
-            if (componentType != WICComponentType.WICPixelFormat)
-            {
-                throw new NotSupportedException($"Component type not supported. {componentType}");
-            }
 
-            var pixelFormatInfoGuid = typeof(IWICPixelFormatInfo).GUID;
-            using ComPtr<IWICPixelFormatInfo> pixelFormatInfo = default;
-            CheckAndThrow(componentInfo.Get()->QueryInterface(&pixelFormatInfoGuid, (void**) pixelFormatInfo.GetAddressOf()), "QueryInterface");
+            //using ComPtr<IWICComponentInfo> componentInfo = default;
+            //CheckAndThrow(_factory.Get()->CreateComponentInfo(&pixelFormat, componentInfo.GetAddressOf()), "CreateComponentInfo");
 
-            uint bitsPerPixel;
-            CheckAndThrow(pixelFormatInfo.Get()->GetBitsPerPixel(&bitsPerPixel), "GetBitsPerPixel");
+            //WICComponentType componentType;
+            //CheckAndThrow(componentInfo.Get()->GetComponentType(&componentType), "GetComponentType");
+            //if (componentType != WICComponentType.WICPixelFormat)
+            //{
+            //    throw new NotSupportedException($"Component type not supported. {componentType}");
+            //}
+
+
+
+
+            //var pixelFormatInfoGuid = typeof(IWICPixelFormatInfo).GUID;
+            //using ComPtr<IWICPixelFormatInfo> pixelFormatInfo = default;
+            //CheckAndThrow(componentInfo.Get()->QueryInterface(&pixelFormatInfoGuid, (void**) pixelFormatInfo.GetAddressOf()), "QueryInterface");
+
+            //uint bitsPerPixel;
+            //CheckAndThrow(pixelFormatInfo.Get()->GetBitsPerPixel(&bitsPerPixel), "GetBitsPerPixel");
+
+            var bitsPerPixel = GetBitsPerPixel(pixelFormat);
 
             uint height, width;
             CheckAndThrow(frameDecode.Get()->GetSize(&width, &height), "GetSize");
+            
 
             return new ImageDecoder(frameDecode, width, height, pixelFormat, bitsPerPixel);
         }
+
+
+        private uint GetBitsPerPixel(Guid guid)
+        {
+            using ComPtr<IWICComponentInfo> componentInfo = default;
+            CheckAndThrow(_factory.Get()->CreateComponentInfo(&guid, componentInfo.GetAddressOf()), "CreateComponentInfo");
+
+            WICComponentType type;
+            CheckAndThrow(componentInfo.Get()->GetComponentType(&type), "GetComponentType");
+            if (type != WICComponentType.WICPixelFormat)
+            {
+                throw new NotSupportedException($"Only {WICComponentType.WICPixelFormat} is suppported.");
+            }
+
+            var pixelFormatInfoGuid = typeof(IWICPixelFormatInfo).GUID;
+            using ComPtr<IWICPixelFormatInfo> info = default;
+            CheckAndThrow(componentInfo.Get()->QueryInterface(&pixelFormatInfoGuid, (void**) info.GetAddressOf()), "QueryInterface");
+
+            uint bitsPerPixel;
+            CheckAndThrow(info.Get()->GetBitsPerPixel(&bitsPerPixel), "GetBitsPerPixel");
+            return bitsPerPixel;
+        }
+
 
         public void Dispose() => _factory.Dispose();
     }
