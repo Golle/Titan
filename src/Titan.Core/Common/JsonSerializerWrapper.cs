@@ -5,8 +5,7 @@ namespace Titan.Core.Common
 {
     internal class JsonSerializerWrapper : IJsonSerializer
     {
-
-        private static readonly JsonSerializerOptions _options = new JsonSerializerOptions
+        private static readonly JsonSerializerOptions Options = new JsonSerializerOptions
         {
             IncludeFields = true,
             IgnoreReadOnlyFields =  false,
@@ -16,12 +15,12 @@ namespace Titan.Core.Common
         public T Deserialize<T>(string json)
         {
             
-            return JsonSerializer.Deserialize<T>(json, _options);
+            return JsonSerializer.Deserialize<T>(json, Options);
         }
 
         public string Serialize<T>(in T obj)
         {
-            return JsonSerializer.Serialize(obj, _options);
+            return JsonSerializer.Serialize(obj, Options);
         }
     }
 }

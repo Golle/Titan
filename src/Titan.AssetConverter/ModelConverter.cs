@@ -1,28 +1,47 @@
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Titan.AssetConverter.Exporter;
 using Titan.AssetConverter.WavefrontObj;
 
 namespace Titan.AssetConverter
 {
+    public record Material(string Name, string Diffuse, string DiffuseMap, string Ambient, string Specular, string Emissive, string NormalMap, bool IsTextured, bool IsTransparent);
+
     internal class ModelConverter
     {
         private readonly ObjParser _parser = new ObjParser();
         private readonly ModelExporter _exporter = new ModelExporter();
         public async Task Convert(string objFile, string outputModel, string outputMaterial)
         {
+            var timer = Stopwatch.StartNew();
             var model = await _parser.ReadFromFile(objFile);
             var mesh = CreateMesh(model);
-            var material = CreateMaterial(model);
-            
             await _exporter.ExportModel(mesh, outputModel);
-
-            Console.WriteLine("Finished");
+            if (model.Materials != null)
+            {
+                var materials = model.Materials.Select(ConvertMaterial).ToArray();
+                await _exporter.ExportMaterials(materials, outputMaterial);
+            }
+            timer.Stop();
+            Console.WriteLine($"Finished {Path.GetFileName(objFile)} in {timer.Elapsed.TotalMilliseconds:## 'ms'}");
         }
 
-        private object CreateMaterial(WavefrontObject model)
+        private static Material ConvertMaterial(ObjMaterial material)
         {
-            return null;
+            return new Material(
+                material.Name,
+                material.DiffuseColor.ToString(),
+                material.DiffuseMap,
+                material.AmbientColor.ToString(),
+                material.SpecularColor.ToString(),
+                material.EmissiveColor.ToString(),
+                material.BumpMap,
+                !string.IsNullOrWhiteSpace(material.DiffuseMap),
+                material.Transparency != 0f // TODO: this is not a good way to solve this. 
+            );
         }
 
         private static Mesh CreateMesh(WavefrontObject model)

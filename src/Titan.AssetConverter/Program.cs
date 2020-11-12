@@ -14,7 +14,7 @@ var files = Directory.GetFiles(input, "*.obj", SearchOption.AllDirectories);
 
 string OutputPath(string filePath, string extension) => Path.ChangeExtension(Path.Combine(output, Path.GetFileName(filePath)), extension);
 
-var tasks = files.Select(f => converter.Convert(f, OutputPath(f, ".dat"), OutputPath(f, ".mat"))).ToArray();
+var tasks = files.Select(f => converter.Convert(f, OutputPath(f, ".dat"), OutputPath(f, ".json"))).ToArray();
 await Task.WhenAll(tasks);
 
 Console.WriteLine("Hello world!");

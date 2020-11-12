@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Titan.AssetConverter.Files;
 
@@ -32,6 +33,15 @@ namespace Titan.AssetConverter.Exporter
             _byteWriter.Write(file, mesh.Vertices);
             Console.WriteLine($"Writing indices {mesh.Indices.Length}");
             _byteWriter.Write(file, mesh.Indices);
+        }
+
+        public async Task ExportMaterials(Material[] materials, string filename)
+        {
+            Console.WriteLine($"Writing {materials.Length} materials to {filename}");
+            await using var file = File.OpenWrite(filename);
+            file.SetLength(0); // Reset the file
+            await JsonSerializer.SerializeAsync(file, materials, new JsonSerializerOptions{WriteIndented = true});
+            await file.FlushAsync();
         }
     }
 }
