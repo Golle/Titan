@@ -28,7 +28,6 @@ namespace Titan.Graphics.D3D11
         public static readonly Color Black = new Color(0f, 0, 0);
         public static readonly Color Zero = new Color(0f, 0, 0, 0);
 
-
         public static Color Parse(string value)
         {
             if (!IsValid(value))
@@ -42,7 +41,7 @@ namespace Titan.Graphics.D3D11
                 R = int.Parse(value.AsSpan(1, 2), NumberStyles.HexNumber) / 255f,
                 G = int.Parse(value.AsSpan(3, 2), NumberStyles.HexNumber) / 255f,
                 B = int.Parse(value.AsSpan(5, 2), NumberStyles.HexNumber) / 255f,
-                A = int.Parse(value.AsSpan(7, 2), NumberStyles.HexNumber) / 255f
+                A = value.Length == 9 ? int.Parse(value.AsSpan(7, 2), NumberStyles.HexNumber) / 255f : 0f
             };
         }
 
@@ -59,14 +58,14 @@ namespace Titan.Graphics.D3D11
                 R = int.Parse(value.AsSpan(1, 2), NumberStyles.HexNumber) / 255f,
                 G = int.Parse(value.AsSpan(3, 2), NumberStyles.HexNumber) / 255f,
                 B = int.Parse(value.AsSpan(5, 2), NumberStyles.HexNumber) / 255f,
-                A = int.Parse(value.AsSpan(7, 2), NumberStyles.HexNumber) / 255f
+                A = value.Length == 9 ? int.Parse(value.AsSpan(7, 2), NumberStyles.HexNumber) / 255f : 0f
             };
             return true;
         }
 
         private static bool IsValid(string value)
         {
-            if (value.Length != 9)
+            if (value.Length != 9 && value.Length != 7)
             {
                 return false;
             }
@@ -76,7 +75,7 @@ namespace Titan.Graphics.D3D11
                 return false;
             }
 
-            foreach (var c in value.AsSpan(1, 8))
+            foreach (var c in value.AsSpan(1, value.Length-1))
             {
                 var val = (int) c;
                 // Validate each character, should be within 0-9, a-f and A-F.

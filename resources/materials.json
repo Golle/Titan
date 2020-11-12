@@ -1,20 +1,20 @@
 [
     {
         "Name": "DefaultTextured",
-        "Diffuse": "#ffffffff",
-        "Ambient": "#ffffffff",
-        "Specular": "#00000000",
-        "Emissive": "#00000000",
+        "Diffuse": "#ffffff",
+        "Ambient": "#ffffff",
+        "Specular": "#000000",
+        "Emissive": "#000000",
         "NormalMap": null,
         "IsTextured": true,
         "IsTransparent": false
     },
     {
         "Name": "DefaultDiffuse",
-        "Diffuse": "#111111ff",
-        "Ambient": "#ffffffff",
-        "Specular": "#00000000",
-        "Emissive": "#00000000",
+        "Diffuse": "#111111",
+        "Ambient": "#ffffff",
+        "Specular": "#000000",
+        "Emissive": "#000000",
         "NormalMap": null,
         "IsTextured": true,
         "IsTransparent": false
