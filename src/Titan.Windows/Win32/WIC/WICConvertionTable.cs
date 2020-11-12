@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static Titan.Windows.Win32.WIC.WICPixelFormats;
 // ReSharper disable InconsistentNaming
 namespace Titan.Windows.Win32.WIC
 {
-    internal class WICConvertionTable
+    public class WICConvertionTable
     {
         private static readonly IDictionary<Guid, Guid> _convertionTable = new Dictionary<Guid, Guid>()
         {
@@ -22,7 +23,7 @@ namespace Titan.Windows.Win32.WIC
             {GUID_WICPixelFormat32bppGrayFixedPoint, GUID_WICPixelFormat32bppGrayFloat}, // DXGI_FORMAT_R32_FLOAT 
 
 //#ifdef DXGI_1_2_FORMATSs
-            {GUID_WICPixelFormat16bppBGR555, GUID_WICPixelFormat16bppBGRA5551}, // DXGI_FORMAT_B5G5R5A1_UNORM
+            //{GUID_WICPixelFormat16bppBGR555, GUID_WICPixelFormat16bppBGRA5551}, // DXGI_FORMAT_B5G5R5A1_UNORM
 
 //#else
             {GUID_WICPixelFormat16bppBGR555, GUID_WICPixelFormat32bppRGBA}, // DXGI_FORMAT_R8G8B8A8_UNORM

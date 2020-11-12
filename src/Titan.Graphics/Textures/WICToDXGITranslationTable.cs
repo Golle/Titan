@@ -45,6 +45,6 @@ namespace Titan.Graphics.Textures
 
         };
 
-        public static DXGI_FORMAT Convert(in Guid guid) => _table.TryGetValue(guid, out var format) ? format : throw new NotSupportedException($"The guid {guid} is not supported");
+        public static DXGI_FORMAT Translate(in Guid guid) => _table.TryGetValue(guid, out var format) ? format : DXGI_FORMAT_UNKNOWN;
     }
 }

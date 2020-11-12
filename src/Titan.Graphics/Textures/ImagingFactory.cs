@@ -1,11 +1,15 @@
 using System;
+using System.Runtime.InteropServices;
 using Titan.Windows.Win32;
+using Titan.Windows.Win32.D3D11;
 using Titan.Windows.Win32.WIC;
 
 using static Titan.Windows.Win32.Common;
 using static Titan.Windows.Win32.Native.CLSCTX;
 using static Titan.Windows.Win32.Native.GENERIC_RIGHTS;
 using static Titan.Windows.Win32.Native.Ole32;
+using static Titan.Windows.Win32.WIC.WICBitmapDitherType;
+using static Titan.Windows.Win32.WIC.WICBitmapPaletteType;
 using static Titan.Windows.Win32.WIC.WICDecodeOptions;
 
 namespace Titan.Graphics.Textures
@@ -22,52 +26,72 @@ namespace Titan.Graphics.Textures
                 CheckAndThrow(CoCreateInstance(clsid, null, CLSCTX_INPROC_SERVER, &riid, (void**)_factory.GetAddressOf()), "CoCreateInstance");
             }
         }
-
-        public IImageDecoder CreateDecoderFromFilename(string filename)
+        public IImage LoadImageFromFile(string filename)
         {
             using ComPtr<IWICBitmapDecoder> decoder = default;
             fixed (char* wzFilename = filename)
             {
-                CheckAndThrow(_factory.Get()->CreateDecoderFromFilename(wzFilename, null, (uint) GENERIC_READ, WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), "CreateDecoderFromFilename");
+                CheckAndThrow(_factory.Get()->CreateDecoderFromFilename(wzFilename, null, (uint)GENERIC_READ, WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), "CreateDecoderFromFilename");
             }
 
             using ComPtr<IWICBitmapFrameDecode> frameDecode = default;
             CheckAndThrow(decoder.Get()->GetFrame(0, frameDecode.GetAddressOf()), "GetFrame");
-            
+
             Guid pixelFormat;
             CheckAndThrow(frameDecode.Get()->GetPixelFormat(&pixelFormat), "GetPixelFormat");
 
-
-
-            //using ComPtr<IWICComponentInfo> componentInfo = default;
-            //CheckAndThrow(_factory.Get()->CreateComponentInfo(&pixelFormat, componentInfo.GetAddressOf()), "CreateComponentInfo");
-
-            //WICComponentType componentType;
-            //CheckAndThrow(componentInfo.Get()->GetComponentType(&componentType), "GetComponentType");
-            //if (componentType != WICComponentType.WICPixelFormat)
-            //{
-            //    throw new NotSupportedException($"Component type not supported. {componentType}");
-            //}
-
-
-
-
-            //var pixelFormatInfoGuid = typeof(IWICPixelFormatInfo).GUID;
-            //using ComPtr<IWICPixelFormatInfo> pixelFormatInfo = default;
-            //CheckAndThrow(componentInfo.Get()->QueryInterface(&pixelFormatInfoGuid, (void**) pixelFormatInfo.GetAddressOf()), "QueryInterface");
-
-            //uint bitsPerPixel;
-            //CheckAndThrow(pixelFormatInfo.Get()->GetBitsPerPixel(&bitsPerPixel), "GetBitsPerPixel");
-
-            var bitsPerPixel = GetBitsPerPixel(pixelFormat);
-
             uint height, width;
             CheckAndThrow(frameDecode.Get()->GetSize(&width, &height), "GetSize");
-            
 
-            return new ImageDecoder(frameDecode, width, height, pixelFormat, bitsPerPixel);
+            var dxgiFormat = WICToDXGITranslationTable.Translate(pixelFormat);
+            if (dxgiFormat == DXGI_FORMAT.DXGI_FORMAT_UNKNOWN)
+            {
+                // needs conversion
+                var newFormatGuid = WICConvertionTable.Convert(pixelFormat);
+                var newBitsPerPixel = GetBitsPerPixel(newFormatGuid);
+                
+                var rowPitch = (width* newBitsPerPixel + 7) / 8;
+                var imageSize = rowPitch * height;
+
+                var buffer = (byte*)Marshal.AllocHGlobal((int)imageSize);
+                try
+                {
+                    using ComPtr<IWICFormatConverter> converter = default;
+                    CheckAndThrow(_factory.Get()->CreateFormatConverter(converter.GetAddressOf()), "CreateFormatConverter");
+                    CheckAndThrow(converter.Get()->Initialize((IWICBitmapSource*)frameDecode.Get(), &newFormatGuid, WICBitmapDitherTypeErrorDiffusion, null, 0, WICBitmapPaletteTypeCustom), "Initialize");
+                    CheckAndThrow(converter.Get()->CopyPixels(null, rowPitch, imageSize, buffer), "CopyPixels");
+
+                    return new Image(buffer, imageSize, WICToDXGITranslationTable.Translate(newFormatGuid), rowPitch, width, height);
+                }
+                catch
+                {
+                    // If there's an exception, free the buffer
+                    Marshal.FreeHGlobal((nint)buffer);
+                    throw;
+                }
+            }
+            else
+            {
+
+                var bitsPerPixel = GetBitsPerPixel(pixelFormat);
+                var stride = (width * bitsPerPixel + 7) / 8;
+                var imageSize = stride * height;
+
+                var buffer = (byte*)Marshal.AllocHGlobal((int)imageSize);
+                try
+                {
+                    CheckAndThrow(frameDecode.Get()->CopyPixels(null, stride, imageSize, buffer), "CopyPixels");
+                }
+                catch
+                {
+                    // If there's an exception, free the buffer
+                    Marshal.FreeHGlobal((nint)buffer);
+                    throw;
+                }
+                
+                return new Image(buffer, imageSize, dxgiFormat, stride,  width, height);
+            }
         }
-
 
         private uint GetBitsPerPixel(Guid guid)
         {

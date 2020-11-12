@@ -24,7 +24,7 @@ namespace Titan.Graphics.Resources
         }
 
         public TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag) => CreateTexture(width, height, format, null, 0, bindFlag);
-        public TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint bitsPerPixel, D3D11_BIND_FLAG bindFlag = default)
+        public TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint stride, D3D11_BIND_FLAG bindFlag = default)
         {
             var desc = new D3D11_TEXTURE2D_DESC
             {
@@ -56,7 +56,7 @@ namespace Titan.Graphics.Resources
                 var data = new D3D11_SUBRESOURCE_DATA
                 {
                     pSysMem = buffer,
-                    SysMemPitch = width * bitsPerPixel / 8
+                    SysMemPitch = stride
                 };
                 CheckAndThrow(_device.Get()->CreateTexture2D(&desc, &data, &_textures[handle].Pointer), "CreateTexture2D");
             }

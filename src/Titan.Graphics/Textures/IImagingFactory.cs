@@ -4,6 +4,6 @@ namespace Titan.Graphics.Textures
 {
     internal interface IImagingFactory : IDisposable
     {
-        IImageDecoder CreateDecoderFromFilename(string filename);
+        IImage LoadImageFromFile(string filename);
     }
 }

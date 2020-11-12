@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Textures
@@ -16,23 +15,12 @@ namespace Titan.Graphics.Textures
 
         public unsafe Texture LoadTexture(string filename)
         {
-            using var decoder = _imagingFactory.CreateDecoderFromFilename(filename);
-            var size = decoder.ImageSize;
-            var buffer = (byte*)Marshal.AllocHGlobal((int) size);
-            try
-            {
-                decoder.CopyPixels(buffer, size);
-
-                var format = WICToDXGITranslationTable.Convert(decoder.PixelFormat);
-                var textureHandle = _device.TextureManager.CreateTexture(decoder.Width, decoder.Height, format, buffer, decoder.BitsPerPixel, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-                ref readonly var texture = ref _device.TextureManager[textureHandle];
-                var shaderResourceHandle = _device.ShaderResourceViewManager.Create(texture.Resource, texture.Format);
-                return new Texture(textureHandle, shaderResourceHandle);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal((nint)buffer);
-            }
+            using var image = _imagingFactory.LoadImageFromFile(filename);
+            var textureHandle = _device.TextureManager.CreateTexture(image.Width, image.Height, image.Format, image.GetBuffer(), image.Stride, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+            
+            ref readonly var texture = ref _device.TextureManager[textureHandle];
+            var shaderResourceHandle = _device.ShaderResourceViewManager.Create(texture.Resource, texture.Format);
+            return new Texture(textureHandle, shaderResourceHandle);
         }
     }
 }

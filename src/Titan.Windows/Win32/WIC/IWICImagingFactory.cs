@@ -58,10 +58,8 @@ namespace Titan.Windows.Win32.WIC
         //HRESULT(STDMETHODCALLTYPE* CreatePalette)(
         // __RPC__in IWICImagingFactory * This,
         // /* [out] */ __RPC__deref_out_opt IWICPalette** ppIPalette);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateFormatConverter)(
-        // __RPC__in IWICImagingFactory * This,
-        // /* [out] */ __RPC__deref_out_opt IWICFormatConverter** ppIFormatConverter);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateFormatConverter(IWICFormatConverter** ppIFormatConverter) => ((delegate* unmanaged[Stdcall]<void*, IWICFormatConverter**, HRESULT>)_vtbl[10])(Unsafe.AsPointer(ref this), ppIFormatConverter);
 
         //HRESULT(STDMETHODCALLTYPE* CreateBitmapScaler)(
         // __RPC__in IWICImagingFactory * This,
