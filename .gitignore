@@ -10,3 +10,6 @@ x86/
 [Oo]bj/
 
 .vs/
+
+# Generated models
+/resources/models/

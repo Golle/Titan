@@ -15,9 +15,10 @@ using Titan.Graphics.Textures;
 using Titan.Input;
 
 //var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
-var simpleMesh = @"F:\Git\GameDev\resources\models\sphere.dat";
-var simpleMesh2 = @"F:\Git\GameDev\resources\models_new\sponza.dat";
-var simpleMesh1 = @"F:\Git\GameDev\resources\models\sphere1.dat";
+var simpleMesh = @"F:\Git\Titan\resources\models\sphere.dat";
+//var simpleMesh2 = @"F:\Git\GameDev\resources\models_new\sponza.dat";
+var simpleMesh2 = @"F:\Git\Titan\resources\models\sponza.dat";
+var simpleMesh1 = @"F:\Git\Titan\resources\models\sphere1.dat";
 
 using var engine = EngineBuilder.CreateDefaultBuilder()
     .ConfigureResourcesBasePath(() => @"F:\Git\Titan\resources\")
