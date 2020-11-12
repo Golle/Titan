@@ -39,17 +39,17 @@ namespace Titan.Graphics.Materials
             {
                 Ambient = Color.TryParse(materialConfiguration.Ambient, out var ambient) ? ambient : Color.Zero,
                 Diffuse = Color.TryParse(materialConfiguration.Diffuse, out var diffuse) ? diffuse : Color.White,
+                DiffuseMap = LoadTexture(materialConfiguration.DiffuseMap),
                 Emissive = Color.TryParse(materialConfiguration.Emissive, out var emissive) ? emissive : Color.Zero,
                 Specular = Color.TryParse(materialConfiguration.Specular, out var specular) ? specular : Color.Zero,
-                NormalMap = LoadNormalMap(materialConfiguration.NormalMap),
+                NormalMap = LoadTexture(materialConfiguration.NormalMap),
                 IsTransparent = materialConfiguration.IsTransparent,
-                IsTextured = materialConfiguration.IsTextured,
+                IsTextured = !string.IsNullOrWhiteSpace(materialConfiguration.DiffuseMap),
                 HasNormalMap = !string.IsNullOrWhiteSpace(materialConfiguration.NormalMap),
             };
             return handle;
         }
-
-        private NormalMap LoadNormalMap(string filename)
+        private Texture LoadTexture(string filename)
         {
             if (string.IsNullOrWhiteSpace(filename))
             {
@@ -57,7 +57,7 @@ namespace Titan.Graphics.Materials
             }
 
             var (textureHandle, shaderResourceViewHandle) = _textureLoader.LoadTexture(_configuration.GetPath(filename));
-            return new NormalMap
+            return new Texture
             {
                 Handle = shaderResourceViewHandle,
                 TextureHandle = textureHandle

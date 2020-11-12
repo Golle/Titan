@@ -1,6 +1,7 @@
 using System.Numerics;
+using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
-using Titan.Graphics.Textures;
+using Texture = Titan.Graphics.Textures.Texture;
 
 namespace Titan.Graphics.Pipeline.Graph
 {
@@ -9,5 +10,6 @@ namespace Titan.Graphics.Pipeline.Graph
         public Texture Texture;
         public Mesh Mesh;
         public Matrix4x4 World;
+        public MaterialHandle[] Materials;
     }
 }

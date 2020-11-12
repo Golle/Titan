@@ -112,12 +112,12 @@ unsafe
                                               Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
                                               Matrix4x4.CreateTranslation(lightPosition));
 
-        meshRenderQueue.Submit(sphere, lightMatrix, texture1);
+        meshRenderQueue.Submit(sphere, lightMatrix, texture1, null);
 
         var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(Vector3.One) *
                                               Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
                                               Matrix4x4.CreateTranslation(Vector3.Zero));
-        meshRenderQueue.Submit(sponza, modelMatrix, texture);
+        meshRenderQueue.Submit(sponza, modelMatrix, texture, sponzaMaterials);
         //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(1,1,1)), texture1);
         //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(2,2,1)), texture);
         //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(3,3,1)), texture1);

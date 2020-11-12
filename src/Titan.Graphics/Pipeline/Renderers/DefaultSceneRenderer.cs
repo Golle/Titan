@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using Titan.Graphics.Camera;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Materials;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
@@ -16,6 +17,7 @@ namespace Titan.Graphics.Pipeline.Renderers
     {
         private readonly IMeshRenderQueue _renderQueue;
         private readonly ICameraManager _cameraManager;
+        private readonly IMaterialsManager _materialsManager;
         private readonly IShaderManager _shaderManager;
         private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IIndexBufferManager _indexBufferManager;
@@ -30,10 +32,11 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         private readonly ShaderProgram _shader;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager)
         {
             _renderQueue = renderQueue;
             _cameraManager = cameraManager;
+            _materialsManager = materialsManager;
             _shaderManager = device.ShaderManager;
             _vertexBufferManager = device.VertexBufferManager;
             _indexBufferManager = device.IndexBufferManager;
@@ -76,10 +79,8 @@ namespace Titan.Graphics.Pipeline.Renderers
                 ref readonly var objectBuffer = ref _constantBufferManager[_perObjectHandle];
                 context.MapResource(objectBuffer.Resource, renderable.World);
                 context.SetVertexShaderConstantBuffer(objectBuffer, 1u);
-                context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
 
                 var mesh = renderable.Mesh;
-
                 ref readonly var indexBuffer = ref _indexBufferManager[mesh.IndexBufferHandle];
                 context.SetIndexBuffer(indexBuffer);
                 context.SetVertexBuffer(_vertexBufferManager[mesh.VertexBufferHandle]);
@@ -90,11 +91,21 @@ namespace Titan.Graphics.Pipeline.Renderers
                     for (var i = 0; i < subsets.Length; ++i)
                     {
                         ref readonly var subset = ref subsets[i];
+                        ref readonly var material = ref _materialsManager[renderable.Materials[subset.MaterialIndex]];
+                        if (material.IsTextured)
+                        {
+                            context.SetPixelShaderResource(_shaderResourceViewManager[material.DiffuseMap.Handle]);
+                        }
+                        else
+                        {
+                            context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
+                        }
                         context.DrawIndexed(subset.Count, subset.StartIndex);
                     }
                 }
                 else
                 {
+                    context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
                     context.DrawIndexed(indexBuffer.NumberOfIndices);
                 }
             }

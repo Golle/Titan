@@ -11,6 +11,7 @@ using Titan.Graphics.Resources;
 using Titan.Graphics.States;
 using Titan.IOC;
 using Titan.Windows;
+using Texture = Titan.Graphics.Resources.Texture;
 
 namespace Titan
 {

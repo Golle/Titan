@@ -6,7 +6,8 @@ namespace Titan.Graphics.Materials
     [StructLayout(LayoutKind.Sequential, Pack = 1)] //TOOD: remove pack 1 if we don't have 4 bools
     public struct Material
     {
-        public NormalMap NormalMap;
+        public Texture NormalMap;
+        public Texture DiffuseMap;
 
         public Color Diffuse;
         public Color Ambient;

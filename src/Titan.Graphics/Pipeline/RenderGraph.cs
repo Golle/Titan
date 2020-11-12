@@ -15,7 +15,7 @@ namespace Titan.Graphics.Pipeline
             _device = device;
 
             _device.ImmediateContext.SetViewport(new Viewport(1920, 1080));
-            _swapchain = new Swapchain(device, true, 0);
+            _swapchain = new Swapchain(device, false, 0);
         }
 
         public void Execute()
