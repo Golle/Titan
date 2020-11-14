@@ -6,6 +6,12 @@ namespace Titan.Graphics.Meshes
     internal struct Header
     {
         public ushort Version;
+        public ushort NumberOfChunks;
+    }
+    
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal struct ChunkHeader
+    {
         public uint VertexSize;
         public uint VertexCount;
         public uint IndexSize;

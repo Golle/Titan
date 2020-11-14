@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan.Core.Common;
 using Titan.Graphics.Resources;
@@ -16,53 +16,55 @@ namespace Titan.Graphics.Meshes
             _device = device;
         }
         
-        public Mesh LoadMesh(string filename)
+        public Mesh[] LoadMesh(string filename)
+        {
+            using var reader = new ByteReader(File.OpenRead(filename));
+            reader.Read<Header>(out var header);
+
+            var meshes = new Mesh[header.NumberOfChunks];
+            for (var i = 0; i < header.NumberOfChunks; ++i)
+            {
+                reader.Read<ChunkHeader>(out var chunkHeader);
+                meshes[i] = CreateMesh(chunkHeader, reader);
+            }
+            return meshes;
+        }
+
+        private unsafe Mesh CreateMesh(ChunkHeader chunkHeader, ByteReader reader)
         {
             IndexBufferHandle indexBuffer;
             VertexBufferHandle vertexBuffer;
-
-            using var reader = new ByteReader(File.OpenRead(filename));
-            reader.Read<Header>(out var header);
-            
-            var submeshes = new SubMesh[header.SubMeshCount];
+            var submeshes = new SubMesh[chunkHeader.SubMeshCount];
             reader.Read(ref submeshes);
 
-            var vertices = Marshal.AllocHGlobal((int) (header.VertexCount * header.VertexSize)); // TODO: only do a single allocation for both vertices+indices
+            var vertices = Marshal.AllocHGlobal((int) (chunkHeader.VertexCount * chunkHeader.VertexSize)); // TODO: only do a single allocation for both vertices+indices
             try
             {
-                unsafe
-                {
-                    var pVertices = vertices.ToPointer();
-
-                    reader.Read(pVertices, header.VertexCount * header.VertexSize);
-
-                    //reader.Read<Vertex>(pVertices, header.VertexCount);
-                    vertexBuffer = _device.VertexBufferManager.CreateVertexBuffer(header.VertexCount, header.VertexSize, pVertices);
-                }
+                var pVertices = vertices.ToPointer();
+                reader.Read(pVertices, chunkHeader.VertexCount * chunkHeader.VertexSize);
+                vertexBuffer = _device.VertexBufferManager.CreateVertexBuffer(chunkHeader.VertexCount, chunkHeader.VertexSize, pVertices);
             }
             finally
             {
                 Marshal.FreeHGlobal(vertices);
             }
-            
-            var indices = Marshal.AllocHGlobal((int) (header.IndexCount * header.IndexSize));
+
+            var indices = Marshal.AllocHGlobal((int) (chunkHeader.IndexCount * chunkHeader.IndexSize));
             try
             {
-                unsafe
+                indexBuffer = chunkHeader.IndexSize switch
                 {
-                    indexBuffer = header.IndexSize switch
-                    {
-                        2 => CreateIndexBuffer<ushort>(reader, indices.ToPointer(), header.IndexCount),
-                        4 => CreateIndexBuffer<uint>(reader, indices.ToPointer(), header.IndexCount),
-                        _ => throw new NotSupportedException($"Index size {header.IndexSize} is not supported.")
-                    };
-                }
+                    2 => CreateIndexBuffer<ushort>(reader, indices.ToPointer(), chunkHeader.IndexCount),
+                    4 => CreateIndexBuffer<uint>(reader, indices.ToPointer(), chunkHeader.IndexCount),
+                    _ => throw new NotSupportedException($"Index size {chunkHeader.IndexSize} is not supported.")
+                };
             }
             finally
             {
                 Marshal.FreeHGlobal(indices);
             }
-            return new Mesh(header.VertexSize == 56, vertexBuffer, indexBuffer, submeshes);
+
+            return new Mesh(vertexBuffer, indexBuffer, submeshes);
         }
 
         private unsafe IndexBufferHandle CreateIndexBuffer<T>(ByteReader reader, void* pIndices, uint count) where T : unmanaged

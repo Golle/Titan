@@ -13,27 +13,18 @@ namespace Titan.AssetConverter
     internal class ModelConverter
     {
         private readonly ObjParser _parser = new();
-        private readonly ModelExporter _exporter = new();
+        private static readonly ModelExporter _exporter = new();
+
         public async Task Convert(string objFile, string outputModel, string outputMaterial)
         {
             var timer = Stopwatch.StartNew();
             var model = await _parser.ReadFromFile(objFile);
-            var hasBumpMap = model.Materials?.Any(m => !string.IsNullOrWhiteSpace(m?.BumpMap)) ?? false;
-            
-            if (hasBumpMap)
-            {
-                await _exporter.ExportModel(CreateMesh<VertexTangentBiNormal>(model), outputModel);
-            }
-            else
-            {
-                await _exporter.ExportModel(CreateMesh<Vertex>(model), outputModel);
-            }
-            
-            if (model.Materials != null)
-            {
-                var materials = model.Materials.Select(ConvertMaterial).ToArray();
-                await _exporter.ExportMaterials(materials, outputMaterial);
-            }
+
+            var meshTask = ExportMesh(model, outputModel);
+            var materialTask = model.Materials != null ? _exporter.ExportMaterials(model.Materials.Select(ConvertMaterial).ToArray(), outputMaterial) : Task.CompletedTask;
+
+            await Task.WhenAll(meshTask, materialTask);
+
             timer.Stop();
             Console.WriteLine($"Finished {Path.GetFileName(objFile)} in {timer.Elapsed.TotalMilliseconds:## 'ms'}");
         }
@@ -53,20 +44,24 @@ namespace Titan.AssetConverter
             );
         }
 
-        private static Mesh<T> CreateMesh<T>(WavefrontObject model) where T : unmanaged
+        private static async Task ExportMesh(WavefrontObject model, string filename)
         {
-            var builder = new MeshBuilder<T>(model);
+            var normalMapBuilder = new MeshBuilder();
+            var vertexBuilder = new MeshBuilder();
+
             foreach (var objGroup in model.Groups)
             {
                 foreach (var face in objGroup.Faces)
                 {
+                    var builder = model.Materials?[face.Material].BumpMap == null ? vertexBuilder : normalMapBuilder;
+
                     builder.SetMaterial(face.Material);
-                    // TODO: add support for Concave faces (triangles done this way might overlap)
-                    // RH
-                    // 1st face => vertex 0, 1, 2
-                    // 2nd face => vertex 0, 2, 3
-                    // 3rd face => vertex 0, 4, 5
-                    // 4th face => ...
+                    //// TODO: add support for Concave faces (triangles done this way might overlap)
+                    //// RH
+                    //// 1st face => vertex 0, 1, 2
+                    //// 2nd face => vertex 0, 2, 3
+                    //// 3rd face => vertex 0, 4, 5
+                    //// 4th face => ...
 
                     var vertices = face.Vertices;
                     // more than 3 vertices per face, we need to triangulate the face to be able to use it in the engine.
@@ -80,7 +75,12 @@ namespace Titan.AssetConverter
                 }
             }
 
-            return builder.Build();
+
+            var normalMapMesh = normalMapBuilder.Build(new NormalMapVertexMapper(model));
+            var mesh = vertexBuilder.Build(new VertexMapper(model));
+
+            await _exporter.ExportModel(mesh, normalMapMesh, filename);
         }
     }
 }
+    

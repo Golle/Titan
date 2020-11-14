@@ -6,6 +6,12 @@ namespace Titan.AssetConverter.Exporter
     internal struct Header
     {
         public ushort Version;
+        public ushort NumberOfChunks;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal struct ChunkHeader
+    {
         public int VertexSize;
         public int VertexCount;
         public int IndexSize;

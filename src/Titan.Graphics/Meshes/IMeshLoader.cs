@@ -1,7 +1,7 @@
-﻿namespace Titan.Graphics.Meshes
+namespace Titan.Graphics.Meshes
 {
     public interface IMeshLoader
     {
-        Mesh LoadMesh(string filename);
+        Mesh[] LoadMesh(string filename);
     }
 }

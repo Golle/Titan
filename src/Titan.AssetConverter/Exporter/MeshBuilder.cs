@@ -1,15 +1,11 @@
 using System;
 using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 using Titan.AssetConverter.WavefrontObj;
 
 namespace Titan.AssetConverter.Exporter
 {
-    internal class MeshBuilder<T> where T : unmanaged
+    internal class MeshBuilder
     {
-        private readonly WavefrontObject _obj;
-
         private readonly ObjVertex[] _vertices = new ObjVertex[200_000];
         private readonly int[] _indices = new int[800_000];
         private readonly SubMesh[] _meshes = new SubMesh[10000];
@@ -19,13 +15,6 @@ namespace Titan.AssetConverter.Exporter
         private int _submeshCount;
 
         private int _currentMaterial = -1;
-
-        public MeshBuilder(WavefrontObject obj)
-        {
-            Debug.Assert(typeof(T) == typeof(Vertex) || typeof(T) == typeof(VertexTangentBiNormal));
-
-            _obj = obj;
-        }
 
         public void AddVertex(in ObjVertex objVertex)
         {
@@ -57,7 +46,6 @@ namespace Titan.AssetConverter.Exporter
             {
                 return;
             }
-            //Console.WriteLine($"[{material}] = @\"{_obj.Materials[material].DiffuseMap}\"");
             _currentMaterial = material;
             SetCountForCurrentMesh();
             ref var mesh = ref _meshes[_submeshCount++];
@@ -73,71 +61,11 @@ namespace Titan.AssetConverter.Exporter
                 mesh.Count = _indexCount - mesh.StartIndex;
             }
         }
-
-        public unsafe Mesh<T>  Build()
+   
+        public Mesh<T> Build<T>(IVertexMapper<T> mapper) where T : unmanaged
         {
-            var setTangentBiNormal = typeof(T) == typeof(VertexTangentBiNormal);
             SetCountForCurrentMesh();
-
-            var result = new T[_vertexCount];
-            fixed (T* pResult = result)
-            {
-                for (var i = 0; i < _vertexCount; ++i)
-                {
-                    ref var vertex = ref _vertices[i];
-                    ref var position = ref _obj.Positions[vertex.VertexIndex];
-                    var pVertex = (Vertex*)(&pResult[i]);
-                    // .obj file is RightHanded, the engine only supports LeftHanded coordinates so we flip position and normal Z coordinate
-                    pVertex->Position = new Vector3(position.X, position.Y, -position.Z);
-
-                    if (vertex.TextureIndex != -1)
-                    {
-                        ref var texture = ref _obj.Textures[vertex.TextureIndex];
-                        pVertex->Texture = new Vector2(texture.X, 1f - texture.Y);// TODO: not sure about this one
-                    }
-                    if (vertex.NormalIndex != -1)
-                    {
-                        ref var normal = ref _obj.Normals[vertex.NormalIndex];
-                        pVertex->Normal = new Vector3(normal.X, normal.Y, -normal.Z);
-                    }
-
-                    if (setTangentBiNormal)
-                    {
-                        var pVertexTangent = (VertexTangentBiNormal*)(&pResult[i]);
-                        pVertexTangent->BiNormal = new Vector3(2, 3, 4);
-                        pVertexTangent->Tangent = new Vector3(6, 7, 8);
-                    }
-
-                }
-
-                // TODO: fix this when everything else works
-                //for (var i = 0; i < _submeshCount; ++i)
-                //{
-                //    ref var submesh = ref _meshes[i];
-                //    SetBoundingBox(ref submesh, new Span<int>(_indices, submesh.StartIndex, submesh.Count), vertices);
-                //}
-            }
-            return new Mesh<T>(result, new Span<int>(_indices, 0, _indexCount).ToArray(), new Span<SubMesh>(_meshes, 0, _submeshCount).ToArray());
+            return mapper.Map(new ReadOnlySpan<ObjVertex>(_vertices, 0, _vertexCount), new ReadOnlySpan<int>(_indices, 0, _indexCount), new ReadOnlySpan<SubMesh>(_meshes, 0, _submeshCount));
         }
-
-        //[MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-        //private static void SetBoundingBox(ref SubMesh mesh, Span<int> indices, in T[] vertices)
-        //{
-        //    var min = new Vector3(float.MaxValue);
-        //    var max = new Vector3(float.MinValue);
-        //    foreach (var index in indices)
-        //    {
-        //        ref var position = ref vertices[index].Position;
-        //        if (position.X < min.X) min.X = position.X;
-        //        if (position.X > max.X) max.X = position.X;
-        //        if (position.Y < min.Y) min.Y = position.Y;
-        //        if (position.Y > max.Y) max.Y = position.Y;
-        //        if (position.Z < min.Z) min.Z = position.Z;
-        //        if (position.Z > max.Z) max.Z = position.Z;
-        //    }
-
-        //    mesh.Min = min;
-        //    mesh.Max = max;
-        //}
     }
 }
