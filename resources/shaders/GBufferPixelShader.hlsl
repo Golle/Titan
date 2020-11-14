@@ -15,15 +15,16 @@ SamplerState splr : register(s0);
 
     float4 GetNormal(PS_INPUT input) 
     {
-        float4 bumpMap = normalMap.Sample(normalSplr, input.Texture);
-        bumpMap = (bumpMap * 2.0f) - 1.0f;
+        // float4 bumpMap = normalMap.Sample(normalSplr, input.Texture);
+        // bumpMap = (bumpMap * 2.0f) - 1.0f;
 
-        float4 result = float4((bumpMap.z * input.Normal), 1.0f);
-        // // bumpNormal = (bumpMap.x * input.tangent) + (bumpMap.y * input.binormal) + (bumpMap.z * input.Normal);
+        // float4 result = float4((bumpMap.z * input.Normal), 1.0f);
+        // // // bumpNormal = (bumpMap.x * input.tangent) + (bumpMap.y * input.binormal) + (bumpMap.z * input.Normal);
         
-        return normalize(result);
+        // return normalize(result);
 
         // return normalMap.Sample(normalSplr, input.Texture);
+        return float4(input.Normal, 1.0);
     }
 #else
     // normal per vertex 

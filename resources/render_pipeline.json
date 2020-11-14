@@ -36,6 +36,14 @@
                 {
                     "Name": "Texture",
                     "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                },
+                {
+                    "Name": "Tangent",
+                    "Format": "DXGI_FORMAT_R32G32B32_FLOAT"
+                },
+                {
+                    "Name": "BiNormal",
+                    "Format": "DXGI_FORMAT_R32G32B32_FLOAT"
                 }
             ]
         },

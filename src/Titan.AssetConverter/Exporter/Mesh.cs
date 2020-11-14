@@ -1,11 +1,11 @@
 namespace Titan.AssetConverter.Exporter
 {
-    internal class Mesh
+    internal class Mesh<T> where T : unmanaged
     {
-        public Vertex[] Vertices { get; }
+        public T[] Vertices { get; }
         public int[] Indices { get; }
         public SubMesh[] SubMeshes { get; }
-        public Mesh(Vertex[] vertices, int[] indices, SubMesh[] subMeshes)
+        public Mesh(T[] vertices, int[] indices, SubMesh[] subMeshes)
         {
             Vertices = vertices;
             Indices = indices;

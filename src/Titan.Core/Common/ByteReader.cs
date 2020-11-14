@@ -12,6 +12,10 @@ namespace Titan.Core.Common
             _stream = stream;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe void Read(void* output, uint size) => _stream.Read(new Span<byte>(output, (int) size));
+
+
         public void Read<T>(out T value) where T : unmanaged
         {
             unsafe

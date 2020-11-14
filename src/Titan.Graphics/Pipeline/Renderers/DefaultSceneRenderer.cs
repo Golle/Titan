@@ -61,9 +61,8 @@ namespace Titan.Graphics.Pipeline.Renderers
                 ViewProjection = Matrix4x4.Transpose(cam.ViewProjection)
             };
 
-            context.SetInputLayout(_shaderManager[_shader.InputLayout]);
-            context.SetVertexShader(_shaderManager[_shader.VertexShader]);
-            context.SetPixelShader(_shaderManager[_shader.PixelShader]);
+            
+
 
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             ref readonly var cameraBuffer = ref _constantBufferManager[_cameraHandle];
@@ -74,6 +73,19 @@ namespace Titan.Graphics.Pipeline.Renderers
 
             foreach (ref readonly var renderable in _renderQueue.GetRenderables())
             {
+                if (renderable.Mesh.HasBumpMap)
+                {
+                    context.SetInputLayout(_shaderManager[_normalMapShader.InputLayout]);
+                    context.SetVertexShader(_shaderManager[_normalMapShader.VertexShader]);
+                    context.SetPixelShader(_shaderManager[_normalMapShader.PixelShader]);
+                }
+                else
+                {
+                    context.SetInputLayout(_shaderManager[_shader.InputLayout]);
+                    context.SetVertexShader(_shaderManager[_shader.VertexShader]);
+                    context.SetPixelShader(_shaderManager[_shader.PixelShader]);
+                }
+
                 ref readonly var objectBuffer = ref _constantBufferManager[_perObjectHandle];
                 context.MapResource(objectBuffer.Resource, renderable.World);
                 context.SetVertexShaderConstantBuffer(objectBuffer, 1u);
@@ -101,13 +113,13 @@ namespace Titan.Graphics.Pipeline.Renderers
 
                         if (material.HasNormalMap)
                         {
-                            context.SetPixelShader(_shaderManager[_normalMapShader.PixelShader]);
-                            context.SetPixelShaderResource(_shaderResourceViewManager[material.NormalMap.Handle], 1);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[material.NormalMap.Handle],1);
                         }
                         else
                         {
-                            context.SetPixelShader(_shaderManager[_shader.PixelShader]);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[material.NormalMap.Handle], 1); // This is bad?
                         }
+
                         context.DrawIndexed(subset.Count, subset.StartIndex);
                     }
                 }

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Titan.AssetConverter.Exporter
 {
-    [StructLayout(LayoutKind.Sequential, Size = 256)]
+    [StructLayout(LayoutKind.Sequential, Size = 256, Pack = 2)]
     internal struct Header
     {
         public ushort Version;

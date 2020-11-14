@@ -12,14 +12,23 @@ namespace Titan.AssetConverter
 
     internal class ModelConverter
     {
-        private readonly ObjParser _parser = new ObjParser();
-        private readonly ModelExporter _exporter = new ModelExporter();
+        private readonly ObjParser _parser = new();
+        private readonly ModelExporter _exporter = new();
         public async Task Convert(string objFile, string outputModel, string outputMaterial)
         {
             var timer = Stopwatch.StartNew();
             var model = await _parser.ReadFromFile(objFile);
-            var mesh = CreateMesh(model);
-            await _exporter.ExportModel(mesh, outputModel);
+            var hasBumpMap = model.Materials?.Any(m => !string.IsNullOrWhiteSpace(m?.BumpMap)) ?? false;
+            
+            if (hasBumpMap)
+            {
+                await _exporter.ExportModel(CreateMesh<VertexTangentBiNormal>(model), outputModel);
+            }
+            else
+            {
+                await _exporter.ExportModel(CreateMesh<Vertex>(model), outputModel);
+            }
+            
             if (model.Materials != null)
             {
                 var materials = model.Materials.Select(ConvertMaterial).ToArray();
@@ -31,7 +40,7 @@ namespace Titan.AssetConverter
 
         private static Material ConvertMaterial(ObjMaterial material)
         {
-            return new Material(
+            return new(
                 material.Name,
                 material.DiffuseColor.ToString(),
                 material.DiffuseMap,
@@ -44,9 +53,9 @@ namespace Titan.AssetConverter
             );
         }
 
-        private static Mesh CreateMesh(WavefrontObject model)
+        private static Mesh<T> CreateMesh<T>(WavefrontObject model) where T : unmanaged
         {
-            var builder = new MeshBuilder(model);
+            var builder = new MeshBuilder<T>(model);
             foreach (var objGroup in model.Groups)
             {
                 foreach (var face in objGroup.Faces)

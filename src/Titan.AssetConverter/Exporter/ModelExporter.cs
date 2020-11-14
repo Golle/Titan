@@ -10,7 +10,7 @@ namespace Titan.AssetConverter.Exporter
     {
         private readonly IByteWriter _byteWriter = new ByteWriter();
         
-        public async Task ExportModel(Mesh mesh, string filename)
+        public async Task ExportModel<T>(Mesh<T> mesh, string filename) where T : unmanaged
         {
             await using var file = File.OpenWrite(filename);
             file.SetLength(0);
@@ -18,7 +18,7 @@ namespace Titan.AssetConverter.Exporter
             {
                 var header = new Header
                 {
-                    VertexSize = sizeof(Vertex),
+                    VertexSize = sizeof(T),
                     VertexCount = mesh.Vertices.Length,
                     IndexSize = sizeof(int),
                     IndexCount = mesh.Indices.Length,

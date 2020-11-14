@@ -15,6 +15,8 @@ cbuffer PerObjectBuffer : register(b1)
         float3 Position: POSITION;
         float3 Normal: Normal;
         float2 Texture: Texture;
+        float3 Tangent: Tangent;
+        float3 BiNormal: BiNormal;
     };
     struct VS_OUTPUT 
     {

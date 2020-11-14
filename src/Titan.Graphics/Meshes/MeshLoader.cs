@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan.Core.Common;
 using Titan.Graphics.Resources;
@@ -14,7 +15,7 @@ namespace Titan.Graphics.Meshes
         {
             _device = device;
         }
-
+        
         public Mesh LoadMesh(string filename)
         {
             IndexBufferHandle indexBuffer;
@@ -32,7 +33,10 @@ namespace Titan.Graphics.Meshes
                 unsafe
                 {
                     var pVertices = vertices.ToPointer();
-                    reader.Read<Vertex>(pVertices, header.VertexCount);
+
+                    reader.Read(pVertices, header.VertexCount * header.VertexSize);
+
+                    //reader.Read<Vertex>(pVertices, header.VertexCount);
                     vertexBuffer = _device.VertexBufferManager.CreateVertexBuffer(header.VertexCount, header.VertexSize, pVertices);
                 }
             }
@@ -58,7 +62,7 @@ namespace Titan.Graphics.Meshes
             {
                 Marshal.FreeHGlobal(indices);
             }
-            return new Mesh(vertexBuffer, indexBuffer, submeshes);
+            return new Mesh(header.VertexSize == 56, vertexBuffer, indexBuffer, submeshes);
         }
 
         private unsafe IndexBufferHandle CreateIndexBuffer<T>(ByteReader reader, void* pIndices, uint count) where T : unmanaged
