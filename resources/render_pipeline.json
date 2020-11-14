@@ -30,6 +30,10 @@
                     "Format": "DXGI_FORMAT_R32G32B32_FLOAT"
                 },
                 {
+                    "Name": "Normal",
+                    "Format": "DXGI_FORMAT_R32G32B32_FLOAT"
+                },
+                {
                     "Name": "Texture",
                     "Format": "DXGI_FORMAT_R32G32_FLOAT"
                 }

@@ -11,8 +11,6 @@ using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline.Renderers
 {
-
-    
     internal class DefaultSceneRenderer : IRenderer
     {
         private readonly IMeshRenderQueue _renderQueue;
@@ -31,6 +29,7 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly SamplerStateHandle _samplerStatehandle;
 
         private readonly ShaderProgram _shader;
+        private readonly ShaderProgram _normalMapShader;
 
         public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager)
         {
@@ -49,10 +48,9 @@ namespace Titan.Graphics.Pipeline.Renderers
 
             _samplerStatehandle = device.SamplerStateManager.GetOrCreate();
             _shader = _shaderManager.GetByName("GBufferDefault");
-            //_shader = _shaderManager.GetByName("GBufferDefaultNormalMap");
+            _normalMapShader = _shaderManager.GetByName("GBufferNormalMap");
         }
 
-        private Vector2 modelRot = new Vector2(0, 0);
         
         public unsafe void Render(IRenderContext context)
         {
@@ -99,6 +97,16 @@ namespace Titan.Graphics.Pipeline.Renderers
                         else
                         {
                             context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
+                        }
+
+                        if (material.HasNormalMap)
+                        {
+                            context.SetPixelShader(_shaderManager[_normalMapShader.PixelShader]);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[material.NormalMap.Handle], 1);
+                        }
+                        else
+                        {
+                            context.SetPixelShader(_shaderManager[_shader.PixelShader]);
                         }
                         context.DrawIndexed(subset.Count, subset.StartIndex);
                     }
