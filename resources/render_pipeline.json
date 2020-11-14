@@ -104,11 +104,13 @@
             "Layout": [
                 {
                     "Name": "Position",
-                    "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                    "Format": "DXGI_FORMAT_R32G32_FLOAT",
+                    "Slot": 0
                 },
                 {
                     "Name": "Texture",
-                    "Format": "DXGI_FORMAT_R32G32_FLOAT"
+                    "Format": "DXGI_FORMAT_R32G32_FLOAT",
+                    "Slot": 0
                 }
             ]
         }

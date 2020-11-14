@@ -103,7 +103,8 @@ namespace Titan.Graphics.Shaders
             var size = 0u;
             for (var i = 0; i < layout.Length; ++i)
             {
-                var (name, format, classification) = layout[i];
+                var (name, format, slot, classification) = layout[i];
+                
                 ref var desc = ref inputDescs[i];
                 fixed (byte* pName = name.AsBytes())
                 {
@@ -112,7 +113,8 @@ namespace Titan.Graphics.Shaders
 
                 //TODO: This needs some changes to support different things properly
                 desc.InstanceDataStepRate = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0;
-                desc.InputSlot = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0;
+                //desc.InputSlot = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0; //TODO: How do we support instance data?
+                desc.InputSlot = slot;
                 desc.InputSlotClass = classification;
                 desc.SemanticIndex = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0;
                 desc.AlignedByteOffset = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 0 : size;

@@ -88,8 +88,8 @@ namespace Titan.AssetConverter.Exporter
                 };
                 if (vertex.TextureIndex != -1)
                 {
-                    vertices[i].Texture = _obj.Textures[vertex.TextureIndex];
-                    vertices[i].Texture.Y = 1f - vertices[i].Texture.Y; // TODO: not sure about this one
+                    ref var texture = ref _obj.Textures[vertex.TextureIndex];
+                    vertices[i].Texture = new Vector2(texture.X, 1f - texture.Y);// TODO: not sure about this one
                 }
                 if (vertex.NormalIndex != -1)
                 {
