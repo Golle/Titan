@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
+    <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
     <ProjectReference Include="..\Titan.Graphics\Titan.Graphics.csproj" />
     <ProjectReference Include="..\Titan.Windows\Titan.Windows.csproj" />
   </ItemGroup>

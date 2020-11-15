@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Titan.ECS.Entities;
 
 namespace Titan.ECS.World
 {
@@ -33,6 +34,21 @@ namespace Titan.ECS.World
         {
             Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");
             Worlds[entity.WorldId].DestroyEntity(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AttachEntity(in Entity parent, in Entity child)
+        {
+            Debug.Assert(parent.WorldId == child.WorldId, "Trying to attach a child to an entity of a different world");
+            Debug.Assert(Worlds[parent.WorldId] != null, "World does not exist");
+            Worlds[parent.WorldId].Attach(parent, child);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DetachEntity(in Entity child)
+        {
+            Debug.Assert(Worlds[child.WorldId] != null, "World does not exist");
+            Worlds[child.WorldId].Detach(child);
         }
     }
 }
