@@ -24,18 +24,22 @@ namespace Titan
         private readonly IGraphicsPipeline _pipeline;
         private readonly IMemoryManager _memoryManager;
 
-        public Engine(EngineConfiguration configuration, IWindowFactory windowFactory, IEventQueue eventQueue, ILog log, IContainer container)
+        private readonly IEventQueue _eventQueue;
+
+        public Engine(EngineConfiguration configuration, ILog log, IContainer container)
         {
             LOGGER.InitializeLogger(log);
-            LOGGER.Debug("Initialize EventQueue with {0}", typeof(ScanningEventTypeProvider));
-            eventQueue.Initialize(new ScanningEventTypeProvider());
-
+            
             container
                 .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath, configuration.RefreshRate, configuration.Debug))
+                .RegisterSingleton(_eventQueue  = container.CreateInstance<EventQueue>())
                 .RegisterSingleton(_memoryManager = CreateMemoryManager())
-                .RegisterSingleton(_window = windowFactory.Create((int) configuration.Width, (int) configuration.Height, configuration.Title))
+                .RegisterSingleton(_window = container.GetInstance<IWindowFactory>().Create((int) configuration.Width, (int) configuration.Height, configuration.Title))
                 .RegisterSingleton(_device = container.CreateInstance<GraphicsDevice>())
                 .RegisterSingleton(_pipeline = container.CreateInstance<GraphicsPipeline>());
+
+            LOGGER.Debug("Initialize EventQueue with {0}", typeof(ScanningEventTypeProvider));
+            _eventQueue.Initialize(new ScanningEventTypeProvider());
 
             LOGGER.Debug("Initialize GraphicsPipeline");
             _pipeline.Initialize("render_pipeline.json");
@@ -82,7 +86,12 @@ namespace Titan
 
         public void Start()
         {
-            throw new NotImplementedException();
+            while (_window.Update())
+            {
+                _eventQueue.Update();
+
+                _pipeline.Execute();
+            }
         }
 
         public void Stop()

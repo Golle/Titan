@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Titan.Core.Logging;
 using Titan.Graphics.Camera;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Materials;
@@ -30,6 +31,8 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         private readonly ShaderProgram _shader;
         private readonly ShaderProgram _normalMapShader;
+        
+        private bool _normalMapEnabled;
 
         public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager)
         {
@@ -48,7 +51,17 @@ namespace Titan.Graphics.Pipeline.Renderers
 
             _samplerStatehandle = device.SamplerStateManager.GetOrCreate();
             _shader = _shaderManager.GetByName("GBufferDefault");
-            _normalMapShader = _shaderManager.GetByName("GBufferNormalMap");
+            
+            try
+            {
+                _normalMapShader = _shaderManager.GetByName("GBufferNormalMap");
+                _normalMapEnabled = true;
+            }
+            catch
+            {
+                LOGGER.Debug("GBufferNormalMap not found, normal map is disabled.");
+            }
+            
         }
 
         
@@ -101,7 +114,7 @@ namespace Titan.Graphics.Pipeline.Renderers
                         }
 
                         //TODO: This is slow and bad
-                        if (material.HasNormalMap)
+                        if (_normalMapEnabled && material.HasNormalMap)
                         {
                             context.SetInputLayout(_shaderManager[_normalMapShader.InputLayout]);
                             context.SetVertexShader(_shaderManager[_normalMapShader.VertexShader]);

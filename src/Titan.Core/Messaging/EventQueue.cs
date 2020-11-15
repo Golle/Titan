@@ -7,7 +7,7 @@ using Titan.Core.Logging;
 
 namespace Titan.Core.Messaging
 {
-    internal class EventQueue : IEventQueue
+    public class EventQueue : IEventQueue
     {
         private delegate void SwapDelegate();
         private readonly IList<SwapDelegate> _swaps = new List<SwapDelegate>();

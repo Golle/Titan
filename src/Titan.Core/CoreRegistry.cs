@@ -1,6 +1,5 @@
 using Titan.Core.Common;
 using Titan.Core.Logging;
-using Titan.Core.Messaging;
 using Titan.IOC;
 
 namespace Titan.Core
@@ -13,7 +12,6 @@ namespace Titan.Core
                 .Register<IDateTime, DateTimeWrapper>()
                 .Register<ILogFormatter, TimeLogFormatter>()
                 .Register<ILog, ConsoleLogger>()
-                .Register<IEventQueue, EventQueue>()
                 .Register<IFileReader, FileReader>()
                 .Register<IJsonSerializer, JsonSerializerWrapper>()
                 ;
