@@ -6,6 +6,7 @@ using Titan;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
+using Titan.ECS;
 using Titan.Graphics.Camera;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
@@ -14,6 +15,8 @@ using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Textures;
 using Titan.Input;
 
+new ECSTestClass().Run();
+return;
 //var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
 var simpleMesh = @"F:\Git\Titan\resources\models\sphere.dat";
 //var simpleMesh2 = @"F:\Git\GameDev\resources\models_new\sponza.dat";
