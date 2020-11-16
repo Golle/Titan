@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.ECS.Entities;
+using Titan.ECS.Registry;
 
 namespace Titan.ECS.World
 {

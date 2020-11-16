@@ -1,6 +1,7 @@
 using System.Numerics;
 using Titan.ECS;
 using Titan.ECS.Entities;
+using Titan.ECS.Registry;
 using Titan.EntitySystem.Components;
 
 namespace Titan

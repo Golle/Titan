@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Titan.ECS.Registry;
 
-namespace Titan.ECS
+namespace Titan.ECS.Registry
 {
     public class ComponentRegistry : IDisposable
     {
