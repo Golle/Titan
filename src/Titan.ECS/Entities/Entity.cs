@@ -10,7 +10,8 @@ namespace Titan.ECS.Entities
     {
         public readonly uint Id;
         public readonly uint WorldId;
-        internal Entity(uint id, uint worldId)
+
+        public Entity(uint id, uint worldId)
         {
             Id = id;
             WorldId = worldId;
@@ -36,5 +37,12 @@ namespace Titan.ECS.Entities
             Attach(entity);
             return entity;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>() where T : unmanaged => WorldContainer.AddComponent<T>(this);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(in T initialValue) where T : unmanaged => WorldContainer.AddComponent<T>(this, initialValue);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveComponent<T>() where T : unmanaged => WorldContainer.RemoveComponent<T>(this);
     }
 }
