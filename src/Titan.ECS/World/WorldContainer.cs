@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Titan.ECS.Components;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.World
@@ -64,7 +65,7 @@ namespace Titan.ECS.World
             Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");
             Worlds[entity.WorldId].AddComponent(entity, value);
         }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void RemoveComponent<T>(in Entity entity) where T : unmanaged
         {
             Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");

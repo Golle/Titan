@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Titan.ECS.World;
 
 namespace Titan.ECS.Registry
 {
-    public class ComponentRegistry : IDisposable
+    internal class ComponentRegistry : IDisposable
     {
         private readonly IDictionary<Type, IComponentPool> _pools = new Dictionary<Type, IComponentPool>();
         private readonly uint _maxEntities;
 
-        public ComponentRegistry(uint maxEntities)
+        public ComponentRegistry(ECSConfiguration configuration)
         {
-            _maxEntities = maxEntities;
+            _maxEntities = configuration.MaxEntities;
         }
 
         public void Register<T>(uint maxComponents = 0) => Register(typeof(T), maxComponents);

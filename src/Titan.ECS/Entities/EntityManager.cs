@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Titan.ECS.World;
 
 namespace Titan.ECS.Entities
 {
@@ -11,9 +12,9 @@ namespace Titan.ECS.Entities
         private uint _nextId;
         private readonly ConcurrentQueue<uint> _freeIds = new();
 
-        public EntityManager(uint worldId)
+        public EntityManager(ECSConfiguration configuration)
         {
-            _worldId = worldId;
+            _worldId = configuration.WorldId;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

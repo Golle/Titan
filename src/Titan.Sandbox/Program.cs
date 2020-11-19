@@ -15,9 +15,6 @@ using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Textures;
 using Titan.Input;
 
-LOGGER.InitializeLogger(new ConsoleLogger(new TimeLogFormatter(new DateTimeWrapper())));
-new ECSTestClass().Run();
-return;
 
 //var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
 var simpleMesh = @"F:\Git\Titan\resources\models\sphere.dat";
@@ -35,7 +32,8 @@ using var engine = EngineBuilder.CreateDefaultBuilder()
 #endif
     .Build();
 
-
+LOGGER.InitializeLogger(new ConsoleLogger(new TimeLogFormatter(new DateTimeWrapper())));
+new ECSTestClass().Run(engine.Container);
 
 var window = engine.Window;
 var container = engine.Container;

@@ -44,13 +44,18 @@ namespace Titan.IOC
             _parentContainer = parentContainer;
         }
 
-        public IContainer Register<TConcrete>() where TConcrete : class
+        public IContainer Register<TConcrete>(bool dispose) where TConcrete : class
         {
-            return Register<TConcrete, TConcrete>();
+            return Register<TConcrete, TConcrete>(dispose);
         }
 
-        public IContainer Register<TTypeToResolve, TConcrete>() where TConcrete : TTypeToResolve
+        public IContainer Register<TTypeToResolve, TConcrete>(bool dispose) where TConcrete : TTypeToResolve
         {
+            if (dispose && !typeof(TConcrete).IsAssignableTo(typeof(IDisposable)))
+            {
+                throw new InvalidOperationException($"Trying to register {typeof(TConcrete)} as Disposable but it doesn't implement IDisposable");
+            }
+
             var typeToResolve = typeof(TTypeToResolve);
             if (_containerObjects.ContainsKey(typeToResolve))
             {
@@ -149,6 +154,14 @@ namespace Titan.IOC
         public IContainer CreateChildContainer()
         {
             return new Container(this);
+        }
+
+        public void Dispose()
+        {
+            foreach (var containerObject in _containerObjects.Values)
+            {
+                containerObject.Dispose();
+            }
         }
     }
 }

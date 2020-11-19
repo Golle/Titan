@@ -5,14 +5,15 @@ using Titan.ECS.Entities;
 
 namespace Titan.ECS.World
 {
-    public class EntityRelationship
+    internal class EntityRelationship : IEntityRelationship
     {
         private readonly uint _worldId;
-        private readonly uint[] _parents = new uint[10_000];
+        private readonly uint[] _parents;
 
-        public EntityRelationship(uint worldId)
+        public EntityRelationship(ECSConfiguration configuration)
         {
-            _worldId = worldId;
+            _worldId = configuration.WorldId;
+            _parents = new uint[configuration.MaxEntities];
         }
 
         public void Attach(in Entity parent, in Entity child)
@@ -39,6 +40,7 @@ namespace Titan.ECS.World
             if (currentParent != 0)
             {
                 LOGGER.Trace("Detached parent {0} from entity {1}", currentParent, child.Id);
+                currentParent = 0;
             }
             else
             {
@@ -52,5 +54,9 @@ namespace Titan.ECS.World
         [MethodImpl(MethodImplOptions.AggressiveInlining)] 
         public Entity GetParent(in Entity entity) => new(entity.Id, _worldId);
 
+        public void Dispose()
+        {
+            // Might need this if we move to unmanaged memory
+        }
     }
 }
