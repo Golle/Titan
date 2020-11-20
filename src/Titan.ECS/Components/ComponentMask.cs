@@ -1,9 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Titan.Core.Messaging;
-using Titan.ECS.Entities;
 
 namespace Titan.ECS.Components
 {
@@ -23,35 +20,13 @@ namespace Titan.ECS.Components
         public bool Contains(in ComponentId id) => _mask.Contains(id);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(in ComponentMask mask) => (_mask & mask._mask) == mask._mask;
-    }
 
-    internal unsafe class EntityFilter : IDisposable
-    {
-        private Entity* _entities;
-        private int _numberOfEntities;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(in ComponentMask lh, in ComponentMask rh) => lh._mask == rh._mask;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(in ComponentMask lh, in ComponentMask rh) => lh._mask != rh._mask;
 
-        private ComponentMask _mask;
-
-        public EntityFilter(uint maxEntities)
-        {
-            _entities = (Entity*) Marshal.AllocHGlobal((int) (sizeof(Entity) * maxEntities));
-        }
-
-
-        public void OnComponentAdded(in Entity entity){}
-
-
-
-
-        public ReadOnlySpan<Entity> GetEntities() => ReadOnlySpan<Entity>.Empty;
-
-        public void Dispose()
-        {
-            if (_entities != null)
-            {
-                Marshal.FreeHGlobal((nint)_entities);
-                _entities = null;
-            }
-        }
+        public override bool Equals(object obj) => throw new NotSupportedException("Use == to avoid boxing");
+        public override int GetHashCode() => throw new NotSupportedException("Use == to avoid boxing");
     }
 }

@@ -5,8 +5,7 @@ using Titan.IOC;
 
 namespace Titan.ECS.World
 {
-
-    internal record ECSConfiguration(uint MaxEntities, uint WorldId);
+    public record WorldConfiguration(uint MaxEntities, uint WorldId);
 
     public class WorldBuilder
     {
@@ -24,7 +23,7 @@ namespace Titan.ECS.World
                 .Register<IEntityManager, EntityManager>()
                 .Register<IEntityInfoRepository, EntityInfoRepository>(dispose: true)
                 .Register<IEntityRelationship, EntityRelationship>(dispose: true)
-                .RegisterSingleton(new ECSConfiguration(maxEntities, Interlocked.Increment(ref _worldCounter)));
+                .RegisterSingleton(new WorldConfiguration(maxEntities, Interlocked.Increment(ref _worldCounter)));
 
             _registry = _container.GetInstance<ComponentRegistry>();
         }

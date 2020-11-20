@@ -8,7 +8,7 @@ using Titan.ECS.Entities;
 
 namespace Titan.ECS.Registry
 {
-    public unsafe class ComponentPool<T> : IComponentPool where T : unmanaged
+    public unsafe class ComponentPool<T> : IComponentPool<T> where T : unmanaged
     {
         private T* _components;
         private T** _indexers;

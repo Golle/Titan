@@ -10,7 +10,7 @@ namespace Titan.ECS.World
         private readonly uint _worldId;
         private readonly uint[] _parents;
 
-        public EntityRelationship(ECSConfiguration configuration)
+        public EntityRelationship(WorldConfiguration configuration)
         {
             _worldId = configuration.WorldId;
             _parents = new uint[configuration.MaxEntities];
@@ -52,7 +52,7 @@ namespace Titan.ECS.World
         
         // TODO: memory vs CPU usage. Can store Entities instead of uints and return a readonly ref
         [MethodImpl(MethodImplOptions.AggressiveInlining)] 
-        public Entity GetParent(in Entity entity) => new(entity.Id, _worldId);
+        public Entity GetParent(in Entity entity) => new(_parents[entity.Id], _worldId);
 
         public void Dispose()
         {

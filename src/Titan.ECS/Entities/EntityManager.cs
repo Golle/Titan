@@ -12,7 +12,7 @@ namespace Titan.ECS.Entities
         private uint _nextId;
         private readonly ConcurrentQueue<uint> _freeIds = new();
 
-        public EntityManager(ECSConfiguration configuration)
+        public EntityManager(WorldConfiguration configuration)
         {
             _worldId = configuration.WorldId;
         }

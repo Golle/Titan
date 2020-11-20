@@ -10,7 +10,7 @@ namespace Titan.ECS.Registry
         private readonly IDictionary<Type, IComponentPool> _pools = new Dictionary<Type, IComponentPool>();
         private readonly uint _maxEntities;
 
-        public ComponentRegistry(ECSConfiguration configuration)
+        public ComponentRegistry(WorldConfiguration configuration)
         {
             _maxEntities = configuration.MaxEntities;
         }

@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.World;
@@ -15,7 +17,6 @@ namespace Titan
                 .WithComponent<Transform2D>()
                 .Build();
 
-
             var entites = new Entity[100];
             for (var i = 0; i < entites.Length; ++i)
             {
@@ -29,7 +30,6 @@ namespace Titan
                     entites[i].AddComponent(new Transform3D());
                 }
             }
-
 
 
         }

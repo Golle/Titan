@@ -9,8 +9,11 @@ namespace Titan.ECS.Entities
     [DebuggerDisplay("Entity={Id} World={WorldId}")]
     public readonly unsafe struct Entity
     {
+        public static readonly Entity Null = new();
+
         public readonly uint Id;
         public readonly uint WorldId;
+
 
         public Entity(uint id, uint worldId)
         {
@@ -27,7 +30,7 @@ namespace Titan.ECS.Entities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Detach() => WorldContainer.DetachEntity(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsNull() => Id == 0u && WorldId == 0;
+        public bool IsNull() => Id == 0u;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Destroy() => WorldContainer.DestroyEntity(this);
         

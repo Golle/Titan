@@ -8,14 +8,14 @@ namespace Titan.ECS.Entities
     {
         private EntityInfo* _entityInfos;
 
-        public EntityInfoRepository(ECSConfiguration configuration)
+        public EntityInfoRepository(WorldConfiguration configuration)
         {
             _entityInfos = (EntityInfo*) Marshal.AllocHGlobal((int) (sizeof(EntityInfo) * configuration.MaxEntities));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref readonly EntityInfo Get(in Entity entity) => ref _entityInfos[entity.Id];
-        public ref readonly EntityInfo this[in Entity entity]
+        public ref EntityInfo Get(in Entity entity) => ref _entityInfos[entity.Id];
+        public ref EntityInfo this[in Entity entity]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _entityInfos[entity.Id];
