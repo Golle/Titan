@@ -22,5 +22,10 @@ namespace Titan.Core.Logging
         public static void Debug(string format, params object[] values) => _log?.Debug(format, values);
         [Conditional("DEBUG")]
         public static void Debug(string message) => _log?.Debug(message);
+
+        [Conditional("DEBUG")]
+        public static void Warning(string format, params object[] values) => _log?.Warning(format, values);
+        [Conditional("DEBUG")]
+        public static void Warning(string message) => _log?.Warning(message);
     }
 }

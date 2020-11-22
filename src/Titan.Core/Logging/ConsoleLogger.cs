@@ -27,6 +27,11 @@ namespace Titan.Core.Logging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Error(string format, params object[] values) => StdErr(_logFormatter.Format(LogLevel.Error, format, values));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Warning(string message) => StdErr(_logFormatter.Format(LogLevel.Warning, message));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Warning(string format, params object[] values) => StdErr(_logFormatter.Format(LogLevel.Warning, format, values));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void StdOut(string message) => Console.WriteLine(message);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void StdErr(string message) => Console.Error.WriteLine(message);

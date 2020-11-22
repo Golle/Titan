@@ -8,5 +8,7 @@ namespace Titan.Core.Logging
         void Debug(string format, params object[] values);
         void Error(string message);
         void Error(string format, params object[] values);
+        void Warning(string message);
+        void Warning(string format, params object[] values);
     }
 }

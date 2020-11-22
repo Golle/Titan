@@ -25,6 +25,11 @@ namespace Titan.ECS.Components
         public static bool operator ==(in ComponentMask lh, in ComponentMask rh) => lh._mask == rh._mask;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(in ComponentMask lh, in ComponentMask rh) => lh._mask != rh._mask;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ComponentMask operator +(in ComponentMask mask, in ComponentId id) => mask.Add(id);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ComponentMask operator -(in ComponentMask mask, in ComponentId id) => mask.Remove(id);
+
 
         public override bool Equals(object obj) => throw new NotSupportedException("Use == to avoid boxing");
         public override int GetHashCode() => throw new NotSupportedException("Use == to avoid boxing");

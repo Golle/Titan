@@ -4,7 +4,7 @@ using Titan.ECS.Entities;
 
 namespace Titan.ECS.World
 {
-    public interface IEntityFilterManager : IDisposable
+    public interface IEntityFilterManager
     {
         IEntityFilter Create(EntityFilterConfiguration configuration);
         void EntityChanged(in Entity entity, in ComponentMask components);
