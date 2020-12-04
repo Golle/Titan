@@ -8,5 +8,6 @@ namespace Titan.ECS.World
     {
         IEntityFilter Create(EntityFilterConfiguration configuration);
         void EntityChanged(in Entity entity, in ComponentMask components);
+        void Update();
     }
 }

@@ -8,6 +8,7 @@ namespace Titan.ECS.World
     {
         Entity CreateEntity();
         IComponentPool<T> GetComponentPool<T>() where T : unmanaged;
-        IEntityRelationship Relationship { get; }
+        void Update();
+        IEntityManager EntityManager { get; }
     }
 }

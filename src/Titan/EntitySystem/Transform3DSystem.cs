@@ -1,4 +1,6 @@
+using System.Numerics;
 using Titan.ECS.Components;
+using Titan.ECS.Entities;
 using Titan.ECS.Registry;
 using Titan.ECS.Systems;
 using Titan.ECS.World;
@@ -13,17 +15,17 @@ namespace Titan.EntitySystem
         private readonly EntityFilter _filter;
 
         private readonly IComponentPool<Transform3D> _transform;
-        private readonly IEntityRelationship _relationship;
+        private readonly IEntityManager _entityManager;
 
         public Transform3DSystem(IWorld world)
         {
+            
             //_filter = new EntityFilterBuilder(world)
             //    .With<Transform3D>()
             //    .Build();
 
             _transform = world.GetComponentPool<Transform3D>();
-            _relationship = world.Relationship;
-
+            _entityManager = world.EntityManager;
         }
 
         public void OnPreUpdate()
@@ -36,12 +38,21 @@ namespace Titan.EntitySystem
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref var transform = ref _transform[entity];
+                
+                transform.ModelMatrix =
+                    Matrix4x4.CreateScale(transform.Scale) *
+                    Matrix4x4.CreateFromQuaternion(transform.Rotation) *
+                    Matrix4x4.CreateTranslation(transform.Position)
+                    ;
 
-                var parent = _relationship.GetParent(entity);
-                if (!parent.IsNull())
+                var parent = _entityManager.GetParent(entity);
+                if (!parent.IsNull() && _transform.Contains(parent))
+                { 
+                    transform.WorldMatrix = transform.ModelMatrix * _transform[parent].WorldMatrix;
+                }
+                else
                 {
-                    //TODO: The parent might not have a transform, the value will be undefined.
-                    var parentTransform = _transform[_relationship.GetParent(entity)];
+                    transform.WorldMatrix = transform.ModelMatrix;
                 }
             }
         }

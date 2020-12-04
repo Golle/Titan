@@ -1,5 +1,6 @@
 using System.Threading;
 using Titan.ECS.Entities;
+using Titan.ECS.Events;
 using Titan.ECS.Registry;
 using Titan.IOC;
 
@@ -15,17 +16,18 @@ namespace Titan.ECS.World
         private readonly IContainer _container;
         private readonly ComponentRegistry _registry;
 
-        public WorldBuilder(IContainer baseContainer, uint maxEntities = 100_000u)
+        public WorldBuilder(IContainer baseContainer, uint maxEntities = 100_000u, uint maxEvents = 10_000u)
         {
             // TODO: container must be disposed (and all classes inside it must be disposed)
-
-            _container = baseContainer.CreateChildContainer()
+            _container = baseContainer
+                .CreateChildContainer()
                 .Register<ComponentRegistry>()
-                .Register<IEntityManager, EntityManager>()
+                .Register<IEntityFactory, EntityFactory>()
                 .Register<IEntityInfoRepository, EntityInfoRepository>(dispose: true)
-                .Register<IEntityRelationship, EntityRelationship>(dispose: true)
+                .Register<IEntityManager, EntityManager>(dispose: true)
                 .Register<IEntityFilterManager, EntityFilterManager>(dispose: true)
-                .RegisterSingleton(new WorldConfiguration(maxEntities, Interlocked.Increment(ref _worldCounter), new EventsConfiguration(10_000)));
+                .Register<IEventQueue, EventQueue>(dispose: true)
+                .RegisterSingleton(new WorldConfiguration(maxEntities, Interlocked.Increment(ref _worldCounter), new EventsConfiguration(maxEvents)));
 
             _registry = _container.GetInstance<ComponentRegistry>();
         }

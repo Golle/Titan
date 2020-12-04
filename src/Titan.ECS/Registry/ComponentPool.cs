@@ -100,6 +100,8 @@ namespace Titan.ECS.Registry
                 return ref *pComponent;
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Contains(in Entity entity) => _indexers[entity.Id] != null;
 
         public void Dispose()
         {

@@ -19,7 +19,7 @@ namespace Titan.ECS.Components
 
             _entities = (Entity*) Marshal.AllocHGlobal((int) size);
             _indexers = (int*) (_entities + maxEntities);
-            for (var i = 0; i < maxEntities; ++i)
+            for (var i = 0; i < maxEntities; ++i) // TODO: replace with Unsafe.Init
             {
                 _indexers[i] = -1;
             }
@@ -46,6 +46,9 @@ namespace Titan.ECS.Components
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void OnEntityDestroyed(in Entity entity) => _indexers[entity.Id] = -1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<Entity> GetEntities() => new(_entities, _numberOfEntities);

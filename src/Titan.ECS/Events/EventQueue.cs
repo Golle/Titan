@@ -11,17 +11,15 @@ using Titan.ECS.World;
 namespace Titan.ECS.Events
 {
     // TODO: move this to Titan.Core and replace the existing event queue
-    internal unsafe class EventQueue : IDisposable
+    internal unsafe class EventQueue :  IEventQueue, IDisposable
     {
         private readonly int _maxEvents;
         private byte* _events;
         private int _count;
 
-
         private bool _high;
         private byte* _evensLastFrame;
         private int _numberOfEventsLastFrame;
-
         
         private const int EventTypeSize = sizeof(short);
         private static readonly int EventSize = sizeof(QueuedEvent);

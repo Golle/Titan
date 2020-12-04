@@ -12,6 +12,7 @@ namespace Titan
     {
         public void Run(IContainer container)
         {
+
             var world = new WorldBuilder(container, maxEntities: 10_000)
                 .WithComponent<Transform3D>()
                 .WithComponent<Transform2D>()

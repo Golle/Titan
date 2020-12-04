@@ -4,17 +4,20 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
+using Titan.ECS.Events;
 
 namespace Titan.ECS.World
 {
     internal class EntityFilterManager : IEntityFilterManager, IDisposable
     {
+        private readonly IEventQueue _eventQueue;
         private readonly IList<EntityFilter> _filters = new List<EntityFilter>(100);
 
         private readonly uint _maxEntities;
         
-        public EntityFilterManager(WorldConfiguration configuration)
+        public EntityFilterManager(WorldConfiguration configuration, IEventQueue eventQueue)
         {
+            _eventQueue = eventQueue;
             _maxEntities = configuration.MaxEntities;
         }
 
@@ -36,6 +39,15 @@ namespace Titan.ECS.World
                 filter.OnEntityChanged(entity, components);
             }
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void EntityDestroyed(in Entity entity)
+        {
+            foreach (var filter in _filters)
+            {
+                filter.OnEntityDestroyed(entity);
+            }
+        }
 
         public void Dispose()
         {
@@ -44,6 +56,22 @@ namespace Titan.ECS.World
                 filter.Dispose();
             }
             _filters.Clear();
+        }
+
+        public void Update()
+        {
+            foreach (ref readonly var @event in _eventQueue.GetEvents())
+            {
+                if (@event.Type == EntityChangedEvent.Id)
+                {
+                    ref readonly var e = ref @event.As<EntityChangedEvent>();
+                    EntityChanged(e.Entity, e.Components);
+                }
+                else if (@event.Type == EntityBeingDestroyedEvent.Id)
+                {
+                    EntityDestroyed(@event.As<EntityBeingDestroyedEvent>().Entity);
+                }
+            }
         }
     }
 }
