@@ -10,5 +10,6 @@ namespace Titan.ECS.World
         IComponentPool<T> GetComponentPool<T>() where T : unmanaged;
         void Update();
         IEntityManager EntityManager { get; }
+        IEntityFilterManager FilterManager { get; }
     }
 }

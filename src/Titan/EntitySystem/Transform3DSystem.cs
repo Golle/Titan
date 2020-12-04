@@ -8,28 +8,18 @@ using Titan.EntitySystem.Components;
 
 namespace Titan.EntitySystem
 {
-
-    
     internal class Transform3DSystem : IEntitySystem
     {
-        private readonly EntityFilter _filter;
+        private readonly IEntityFilter _filter;
 
         private readonly IComponentPool<Transform3D> _transform;
         private readonly IEntityManager _entityManager;
 
         public Transform3DSystem(IWorld world)
         {
-            
-            //_filter = new EntityFilterBuilder(world)
-            //    .With<Transform3D>()
-            //    .Build();
-
+            _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
             _transform = world.GetComponentPool<Transform3D>();
             _entityManager = world.EntityManager;
-        }
-
-        public void OnPreUpdate()
-        {
             
         }
 
@@ -57,15 +47,6 @@ namespace Titan.EntitySystem
             }
         }
 
-        public void OnPostUpdate()
-        {
-        }
-
-        public void Dispose()
-        {
-            _filter.Dispose();
-        }
+        public void Dispose() { }
     }
-
-
 }

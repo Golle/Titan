@@ -1,8 +1,6 @@
-using System;
-using System.Diagnostics;
-using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.World;
+using Titan.EntitySystem;
 using Titan.EntitySystem.Components;
 using Titan.IOC;
 
@@ -13,10 +11,12 @@ namespace Titan
         public void Run(IContainer container)
         {
 
-            var world = new WorldBuilder(container, maxEntities: 10_000)
+            var world = new WorldBuilder()
+                .WithMaxEntities(10_000)
+                .WithMaxEvents(10_000)
                 .WithComponent<Transform3D>()
                 .WithComponent<Transform2D>()
-                .Build();
+                .Build(container);
 
             var entites = new Entity[100];
             for (var i = 0; i < entites.Length; ++i)

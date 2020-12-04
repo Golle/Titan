@@ -1,37 +1,26 @@
-using Titan.ECS.World;
+using System.Collections.Generic;
 
 namespace Titan.ECS.Systems
 {
     internal class NaiveSystemsRunner : ISystemsRunner
     {
-        private readonly IEntityFilterManager _entityFilterManager;
-        private IEntitySystem[] _systems = new IEntitySystem[100];
+        private readonly IList<IEntitySystem> _systems = new List<IEntitySystem>();
 
-        private int _numberOfSystems;
-
-
-        public NaiveSystemsRunner(IEntityFilterManager entityFilterManager)
+        public NaiveSystemsRunner()
         {
-            _entityFilterManager = entityFilterManager;
+            
         }
-
         public void Update(in TimeStep timestep)
         {
             // Update the filters, listen for component messages etc.
             //_entityFilterManager.Update();
 
             // TODO: these steps should be run in different threads
-            for (var i = 0; i < _numberOfSystems; ++i)
+            foreach (var entitySystem in _systems)
             {
-                _systems[i].OnPreUpdate();
-            }
-            for (var i = 0; i < _systems.Length; ++i)
-            {
-                _systems[i].OnUpdate(timestep);
-            }
-            for (var i = 0; i < _systems.Length; ++i)
-            {
-                _systems[i].OnPostUpdate();
+                entitySystem.OnPreUpdate();
+                entitySystem.OnUpdate(timestep);
+                entitySystem.OnPostUpdate();
             }
         }
     }
