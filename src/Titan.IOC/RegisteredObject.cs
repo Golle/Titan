@@ -15,11 +15,11 @@ namespace Titan.IOC
         {
             TypeToResolve = typeToResolve ?? throw new ArgumentNullException(nameof(typeToResolve));
             ConcreteType = concreteType ?? throw new ArgumentNullException(nameof(concreteType)); ;
-         
+
             var constructors = ConcreteType.GetConstructors();
             if (constructors.Length == 0)
             {
-                throw new NoConstructorDefinedException($"Type {ConcreteType.Name} is missing a constructor");
+                throw new NoConstructorDefinedException($"Type {ConcreteType.Name} is missing a public constructor");
             }
 
             if (constructors.Length > 1)

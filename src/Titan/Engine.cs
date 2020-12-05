@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
@@ -11,6 +12,7 @@ using Titan.Graphics.Resources;
 using Titan.Graphics.States;
 using Titan.IOC;
 using Titan.Windows;
+using Titan.Windows.Events;
 using Texture = Titan.Graphics.Resources.Texture;
 
 namespace Titan
@@ -29,7 +31,7 @@ namespace Titan
         public Engine(EngineConfiguration configuration, ILog log, IContainer container)
         {
             LOGGER.InitializeLogger(log);
-            
+
             container
                 .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath, configuration.RefreshRate, configuration.Debug))
                 .RegisterSingleton(_eventQueue  = container.CreateInstance<EventQueue>())

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Titan.IOC
 {
-    public interface IContainer
+    public interface IContainer : IDisposable
     {
-        IContainer Register<TConcrete>() where TConcrete : class;
-        IContainer Register<TTypeToResolve, TConcrete>() where TConcrete : TTypeToResolve;
+        IContainer Register<TConcrete>(bool dispose = false) where TConcrete : class;
+        IContainer Register<TTypeToResolve, TConcrete>(bool dispose = false) where TConcrete : TTypeToResolve;
         TTypeToResolve CreateInstance<TTypeToResolve>();
         object CreateInstance(Type type);
         TTypeToResolve GetInstance<TTypeToResolve>();

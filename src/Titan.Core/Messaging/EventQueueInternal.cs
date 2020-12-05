@@ -19,7 +19,7 @@ namespace Titan.Core.Messaging
 
         static EventQueueInternal()
         {
-            MaxEvents = 100;
+            MaxEvents = 10000;
             Messages = new T[MaxEvents * 2];
         }
         

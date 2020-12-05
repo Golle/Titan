@@ -37,7 +37,7 @@ namespace Titan.Graphics.D3D11
         public void SetBlendState(BlendState blendState) => _context.Get()->OMSetBlendState(blendState.Ptr.Get(), blendState.BlendFactor, blendState.SampleMask);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexShaderConstantBuffer(in ConstantBuffer constantBuffer, uint slot = 0)
+        public void SetVertexShaderConstantBuffer(in ConstantBuffer constantBuffer, uint slot = 0u)
         {
             fixed (ID3D11Buffer** pBuffer = &constantBuffer.Pointer)
             {
@@ -45,7 +45,7 @@ namespace Titan.Graphics.D3D11
             }
         } 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderConstantBuffer(in ConstantBuffer constantBuffer, uint slot = 0)
+        public void SetPixelShaderConstantBuffer(in ConstantBuffer constantBuffer, uint slot = 0u)
         {
             fixed (ID3D11Buffer** pBuffer = &constantBuffer.Pointer)
             {
