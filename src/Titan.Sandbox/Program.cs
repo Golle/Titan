@@ -16,9 +16,7 @@ using Titan.Graphics.Textures;
 using Titan.Input;
 
 
-//var simpleMesh = @"F:\Git\GameDev\resources\models\cube.dat";
 var simpleMesh = @"F:\Git\Titan\resources\models\sphere.dat";
-//var simpleMesh2 = @"F:\Git\GameDev\resources\models_new\sponza.dat";
 var simpleMesh2 = @"F:\Git\Titan\resources\models\sponza.dat";
 var simpleMesh1 = @"F:\Git\Titan\resources\models\sphere1.dat";
 
@@ -37,183 +35,166 @@ new ECSTestClass().Run(engine.Container);
 
 var window = engine.Window;
 var container = engine.Container;
-//var device = engine.Device;
 var pipeline = (GraphicsPipeline)container.GetInstance<IGraphicsPipeline>();
+var cameraManager = container.GetInstance<ICameraManager>();
+var textureLoader = container.GetInstance<ITextureLoader>();
+var meshLoader = container.GetInstance<IMeshLoader>();
+var input = container.GetInstance<IInputHandler>();
+var eventQueue = container.GetInstance<IEventQueue>();
+var materialsLoader = container.GetInstance<IMaterialsLoader>();
+var materialsManager = container.GetInstance<IMaterialsManager>();
+var configuration = container.GetInstance<TitanConfiguration>();
+var materialConfigurations = materialsLoader.LoadMaterials(configuration.GetPath("models/sponza.json"));
+var sponzaMaterials = materialConfigurations.Select(m => materialsManager.CreateFromConfiguration(m)).ToArray();
+
+//var mesh = meshLoader.LoadMesh(simpleMesh);
+var sphere = meshLoader.LoadMesh(simpleMesh1)[0];
+var sponzaMeshes = meshLoader.LoadMesh(simpleMesh2);
+    
+var texture1 = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
+var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\link.png");
+//var texture = textureLoader.LoadTexture(@"F:\tmp\globe.png");
+
+var lightQueue = container.GetInstance<ILigthRenderQueue>();
+var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
+//meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);
+//meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1,0,0), texture);
+    
+    
+
+var s = Stopwatch.StartNew();
+var frames = 0;
+var rotation = Vector2.Zero;
+const float maxRotation = (float)Math.PI / 2f - 0.01f;
+var camera = cameraManager.GetCamera();
+
+var firstPerson = false;
 
 
-unsafe
+#region LIGHTS
+
+var lightPosition = new Vector3(0, 350, 0);
+var lightVelocity = 4f;
+var maxDinstance = 1200f;
+#endregion
+
+
+while (engine.Window.Update())
 {
-    var cameraManager = container.GetInstance<ICameraManager>();
-    var textureLoader = container.GetInstance<ITextureLoader>();
-    var meshLoader = container.GetInstance<IMeshLoader>();
-    var input = container.GetInstance<IInputHandler>();
-    var eventQueue = container.GetInstance<IEventQueue>();
-    var materialsLoader = container.GetInstance<IMaterialsLoader>();
-    var materialsManager = container.GetInstance<IMaterialsManager>();
-    var configuration = container.GetInstance<TitanConfiguration>();
-    var materialConfigurations = materialsLoader.LoadMaterials(configuration.GetPath("models/sponza.json"));
-    var sponzaMaterials = materialConfigurations.Select(m => materialsManager.CreateFromConfiguration(m)).ToArray();
+    meshRenderQueue.Reset();
+    lightQueue.Reset();
 
-    //var mesh = meshLoader.LoadMesh(simpleMesh);
-    var sphere = meshLoader.LoadMesh(simpleMesh1)[0];
-    var sponzaMeshes = meshLoader.LoadMesh(simpleMesh2);
-    
-    var texture1 = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\blue.png");
-    var texture = textureLoader.LoadTexture(@"F:\Git\GameDev\resources\link.png");
-    //var texture = textureLoader.LoadTexture(@"F:\tmp\globe.png");
+    eventQueue.Update();
+    input.Update();
 
-    var lightQueue = container.GetInstance<ILigthRenderQueue>();
-    var meshRenderQueue = container.GetInstance<IMeshRenderQueue>();
-    //meshRenderQueue.Submit(mesh, Matrix4x4.CreateTranslation(-2f, 0, 0), texture);
-    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(1,0,0), texture);
-    
-    
+    #region LIGHT CALCULATION
 
-    var s = Stopwatch.StartNew();
-    var frames = 0;
-    var rotation = Vector2.Zero;
-    const float maxRotation = (float)Math.PI / 2f - 0.01f;
-    var camera = cameraManager.GetCamera();
+    if (lightPosition.X > maxDinstance)
+    {
+        lightPosition.X = maxDinstance-0.1f;
+        lightVelocity = -lightVelocity;
+    }
+    else if (lightPosition.X < -maxDinstance)
+    {
+        lightPosition.X = -maxDinstance+0.1f;
+        lightVelocity = -lightVelocity;
+    }
 
-    var firstPerson = false;
+    lightPosition.X += lightVelocity;
 
+    lightQueue.Submit(lightPosition);
 
-    #region LIGHTS
-
-        var lightPosition = new Vector3(0, 350, 0);
-        var lightVelocity = 4f;
-        var maxDinstance = 1200f;
     #endregion
 
+    var lightMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(Vector3.One * 10) *
+                                          Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
+                                          Matrix4x4.CreateTranslation(lightPosition));
 
-    while (engine.Window.Update())
-    {
-        meshRenderQueue.Reset();
-        lightQueue.Reset();
+    meshRenderQueue.Submit(sphere, lightMatrix, texture1, null);
 
-        eventQueue.Update();
-        input.Update();
-
-        #region LIGHT CALCULATION
-
-        if (lightPosition.X > maxDinstance)
-        {
-            lightPosition.X = maxDinstance-0.1f;
-            lightVelocity = -lightVelocity;
-        }
-        else if (lightPosition.X < -maxDinstance)
-        {
-            lightPosition.X = -maxDinstance+0.1f;
-            lightVelocity = -lightVelocity;
-        }
-
-        lightPosition.X += lightVelocity;
-
-        lightQueue.Submit(lightPosition);
-
-        #endregion
-
-        var lightMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(Vector3.One * 10) *
-                                              Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
-                                              Matrix4x4.CreateTranslation(lightPosition));
-
-        meshRenderQueue.Submit(sphere, lightMatrix, texture1, null);
-
-        var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(Vector3.One) *
-                                              Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
-                                              Matrix4x4.CreateTranslation(Vector3.Zero));
-        meshRenderQueue.Submit(sponzaMeshes[0], modelMatrix, texture, sponzaMaterials);
-        meshRenderQueue.Submit(sponzaMeshes[1], modelMatrix, texture, sponzaMaterials);
-        //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(1,1,1)), texture1);
-        //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(2,2,1)), texture);
-        //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(3,3,1)), texture1);
+    var modelMatrix = Matrix4x4.Transpose(Matrix4x4.CreateScale(Vector3.One) *
+                                          Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
+                                          Matrix4x4.CreateTranslation(Vector3.Zero));
+    meshRenderQueue.Submit(sponzaMeshes[0], modelMatrix, texture, sponzaMaterials);
+    meshRenderQueue.Submit(sponzaMeshes[1], modelMatrix, texture, sponzaMaterials);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(1,1,1)), texture1);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(2,2,1)), texture);
+    //meshRenderQueue.Submit(mesh1, Matrix4x4.CreateTranslation(new Vector3(3,3,1)), texture1);
         
 
 
-        #region TEMP INPUT HANLDING
-        if (firstPerson)
-        {
-            var multiplier = input.IsKeyDown(KeyCode.Shift) ? 15f : 1f;
-            var speed = 0.2f * multiplier;
-            var mousePos = input.MouseLastPosition - input.MousePosition;
+    #region TEMP INPUT HANLDING
+    if (firstPerson)
+    {
+        var multiplier = input.IsKeyDown(KeyCode.Shift) ? 15f : 1f;
+        var speed = 0.2f * multiplier;
+        var mousePos = input.MouseLastPosition - input.MousePosition;
 
             
-            if (mousePos.Y != 0 || mousePos.X != 0)
-            {
-                const float constant = 0.003f;
-                rotation.X -= mousePos.X * constant;
-                rotation.Y = Math.Clamp(rotation.Y + mousePos.Y * constant, -maxRotation, maxRotation);
-                camera.Rotate(new Vector3(rotation, 0));
-            }
+        if (mousePos.Y != 0 || mousePos.X != 0)
+        {
+            const float constant = 0.003f;
+            rotation.X -= mousePos.X * constant;
+            rotation.Y = Math.Clamp(rotation.Y + mousePos.Y * constant, -maxRotation, maxRotation);
+            camera.Rotate(new Vector3(rotation, 0));
+        }
 
-            if (input.IsKeyDown(KeyCode.W))
-            {
-                camera.MoveForward(-speed);
-            }
-            if (input.IsKeyDown(KeyCode.S))
-            {
-                camera.MoveForward(speed);
-            }
-            if (input.IsKeyDown(KeyCode.A))
-            {
-                camera.MoveSide(speed);
-            }
-            if (input.IsKeyDown(KeyCode.D))
-            {
-                camera.MoveSide(-speed);
-            }
-            if (input.IsKeyDown(KeyCode.V))
-            {
-                camera.MoveUp(speed);
-            }
-            if (input.IsKeyDown(KeyCode.C))
-            {
-                camera.MoveUp(-speed);
-            }
+        if (input.IsKeyDown(KeyCode.W))
+        {
+            camera.MoveForward(-speed);
+        }
+        if (input.IsKeyDown(KeyCode.S))
+        {
+            camera.MoveForward(speed);
+        }
+        if (input.IsKeyDown(KeyCode.A))
+        {
+            camera.MoveSide(speed);
+        }
+        if (input.IsKeyDown(KeyCode.D))
+        {
+            camera.MoveSide(-speed);
+        }
+        if (input.IsKeyDown(KeyCode.V))
+        {
+            camera.MoveUp(speed);
+        }
+        if (input.IsKeyDown(KeyCode.C))
+        {
+            camera.MoveUp(-speed);
+        }
 
             
-        }
-        if (input.IsKeyPressed(KeyCode.Space))
-        {
-            firstPerson = !firstPerson;
-            window.ToggleMouse();
-        }
-
-        camera.Update();
-        #endregion
-
-        window.SetTitle($"[{input.MousePosition.X}, {input.MousePosition.Y}]");
-
-        pipeline.Execute();
-
-        if (input.IsKeyPressed(KeyCode.Escape))
-        {
-            LOGGER.Debug("Escape key pressed, exiting the game.");
-            engine.Stop();
-        }
-        frames++;
-        if (s.Elapsed.TotalSeconds > 2.0f)
-        {
-            s.Stop();
-            Console.WriteLine($"FPS: {frames / s.Elapsed.TotalSeconds:##}");
-
-            s.Restart();
-            frames = 0;
-        }
-
-
-
-        //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
+    }
+    if (input.IsKeyPressed(KeyCode.Space))
+    {
+        firstPerson = !firstPerson;
+        window.ToggleMouse();
     }
 
-    //{
-    //    using ComPtr<ID3D11Debug> d3dDebug = default;
-    //    fixed (Guid* debugGuidPtr = &D3D11Common.D3D11Debug)
-    //    {
-    //        Common.CheckAndThrow(engine.Device.Ptr->QueryInterface(debugGuidPtr, (void**)d3dDebug.GetAddressOf()), "QueryInterface");
-    //    }
-    //    Common.CheckAndThrow(d3dDebug.Get()->ReportLiveDeviceObjects(D3D11_RLDO_FLAGS.D3D11_RLDO_DETAIL), "ReportLiveDeviceObjects");
-    //}
-    //deferredShadingPixelShader.Dispose();
-    //backbuffer.Dispose();
+    camera.Update();
+    #endregion
+
+    window.SetTitle($"[{input.MousePosition.X}, {input.MousePosition.Y}]");
+
+    pipeline.Execute();
+
+    if (input.IsKeyPressed(KeyCode.Escape))
+    {
+        LOGGER.Debug("Escape key pressed, exiting the game.");
+        engine.Stop();
+    }
+    frames++;
+    if (s.Elapsed.TotalSeconds > 2.0f)
+    {
+        s.Stop();
+        Console.WriteLine($"FPS: {frames / s.Elapsed.TotalSeconds:##}");
+
+        s.Restart();
+        frames = 0;
+    }
+
+
+
+    //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
 }
