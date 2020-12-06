@@ -12,7 +12,7 @@ namespace Titan
         private string _title;
         private readonly IContainer _container = Bootstrapper.CreateContainer();
 
-        public static EngineBuilder CreateDefaultBuilder() => new EngineBuilder();
+        public static EngineBuilder CreateDefaultBuilder() => new();
 
         public EngineBuilder ConfigureResourcesBasePath(Func<string> pathFunc)
         {
@@ -33,7 +33,7 @@ namespace Titan
             _debugFunc = debugFunc;
             return this;
         }
-
+        
         public IEngine Build()
         {
             var engineConfiguration = new EngineConfiguration

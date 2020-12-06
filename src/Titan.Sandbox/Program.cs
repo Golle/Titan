@@ -7,6 +7,11 @@ using Titan.Core;
 using Titan.Core.Common;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
+using Titan.ECS.Components;
+using Titan.ECS.Registry;
+using Titan.ECS.Systems;
+using Titan.ECS.World;
+using Titan.EntitySystem.Components;
 using Titan.Graphics.Camera;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
@@ -14,6 +19,24 @@ using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Textures;
 using Titan.Input;
+using TimeStep = Titan.ECS.Systems.TimeStep;
+
+var assetDirectory = new AssetsDirectory(@"F:\Git\Titan\resources");
+var displayConfiguration = DisplayConfiguration.FromFile(@"F:\Git\Titan\resources\display.json");
+
+
+var gameConfiguration = new GameConfigurationBuilder()
+    .WithAssetsDirectory(assetDirectory)
+    .WithDisplayConfiguration(displayConfiguration)
+    .WithSystem<SandboxSystem>(nameof(SandboxSystem), "Transform3D")
+    .WithSystem<AnotherSandboxSystem>(nameof(AnotherSandboxSystem), nameof(SandboxSystem))
+    .Build();
+
+
+using var application = Application.Start(gameConfiguration);
+
+    
+
 
 
 var simpleMesh = @"F:\Git\Titan\resources\models\sphere.dat";
@@ -197,4 +220,54 @@ while (engine.Window.Update())
 
 
     //GC.Collect(); // Force garbage collection to see if we have any interop pointers that needs to be pinned.
+}
+
+
+public class AnotherSandboxSystem : IEntitySystem
+{
+    private readonly IInputHandler _inputHandler;
+
+    public AnotherSandboxSystem(IInputHandler inputHandler)
+    {
+        _inputHandler = inputHandler;
+    }
+
+    public void OnPreUpdate()
+    {
+        if (_inputHandler.IsKeyPressed(KeyCode.F1))
+        {
+            Environment.Exit(1000);
+        }
+    }
+
+    public void OnUpdate(in TimeStep timeStep)
+    {
+        
+    }
+
+    public void Dispose() { }
+}
+
+
+public class SandboxSystem : IEntitySystem
+{
+    private readonly IComponentPool<Transform3D> _transform;
+    private readonly IEntityFilter _filter;
+
+    public SandboxSystem(IWorld world)
+    {
+        _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
+        _transform = world.GetComponentPool<Transform3D>();
+    }
+
+    public void OnUpdate(in TimeStep timeStep)
+    {
+        foreach (ref readonly var entity in _filter.GetEntities())
+        {
+            ref var transform = ref _transform[entity];
+            transform.Position += Vector3.UnitX * timeStep;
+        }
+    }
+
+    public void Dispose() { }
 }

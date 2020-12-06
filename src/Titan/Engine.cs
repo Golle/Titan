@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
@@ -12,8 +11,6 @@ using Titan.Graphics.Resources;
 using Titan.Graphics.States;
 using Titan.IOC;
 using Titan.Windows;
-using Titan.Windows.Events;
-using Texture = Titan.Graphics.Resources.Texture;
 
 namespace Titan
 {
@@ -33,7 +30,7 @@ namespace Titan
             LOGGER.InitializeLogger(log);
 
             container
-                .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath, configuration.RefreshRate, configuration.Debug))
+                .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath, configuration.RefreshRate, 0.02f, configuration.Debug))
                 .RegisterSingleton(_eventQueue  = container.CreateInstance<EventQueue>())
                 .RegisterSingleton(_memoryManager = CreateMemoryManager())
                 .RegisterSingleton(_window = container.GetInstance<IWindowFactory>().Create((int) configuration.Width, (int) configuration.Height, configuration.Title))
@@ -60,7 +57,7 @@ namespace Titan
                 new ChunkDescriptor("ConstantBuffer", (uint) sizeof(ConstantBuffer), 100),
                 new ChunkDescriptor("Materials", (uint) sizeof(Material), 256),
                 new ChunkDescriptor("Shaders", (uint) IntPtr.Size, 1024),
-                new ChunkDescriptor("Texture", (uint) sizeof(Texture), 1024),
+                new ChunkDescriptor("Texture", (uint) sizeof(Graphics.Resources.Texture), 1024),
                 new ChunkDescriptor("ShaderResourceView", (uint) sizeof(ShaderResourceView), 1024),
                 new ChunkDescriptor("RenderTargetView", (uint) sizeof(RenderTargetView), 1024),
                 new ChunkDescriptor("DepthStencilView", (uint) sizeof(DepthStencilView), 10),
