@@ -253,10 +253,12 @@ public class SandboxSystem : IEntitySystem
 {
     private readonly IComponentPool<Transform3D> _transform;
     private readonly IEntityFilter _filter;
+    private readonly IEntityFilter _filter2;
 
     public SandboxSystem(IWorld world)
     {
         _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
+        _filter2 = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
         _transform = world.GetComponentPool<Transform3D>();
     }
 
