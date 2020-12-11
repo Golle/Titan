@@ -3,7 +3,7 @@ using Titan.Core.Common;
 
 namespace Titan.Core.Logging
 {
-    internal class TimeLogFormatter : ILogFormatter
+    public class TimeLogFormatter : ILogFormatter
     {
         private readonly IDateTime _dateTime;
 

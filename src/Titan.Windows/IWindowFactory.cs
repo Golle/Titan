@@ -2,6 +2,6 @@ namespace Titan.Windows
 {
     public interface IWindowFactory
     {
-        IWindow Create(int width, int height, string title);
+        IWindow Create(uint width, uint height, string title);
     }
 }

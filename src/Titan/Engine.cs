@@ -33,7 +33,7 @@ namespace Titan
                 .RegisterSingleton(new TitanConfiguration(configuration.ResourceBasePath, configuration.RefreshRate, 0.02f, configuration.Debug))
                 .RegisterSingleton(_eventQueue  = container.CreateInstance<EventQueue>())
                 .RegisterSingleton(_memoryManager = CreateMemoryManager())
-                .RegisterSingleton(_window = container.GetInstance<IWindowFactory>().Create((int) configuration.Width, (int) configuration.Height, configuration.Title))
+                .RegisterSingleton(_window = container.GetInstance<IWindowFactory>().Create(configuration.Width,configuration.Height, configuration.Title))
                 .RegisterSingleton(_device = container.CreateInstance<GraphicsDevice>())
                 .RegisterSingleton(_pipeline = container.CreateInstance<GraphicsPipeline>());
 

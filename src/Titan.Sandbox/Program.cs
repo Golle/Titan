@@ -21,21 +21,38 @@ using Titan.Graphics.Textures;
 using Titan.Input;
 using TimeStep = Titan.ECS.Systems.TimeStep;
 
+//LOGGER.InitializeLogger(new ConsoleLogger(new TimeLogFormatter(new DateTimeWrapper())));
+
+var pipelineConfiguration = new PipelineConfiguration(@"F:\Git\Titan\resources\render_pipeline.json");
 var assetDirectory = new AssetsDirectory(@"F:\Git\Titan\resources");
 var displayConfiguration = DisplayConfiguration.FromFile(@"F:\Git\Titan\resources\display.json");
 
 
-var gameConfiguration = new GameConfigurationBuilder()
+var gameConfigurationBuilder = new GameConfigurationBuilder()
     .WithAssetsDirectory(assetDirectory)
     .WithDisplayConfiguration(displayConfiguration)
-    .WithSystem<SandboxSystem>(nameof(SandboxSystem), "Transform3D")
+    .WithPipelineConfiguration(pipelineConfiguration)
+    .WithSystem<SandboxSystem>(nameof(SandboxSystem), TitanSystems.Transform3D)
     .WithSystem<AnotherSandboxSystem>(nameof(AnotherSandboxSystem), nameof(SandboxSystem))
-    .Build();
-
-
-using var application = Application.Start(gameConfiguration);
-
     
+    .WithDefaultConsoleLogger();
+
+
+using var application = Application.Create(gameConfigurationBuilder);
+application.Run();
+
+return;
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -52,9 +69,6 @@ using var engine = EngineBuilder.CreateDefaultBuilder()
     .ConfigureDebug(() => false)
 #endif
     .Build();
-
-LOGGER.InitializeLogger(new ConsoleLogger(new TimeLogFormatter(new DateTimeWrapper())));
-new ECSTestClass().Run(engine.Container);
 
 var window = engine.Window;
 var container = engine.Container;
