@@ -28,7 +28,7 @@ namespace Titan.Graphics.Resources
         {
             if (_resources != null)
             {
-                throw new InvalidOperationException($"{nameof(TextureManager)} has already been initialized.");
+                throw new InvalidOperationException($"{nameof(ShaderResourceViewManager)} has already been initialized.");
             }
             _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(ShaderResourceViewManager)} with the wrong device.", nameof(graphicsDevice));
             var memory = _memoryManager.GetMemoryChunkValidated<ShaderResourceView>("ShaderResourceView");

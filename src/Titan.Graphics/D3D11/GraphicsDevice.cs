@@ -19,8 +19,6 @@ namespace Titan.Graphics.D3D11
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
 
-        public IVertexBufferManager VertexBufferManager { get; private set; }
-        public IIndexBufferManager IndexBufferManager { get; private set; }
         public IConstantBufferManager ConstantBufferManager { get; private set; }
         public IRenderTargetViewManager RenderTargetViewManager { get; private set; }
         public IDepthStencilViewManager DepthStencilViewManager { get; private set; }
@@ -44,8 +42,6 @@ namespace Titan.Graphics.D3D11
             InitBackBuffer();
 
             var pDevice = _device.Get();
-            IndexBufferManager = new IndexBufferManager(pDevice, _memoryManager);
-            VertexBufferManager = new VertexBufferManager(pDevice, _memoryManager);
             ConstantBufferManager = new ConstantBufferManager(pDevice, _memoryManager);
             DepthStencilViewManager = new DepthStencilViewManager(pDevice, _memoryManager);
             DepthStencilStateManager = new DepthStencilStateManager(pDevice, _memoryManager);
@@ -106,8 +102,6 @@ namespace Titan.Graphics.D3D11
 
         public void Dispose()
         {
-            IndexBufferManager.Dispose();
-            VertexBufferManager.Dispose();
             ConstantBufferManager.Dispose();
             RenderTargetViewManager.Dispose();
             DepthStencilViewManager.Dispose();

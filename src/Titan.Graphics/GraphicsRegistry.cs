@@ -29,6 +29,8 @@ namespace Titan.Graphics
                 // D3D11 Managers
                 .Register<ITextureManager, TextureManager>()
                 .Register<IShaderResourceViewManager, ShaderResourceViewManager>()
+                .Register<IVertexBufferManager, VertexBufferManager>()
+                .Register<IIndexBufferManager, IndexBufferManager>()
 
                 
                 // Image loading

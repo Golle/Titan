@@ -90,6 +90,8 @@ namespace Titan
         {
             _container.GetInstance<ITextureManager>().Initialize(_device);
             _container.GetInstance<IShaderResourceViewManager>().Initialize(_device);
+            _container.GetInstance<IVertexBufferManager>().Initialize(_device);
+            _container.GetInstance<IIndexBufferManager>().Initialize(_device);
         }
 
         private unsafe void InitMemoryManager()

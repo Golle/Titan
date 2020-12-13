@@ -8,11 +8,13 @@ namespace Titan.Graphics.Meshes
 {
     internal class MeshLoader : IMeshLoader
     {
-        private readonly IGraphicsDevice _device;
+        private readonly IVertexBufferManager _vertexBufferManager;
+        private readonly IIndexBufferManager _indexBufferManager;
 
-        public MeshLoader(IGraphicsDevice device)
+        public MeshLoader(IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
         {
-            _device = device;
+            _vertexBufferManager = vertexBufferManager;
+            _indexBufferManager = indexBufferManager;
         }
         
         public Mesh[] LoadMesh(string filename)
@@ -41,7 +43,7 @@ namespace Titan.Graphics.Meshes
             {
                 var pVertices = vertices.ToPointer();
                 reader.Read(pVertices, chunkHeader.VertexCount * chunkHeader.VertexSize);
-                vertexBuffer = _device.VertexBufferManager.CreateVertexBuffer(chunkHeader.VertexCount, chunkHeader.VertexSize, pVertices);
+                vertexBuffer = _vertexBufferManager.CreateVertexBuffer(chunkHeader.VertexCount, chunkHeader.VertexSize, pVertices);
             }
             finally
             {
@@ -69,7 +71,7 @@ namespace Titan.Graphics.Meshes
         private unsafe IndexBufferHandle CreateIndexBuffer<T>(ByteReader reader, void* pIndices, uint count) where T : unmanaged
         {
             reader.Read<T>(pIndices, count);
-            return _device.IndexBufferManager.CreateIndexBuffer<T>(count, pIndices);
+            return _indexBufferManager.CreateIndexBuffer<T>(count, pIndices);
         }
     }
 }

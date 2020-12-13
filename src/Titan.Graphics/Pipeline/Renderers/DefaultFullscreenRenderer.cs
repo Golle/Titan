@@ -16,11 +16,11 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IndexBufferHandle _indexBufferHandle;
         private readonly ShaderProgram _shader;
 
-        public DefaultFullscreenRenderer(IGraphicsDevice device)
+        public DefaultFullscreenRenderer(IGraphicsDevice device, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
         {
             _shaderManager = device.ShaderManager;
-            _vertexBufferManager = device.VertexBufferManager;
-            _indexBufferManager = device.IndexBufferManager;
+            _vertexBufferManager = vertexBufferManager;
+            _indexBufferManager = indexBufferManager;
 
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex {Position = new Vector2(-1, -1), UV = new Vector2(0, 1)};

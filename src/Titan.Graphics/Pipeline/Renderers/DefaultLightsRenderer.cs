@@ -25,11 +25,11 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         
 
-        public unsafe DefaultLightsRenderer(IGraphicsDevice device, ILigthRenderQueue ligthRenderQueue)
+        public unsafe DefaultLightsRenderer(IGraphicsDevice device, ILigthRenderQueue ligthRenderQueue, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
         {
             _ligthRenderQueue = ligthRenderQueue;
-            _vertexBufferManager = device.VertexBufferManager;
-            _indexBufferManager = device.IndexBufferManager;
+            _vertexBufferManager = vertexBufferManager;
+            _indexBufferManager = indexBufferManager;
             _constantBufferManager = device.ConstantBufferManager;
             _shaderManager = device.ShaderManager;
 

@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
+using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -10,17 +12,27 @@ namespace Titan.Graphics.Resources
 {
     internal unsafe class IndexBufferManager : IIndexBufferManager
     {
+        private readonly IMemoryManager _memoryManager;
         private ComPtr<ID3D11Device> _device;
-        private readonly IndexBuffer* _buffers;
-        private readonly uint _maxBuffers;
+        private IndexBuffer* _buffers;
+        private uint _maxBuffers;
         private int _numberOfBuffers;
 
-        private readonly ConcurrentQueue<int> _freeHandles = new ConcurrentQueue<int>();
-        public IndexBufferManager(ID3D11Device* device, IMemoryManager memoryManager)
+        private readonly ConcurrentQueue<int> _freeHandles = new();
+        public IndexBufferManager(IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device);
+            _memoryManager = memoryManager;
+        }
 
-            var memory = memoryManager.GetMemoryChunkValidated<IndexBuffer>("IndexBuffer");
+        public void Initialize(IGraphicsDevice graphicsDevice)
+        {
+            if (_buffers != null)
+            {
+                throw new InvalidOperationException($"{nameof(IndexBufferManager)} has already been initialized.");
+            }
+            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(IndexBufferManager)} with the wrong device.", nameof(graphicsDevice));
+
+            var memory = _memoryManager.GetMemoryChunkValidated<IndexBuffer>("IndexBuffer");
             _buffers = memory.Pointer;
             _maxBuffers = memory.Count;
         }
@@ -85,16 +97,20 @@ namespace Titan.Graphics.Resources
 
         public void Dispose()
         {
-            _device.Dispose();
-            for (var i = 0; i < _numberOfBuffers; ++i)
+            if (_buffers != null)
             {
-                if (_buffers->Pointer != null)
+                for (var i = 0; i < _numberOfBuffers; ++i)
                 {
-                    _buffers[i].Pointer->Release();
-                    _buffers[i].Pointer = null;
+                    if (_buffers->Pointer != null)
+                    {
+                        _buffers[i].Pointer->Release();
+                        _buffers[i].Pointer = null;
+                    }
                 }
+                _numberOfBuffers = 0;
+                _device.Dispose();
+                _buffers = null;
             }
-            _numberOfBuffers = 0;
         }
     }
 }
