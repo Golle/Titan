@@ -16,6 +16,7 @@ namespace Titan.Graphics
         public void Register(IContainer container)
         {
             container
+                .Register<GraphicsSystem>()
                 .Register<IGraphicsDevice, GraphicsDevice>()
                 
                 // Graphics pipeline
@@ -31,6 +32,8 @@ namespace Titan.Graphics
                 .Register<IShaderResourceViewManager, ShaderResourceViewManager>()
                 .Register<IVertexBufferManager, VertexBufferManager>()
                 .Register<IIndexBufferManager, IndexBufferManager>()
+                .Register<IConstantBufferManager, ConstantBufferManager>()
+                .Register<IRenderTargetViewManager, RenderTargetViewManager>()
 
                 
                 // Image loading

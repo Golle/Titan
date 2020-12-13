@@ -25,12 +25,12 @@ namespace Titan.Graphics.Pipeline.Renderers
 
         
 
-        public unsafe DefaultLightsRenderer(IGraphicsDevice device, ILigthRenderQueue ligthRenderQueue, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
+        public unsafe DefaultLightsRenderer(IGraphicsDevice device, ILigthRenderQueue ligthRenderQueue, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager)
         {
             _ligthRenderQueue = ligthRenderQueue;
             _vertexBufferManager = vertexBufferManager;
             _indexBufferManager = indexBufferManager;
-            _constantBufferManager = device.ConstantBufferManager;
+            _constantBufferManager = constantBufferManager;
             _shaderManager = device.ShaderManager;
 
             var vertices = stackalloc FullscreenVertex[4];

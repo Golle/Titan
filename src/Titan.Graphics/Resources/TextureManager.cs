@@ -19,10 +19,9 @@ namespace Titan.Graphics.Resources
 
         private int _numberOfTextures;
 
-        public TextureManager(IGraphicsDevice graphicsDevice, IMemoryManager memoryManager)
+        public TextureManager(IMemoryManager memoryManager)
         {
             _memoryManager = memoryManager;
-            
         }
 
         public void Initialize(IGraphicsDevice graphicsDevice)

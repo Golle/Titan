@@ -25,6 +25,7 @@ namespace Titan.Graphics.Pipeline
         internal RenderPassBuilder(IGraphicsDevice device)
         {
             _device = device;
+            _renderTargets["$Backbuffer"] = 0; // The backbuffer will always be at handle 0
         }
 
         public void AddPass(RenderPassConfiguration config)
@@ -176,7 +177,7 @@ namespace Titan.Graphics.Pipeline
             if (renderTargets.Length == 1)
             {
                 var renderTarget = renderTargets[0];
-                var renderTargetView = renderTarget.IsGlobal() ? _device.RenderTargetViewManager.BackbufferHandle : _renderTargets[renderTarget.Name];
+                var renderTargetView = _renderTargets[renderTarget.Name];
 
                 if (depthStencil != null)
                 {
@@ -205,7 +206,7 @@ namespace Titan.Graphics.Pipeline
                 for (var i = 0; i < renderTargets.Length; ++i)
                 {
                     var renderTarget = renderTargets[i];
-                    var renderTargetView = renderTarget.IsGlobal() ? _device.RenderTargetViewManager.BackbufferHandle : _renderTargets[renderTarget.Name];
+                    var renderTargetView = _renderTargets[renderTarget.Name];
                     command.Set(i, renderTargetView);
                     if (renderTarget.Clear)
                     {

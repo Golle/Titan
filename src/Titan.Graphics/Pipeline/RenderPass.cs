@@ -12,13 +12,15 @@ namespace Titan.Graphics.Pipeline
         private readonly RenderPassCommand[] _commands;
         private readonly IGraphicsDevice _device;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
+        private readonly IRenderTargetViewManager _renderTargetViewManager;
 
-        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device, IShaderResourceViewManager shaderResourceViewManager)
+        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager)
         {
             _name = name;
             _commands = commands;
             _device = device;
             _shaderResourceViewManager = shaderResourceViewManager;
+            _renderTargetViewManager = renderTargetViewManager;
         }
 
         public void Render(IRenderContext renderContext)
@@ -33,16 +35,16 @@ namespace Titan.Graphics.Pipeline
                 switch (command.Type)
                 {
                     case CommandType.ClearRenderTarget:
-                        renderContext.ClearRenderTargetView(_device.RenderTargetViewManager[command.ClearRenderTarget.RenderTarget], command.ClearRenderTarget.Color);
+                        renderContext.ClearRenderTargetView(_renderTargetViewManager[command.ClearRenderTarget.RenderTarget], command.ClearRenderTarget.Color);
                         break;
                     case CommandType.ClearDepthStencil:
                         renderContext.ClearDepthStencilView(_device.DepthStencilViewManager[command.DepthStencil]);
                         break;
                     case CommandType.SetRenderTargetAndDepthStencil:
-                        renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget], _device.DepthStencilViewManager[command.DepthStencil]);
+                        renderContext.SetRenderTarget(_renderTargetViewManager[command.RenderTarget], _device.DepthStencilViewManager[command.DepthStencil]);
                         break;
                     case CommandType.SetRenderTarget:
-                        renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget]);
+                        renderContext.SetRenderTarget(_renderTargetViewManager[command.RenderTarget]);
                         break;
                     case CommandType.SetMultipleRenderTargetAndDepthStencil:
                         SetRenderTargets(renderContext, command.MultipleRenderTargets, true);
@@ -113,7 +115,7 @@ namespace Titan.Graphics.Pipeline
             var renderTargets = stackalloc ID3D11RenderTargetView*[(int)command.Count];
             for (var i = 0; i < command.Count; ++i)
             {
-                renderTargets[i] = _device.RenderTargetViewManager[command.Handles[i]].Pointer;
+                renderTargets[i] = _renderTargetViewManager[command.Handles[i]].Pointer;
             }
 
             var depthStencilView = hasDepthStencil ? _device.DepthStencilViewManager[command.DepthStencilView].Pointer : null;

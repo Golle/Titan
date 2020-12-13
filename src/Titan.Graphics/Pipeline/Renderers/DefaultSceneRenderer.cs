@@ -33,7 +33,7 @@ namespace Titan.Graphics.Pipeline.Renderers
         
         private bool _normalMapEnabled;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager)
         {
             _renderQueue = renderQueue;
             _cameraManager = cameraManager;
@@ -41,7 +41,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             _shaderManager = device.ShaderManager;
             _vertexBufferManager = vertexBufferManager;
             _indexBufferManager = indexBufferManager;
-            _constantBufferManager = device.ConstantBufferManager;
+            _constantBufferManager = constantBufferManager;
             _shaderResourceViewManager = shaderResourceViewManager;
             _samplerStateManager = device.SamplerStateManager;
             

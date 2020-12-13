@@ -18,19 +18,21 @@ namespace Titan.Graphics.Pipeline
         private readonly IGraphicsDevice _device;
         private readonly ITextureManager _textureManager;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
+        private readonly IRenderTargetViewManager _renderTargetViewManager;
         private readonly IRenderPassFactory _renderPassFactory;
 
         private readonly IList<IRenderer> _renderers = new List<IRenderer>();
         
         private RenderGraph _renderGraph;
 
-        public GraphicsPipeline(IContainer container,  IWindow window, IGraphicsDevice device, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IRenderPassFactory renderPassFactory)
+        public GraphicsPipeline(IContainer container,  IWindow window, IGraphicsDevice device, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IRenderPassFactory renderPassFactory)
         {
             _window = window;
             _container = container;
             _device = device;
             _textureManager = textureManager;
             _shaderResourceViewManager = shaderResourceViewManager;
+            _renderTargetViewManager = renderTargetViewManager;
             _renderPassFactory = renderPassFactory;
         }
 
@@ -72,7 +74,7 @@ namespace Titan.Graphics.Pipeline
             foreach (var renderPass in renderPasses)
             {
                 LOGGER.Debug("Creating RenderPass {0}", renderPass.Name);
-                foreach (var renderTarget in renderPass.RenderTargets.Where(r => !r.IsGlobal()))
+                foreach (var renderTarget in renderPass.RenderTargets.Where(r => !r.Name.StartsWith("$")))
                 {
                     LOGGER.Debug("Creating RenderTarget {0}", renderTarget.Name);
                     if (IsResource(renderPasses, renderTarget))
@@ -80,7 +82,7 @@ namespace Titan.Graphics.Pipeline
                         var textureHandle = _textureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
                         var resource = _textureManager[textureHandle].Resource;
                         var resourceHandle = _shaderResourceViewManager.Create(resource, renderTarget.Format);
-                        var renderTargetHandle = _device.RenderTargetViewManager.Create(resource, renderTarget.Format);
+                        var renderTargetHandle = _renderTargetViewManager.Create(resource, renderTarget.Format);
                         builder.AddRenderTarget(renderTarget.Name, renderTargetHandle);
                         builder.AddShaderResource(renderTarget.Name, resourceHandle);
                     }
@@ -88,7 +90,7 @@ namespace Titan.Graphics.Pipeline
                     {
                         var textureHandle = _textureManager.CreateTexture((uint)_window.Width, (uint)_window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET);
                         var resource = _textureManager[textureHandle].Resource;
-                        var renderTargetHandle = _device.RenderTargetViewManager.Create(resource, renderTarget.Format);
+                        var renderTargetHandle = _renderTargetViewManager.Create(resource, renderTarget.Format);
                         builder.AddRenderTarget(renderTarget.Name, renderTargetHandle);
                         //var resourceHandle = _device.ShaderResourceViewManager.Create(_device.TextureManager[textureHandle].Resource, renderTarget.Format);
                         //builder.AddShaderResource(renderTarget.Name, resourceHandle);

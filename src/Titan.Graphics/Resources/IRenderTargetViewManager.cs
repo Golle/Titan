@@ -5,6 +5,7 @@ namespace Titan.Graphics.Resources
 {
     public interface IRenderTargetViewManager : IDisposable
     {
+        void Initialize(IGraphicsDevice graphicsDevice);
         unsafe RenderTargetViewHandle Create(ID3D11Resource* resource, DXGI_FORMAT format);
         void Destroy(in RenderTargetViewHandle handle);
         ref readonly RenderTargetView this[in RenderTargetViewHandle handle] { get; }

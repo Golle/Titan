@@ -5,7 +5,6 @@ using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Graphics;
 using Titan.Graphics.Materials;
-using Titan.Graphics.Pipeline;
 using Titan.Graphics.Resources;
 using Titan.Graphics.States;
 using Titan.IOC;
@@ -19,8 +18,7 @@ namespace Titan
         private readonly ILog _log;
 
         private readonly IWindow _window;
-        private readonly IGraphicsDevice _device;
-        private readonly IGraphicsPipeline _pipeline;
+        private readonly GraphicsSystem _graphicsSystem;
         private readonly IEventQueue _eventQueue;
         private readonly IMemoryManager _memoryManager;
 
@@ -38,11 +36,10 @@ namespace Titan
             return application;
         }
         
-        private Application(IWindow window, IGraphicsDevice graphicsDevice, IGraphicsPipeline graphicsPipeline, IEventQueue eventQueue, IMemoryManager memoryManager, ILog log, IContainer container)
+        private Application(IWindow window, GraphicsSystem graphicsSystem, IEventQueue eventQueue, IMemoryManager memoryManager, ILog log, IContainer container)
         {
             _window = window;
-            _device = graphicsDevice;
-            _pipeline = graphicsPipeline;
+            _graphicsSystem = graphicsSystem;
             _eventQueue = eventQueue;
             _memoryManager = memoryManager;
             _log = log;
@@ -59,7 +56,7 @@ namespace Titan
             while (_window.Update())
             {
                 _eventQueue.Update();
-                _pipeline.Execute();
+                _graphicsSystem.RenderFrame();
             }
         }
 
@@ -79,21 +76,10 @@ namespace Titan
             LOGGER.Debug("Initialize Window with title '{0}' and dimensions {1}x{2}", configuration.DisplayConfiguration.Title, configuration.DisplayConfiguration.Width, configuration.DisplayConfiguration.Height);
             _window.Initialize((int) configuration.DisplayConfiguration.Width, (int) configuration.DisplayConfiguration.Height, configuration.DisplayConfiguration.Title);
 
-            LOGGER.Debug("Initialize the D3D11 Device");
-            _device.Initialize(configuration.DisplayConfiguration.RefreshRate, true);
-            InitializeGraphicManagers(configuration.AssetsDirectory);
-            LOGGER.Debug("Initialize Graphics pipeline");
-            _pipeline.Initialize(configuration.PipelineConfiguration);
+            LOGGER.Debug("Initialize the Graphics System");
+            _graphicsSystem.Initialize(configuration.AssetsDirectory.Path, configuration.DisplayConfiguration.RefreshRate, configuration.PipelineConfiguration, true);
         }
-
-        private void InitializeGraphicManagers(AssetsDirectory assetsDirectory)
-        {
-            _container.GetInstance<ITextureManager>().Initialize(_device);
-            _container.GetInstance<IShaderResourceViewManager>().Initialize(_device);
-            _container.GetInstance<IVertexBufferManager>().Initialize(_device);
-            _container.GetInstance<IIndexBufferManager>().Initialize(_device);
-        }
-
+        
         private unsafe void InitMemoryManager()
         {
             LOGGER.Debug("Initialize memory manager");
@@ -116,8 +102,7 @@ namespace Titan
 
         public void Dispose()
         {
-            _pipeline?.Dispose();
-            _device?.Dispose();
+            _graphicsSystem?.Dispose();
             _window?.Dispose();
             _container.Dispose();
             _memoryManager.Dispose();

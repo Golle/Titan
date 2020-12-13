@@ -19,14 +19,13 @@ namespace Titan.Graphics.D3D11
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
 
-        public IConstantBufferManager ConstantBufferManager { get; private set; }
-        public IRenderTargetViewManager RenderTargetViewManager { get; private set; }
         public IDepthStencilViewManager DepthStencilViewManager { get; private set; }
         public IDepthStencilStateManager DepthStencilStateManager { get; private set; }
         public ISamplerStateManager SamplerStateManager { get; private set; }
         public IRenderContext ImmediateContext { get; private set; }
         public IShaderManager ShaderManager { get; private set; }
         public ID3D11Device* Ptr => _device.Get();
+        public IDXGISwapChain* SwapChainPtr => _swapChain.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
 
         public GraphicsDevice(IWindow window, IMemoryManager memoryManager, IShaderCompiler shaderCompiler)
@@ -39,10 +38,8 @@ namespace Titan.Graphics.D3D11
         public void Initialize(uint refreshRate, bool debug = false)
         {
             InitDeviceAndSwapChain(refreshRate, debug);
-            InitBackBuffer();
 
             var pDevice = _device.Get();
-            ConstantBufferManager = new ConstantBufferManager(pDevice, _memoryManager);
             DepthStencilViewManager = new DepthStencilViewManager(pDevice, _memoryManager);
             DepthStencilStateManager = new DepthStencilStateManager(pDevice, _memoryManager);
             SamplerStateManager = new SamplerStateManager(pDevice, _memoryManager);
@@ -87,23 +84,8 @@ namespace Titan.Graphics.D3D11
             ImmediateContext = new RenderContext(context.Get());
         }
 
-        private void InitBackBuffer()
-        {
-            using var renderTarget = new ComPtr<ID3D11RenderTargetView>();
-            using var backbuffer = new ComPtr<ID3D11Buffer>();
-            fixed (Guid* resourcePointer = &D3D11Resource)
-            {
-                CheckAndThrow(_swapChain.Get()->GetBuffer(0, resourcePointer, (void**) backbuffer.GetAddressOf()), "GetBuffer");
-            }
-            CheckAndThrow(_device.Get()->CreateRenderTargetView((ID3D11Resource*) backbuffer.Get(), null, renderTarget.GetAddressOf()), "CreateRenderTargetView");
-            
-            RenderTargetViewManager = new RenderTargetViewManager(_device.Get(), renderTarget.Get(), _memoryManager);
-        }
-
         public void Dispose()
         {
-            ConstantBufferManager.Dispose();
-            RenderTargetViewManager.Dispose();
             DepthStencilViewManager.Dispose();
             DepthStencilStateManager.Dispose();
             SamplerStateManager.Dispose();
