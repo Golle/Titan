@@ -1,11 +1,9 @@
 using System;
-using System.IO;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Graphics;
-using Titan.Graphics.D3D11;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Resources;
@@ -15,16 +13,68 @@ using Titan.Windows;
 
 namespace Titan
 {
+    internal class EngineInitializer : IDisposable
+    {
+        private readonly IGraphicsPipeline _graphicsPipeline;
+        private readonly IGraphicsDevice _graphicsDevice;
+        private readonly IWindow _window;
+
+        public EngineInitializer(IGraphicsPipeline graphicsPipeline, IGraphicsDevice graphicsDevice, IWindow window)
+        {
+            _graphicsPipeline = graphicsPipeline;
+            _graphicsDevice = graphicsDevice;
+            _window = window;
+        }
+
+        internal void InitializeAll(GameConfiguration configuration)
+        {
+            var displayConfig = configuration.DisplayConfiguration;
+            _window.Initialize((int) displayConfig.Width, (int) displayConfig.Height, displayConfig.Title);
+            _graphicsDevice.Initialize(displayConfig.RefreshRate, debug: true);
+            //_graphicsPipeline.Initialize();
+        }
+
+        public void Dispose()
+        {
+            
+        }
+    }
+
     public class Application : IDisposable
     {
-        private readonly IContainer _container = Bootstrapper.CreateContainer();
-        private IWindow _window;
-        private IGraphicsDevice _device;
-        private IGraphicsPipeline _pipeline;
-        private IEventQueue _eventQueue;
+        private readonly IContainer _container;
+        private readonly ILog _log;
 
-        public static Application Create(GameConfigurationBuilder configuration) => new(configuration.Build());
-        private Application(GameConfiguration configuration) => Initialize(configuration);
+        private readonly IWindow _window;
+        private readonly IGraphicsDevice _device;
+        private readonly IGraphicsPipeline _pipeline;
+        private readonly IEventQueue _eventQueue;
+        private readonly IMemoryManager _memoryManager;
+
+        public static Application Create(GameConfigurationBuilder configurationBuilder)
+        {
+            var container = Bootstrapper.CreateContainer();
+            var loader = container.CreateInstance<ConfigurationFileLoader>();
+
+            var configuration = configurationBuilder.Build(loader);
+            
+            container.RegisterSingleton(container);
+            
+            var application = container.CreateInstance<Application>();
+            application.Initialize(configuration);
+            return application;
+        }
+        
+        private Application(IWindow window, IGraphicsDevice graphicsDevice, IGraphicsPipeline graphicsPipeline, IEventQueue eventQueue, IMemoryManager memoryManager, ILog log, IContainer container)
+        {
+            _window = window;
+            _device = graphicsDevice;
+            _pipeline = graphicsPipeline;
+            _eventQueue = eventQueue;
+            _memoryManager = memoryManager;
+            _log = log;
+            _container = container;
+        }
         
         public void Run()
         {
@@ -42,24 +92,31 @@ namespace Titan
 
         private void Initialize(GameConfiguration configuration)
         {
-            _container.RegisterSingleton(_container);
             _container.RegisterSingleton(new TitanConfiguration(configuration.AssetsDirectory.Path, 144, 0.1f, true)); // TODO: not sure if we want this
-            InitLogger(configuration.LoggerConfiguration);
-            InitEventsQueue();
             
-            InitMemoryManager();
-            
-            InitDisplay(configuration.DisplayConfiguration);
-            InitPipeline(configuration.PipelineConfiguration);
-            
+            // Use default logger for now
+            LOGGER.InitializeLogger(_log);
+            LOGGER.Debug("LOGGER initialized with type: ", _log.GetType().Name);
 
+            LOGGER.Debug("Initialize EventQueue with {0}", typeof(ScanningEventTypeProvider));
+            _eventQueue.Initialize(new ScanningEventTypeProvider());
+
+            InitMemoryManager();
+
+            LOGGER.Debug("Initialize Window with title '{0}' and dimensions {1}x{2}", configuration.DisplayConfiguration.Title, configuration.DisplayConfiguration.Width, configuration.DisplayConfiguration.Height);
+            _window.Initialize((int) configuration.DisplayConfiguration.Width, (int) configuration.DisplayConfiguration.Height, configuration.DisplayConfiguration.Title);
+
+            LOGGER.Debug("Initialize the D3D11 Device");
+            _device.Initialize(configuration.DisplayConfiguration.RefreshRate, true);
+            LOGGER.Debug("Initialize Graphics pipeline");
+            _pipeline.Initialize(configuration.PipelineConfiguration);
         }
 
         private unsafe void InitMemoryManager()
         {
             LOGGER.Debug("Initialize memory manager");
             // TODO: not sure how to do this yet. Could have each manager "request" a memory chunk.
-            var memoryManager = new MemoryManager(new[]
+            _memoryManager.Initialize(new[]
             {
                 new ChunkDescriptor("VertexBuffer", (uint) sizeof(VertexBuffer), 2048),
                 new ChunkDescriptor("IndexBuffer", (uint) sizeof(IndexBuffer), 2048),
@@ -73,39 +130,6 @@ namespace Titan
                 new ChunkDescriptor("DepthStencilState", (uint) sizeof(DepthStencilState), 10),
                 new ChunkDescriptor("SamplerState", (uint) sizeof(SamplerState), 20),
             });
-            _container.RegisterSingleton<IMemoryManager>(memoryManager);
-        }
-
-        private void InitPipeline(PipelineConfiguration config)
-        {
-            
-            _container.RegisterSingleton(_pipeline = _container.CreateInstance<GraphicsPipeline>());
-            LOGGER.Debug("Initialize Graphics pipeline from {0}", config.Path);
-            _pipeline.Initialize(Path.GetFileName(config.Path)); // TODO: temp since we expect just a filename in the pipeline at the moment
-        }
-
-        private void InitLogger(LoggerConfiguration _)
-        {
-            // Use default logger for now
-            var logger = _container.GetInstance<ILog>();
-            LOGGER.InitializeLogger(logger);
-            LOGGER.Debug("LOGGER initialized with type: ", logger.GetType().Name);
-        }
-
-        private void InitEventsQueue()
-        {
-            _container.RegisterSingleton(_eventQueue = _container.CreateInstance<EventQueue>());
-            LOGGER.Debug("Initialize EventQueue with {0}", typeof(ScanningEventTypeProvider));
-            _eventQueue.Initialize(new ScanningEventTypeProvider());
-        }
-
-        private void InitDisplay(DisplayConfiguration config)
-        {
-            LOGGER.Debug("Initialize Window with title '{0}' and dimensions {1}x{2}", config.Title, config.Width, config.Height);
-            _container.RegisterSingleton(_window = _container.GetInstance<IWindowFactory>().Create(config.Width, config.Height, config.Title));
-
-            LOGGER.Debug("Initialize the D3D11 Device");
-            _container.RegisterSingleton(_device = _container.CreateInstance<GraphicsDevice>());
         }
 
         public void Dispose()
@@ -114,6 +138,7 @@ namespace Titan
             _device?.Dispose();
             _window?.Dispose();
             _container.Dispose();
+            _memoryManager.Dispose();
         }
     }
 }

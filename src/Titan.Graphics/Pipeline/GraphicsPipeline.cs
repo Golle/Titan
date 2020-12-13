@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Graphics.Pipeline.Configuration;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.IOC;
 using Titan.Windows;
@@ -14,8 +14,6 @@ namespace Titan.Graphics.Pipeline
 {
     internal class GraphicsPipeline : IGraphicsPipeline
     {
-        private readonly TitanConfiguration _configuration;
-        private readonly IPipelineConfigurationLoader _loader;
         private readonly IWindow _window;
         private readonly IContainer _container;
         private readonly IGraphicsDevice _device;
@@ -24,16 +22,14 @@ namespace Titan.Graphics.Pipeline
         
         private RenderGraph _renderGraph;
 
-        public GraphicsPipeline(TitanConfiguration configuration, IPipelineConfigurationLoader loader, IContainer container,  IWindow window, IGraphicsDevice device)
+        public GraphicsPipeline(IContainer container,  IWindow window, IGraphicsDevice device)
         {
-            _configuration = configuration;
-            _loader = loader;
             _window = window;
             _container = container;
             _device = device;
         }
 
-        public unsafe void Initialize(string filename)
+        public unsafe void Initialize(PipelineConfiguration configuration)
         {
             if (_renderGraph != null)
             {
@@ -41,10 +37,8 @@ namespace Titan.Graphics.Pipeline
             }
             var builder = new RenderPassBuilder(_device);
             
-            var path = _configuration.GetPath(filename);
-            LOGGER.Debug("Loading Pipeline configuration from {0}", path);
             
-            var (shaderPrograms, renderPasses, renderers, samplers) = _loader.Load(path);
+            var (shaderPrograms, renderPasses, renderers, samplers) = configuration;
 
             // Shaders must be compiled first since they are used in the Renderers
             LOGGER.Debug("Adding ShaderPrograms {0}", shaderPrograms.Length);

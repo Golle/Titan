@@ -7,10 +7,12 @@ using Titan.Core.Logging;
 
 namespace Titan.Core.Messaging
 {
+    // TODO: replace this with the implementation in the ECS
     public class EventQueue : IEventQueue
     {
         private delegate void SwapDelegate();
         private readonly IList<SwapDelegate> _swaps = new List<SwapDelegate>();
+
         public void Initialize(IEventTypeProvider eventTypeProvider)
         {
             Debug.Assert(_swaps.Count == 0, "EventQueue has already been initialized");
@@ -30,7 +32,7 @@ namespace Titan.Core.Messaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<T> GetEvents<T>() where T : struct => EventQueueInternal<T>.GetEvents();
 
-        void IEventQueue.Update()
+        public void Update()
         {
             foreach (var swap in _swaps)
             {

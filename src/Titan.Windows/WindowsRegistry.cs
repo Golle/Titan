@@ -8,7 +8,7 @@ namespace Titan.Windows
         public void Register(IContainer container)
         {
             container
-                .Register<IWindowFactory, Win32WindowFactory>()
+                .Register<IWindow, Win32Window>()
                 .Register<IWindowEventHandler, WindowEventHandler>()
 
                 ;

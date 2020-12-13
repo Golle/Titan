@@ -4,7 +4,7 @@ namespace Titan.Graphics.Pipeline
 {
     public interface IGraphicsPipeline : IDisposable
     {
-        void Initialize(string filename);
+        void Initialize(PipelineConfiguration configuration);
         void Execute();
     }
 }

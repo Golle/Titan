@@ -2,17 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Titan.ECS.Systems;
+using Titan.Graphics.Pipeline;
 
 namespace Titan
 {
 
-    public record DisplayConfiguration(string Title, uint Width, uint Height, uint RefreshRate)
-    {
-        public static DisplayConfiguration FromFile(string file) => System.Text.Json.JsonSerializer.Deserialize<DisplayConfiguration>(File.ReadAllText(file));
-    }
-
-    public record PipelineConfiguration(string Path);
-
+    public record DisplayConfigurationFile(string Path);
+    public record DisplayConfiguration(string Title, uint Width, uint Height, uint RefreshRate);
+    public record PipelineConfigurationFile(string Path);
     public record LoggerConfiguration();
     public record AssetsDirectory(string Path);
     public record SystemsConfiguration(string Name, Type Type, string[] Dependencies);
@@ -25,7 +22,9 @@ namespace Titan
         private AssetsDirectory _assetsDirectory;
         private DisplayConfiguration _displayConfiguration;
         private LoggerConfiguration _loggerConfiguration;
-        private PipelineConfiguration _pipelineConfiguration;
+        
+        private PipelineConfigurationFile _pipelineConfigurationFile;
+        private DisplayConfigurationFile _displayConfigurationFile;
 
         public GameConfigurationBuilder WithDefaultConsoleLogger()
         {
@@ -45,22 +44,33 @@ namespace Titan
             return this;
         }
 
+        public GameConfigurationBuilder WithDisplayConfigurationFile(DisplayConfigurationFile configurationFile)
+        {
+            _displayConfigurationFile = configurationFile;
+            return this;
+        }
         public GameConfigurationBuilder WithDisplayConfiguration(DisplayConfiguration configuration)
         {
             _displayConfiguration = configuration;
             return this;
         }
 
-        public GameConfigurationBuilder WithPipelineConfiguration(PipelineConfiguration configuration)
+        public GameConfigurationBuilder WithPipelineConfigurationFromFile(PipelineConfigurationFile configurationFile)
         {
-            _pipelineConfiguration = configuration;
+            _pipelineConfigurationFile = configurationFile;
             return this;
         }
 
-        internal GameConfiguration Build()
+        internal GameConfiguration Build(ConfigurationFileLoader loader)
         {
             Validate();
-            return new (_assetsDirectory, _systems.ToArray(), _displayConfiguration, _loggerConfiguration, _pipelineConfiguration);
+
+            string GetPath(string filename) => Path.Combine(_assetsDirectory.Path, filename);
+            
+            var pipelineConfiguration = loader.ReadConfig<PipelineConfiguration>(GetPath(_pipelineConfigurationFile.Path));
+            var displayConfiguration = _displayConfiguration ?? loader.ReadConfig<DisplayConfiguration>(GetPath(_displayConfigurationFile.Path));
+            
+            return new (_assetsDirectory, _systems.ToArray(), displayConfiguration, _loggerConfiguration, pipelineConfiguration);
         }
 
         private void Validate()
@@ -69,17 +79,17 @@ namespace Titan
             {
                 throw new InvalidOperationException($"{nameof(AssetsDirectory)} is not set. Use {nameof(WithAssetsDirectory)} to configure.");
             }
-            if (_displayConfiguration == null)
+            if (_displayConfiguration == null && _displayConfigurationFile == null)
             {
-                throw new InvalidOperationException($"{nameof(DisplayConfiguration)} is not set. Use {nameof(WithDisplayConfiguration)} to configure.");
+                throw new InvalidOperationException($"{nameof(DisplayConfiguration)} is not set. Use {nameof(WithDisplayConfiguration)} or {nameof(WithDisplayConfigurationFile)} to configure.");
             }
             if (_loggerConfiguration == null)
             {
                 throw new InvalidOperationException($"{nameof(LoggerConfiguration)} is not set. Use {nameof(WithDefaultConsoleLogger)} to configure.");
             }
-            if (_pipelineConfiguration == null)
+            if (_pipelineConfigurationFile == null)
             {
-                throw new InvalidOperationException($"{nameof(PipelineConfiguration)} is not set. Use {nameof(WithPipelineConfiguration)} to configure.");
+                throw new InvalidOperationException($"{nameof(PipelineConfigurationFile)} is not set. Use {nameof(WithPipelineConfigurationFromFile)} to configure.");
             }
         }
     }

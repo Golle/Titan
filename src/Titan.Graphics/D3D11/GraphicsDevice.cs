@@ -1,5 +1,4 @@
 using System;
-using Titan.Core;
 using Titan.Core.Memory;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
@@ -14,23 +13,43 @@ namespace Titan.Graphics.D3D11
 {
     public unsafe class GraphicsDevice : IGraphicsDevice
     {
+        private readonly IWindow _window;
+        private readonly IMemoryManager _memoryManager;
+        private readonly IShaderCompiler _shaderCompiler;
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
 
-        public IShaderResourceViewManager ShaderResourceViewManager { get; }
-        public ITextureManager TextureManager { get; }
-        public IVertexBufferManager VertexBufferManager { get; }
-        public IIndexBufferManager IndexBufferManager { get; }
-        public IConstantBufferManager ConstantBufferManager { get; }
+        public IShaderResourceViewManager ShaderResourceViewManager { get; private set; }
+        public ITextureManager TextureManager { get; private set; }
+        public IVertexBufferManager VertexBufferManager { get; private set; }
+        public IIndexBufferManager IndexBufferManager { get; private set; }
+        public IConstantBufferManager ConstantBufferManager { get; private set; }
         public IRenderTargetViewManager RenderTargetViewManager { get; private set; }
-        public IDepthStencilViewManager DepthStencilViewManager { get; }
-        public IDepthStencilStateManager DepthStencilStateManager { get; }
-        public ISamplerStateManager SamplerStateManager { get; }
+        public IDepthStencilViewManager DepthStencilViewManager { get; private set; }
+        public IDepthStencilStateManager DepthStencilStateManager { get; private set; }
+        public ISamplerStateManager SamplerStateManager { get; private set; }
         public IRenderContext ImmediateContext { get; private set; }
-        public IShaderManager ShaderManager { get; }
+        public IShaderManager ShaderManager { get; private set; }
         public ID3D11Device* Ptr => _device.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
 
+        public void Initialize(uint refreshRate, bool debug = false)
+        {
+            
+            InitDeviceAndSwapChain(refreshRate, debug);
+            InitBackBuffer();
+
+            var pDevice = _device.Get();
+            TextureManager = new TextureManager(pDevice, _memoryManager);
+            IndexBufferManager = new IndexBufferManager(pDevice, _memoryManager);
+            ShaderResourceViewManager = new ShaderResourceViewManager(pDevice, _memoryManager);
+            VertexBufferManager = new VertexBufferManager(pDevice, _memoryManager);
+            ConstantBufferManager = new ConstantBufferManager(pDevice, _memoryManager);
+            DepthStencilViewManager = new DepthStencilViewManager(pDevice, _memoryManager);
+            DepthStencilStateManager = new DepthStencilStateManager(pDevice, _memoryManager);
+            SamplerStateManager = new SamplerStateManager(pDevice, _memoryManager);
+            ShaderManager = new ShaderManager(pDevice, _memoryManager, _shaderCompiler);
+        }
         public void ResizeBuffers()
         {
             // TODO: this will crash because RenderTargetViewManager has a reference to backbuffer. Move the backbuffer to the manager and implement resize for all buffers.
@@ -39,33 +58,23 @@ namespace Titan.Graphics.D3D11
             //InitBackBuffer(null);
         }
 
-        public GraphicsDevice(IWindow window, IMemoryManager memoryManager, IShaderCompiler shaderCompiler, TitanConfiguration configuration)
+        public GraphicsDevice(IWindow window, IMemoryManager memoryManager, IShaderCompiler shaderCompiler)
         {
-            InitDeviceAndSwapChain(window, configuration.RefreshRate, configuration.Debug);
-            InitBackBuffer(memoryManager);
-
-            var pDevice = _device.Get();
-            TextureManager = new TextureManager(pDevice, memoryManager);
-            IndexBufferManager = new IndexBufferManager(pDevice, memoryManager);
-            ShaderResourceViewManager = new ShaderResourceViewManager(pDevice, memoryManager);
-            VertexBufferManager = new VertexBufferManager(pDevice, memoryManager);
-            ConstantBufferManager = new ConstantBufferManager(pDevice, memoryManager);
-            DepthStencilViewManager = new DepthStencilViewManager(pDevice, memoryManager);
-            DepthStencilStateManager = new DepthStencilStateManager(pDevice, memoryManager);
-            SamplerStateManager = new SamplerStateManager(pDevice, memoryManager);
-            ShaderManager = new ShaderManager(pDevice, memoryManager, shaderCompiler, configuration);
+            _window = window;
+            _memoryManager = memoryManager;
+            _shaderCompiler = shaderCompiler;
         }
 
 
-        private void InitDeviceAndSwapChain(IWindow window, uint refreshRate, bool debug)
+        private void InitDeviceAndSwapChain( uint refreshRate, bool debug)
         {
             var flags = debug ? 2u : 0u;
             var featureLevel = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1;
             DXGI_SWAP_CHAIN_DESC desc;
             desc.BufferCount = 2;
             //desc.BufferCount = 1;
-            desc.BufferDesc.Width = (uint) window.Width;
-            desc.BufferDesc.Height = (uint) window.Height;
+            desc.BufferDesc.Width = (uint) _window.Width;
+            desc.BufferDesc.Height = (uint) _window.Height;
             desc.BufferDesc.Format = DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM;
             desc.BufferDesc.RefreshRate.Denominator = refreshRate;
             desc.BufferDesc.Scaling = DXGI_MODE_SCALING.DXGI_MODE_SCALING_UNSPECIFIED;
@@ -75,8 +84,8 @@ namespace Titan.Graphics.D3D11
             desc.SampleDesc.Quality = 0;
 
             desc.BufferUsage = DXGI_USAGE.DXGI_USAGE_RENDER_TARGET_OUTPUT;
-            desc.OutputWindow = window.Handle;
-            desc.Windowed = window.Windowed;
+            desc.OutputWindow = _window.Handle;
+            desc.Windowed = _window.Windowed;
             //desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_DISCARD;
             desc.SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_FLIP_DISCARD;
             desc.Flags = DXGI_SWAP_CHAIN_FLAG.DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -86,7 +95,7 @@ namespace Titan.Graphics.D3D11
             ImmediateContext = new RenderContext(context.Get());
         }
 
-        private void InitBackBuffer(IMemoryManager memoryManager)
+        private void InitBackBuffer()
         {
             using var renderTarget = new ComPtr<ID3D11RenderTargetView>();
             using var backbuffer = new ComPtr<ID3D11Buffer>();
@@ -96,7 +105,7 @@ namespace Titan.Graphics.D3D11
             }
             CheckAndThrow(_device.Get()->CreateRenderTargetView((ID3D11Resource*) backbuffer.Get(), null, renderTarget.GetAddressOf()), "CreateRenderTargetView");
             
-            RenderTargetViewManager = new RenderTargetViewManager(_device.Get(), renderTarget.Get(), memoryManager);
+            RenderTargetViewManager = new RenderTargetViewManager(_device.Get(), renderTarget.Get(), _memoryManager);
         }
 
         public void Dispose()

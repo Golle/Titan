@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
@@ -15,7 +16,6 @@ namespace Titan.Graphics.Shaders
     {
         private ComPtr<ID3D11Device> _device;
 
-        private readonly TitanConfiguration _configuration; // TODO: should the configuration be here?
         private readonly IShaderCompiler _shaderCompiler;
 
         private readonly IDictionary<PixelShaderDescriptor, PixelShaderHandle> _pixelShaderCache = new Dictionary<PixelShaderDescriptor, PixelShaderHandle>();
@@ -30,13 +30,12 @@ namespace Titan.Graphics.Shaders
 
         private int _handle;
 
-        public ShaderManager(ID3D11Device* device, IMemoryManager memoryManager, IShaderCompiler shaderCompiler, TitanConfiguration configuration)
+        public ShaderManager(ID3D11Device* device, IMemoryManager memoryManager, IShaderCompiler shaderCompiler)
         {
             Debug.Assert(sizeof(VertexShader) == sizeof(PixelShader) && sizeof(PixelShader) == sizeof(InputLayout), "VertexShader, PixelShader and InputLayout must be of the same size.");
 
             _device = new ComPtr<ID3D11Device>(device);
             _shaderCompiler = shaderCompiler;
-            _configuration = configuration;
 
             var memory = memoryManager.GetMemoryChunk("Shaders");
             _memory = memory.Pointer;
@@ -57,7 +56,9 @@ namespace Titan.Graphics.Shaders
             if (!_vertexShaderCache.TryGetValue(vertexShaderDescriptor, out var vertexShaderHandle))
             {
                 vertexShaderHandle = NextHandle();
-                using var shader = _shaderCompiler.CompileShaderFromFile(_configuration.GetPath(vertexShaderDescriptor.Filename), vertexShaderDescriptor.Entrypoint, vertexShaderDescriptor.Version, vertexShaderDescriptor.Defines);
+                //var filename = _configuration.GetPath(vertexShaderDescriptor.Filename); // TODO: fix this when we have an asset manager
+                var filename = Path.Combine(@"F:\Git\Titan\resources", vertexShaderDescriptor.Filename);
+                using var shader = _shaderCompiler.CompileShaderFromFile(filename, vertexShaderDescriptor.Entrypoint, vertexShaderDescriptor.Version, vertexShaderDescriptor.Defines);
                 Common.CheckAndThrow(_device.Get()->CreateVertexShader(shader.Buffer, shader.BufferSize, null, &((VertexShader*)_memory)[vertexShaderHandle].Pointer), "CreateVertexShader");
                 _vertexShaderCache.Add(vertexShaderDescriptor, vertexShaderHandle);
                 if (!hasCachedInputHandle)
@@ -77,7 +78,9 @@ namespace Titan.Graphics.Shaders
             if (!_pixelShaderCache.TryGetValue(pixelShaderDescriptor, out var pixelShaderHandle))
             {
                 pixelShaderHandle = NextHandle();
-                using var shader = _shaderCompiler.CompileShaderFromFile(_configuration.GetPath(pixelShaderDescriptor.Filename), pixelShaderDescriptor.Entrypoint, pixelShaderDescriptor.Version, pixelShaderDescriptor.Defines);
+                //var filename = _configuration.GetPath(pixelShaderDescriptor.Filename);
+                var filename = Path.Combine(@"F:\Git\Titan\resources", pixelShaderDescriptor.Filename); // TODO: fix this when we have an asset manager
+                using var shader = _shaderCompiler.CompileShaderFromFile(filename, pixelShaderDescriptor.Entrypoint, pixelShaderDescriptor.Version, pixelShaderDescriptor.Defines);
                 
                 Common.CheckAndThrow(_device.Get()->CreatePixelShader(shader.Buffer, shader.BufferSize, null, &((PixelShader*) _memory)[pixelShaderHandle].Pointer), "CreatePixelShader");
                 _pixelShaderCache.Add(pixelShaderDescriptor, pixelShaderHandle);

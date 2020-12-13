@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using Titan.Windows.Win32.Native;
 
@@ -19,18 +18,25 @@ namespace Titan.Windows.Win32
         }
 
         private readonly IWindowEventHandler _windowEventHandler;
-        public HWND Handle { get; }
+        public HWND Handle { get; private set; }
         public int Height { get; private set; }
         public int Width { get; private set; }
         public POINT Center { get; private set; }
         public bool Windowed => true;
 
-        private readonly unsafe UserData * _userData;
+        private unsafe UserData * _userData;
         private POINT _mousePosition;
 
-        public unsafe Win32Window(int width, int height, string title, IWindowEventHandler windowEventHandler)
+        public Win32Window(IWindowEventHandler windowEventHandler)
         {
             _windowEventHandler = windowEventHandler;
+        }
+        public unsafe void Initialize(int width, int height, string title)
+        {
+            if (_userData != null)
+            {
+                throw new InvalidOperationException("Window has already been initialized");
+            }
             _userData = (UserData*)Marshal.AllocHGlobal(sizeof(UserData));
             _userData->EventHandler = (IntPtr) GCHandle.Alloc(_windowEventHandler);
             _userData->Window = (IntPtr) GCHandle.Alloc(this);
@@ -273,16 +279,18 @@ EndHandler:
             
         }
 
-        public void Dispose()
+        public unsafe void Dispose()
         {
-            unsafe
+            if (_userData != null)
             {
                 GCHandle.FromIntPtr(_userData->EventHandler).Free();
                 GCHandle.FromIntPtr(_userData->Window).Free();
                 Marshal.FreeHGlobal((nint)_userData);
-            }
 
-            DestroyWindow(Handle);
+                DestroyWindow(Handle);
+                Handle = 0;
+                _userData = null;
+            }
         }
     }
 }

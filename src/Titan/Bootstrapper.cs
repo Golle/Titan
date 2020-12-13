@@ -14,7 +14,6 @@ namespace Titan
             .AddRegistry<GraphicsRegistry>()
         
         
-        
             .Register<IInputHandler, InputHandler>()
             ;
     }
