@@ -19,12 +19,9 @@ namespace Titan.Graphics.Pipeline
 
         private readonly IDictionary<string, DepthStencilViewHandle> _depthStencils = new Dictionary<string, DepthStencilViewHandle>();
         private readonly IDictionary<string, SamplerStateHandle> _samplers = new Dictionary<string, SamplerStateHandle>();
-        
-        private readonly IGraphicsDevice _device;
 
-        internal RenderPassBuilder(IGraphicsDevice device)
+        internal RenderPassBuilder()
         {
-            _device = device;
             _renderTargets["$Backbuffer"] = 0; // The backbuffer will always be at handle 0
         }
 

@@ -16,9 +16,9 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IndexBufferHandle _indexBufferHandle;
         private readonly ShaderProgram _shader;
 
-        public DefaultFullscreenRenderer(IGraphicsDevice device, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager)
+        public DefaultFullscreenRenderer(IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IShaderManager shaderManager)
         {
-            _shaderManager = device.ShaderManager;
+            _shaderManager = shaderManager;
             _vertexBufferManager = vertexBufferManager;
             _indexBufferManager = indexBufferManager;
 

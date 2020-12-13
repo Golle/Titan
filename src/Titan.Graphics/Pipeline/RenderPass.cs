@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
+using Titan.Graphics.Shaders;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline
@@ -13,14 +14,18 @@ namespace Titan.Graphics.Pipeline
         private readonly IGraphicsDevice _device;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly IRenderTargetViewManager _renderTargetViewManager;
+        private readonly IDepthStencilViewManager _depthStencilViewManager;
+        private readonly IShaderManager _shaderManager;
 
-        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager)
+        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, IShaderManager shaderManager)
         {
             _name = name;
             _commands = commands;
             _device = device;
             _shaderResourceViewManager = shaderResourceViewManager;
             _renderTargetViewManager = renderTargetViewManager;
+            _depthStencilViewManager = depthStencilViewManager;
+            _shaderManager = shaderManager;
         }
 
         public void Render(IRenderContext renderContext)
@@ -38,10 +43,10 @@ namespace Titan.Graphics.Pipeline
                         renderContext.ClearRenderTargetView(_renderTargetViewManager[command.ClearRenderTarget.RenderTarget], command.ClearRenderTarget.Color);
                         break;
                     case CommandType.ClearDepthStencil:
-                        renderContext.ClearDepthStencilView(_device.DepthStencilViewManager[command.DepthStencil]);
+                        renderContext.ClearDepthStencilView(_depthStencilViewManager[command.DepthStencil]);
                         break;
                     case CommandType.SetRenderTargetAndDepthStencil:
-                        renderContext.SetRenderTarget(_renderTargetViewManager[command.RenderTarget], _device.DepthStencilViewManager[command.DepthStencil]);
+                        renderContext.SetRenderTarget(_renderTargetViewManager[command.RenderTarget], _depthStencilViewManager[command.DepthStencil]);
                         break;
                     case CommandType.SetRenderTarget:
                         renderContext.SetRenderTarget(_renderTargetViewManager[command.RenderTarget]);
@@ -54,9 +59,9 @@ namespace Titan.Graphics.Pipeline
                         break;
                     case CommandType.SetShaderProgram:
                         var shader = command.ShaderProgram;
-                        renderContext.SetInputLayout(_device.ShaderManager[shader.InputLayout]);
-                        renderContext.SetPixelShader(_device.ShaderManager[shader.PixelShader]);
-                        renderContext.SetVertexShader(_device.ShaderManager[shader.VertexShader]);
+                        renderContext.SetInputLayout(_shaderManager[shader.InputLayout]);
+                        renderContext.SetPixelShader(_shaderManager[shader.PixelShader]);
+                        renderContext.SetVertexShader(_shaderManager[shader.VertexShader]);
                         break;
                     case CommandType.Render:
                         command.Renderer.Render(renderContext);
@@ -118,7 +123,7 @@ namespace Titan.Graphics.Pipeline
                 renderTargets[i] = _renderTargetViewManager[command.Handles[i]].Pointer;
             }
 
-            var depthStencilView = hasDepthStencil ? _device.DepthStencilViewManager[command.DepthStencilView].Pointer : null;
+            var depthStencilView = hasDepthStencil ? _depthStencilViewManager[command.DepthStencilView].Pointer : null;
             context.SetRenderTargets(renderTargets, command.Count, depthStencilView);
         }
     }

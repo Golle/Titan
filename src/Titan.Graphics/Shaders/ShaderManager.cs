@@ -4,9 +4,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core;
 using Titan.Core.Memory;
+using Titan.Graphics.D3D11;
+using Titan.Graphics.Resources;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -16,6 +19,7 @@ namespace Titan.Graphics.Shaders
     {
         private ComPtr<ID3D11Device> _device;
 
+        private readonly IMemoryManager _memoryManager;
         private readonly IShaderCompiler _shaderCompiler;
 
         private readonly IDictionary<PixelShaderDescriptor, PixelShaderHandle> _pixelShaderCache = new Dictionary<PixelShaderDescriptor, PixelShaderHandle>();
@@ -24,22 +28,32 @@ namespace Titan.Graphics.Shaders
 
         private readonly IDictionary<string, ShaderProgram> _cachedPrograms = new Dictionary<string, ShaderProgram>();
 
-
-        private readonly void* _memory;
-        private readonly uint _maxHandles;
+        private void* _memory;
+        private uint _maxHandles;
 
         private int _handle;
+        private string _assetsPath;
 
-        public ShaderManager(ID3D11Device* device, IMemoryManager memoryManager, IShaderCompiler shaderCompiler)
+
+        public ShaderManager(IMemoryManager memoryManager, IShaderCompiler shaderCompiler)
+        {
+            _memoryManager = memoryManager;
+            _shaderCompiler = shaderCompiler;
+        }
+
+        public void Initialize(IGraphicsDevice graphicsDevice, string assetsPath)
         {
             Debug.Assert(sizeof(VertexShader) == sizeof(PixelShader) && sizeof(PixelShader) == sizeof(InputLayout), "VertexShader, PixelShader and InputLayout must be of the same size.");
 
-            _device = new ComPtr<ID3D11Device>(device);
-            _shaderCompiler = shaderCompiler;
-
-            var memory = memoryManager.GetMemoryChunk("Shaders");
+            if (_memory != null)
+            {
+                throw new InvalidOperationException($"{nameof(ShaderManager)} has already been initialized.");
+            }
+            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(ShaderManager)} with the wrong device.", nameof(graphicsDevice));
+            var memory = _memoryManager.GetMemoryChunk("Shaders");
             _memory = memory.Pointer;
             _maxHandles = memory.Count;
+            _assetsPath = assetsPath;
         }
 
         public ShaderProgram GetByName(string name) => _cachedPrograms.TryGetValue(name, out var shader) ? shader : throw new KeyNotFoundException($"Shader with name {name} does not exist");
@@ -56,8 +70,7 @@ namespace Titan.Graphics.Shaders
             if (!_vertexShaderCache.TryGetValue(vertexShaderDescriptor, out var vertexShaderHandle))
             {
                 vertexShaderHandle = NextHandle();
-                //var filename = _configuration.GetPath(vertexShaderDescriptor.Filename); // TODO: fix this when we have an asset manager
-                var filename = Path.Combine(@"F:\Git\Titan\resources", vertexShaderDescriptor.Filename);
+                var filename = Path.Combine(_assetsPath, vertexShaderDescriptor.Filename);
                 using var shader = _shaderCompiler.CompileShaderFromFile(filename, vertexShaderDescriptor.Entrypoint, vertexShaderDescriptor.Version, vertexShaderDescriptor.Defines);
                 Common.CheckAndThrow(_device.Get()->CreateVertexShader(shader.Buffer, shader.BufferSize, null, &((VertexShader*)_memory)[vertexShaderHandle].Pointer), "CreateVertexShader");
                 _vertexShaderCache.Add(vertexShaderDescriptor, vertexShaderHandle);
@@ -78,8 +91,7 @@ namespace Titan.Graphics.Shaders
             if (!_pixelShaderCache.TryGetValue(pixelShaderDescriptor, out var pixelShaderHandle))
             {
                 pixelShaderHandle = NextHandle();
-                //var filename = _configuration.GetPath(pixelShaderDescriptor.Filename);
-                var filename = Path.Combine(@"F:\Git\Titan\resources", pixelShaderDescriptor.Filename); // TODO: fix this when we have an asset manager
+                var filename = Path.Combine(_assetsPath, pixelShaderDescriptor.Filename);
                 using var shader = _shaderCompiler.CompileShaderFromFile(filename, pixelShaderDescriptor.Entrypoint, pixelShaderDescriptor.Version, pixelShaderDescriptor.Defines);
                 
                 Common.CheckAndThrow(_device.Get()->CreatePixelShader(shader.Buffer, shader.BufferSize, null, &((PixelShader*) _memory)[pixelShaderHandle].Pointer), "CreatePixelShader");
@@ -132,20 +144,39 @@ namespace Titan.Graphics.Shaders
         
         private int NextHandle() => Interlocked.Increment(ref _handle) - 1;
         private static string CreateInputLayoutKey(in InputLayoutDescriptor[] layout) => string.Join('#', layout.Select(l => $"{l.Name}:{l.Format}:{l.Classification}".ToLowerInvariant()));
-        public ref readonly InputLayout this[in InputLayoutHandle handle] => ref ((InputLayout*)_memory)[handle];
-        public ref readonly PixelShader this[in PixelShaderHandle handle] => ref ((PixelShader*)_memory)[handle];
-        public ref readonly VertexShader this[in VertexShaderHandle handle] => ref ((VertexShader*)_memory)[handle];
+        
+        public ref readonly InputLayout this[in InputLayoutHandle handle]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => ref ((InputLayout*) _memory)[handle];
+        }
+
+        public ref readonly PixelShader this[in PixelShaderHandle handle]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => ref ((PixelShader*) _memory)[handle];
+        }
+
+        public ref readonly VertexShader this[in VertexShaderHandle handle]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => ref ((VertexShader*) _memory)[handle];
+        }
 
         public void Dispose()
         {
-            for (var i = 0; i < _handle; ++i)
+            if (_memory != null)
             {
-                ref var pUnknown = ref ((IUnknown**) _memory)[i];
-                pUnknown->Release();
-                pUnknown = null;
+                for (var i = 0; i < _handle; ++i)
+                {
+                    ref var pUnknown = ref ((IUnknown**)_memory)[i];
+                    pUnknown->Release();
+                    pUnknown = null;
+                }
+                _handle = 0;
+                _device.Dispose();
+                _memory = null;
             }
-            _handle = 0;
-            _device.Dispose();
         }
     }
 }

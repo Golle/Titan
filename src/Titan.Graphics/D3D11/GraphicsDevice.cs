@@ -19,11 +19,9 @@ namespace Titan.Graphics.D3D11
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
 
-        public IDepthStencilViewManager DepthStencilViewManager { get; private set; }
         public IDepthStencilStateManager DepthStencilStateManager { get; private set; }
         public ISamplerStateManager SamplerStateManager { get; private set; }
         public IRenderContext ImmediateContext { get; private set; }
-        public IShaderManager ShaderManager { get; private set; }
         public ID3D11Device* Ptr => _device.Get();
         public IDXGISwapChain* SwapChainPtr => _swapChain.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
@@ -40,10 +38,8 @@ namespace Titan.Graphics.D3D11
             InitDeviceAndSwapChain(refreshRate, debug);
 
             var pDevice = _device.Get();
-            DepthStencilViewManager = new DepthStencilViewManager(pDevice, _memoryManager);
             DepthStencilStateManager = new DepthStencilStateManager(pDevice, _memoryManager);
             SamplerStateManager = new SamplerStateManager(pDevice, _memoryManager);
-            ShaderManager = new ShaderManager(pDevice, _memoryManager, _shaderCompiler);
         }
 
         public void ResizeBuffers()
@@ -86,10 +82,8 @@ namespace Titan.Graphics.D3D11
 
         public void Dispose()
         {
-            DepthStencilViewManager.Dispose();
             DepthStencilStateManager.Dispose();
             SamplerStateManager.Dispose();
-            ShaderManager.Dispose();
             (ImmediateContext as IDisposable)?.Dispose();
 
             _swapChain.Dispose();

@@ -4,6 +4,7 @@ using System.Linq;
 using Titan.Core.Logging;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
+using Titan.Graphics.Shaders;
 using Titan.IOC;
 using Titan.Windows;
 using static Titan.Windows.Win32.D3D11.D3D11_BIND_FLAG;
@@ -19,13 +20,15 @@ namespace Titan.Graphics.Pipeline
         private readonly ITextureManager _textureManager;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly IRenderTargetViewManager _renderTargetViewManager;
+        private readonly IDepthStencilViewManager _depthStencilViewManager;
+        private readonly IShaderManager _shaderManager;
         private readonly IRenderPassFactory _renderPassFactory;
 
         private readonly IList<IRenderer> _renderers = new List<IRenderer>();
         
         private RenderGraph _renderGraph;
 
-        public GraphicsPipeline(IContainer container,  IWindow window, IGraphicsDevice device, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IRenderPassFactory renderPassFactory)
+        public GraphicsPipeline(IContainer container, IWindow window, IGraphicsDevice device, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, IShaderManager shaderManager, IRenderPassFactory renderPassFactory)
         {
             _window = window;
             _container = container;
@@ -33,6 +36,8 @@ namespace Titan.Graphics.Pipeline
             _textureManager = textureManager;
             _shaderResourceViewManager = shaderResourceViewManager;
             _renderTargetViewManager = renderTargetViewManager;
+            _depthStencilViewManager = depthStencilViewManager;
+            _shaderManager = shaderManager;
             _renderPassFactory = renderPassFactory;
         }
 
@@ -42,7 +47,7 @@ namespace Titan.Graphics.Pipeline
             {
                 throw new InvalidOperationException("Graphics Pipeline has already been initialized.");
             }
-            var builder = _container.CreateInstance<RenderPassBuilder>();
+            var builder = new RenderPassBuilder();
             
             
             var (shaderPrograms, renderPasses, renderers, samplers) = configuration;
@@ -53,7 +58,7 @@ namespace Titan.Graphics.Pipeline
             {
                 LOGGER.Debug("Compiling shader program {0}", name);
 
-                var program = _device.ShaderManager.AddShader(name, vertexShader, pixelShader, layout);
+                var program = _shaderManager.AddShader(name, vertexShader, pixelShader, layout);
                 builder.AddShaderProgram(name, program);
             }
 
@@ -102,7 +107,7 @@ namespace Titan.Graphics.Pipeline
                     LOGGER.Debug("Creating DepthStencil {0}", renderPass.DepthStencil.Name);
                     // temp impl
                     var stencilTextureHandle = _textureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
-                    var stencilHandle = _device.DepthStencilViewManager.Create(_textureManager[stencilTextureHandle].Resource);
+                    var stencilHandle = _depthStencilViewManager.Create(_textureManager[stencilTextureHandle].Resource);
                     builder.AddDepthStencil(renderPass.DepthStencil.Name, stencilHandle);
                 }
                 

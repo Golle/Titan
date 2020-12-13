@@ -17,21 +17,18 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IConstantBufferManager _constantBufferManager;
         private readonly IShaderManager _shaderManager;
 
-
         private readonly VertexBufferHandle _vertexBufferHandle;
         private readonly IndexBufferHandle _indexBufferHandle;
         private readonly ConstantBufferHandle _lightSourceHandle;
         private readonly ShaderProgram _shader;
-
         
-
-        public unsafe DefaultLightsRenderer(IGraphicsDevice device, ILigthRenderQueue ligthRenderQueue, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager)
+        public unsafe DefaultLightsRenderer(ILigthRenderQueue ligthRenderQueue, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, IShaderManager shaderManager)
         {
             _ligthRenderQueue = ligthRenderQueue;
             _vertexBufferManager = vertexBufferManager;
             _indexBufferManager = indexBufferManager;
             _constantBufferManager = constantBufferManager;
-            _shaderManager = device.ShaderManager;
+            _shaderManager = shaderManager;
 
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex { Position = new Vector2(-1, -1), UV = new Vector2(0, 1) };
@@ -51,7 +48,7 @@ namespace Titan.Graphics.Pipeline.Renderers
 
             _lightSourceHandle = _constantBufferManager.CreateConstantBuffer(new LightSource(), D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
-            _shader = device.ShaderManager.GetByName("DeferredShadingDefault");
+            _shader = shaderManager.GetByName("DeferredShadingDefault");
         }
 
         public void Render(IRenderContext context)
@@ -94,8 +91,8 @@ namespace Titan.Graphics.Pipeline.Renderers
             private const int MaxNumberOfLights = 32;
             [FieldOffset(0)]
             public int NumberOfLights;
-            [FieldOffset(16)]
-            public unsafe fixed float Position[4*MaxNumberOfLights];
+            [FieldOffset(16)] 
+            private unsafe fixed float Position[4*MaxNumberOfLights];
             public unsafe void Set(int index, in Vector3 position)
             {
                 fixed (Vector3* pPosition = &position)

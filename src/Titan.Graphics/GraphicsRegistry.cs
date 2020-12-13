@@ -34,6 +34,8 @@ namespace Titan.Graphics
                 .Register<IIndexBufferManager, IndexBufferManager>()
                 .Register<IConstantBufferManager, ConstantBufferManager>()
                 .Register<IRenderTargetViewManager, RenderTargetViewManager>()
+                .Register<IDepthStencilViewManager, DepthStencilViewManager>()
+                .Register<IShaderManager, ShaderManager>()
 
                 
                 // Image loading
