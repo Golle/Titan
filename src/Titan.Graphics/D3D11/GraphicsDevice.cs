@@ -19,8 +19,6 @@ namespace Titan.Graphics.D3D11
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
 
-        public IShaderResourceViewManager ShaderResourceViewManager { get; private set; }
-        public ITextureManager TextureManager { get; private set; }
         public IVertexBufferManager VertexBufferManager { get; private set; }
         public IIndexBufferManager IndexBufferManager { get; private set; }
         public IConstantBufferManager ConstantBufferManager { get; private set; }
@@ -33,16 +31,20 @@ namespace Titan.Graphics.D3D11
         public ID3D11Device* Ptr => _device.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
 
+        public GraphicsDevice(IWindow window, IMemoryManager memoryManager, IShaderCompiler shaderCompiler)
+        {
+            _window = window;
+            _memoryManager = memoryManager;
+            _shaderCompiler = shaderCompiler;
+        }
+
         public void Initialize(uint refreshRate, bool debug = false)
         {
-            
             InitDeviceAndSwapChain(refreshRate, debug);
             InitBackBuffer();
 
             var pDevice = _device.Get();
-            TextureManager = new TextureManager(pDevice, _memoryManager);
             IndexBufferManager = new IndexBufferManager(pDevice, _memoryManager);
-            ShaderResourceViewManager = new ShaderResourceViewManager(pDevice, _memoryManager);
             VertexBufferManager = new VertexBufferManager(pDevice, _memoryManager);
             ConstantBufferManager = new ConstantBufferManager(pDevice, _memoryManager);
             DepthStencilViewManager = new DepthStencilViewManager(pDevice, _memoryManager);
@@ -50,19 +52,13 @@ namespace Titan.Graphics.D3D11
             SamplerStateManager = new SamplerStateManager(pDevice, _memoryManager);
             ShaderManager = new ShaderManager(pDevice, _memoryManager, _shaderCompiler);
         }
+
         public void ResizeBuffers()
         {
             // TODO: this will crash because RenderTargetViewManager has a reference to backbuffer. Move the backbuffer to the manager and implement resize for all buffers.
             //_backBuffer.Dispose();
             //CheckAndThrow(_swapChain.Get()->ResizeBuffers(0, 0, 0, DXGI_FORMAT.DXGI_FORMAT_UNKNOWN, 0), "IDXGISwapChain::ResizeBuffers");
             //InitBackBuffer(null);
-        }
-
-        public GraphicsDevice(IWindow window, IMemoryManager memoryManager, IShaderCompiler shaderCompiler)
-        {
-            _window = window;
-            _memoryManager = memoryManager;
-            _shaderCompiler = shaderCompiler;
         }
 
 
@@ -110,9 +106,7 @@ namespace Titan.Graphics.D3D11
 
         public void Dispose()
         {
-            TextureManager.Dispose();
             IndexBufferManager.Dispose();
-            ShaderResourceViewManager.Dispose();
             VertexBufferManager.Dispose();
             ConstantBufferManager.Dispose();
             RenderTargetViewManager.Dispose();

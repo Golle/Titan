@@ -11,12 +11,14 @@ namespace Titan.Graphics.Pipeline
         private readonly string _name;
         private readonly RenderPassCommand[] _commands;
         private readonly IGraphicsDevice _device;
+        private readonly IShaderResourceViewManager _shaderResourceViewManager;
 
-        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device)
+        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device, IShaderResourceViewManager shaderResourceViewManager)
         {
             _name = name;
             _commands = commands;
             _device = device;
+            _shaderResourceViewManager = shaderResourceViewManager;
         }
 
         public void Render(IRenderContext renderContext)
@@ -58,10 +60,10 @@ namespace Titan.Graphics.Pipeline
                         command.Renderer.Render(renderContext);
                         break;
                     case CommandType.SetVertexShaderResource:
-                        renderContext.SetVertexShaderResource(_device.ShaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
+                        renderContext.SetVertexShaderResource(_shaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
                         break;
                     case CommandType.SetPixelShaderResource:
-                        renderContext.SetPixelShaderResource(_device.ShaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
+                        renderContext.SetPixelShaderResource(_shaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
                         break;
                     case CommandType.SetVertexShaderSampler:
                         renderContext.SetVertexShaderSampler(_device.SamplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);

@@ -91,7 +91,7 @@ namespace Titan.Graphics.Pipeline
             _samplers.Add(name, handle);
         }
 
-        public RenderPass[] Compile()
+        public RenderPass[] Compile(IRenderPassFactory renderPassFactory)
         {
             var renderPasses = new List<RenderPass>();
             
@@ -120,7 +120,7 @@ namespace Titan.Graphics.Pipeline
                     commandList.AddRange(CreateUnbindResourcesCommands(pass.Resources));
                 }
 
-                renderPasses.Add(new RenderPass(pass.Name, commandList.ToArray(), _device));
+                renderPasses.Add(renderPassFactory.Create(pass.Name, commandList));
             }
             
             return renderPasses.ToArray();

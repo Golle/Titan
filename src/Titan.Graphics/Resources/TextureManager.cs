@@ -1,6 +1,8 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
+using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -9,20 +11,32 @@ namespace Titan.Graphics.Resources
 {
     internal unsafe class TextureManager : ITextureManager
     {
+        private readonly IMemoryManager _memoryManager;
         private ComPtr<ID3D11Device> _device;
-        private readonly Texture* _textures;
-        private readonly uint _maxTextures;
+        
+        private Texture* _textures;
+        private uint _maxTextures;
 
         private int _numberOfTextures;
 
-        public TextureManager(ID3D11Device* device, IMemoryManager memoryManager)
+        public TextureManager(IGraphicsDevice graphicsDevice, IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device);
-            var memory = memoryManager.GetMemoryChunkValidated<Texture>("Texture");
+            _memoryManager = memoryManager;
+            
+        }
+
+        public void Initialize(IGraphicsDevice graphicsDevice)
+        {
+            if (_textures != null)
+            {
+                throw new InvalidOperationException($"{nameof(TextureManager)} has already been initialized.");
+            }
+            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(TextureManager)} with the wrong device.", nameof(graphicsDevice));
+            var memory = _memoryManager.GetMemoryChunkValidated<Texture>("Texture");
             _textures = memory.Pointer;
             _maxTextures = memory.Count;
         }
-
+   
         public TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag) => CreateTexture(width, height, format, null, 0, bindFlag);
         public TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint stride, D3D11_BIND_FLAG bindFlag = default)
         {
@@ -76,18 +90,21 @@ namespace Titan.Graphics.Resources
 
         public void Dispose()
         {
-            
-            for (var i = 0; i < _numberOfTextures; ++i)
+            if (_textures != null)
             {
-                ref var texture = ref _textures[i];
-                if (texture.Pointer != null)
+                for (var i = 0; i < _numberOfTextures; ++i)
                 {
-                    texture.Pointer->Release();
-                    texture.Pointer = null;
+                    ref var texture = ref _textures[i];
+                    if (texture.Pointer != null)
+                    {
+                        texture.Pointer->Release();
+                        texture.Pointer = null;
+                    }
                 }
+                _numberOfTextures = 0;
+                _textures = null;
+                _device.Dispose();
             }
-            _numberOfTextures = 0;
-            _device.Dispose();
         }
     }
 }

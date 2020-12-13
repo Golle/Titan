@@ -6,7 +6,6 @@ using Titan.Graphics.Pipeline;
 
 namespace Titan
 {
-
     public record DisplayConfigurationFile(string Path);
     public record DisplayConfiguration(string Title, uint Width, uint Height, uint RefreshRate);
     public record PipelineConfigurationFile(string Path);

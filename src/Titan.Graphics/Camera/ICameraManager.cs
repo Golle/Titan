@@ -1,4 +1,3 @@
-using System;
 using Titan.Windows;
 
 namespace Titan.Graphics.Camera

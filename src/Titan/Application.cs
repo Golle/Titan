@@ -13,33 +13,6 @@ using Titan.Windows;
 
 namespace Titan
 {
-    internal class EngineInitializer : IDisposable
-    {
-        private readonly IGraphicsPipeline _graphicsPipeline;
-        private readonly IGraphicsDevice _graphicsDevice;
-        private readonly IWindow _window;
-
-        public EngineInitializer(IGraphicsPipeline graphicsPipeline, IGraphicsDevice graphicsDevice, IWindow window)
-        {
-            _graphicsPipeline = graphicsPipeline;
-            _graphicsDevice = graphicsDevice;
-            _window = window;
-        }
-
-        internal void InitializeAll(GameConfiguration configuration)
-        {
-            var displayConfig = configuration.DisplayConfiguration;
-            _window.Initialize((int) displayConfig.Width, (int) displayConfig.Height, displayConfig.Title);
-            _graphicsDevice.Initialize(displayConfig.RefreshRate, debug: true);
-            //_graphicsPipeline.Initialize();
-        }
-
-        public void Dispose()
-        {
-            
-        }
-    }
-
     public class Application : IDisposable
     {
         private readonly IContainer _container;
@@ -108,8 +81,15 @@ namespace Titan
 
             LOGGER.Debug("Initialize the D3D11 Device");
             _device.Initialize(configuration.DisplayConfiguration.RefreshRate, true);
+            InitializeGraphicManagers(configuration.AssetsDirectory);
             LOGGER.Debug("Initialize Graphics pipeline");
             _pipeline.Initialize(configuration.PipelineConfiguration);
+        }
+
+        private void InitializeGraphicManagers(AssetsDirectory assetsDirectory)
+        {
+            _container.GetInstance<ITextureManager>().Initialize(_device);
+            _container.GetInstance<IShaderResourceViewManager>().Initialize(_device);
         }
 
         private unsafe void InitMemoryManager()

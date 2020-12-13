@@ -11,8 +11,6 @@ namespace Titan.Graphics
     public interface IGraphicsDevice : IDisposable
     {
         void Initialize(uint refreshRate, bool debug = false);
-        IShaderResourceViewManager ShaderResourceViewManager { get; }
-        ITextureManager TextureManager { get; }
         IVertexBufferManager VertexBufferManager { get; }
         IIndexBufferManager IndexBufferManager { get; }
         IConstantBufferManager ConstantBufferManager { get; }

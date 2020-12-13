@@ -1,4 +1,3 @@
-using System;
 using Titan.Core.Messaging;
 using Titan.Windows.Events;
 using Titan.Windows.Win32.Native;

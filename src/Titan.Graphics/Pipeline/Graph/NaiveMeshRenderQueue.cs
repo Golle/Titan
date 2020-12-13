@@ -1,5 +1,4 @@
 using System;
-using System.Drawing.Drawing2D;
 using System.Numerics;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;

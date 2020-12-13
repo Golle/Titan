@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Titan.ECS.Components;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.World

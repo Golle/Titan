@@ -1,4 +1,3 @@
-using System;
 using System.Numerics;
 using Titan.Core.Logging;
 using Titan.Graphics.Camera;
@@ -34,7 +33,7 @@ namespace Titan.Graphics.Pipeline.Renderers
         
         private bool _normalMapEnabled;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager, IShaderResourceViewManager shaderResourceViewManager)
         {
             _renderQueue = renderQueue;
             _cameraManager = cameraManager;
@@ -43,7 +42,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             _vertexBufferManager = device.VertexBufferManager;
             _indexBufferManager = device.IndexBufferManager;
             _constantBufferManager = device.ConstantBufferManager;
-            _shaderResourceViewManager = device.ShaderResourceViewManager;
+            _shaderResourceViewManager = shaderResourceViewManager;
             _samplerStateManager = device.SamplerStateManager;
             
             _perObjectHandle = _constantBufferManager.CreateConstantBuffer<Matrix4x4>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);

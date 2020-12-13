@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Graphics.Pipeline.Renderers;
+using Titan.Graphics.Resources;
 using Titan.IOC;
 using Titan.Windows;
 using static Titan.Windows.Win32.D3D11.D3D11_BIND_FLAG;
@@ -17,16 +16,22 @@ namespace Titan.Graphics.Pipeline
         private readonly IWindow _window;
         private readonly IContainer _container;
         private readonly IGraphicsDevice _device;
+        private readonly ITextureManager _textureManager;
+        private readonly IShaderResourceViewManager _shaderResourceViewManager;
+        private readonly IRenderPassFactory _renderPassFactory;
 
         private readonly IList<IRenderer> _renderers = new List<IRenderer>();
         
         private RenderGraph _renderGraph;
 
-        public GraphicsPipeline(IContainer container,  IWindow window, IGraphicsDevice device)
+        public GraphicsPipeline(IContainer container,  IWindow window, IGraphicsDevice device, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IRenderPassFactory renderPassFactory)
         {
             _window = window;
             _container = container;
             _device = device;
+            _textureManager = textureManager;
+            _shaderResourceViewManager = shaderResourceViewManager;
+            _renderPassFactory = renderPassFactory;
         }
 
         public unsafe void Initialize(PipelineConfiguration configuration)
@@ -35,7 +40,7 @@ namespace Titan.Graphics.Pipeline
             {
                 throw new InvalidOperationException("Graphics Pipeline has already been initialized.");
             }
-            var builder = new RenderPassBuilder(_device);
+            var builder = _container.CreateInstance<RenderPassBuilder>();
             
             
             var (shaderPrograms, renderPasses, renderers, samplers) = configuration;
@@ -72,17 +77,17 @@ namespace Titan.Graphics.Pipeline
                     LOGGER.Debug("Creating RenderTarget {0}", renderTarget.Name);
                     if (IsResource(renderPasses, renderTarget))
                     {
-                        var textureHandle = _device.TextureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
-                        var resource = _device.TextureManager[textureHandle].Resource;
-                        var resourceHandle = _device.ShaderResourceViewManager.Create(resource, renderTarget.Format);
+                        var textureHandle = _textureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+                        var resource = _textureManager[textureHandle].Resource;
+                        var resourceHandle = _shaderResourceViewManager.Create(resource, renderTarget.Format);
                         var renderTargetHandle = _device.RenderTargetViewManager.Create(resource, renderTarget.Format);
                         builder.AddRenderTarget(renderTarget.Name, renderTargetHandle);
                         builder.AddShaderResource(renderTarget.Name, resourceHandle);
                     }
                     else
                     {
-                        var textureHandle = _device.TextureManager.CreateTexture((uint)_window.Width, (uint)_window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET);
-                        var resource = _device.TextureManager[textureHandle].Resource;
+                        var textureHandle = _textureManager.CreateTexture((uint)_window.Width, (uint)_window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET);
+                        var resource = _textureManager[textureHandle].Resource;
                         var renderTargetHandle = _device.RenderTargetViewManager.Create(resource, renderTarget.Format);
                         builder.AddRenderTarget(renderTarget.Name, renderTargetHandle);
                         //var resourceHandle = _device.ShaderResourceViewManager.Create(_device.TextureManager[textureHandle].Resource, renderTarget.Format);
@@ -94,15 +99,16 @@ namespace Titan.Graphics.Pipeline
                 {
                     LOGGER.Debug("Creating DepthStencil {0}", renderPass.DepthStencil.Name);
                     // temp impl
-                    var stencilTextureHandle = _device.TextureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
-                    var stencilHandle = _device.DepthStencilViewManager.Create(_device.TextureManager[stencilTextureHandle].Resource);
+                    var stencilTextureHandle = _textureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+                    var stencilHandle = _device.DepthStencilViewManager.Create(_textureManager[stencilTextureHandle].Resource);
                     builder.AddDepthStencil(renderPass.DepthStencil.Name, stencilHandle);
                 }
                 
                 builder.AddPass(renderPass);
             }
 
-            _renderGraph = new RenderGraph(builder.Compile(), _device);
+            var passes = builder.Compile(_renderPassFactory);
+            _renderGraph = new RenderGraph(passes, _device);
             
         }
 

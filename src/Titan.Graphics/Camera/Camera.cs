@@ -1,4 +1,3 @@
-using System;
 using System.Numerics;
 using Titan.Core.Common;
 using Titan.Windows;
