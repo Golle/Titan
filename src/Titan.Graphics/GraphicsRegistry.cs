@@ -36,6 +36,7 @@ namespace Titan.Graphics
                 .Register<IRenderTargetViewManager, RenderTargetViewManager>()
                 .Register<IDepthStencilViewManager, DepthStencilViewManager>()
                 .Register<ISamplerStateManager, SamplerStateManager>()
+                .Register<IDepthStencilStateManager, DepthStencilStateManager>()
                 .Register<IShaderManager, ShaderManager>()
                 
                 // Image loading

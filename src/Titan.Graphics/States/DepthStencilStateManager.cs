@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
@@ -10,20 +9,24 @@ namespace Titan.Graphics.States
 {
     internal unsafe class DepthStencilStateManager : IDepthStencilStateManager
     {
+        private readonly IMemoryManager _memoryManager;
         private readonly IDictionary<D3D11_DEPTH_STENCIL_DESC, DepthStencilStateHandle> _cachedHandles = new Dictionary<D3D11_DEPTH_STENCIL_DESC, DepthStencilStateHandle>();
 
         private ComPtr<ID3D11Device> _device;
-        private readonly DepthStencilState* _states;
-        private readonly uint _maxStates;
+        private DepthStencilState* _states;
+        private uint _maxStates;
 
         private int _numberOfStates;
-        public DepthStencilStateManager(ID3D11Device* device, IMemoryManager memoryManager)
+        public DepthStencilStateManager(IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device);
+            _memoryManager = memoryManager;
+        }
 
-            var memory = memoryManager.GetMemoryChunk("DepthStencilState");
-            Debug.Assert(memory.Stride == sizeof(DepthStencilState), "The stride of the memory chunk is not matching the expected size");
-            _states = (DepthStencilState*)memory.Pointer;
+        public void Initialize(IGraphicsDevice graphicsDevice)
+        {
+            _device = new ComPtr<ID3D11Device>(graphicsDevice.Ptr);
+            var memory = _memoryManager.GetMemoryChunkValidated<DepthStencilState>("DepthStencilState");
+            _states = memory.Pointer;
             _maxStates = memory.Count;
         }
 
@@ -53,18 +56,21 @@ namespace Titan.Graphics.States
 
         public void Dispose()
         {
-            for (var i = 0; i < _numberOfStates; ++i)
+            if (_states != null)
             {
-                ref var state = ref _states[i];
-                if (state.Pointer != null)
+                for (var i = 0; i < _numberOfStates; ++i)
                 {
-                    state.Pointer->Release();
-                    state.Pointer = null;
+                    ref var state = ref _states[i];
+                    if (state.Pointer != null)
+                    {
+                        state.Pointer->Release();
+                        state.Pointer = null;
+                    }
                 }
+                _numberOfStates = 0;
+                _states = null;
+                _device.Dispose();
             }
-
-            _numberOfStates = 0;
-            _device.Dispose();
         }
     }
 }
