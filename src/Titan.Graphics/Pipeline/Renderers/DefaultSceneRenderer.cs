@@ -33,7 +33,7 @@ namespace Titan.Graphics.Pipeline.Renderers
         
         private bool _normalMapEnabled;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, IShaderManager shaderManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, ISamplerStateManager samplerStateManager, IShaderManager shaderManager)
         {
             _renderQueue = renderQueue;
             _cameraManager = cameraManager;
@@ -43,12 +43,12 @@ namespace Titan.Graphics.Pipeline.Renderers
             _indexBufferManager = indexBufferManager;
             _constantBufferManager = constantBufferManager;
             _shaderResourceViewManager = shaderResourceViewManager;
-            _samplerStateManager = device.SamplerStateManager;
+            _samplerStateManager = samplerStateManager;
             
             _perObjectHandle = _constantBufferManager.CreateConstantBuffer<Matrix4x4>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
             _cameraHandle = _constantBufferManager.CreateConstantBuffer<CameraBuffer>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
-            _samplerStatehandle = device.SamplerStateManager.GetOrCreate();
+            _samplerStatehandle = samplerStateManager.GetOrCreate();
             _shader = _shaderManager.GetByName("GBufferDefault");
             
             try

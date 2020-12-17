@@ -9,6 +9,8 @@ namespace Titan.Graphics.States
 {
     public interface ISamplerStateManager : IDisposable
     {
+
+        void Initialize(IGraphicsDevice graphicsDevice);
         SamplerStateHandle GetOrCreate(
             D3D11_FILTER filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
             D3D11_TEXTURE_ADDRESS_MODE addressU = D3D11_TEXTURE_ADDRESS_WRAP,

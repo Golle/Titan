@@ -6,6 +6,7 @@ using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
+using Titan.Graphics.States;
 using Titan.Graphics.Textures;
 using Titan.IOC;
 
@@ -26,7 +27,6 @@ namespace Titan.Graphics
                 // Shaders
                 .Register<IShaderCompiler, ShaderCompiler>()
                 
-                
                 // D3D11 Managers
                 .Register<ITextureManager, TextureManager>()
                 .Register<IShaderResourceViewManager, ShaderResourceViewManager>()
@@ -35,8 +35,8 @@ namespace Titan.Graphics
                 .Register<IConstantBufferManager, ConstantBufferManager>()
                 .Register<IRenderTargetViewManager, RenderTargetViewManager>()
                 .Register<IDepthStencilViewManager, DepthStencilViewManager>()
+                .Register<ISamplerStateManager, SamplerStateManager>()
                 .Register<IShaderManager, ShaderManager>()
-
                 
                 // Image loading
                 .Register<IImagingFactory, ImagingFactory>()
@@ -45,11 +45,9 @@ namespace Titan.Graphics
                 // Model loading
                 .Register<IMeshLoader, MeshLoader>()
                 
-                
                 // Default render queues
                 .Register<IMeshRenderQueue, NaiveMeshRenderQueue>()
                 .Register<ILigthRenderQueue, NaiveLightRenderQueue>()
-
                 
                 // Materials
                 .Register<IMaterialsLoader, MaterialsLoader>()

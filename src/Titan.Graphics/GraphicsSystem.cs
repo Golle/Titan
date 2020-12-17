@@ -4,6 +4,7 @@ using Titan.Core.Logging;
 using Titan.Graphics.Pipeline;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
+using Titan.Graphics.States;
 
 namespace Titan.Graphics
 {
@@ -18,9 +19,10 @@ namespace Titan.Graphics
         private readonly IConstantBufferManager _constantBufferManager;
         private readonly IRenderTargetViewManager _renderTargetViewManager;
         private readonly IDepthStencilViewManager _depthStencilViewManager;
+        private readonly ISamplerStateManager _samplerStateManager;
         private readonly IShaderManager _shaderManager;
 
-        public GraphicsSystem(IGraphicsDevice device, IGraphicsPipeline graphicsPipeline, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, IShaderManager shaderManager)
+        public GraphicsSystem(IGraphicsDevice device, IGraphicsPipeline graphicsPipeline, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IShaderManager shaderManager)
         {
             _device = device;
             _graphicsPipeline = graphicsPipeline;
@@ -31,6 +33,7 @@ namespace Titan.Graphics
             _constantBufferManager = constantBufferManager;
             _renderTargetViewManager = renderTargetViewManager;
             _depthStencilViewManager = depthStencilViewManager;
+            _samplerStateManager = samplerStateManager;
             _shaderManager = shaderManager;
         }
 
@@ -47,6 +50,7 @@ namespace Titan.Graphics
             _constantBufferManager.Initialize(_device);
             _renderTargetViewManager.Initialize(_device);
             _depthStencilViewManager.Initialize(_device);
+            _samplerStateManager.Initialize(_device);
             _shaderManager.Initialize(_device, assetsDirectory);
             LOGGER.Debug("Finished initializing GraphicManagers");
 
@@ -70,6 +74,7 @@ namespace Titan.Graphics
             _constantBufferManager.Dispose();
             _renderTargetViewManager.Dispose();
             _depthStencilViewManager.Dispose();
+            _samplerStateManager.Dispose();
 
 
             _device.Dispose();

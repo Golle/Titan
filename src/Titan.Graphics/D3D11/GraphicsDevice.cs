@@ -1,7 +1,5 @@
 using System;
 using Titan.Core.Memory;
-using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders;
 using Titan.Graphics.States;
 using Titan.Windows;
 using Titan.Windows.Win32;
@@ -15,22 +13,19 @@ namespace Titan.Graphics.D3D11
     {
         private readonly IWindow _window;
         private readonly IMemoryManager _memoryManager;
-        private readonly IShaderCompiler _shaderCompiler;
         private ComPtr<ID3D11Device> _device;
         private ComPtr<IDXGISwapChain> _swapChain;
 
         public IDepthStencilStateManager DepthStencilStateManager { get; private set; }
-        public ISamplerStateManager SamplerStateManager { get; private set; }
         public IRenderContext ImmediateContext { get; private set; }
         public ID3D11Device* Ptr => _device.Get();
         public IDXGISwapChain* SwapChainPtr => _swapChain.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
 
-        public GraphicsDevice(IWindow window, IMemoryManager memoryManager, IShaderCompiler shaderCompiler)
+        public GraphicsDevice(IWindow window, IMemoryManager memoryManager)
         {
             _window = window;
             _memoryManager = memoryManager;
-            _shaderCompiler = shaderCompiler;
         }
 
         public void Initialize(uint refreshRate, bool debug = false)
@@ -39,7 +34,6 @@ namespace Titan.Graphics.D3D11
 
             var pDevice = _device.Get();
             DepthStencilStateManager = new DepthStencilStateManager(pDevice, _memoryManager);
-            SamplerStateManager = new SamplerStateManager(pDevice, _memoryManager);
         }
 
         public void ResizeBuffers()
@@ -83,7 +77,6 @@ namespace Titan.Graphics.D3D11
         public void Dispose()
         {
             DepthStencilStateManager.Dispose();
-            SamplerStateManager.Dispose();
             (ImmediateContext as IDisposable)?.Dispose();
 
             _swapChain.Dispose();

@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
+using Titan.Graphics.States;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline
@@ -11,20 +12,20 @@ namespace Titan.Graphics.Pipeline
     {
         private readonly string _name;
         private readonly RenderPassCommand[] _commands;
-        private readonly IGraphicsDevice _device;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly IRenderTargetViewManager _renderTargetViewManager;
         private readonly IDepthStencilViewManager _depthStencilViewManager;
+        private readonly ISamplerStateManager _samplerStateManager;
         private readonly IShaderManager _shaderManager;
 
-        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, IShaderManager shaderManager)
+        public RenderPass(string name, RenderPassCommand[] commands, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IShaderManager shaderManager)
         {
             _name = name;
             _commands = commands;
-            _device = device;
             _shaderResourceViewManager = shaderResourceViewManager;
             _renderTargetViewManager = renderTargetViewManager;
             _depthStencilViewManager = depthStencilViewManager;
+            _samplerStateManager = samplerStateManager;
             _shaderManager = shaderManager;
         }
 
@@ -73,10 +74,10 @@ namespace Titan.Graphics.Pipeline
                         renderContext.SetPixelShaderResource(_shaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
                         break;
                     case CommandType.SetVertexShaderSampler:
-                        renderContext.SetVertexShaderSampler(_device.SamplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
+                        renderContext.SetVertexShaderSampler(_samplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
                         break;
                     case CommandType.SetPixelShaderSampler:
-                        renderContext.SetPixelShaderSampler(_device.SamplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
+                        renderContext.SetPixelShaderSampler(_samplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
                         break;
                     case CommandType.UnbindRenderTargets:
                         UnbindRenderTargets(renderContext);

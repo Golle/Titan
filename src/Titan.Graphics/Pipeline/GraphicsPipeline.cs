@@ -5,6 +5,7 @@ using Titan.Core.Logging;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
+using Titan.Graphics.States;
 using Titan.IOC;
 using Titan.Windows;
 using static Titan.Windows.Win32.D3D11.D3D11_BIND_FLAG;
@@ -21,6 +22,7 @@ namespace Titan.Graphics.Pipeline
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly IRenderTargetViewManager _renderTargetViewManager;
         private readonly IDepthStencilViewManager _depthStencilViewManager;
+        private readonly ISamplerStateManager _samplerStateManager;
         private readonly IShaderManager _shaderManager;
         private readonly IRenderPassFactory _renderPassFactory;
 
@@ -28,7 +30,7 @@ namespace Titan.Graphics.Pipeline
         
         private RenderGraph _renderGraph;
 
-        public GraphicsPipeline(IContainer container, IWindow window, IGraphicsDevice device, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, IShaderManager shaderManager, IRenderPassFactory renderPassFactory)
+        public GraphicsPipeline(IContainer container, IWindow window, IGraphicsDevice device, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IShaderManager shaderManager, IRenderPassFactory renderPassFactory)
         {
             _window = window;
             _container = container;
@@ -37,6 +39,7 @@ namespace Titan.Graphics.Pipeline
             _shaderResourceViewManager = shaderResourceViewManager;
             _renderTargetViewManager = renderTargetViewManager;
             _depthStencilViewManager = depthStencilViewManager;
+            _samplerStateManager = samplerStateManager;
             _shaderManager = shaderManager;
             _renderPassFactory = renderPassFactory;
         }
@@ -72,7 +75,7 @@ namespace Titan.Graphics.Pipeline
             foreach (var sampler in samplers)
             {
                 LOGGER.Debug("Creating SamplerState {0}", sampler.Name);
-                var samplerHandle = _device.SamplerStateManager.GetOrCreate(sampler.Filter, sampler.AddressU, sampler.AddressV, sampler.AddressW, sampler.ComparisonFunc);
+                var samplerHandle = _samplerStateManager.GetOrCreate(sampler.Filter, sampler.AddressU, sampler.AddressV, sampler.AddressW, sampler.ComparisonFunc);
                 builder.AddSampler(sampler.Name, samplerHandle);
             }
 
