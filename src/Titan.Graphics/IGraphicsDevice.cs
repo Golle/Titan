@@ -10,7 +10,6 @@ namespace Titan.Graphics
         void Initialize(uint refreshRate, bool debug = false);
         IRenderContext ImmediateContext { get; }
 
-        unsafe ID3D11Device* Ptr { get; }
         ref readonly ComPtr<IDXGISwapChain> SwapChain { get; }
 
         public void ResizeBuffers();

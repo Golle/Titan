@@ -9,6 +9,7 @@ using static Titan.Windows.Win32.D3D11.D3D11_COLOR_WRITE_ENABLE;
 
 namespace Titan.Graphics.D3D11.State
 {
+    //TODO: this should be handled in a manager
     public unsafe class BlendState : IDisposable
     {
         internal ref readonly ComPtr<ID3D11BlendState> Ptr => ref _blendState;
@@ -19,7 +20,7 @@ namespace Titan.Graphics.D3D11.State
         private Color _blendFactor;
 
 
-        public BlendState(IGraphicsDevice device)
+        public BlendState(IGraphicsDevice graphicsDevice)
         {
             D3D11_BLEND_DESC desc = default;
             for (var i = 0; i < 8; ++i)
@@ -45,16 +46,19 @@ namespace Titan.Graphics.D3D11.State
             desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 
 
-
-            CheckAndThrow(device.Ptr->CreateBlendState(&desc, _blendState.GetAddressOf()), "CreateBlendState");
+            if (graphicsDevice is GraphicsDevice device)
+            {
+                CheckAndThrow(device.Ptr->CreateBlendState(&desc, _blendState.GetAddressOf()), "CreateBlendState");
+            }
+            else
+            {
+                throw new ArgumentException($"Trying to initialize a D3D11 {nameof(BlendState)} with the wrong device.", nameof(graphicsDevice));
+            }
 
             _blendFactor = new Color(1f, 1f, 1f, 1f);
             SampleMask = 0xffffffff;
         }
 
-        public void Dispose()
-        {
-            _blendState.Dispose();
-        }
+        public void Dispose() => _blendState.Dispose();
     }
 }
