@@ -7,17 +7,25 @@ using static Titan.Windows.Win32.Common;
 
 namespace Titan.Graphics.D3D11
 {
+    // TODO: put this on the device or in a manager
     public unsafe class Swapchain : IDisposable
     {
         private ComPtr<IDXGISwapChain> _swapChain;
 
         private readonly uint _syncInterval;
         private readonly uint _flags;
-        public Swapchain(IGraphicsDevice device, bool vsync, uint flags = 0u)
+        public Swapchain(IGraphicsDevice graphicsDevice, bool vsync, uint flags = 0u)
         {
             _flags = flags;
             _syncInterval = vsync ? 1 : 0;
-            _swapChain = new ComPtr<IDXGISwapChain>(device.SwapChain.Get());
+            if (graphicsDevice is GraphicsDevice device)
+            {
+                _swapChain = new ComPtr<IDXGISwapChain>(device.SwapChain.Get());
+            }
+            else
+            {
+                throw new ArgumentException($"Trying to initialize a D3D11 {nameof(Swapchain)} with the wrong device.", nameof(graphicsDevice));
+            }
         }
 
         public DXGI_SWAP_CHAIN_DESC GetDesc()
