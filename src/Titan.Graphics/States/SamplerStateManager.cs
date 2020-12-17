@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
+using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
@@ -24,7 +26,7 @@ namespace Titan.Graphics.States
 
         public void Initialize(IGraphicsDevice graphicsDevice)
         {
-            _device = new ComPtr<ID3D11Device>(graphicsDevice.Ptr);
+            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(SamplerStateManager)} with the wrong device.", nameof(graphicsDevice));
             var memory = _memoryManager.GetMemoryChunkValidated<SamplerState>("SamplerState");
             _samplers = memory.Pointer;
             _maxSamplers = memory.Count;

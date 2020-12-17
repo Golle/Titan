@@ -9,7 +9,6 @@ using System.Threading;
 using Titan.Core;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.Resources;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
