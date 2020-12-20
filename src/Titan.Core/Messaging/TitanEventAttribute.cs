@@ -1,12 +1,9 @@
 using System;
 
+// ReSharper disable InconsistentNaming
+
 namespace Titan.Core.Messaging
 {
-    /// <summary>
-    /// The TitanEventAttribute is used for marking an Event type so the scanner can find it.
-    /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
-    public class TitanEventAttribute : Attribute
-    {
-    }
+    public class TitanEventAttribute : Attribute{}
 }

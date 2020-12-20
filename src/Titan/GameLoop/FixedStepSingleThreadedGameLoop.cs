@@ -33,8 +33,8 @@ namespace Titan.GameLoop
         {
             var timer = Stopwatch.StartNew();
 
-            _eventQueue.Update();
-            _inputHandler.Update();
+            //_eventQueue.Update();
+            //_inputHandler.Update();
             
             // do the stuffs
             

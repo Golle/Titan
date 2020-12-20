@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Core.Messaging;
 using Titan.ECS.Events;
 using Titan.ECS.World;
 

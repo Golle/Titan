@@ -2,21 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Titan.Core.Logging;
+using Titan.Core.Messaging;
 using Titan.ECS.Entities;
-using Titan.ECS.Events;
 using Titan.ECS.Registry;
 using Titan.IOC;
 
 namespace Titan.ECS.World
 {
-    public record EventsConfiguration(uint MaxEventQueueSize);
-    public record WorldConfiguration(uint MaxEntities, uint WorldId, EventsConfiguration EventsConfiguration);
+    public record WorldConfiguration(uint MaxEntities, uint WorldId);
 
     public class WorldBuilder
     {
         private static uint _worldCounter = 0;// TODO: move this to some other class
 
-        private uint _maxEvents = 1000;
         private uint _maxEntities = 1000;
         private readonly IList<(Type componentType, uint maxComponents)> _components = new List<(Type componentType, uint maxComponents)>();
 
@@ -26,11 +24,7 @@ namespace Titan.ECS.World
             return this;
         }
 
-        public WorldBuilder WithMaxEvents(uint maxEvents)
-        {
-            _maxEvents = maxEvents;
-            return this;
-        }
+    
         public WorldBuilder WithComponent<T>(uint maxComponents = 0u) where T : unmanaged
         {
             _components.Add((typeof(T), maxComponents));
@@ -46,13 +40,12 @@ namespace Titan.ECS.World
                 .Register<IEntityInfoRepository, EntityInfoRepository>(dispose: true)
                 .Register<IEntityManager, EntityManager>(dispose: true)
                 .Register<IEntityFilterManager, EntityFilterManager>(dispose: true)
-                .Register<IEventQueue, EventQueue>(dispose: true)
-                .RegisterSingleton(new WorldConfiguration(_maxEntities, Interlocked.Increment(ref _worldCounter), new EventsConfiguration(_maxEvents)));
+                .RegisterSingleton(new WorldConfiguration(_maxEntities, Interlocked.Increment(ref _worldCounter)));
+            
             try
             {
                 LOGGER.Debug("Creating world");
                 LOGGER.Debug("Max entities: {0}", _maxEntities);
-                LOGGER.Debug("Max events: {0}", _maxEvents);
                 LOGGER.Debug("Number of Components: {0}", _components.Count);
 
                 var componentRegistry = container.GetInstance<ComponentRegistry>();

@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Titan.Core.Messaging;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.Events;

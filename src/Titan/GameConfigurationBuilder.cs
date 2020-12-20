@@ -12,8 +12,9 @@ namespace Titan
     public record LoggerConfiguration();
     public record AssetsDirectory(string Path);
     public record SystemsConfiguration(string Name, Type Type, string[] Dependencies);
+    public record EventsConfiguration(uint MaxEventQueueSize);
 
-    internal record GameConfiguration(AssetsDirectory AssetsDirectory, SystemsConfiguration[] Systems, DisplayConfiguration DisplayConfiguration, LoggerConfiguration LoggerConfiguration, PipelineConfiguration PipelineConfiguration);
+    internal record GameConfiguration(AssetsDirectory AssetsDirectory, SystemsConfiguration[] Systems, DisplayConfiguration DisplayConfiguration, LoggerConfiguration LoggerConfiguration, PipelineConfiguration PipelineConfiguration, EventsConfiguration EventsConfiguration);
 
     public class GameConfigurationBuilder
     {
@@ -24,6 +25,8 @@ namespace Titan
         
         private PipelineConfigurationFile _pipelineConfigurationFile;
         private DisplayConfigurationFile _displayConfigurationFile;
+        private EventsConfiguration _eventConfiguration;
+        private static readonly EventsConfiguration DefaultEventConfiguration = new(10_000);
 
         public GameConfigurationBuilder WithDefaultConsoleLogger()
         {
@@ -60,6 +63,11 @@ namespace Titan
             return this;
         }
 
+        public GameConfigurationBuilder WithEventsConfiguration(EventsConfiguration eventsConfiguration)
+        {
+            _eventConfiguration = eventsConfiguration;
+            return this;
+        }
         internal GameConfiguration Build(ConfigurationFileLoader loader)
         {
             Validate();
@@ -68,8 +76,9 @@ namespace Titan
             
             var pipelineConfiguration = loader.ReadConfig<PipelineConfiguration>(GetPath(_pipelineConfigurationFile.Path));
             var displayConfiguration = _displayConfiguration ?? loader.ReadConfig<DisplayConfiguration>(GetPath(_displayConfigurationFile.Path));
+            var eventConfiguration = _eventConfiguration ?? DefaultEventConfiguration;
             
-            return new (_assetsDirectory, _systems.ToArray(), displayConfiguration, _loggerConfiguration, pipelineConfiguration);
+            return new (_assetsDirectory, _systems.ToArray(), displayConfiguration, _loggerConfiguration, pipelineConfiguration, eventConfiguration);
         }
 
         private void Validate()

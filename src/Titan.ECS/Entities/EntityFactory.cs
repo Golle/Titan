@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Titan.Core.Messaging;
 using Titan.ECS.Events;
 using Titan.ECS.World;
 

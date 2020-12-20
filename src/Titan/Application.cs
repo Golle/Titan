@@ -7,6 +7,7 @@ using Titan.Graphics;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Resources;
 using Titan.Graphics.States;
+using Titan.Input;
 using Titan.IOC;
 using Titan.Windows;
 
@@ -21,6 +22,7 @@ namespace Titan
         private readonly GraphicsSystem _graphicsSystem;
         private readonly IEventQueue _eventQueue;
         private readonly IMemoryManager _memoryManager;
+        private readonly IInputHandler _inputHandler;
 
         public static Application Create(GameConfigurationBuilder configurationBuilder)
         {
@@ -36,12 +38,13 @@ namespace Titan
             return application;
         }
         
-        private Application(IWindow window, GraphicsSystem graphicsSystem, IEventQueue eventQueue, IMemoryManager memoryManager, ILog log, IContainer container)
+        private Application(IWindow window, GraphicsSystem graphicsSystem, IEventQueue eventQueue, IMemoryManager memoryManager, IInputHandler inputHandler, ILog log, IContainer container)
         {
             _window = window;
             _graphicsSystem = graphicsSystem;
             _eventQueue = eventQueue;
             _memoryManager = memoryManager;
+            _inputHandler = inputHandler;
             _log = log;
             _container = container;
         }
@@ -53,9 +56,15 @@ namespace Titan
 
         private void StartMainLoop()
         {
-            while (_window.Update())
+            while (_window.Update()) // Window events + inputs (mouse and keyboard)
             {
                 _eventQueue.Update();
+                _inputHandler.Update();
+                
+                /*
+                 *Insert multithreaded game system update here
+                 */
+                
                 _graphicsSystem.RenderFrame();
             }
         }
@@ -68,9 +77,9 @@ namespace Titan
             LOGGER.InitializeLogger(_log);
             LOGGER.Debug("LOGGER initialized with type: ", _log.GetType().Name);
 
-            LOGGER.Debug("Initialize EventQueue with {0}", typeof(ScanningEventTypeProvider));
-            _eventQueue.Initialize(new ScanningEventTypeProvider());
-
+            LOGGER.Debug("Initialize EventQueue with max event queue size {0}", configuration.EventsConfiguration.MaxEventQueueSize);
+            _eventQueue.Initialize(configuration.EventsConfiguration.MaxEventQueueSize);
+            
             InitMemoryManager();
 
             LOGGER.Debug("Initialize Window with title '{0}' and dimensions {1}x{2}", configuration.DisplayConfiguration.Title, configuration.DisplayConfiguration.Width, configuration.DisplayConfiguration.Height);

@@ -16,12 +16,7 @@ namespace Titan.Graphics.D3D11
         public ID3D11Device* Ptr => _device.Get();
         public IDXGISwapChain* SwapChainPtr => _swapChain.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
-
-        public GraphicsDevice(IWindow window)
-        {
-            _window = window;
-        }
-
+        public GraphicsDevice(IWindow window) => _window = window;
         public void Initialize(uint refreshRate, bool debug = false)
         {
             var flags = debug ? 2u : 0u;
