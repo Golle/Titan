@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
@@ -51,7 +52,9 @@ namespace Titan
         
         public void Run()
         {
+            _log.Debug("Application starting");
             StartMainLoop();
+            _log.Debug("Application finished, exiting.");
         }
 
         private void StartMainLoop()
@@ -60,11 +63,11 @@ namespace Titan
             {
                 _eventQueue.Update();
                 _inputHandler.Update();
-                
+
                 /*
                  *Insert multithreaded game system update here
                  */
-                
+
                 _graphicsSystem.RenderFrame();
             }
         }
@@ -75,7 +78,7 @@ namespace Titan
             
             // Use default logger for now
             LOGGER.InitializeLogger(_log);
-            LOGGER.Debug("LOGGER initialized with type: ", _log.GetType().Name);
+            LOGGER.Debug("LOGGER initialized with type: {0}", _log.GetType().Name);
 
             LOGGER.Debug("Initialize EventQueue with max event queue size {0}", configuration.EventsConfiguration.MaxEventQueueSize);
             _eventQueue.Initialize(configuration.EventsConfiguration.MaxEventQueueSize);

@@ -9,7 +9,6 @@ namespace Titan.ECS.Entities
 {
     internal unsafe class EntityManager : IEntityManager
     {
-
         private readonly IEntityFactory _entityFactory;
         private readonly IEventQueue _eventQueue;
 

@@ -25,5 +25,11 @@ namespace Titan.Graphics.Textures
             var shaderResourceHandle = _shaderResourceViewManager.Create(texture.Resource, texture.Format);
             return new Texture(textureHandle, shaderResourceHandle);
         }
+
+        public void UnloadTexture(Texture texture)
+        {
+            _shaderResourceViewManager.Destroy(texture.ResourceViewHandle);
+            _textureManager.Destroy(texture.TextureHandle);
+        }
     }
 }

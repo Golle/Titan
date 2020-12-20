@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
@@ -154,6 +155,7 @@ namespace Titan.Graphics.Pipeline
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Execute()
         {
             // temp

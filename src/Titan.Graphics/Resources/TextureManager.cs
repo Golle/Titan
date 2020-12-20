@@ -81,6 +81,16 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
+        public void Destroy(in TextureHandle textureHandle)
+        {
+            ref var texture = ref _textures[textureHandle];
+            if (texture.Pointer != null)
+            {
+                texture.Pointer->Release();
+                texture.Pointer = null;
+            }
+        }
+
         public ref readonly Texture this[in TextureHandle handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

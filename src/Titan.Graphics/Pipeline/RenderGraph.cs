@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11;
 
 namespace Titan.Graphics.Pipeline
@@ -18,6 +19,7 @@ namespace Titan.Graphics.Pipeline
             _swapchain = new Swapchain(device, false, 0);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Execute()
         {
             foreach (var renderPass in _renderPasses)
