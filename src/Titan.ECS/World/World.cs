@@ -14,7 +14,6 @@ namespace Titan.ECS.World
         public void Update()
         {
             // TODO: this should not be in the World class, every service/manager should be added to a game loop where they can be executed async if needed.
-            _eventQueue.Update();
             EntityManager.Update();
             _entityFactory.Update();
         }

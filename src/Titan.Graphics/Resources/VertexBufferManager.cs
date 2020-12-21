@@ -10,6 +10,8 @@ using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Resources
 {
+    
+    
     internal unsafe class VertexBufferManager : IVertexBufferManager
     {
         private readonly IMemoryManager _memoryManager;
@@ -22,6 +24,7 @@ namespace Titan.Graphics.Resources
         public VertexBufferManager(IMemoryManager memoryManager)
         {
             _memoryManager = memoryManager;
+
         }
 
         public void Initialize(IGraphicsDevice graphicsDevice)
