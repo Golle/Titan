@@ -4,7 +4,7 @@ using Titan.Windows.Win32.D3D11;
 namespace Titan.Graphics.Resources
 {
     [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct Texture
+    public unsafe struct Texture2D
     {
         [FieldOffset(0)]
         public ID3D11Texture2D* Pointer;

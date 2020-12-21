@@ -14,7 +14,7 @@ namespace Titan.Graphics.Resources
         private readonly IMemoryManager _memoryManager;
         private ComPtr<ID3D11Device> _device;
         
-        private Texture* _textures;
+        private Texture2D* _textures;
         private uint _maxTextures;
 
         private int _numberOfTextures;
@@ -31,13 +31,13 @@ namespace Titan.Graphics.Resources
                 throw new InvalidOperationException($"{nameof(TextureManager)} has already been initialized.");
             }
             _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(TextureManager)} with the wrong device.", nameof(graphicsDevice));
-            var memory = _memoryManager.GetMemoryChunkValidated<Texture>("Texture");
+            var memory = _memoryManager.GetMemoryChunkValidated<Texture2D>("Texture");
             _textures = memory.Pointer;
             _maxTextures = memory.Count;
         }
    
-        public Handle<Texture> CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag) => CreateTexture(width, height, format, null, 0, bindFlag);
-        public Handle<Texture> CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint stride, D3D11_BIND_FLAG bindFlag = default)
+        public Handle<Texture2D> CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag) => CreateTexture(width, height, format, null, 0, bindFlag);
+        public Handle<Texture2D> CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint stride, D3D11_BIND_FLAG bindFlag = default)
         {
             var desc = new D3D11_TEXTURE2D_DESC
             {
@@ -81,7 +81,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void Destroy(in Handle<Texture> handle)
+        public void Destroy(in Handle<Texture2D> handle)
         {
             ref var texture = ref _textures[handle];
             if (texture.Pointer != null)
@@ -91,7 +91,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly Texture this[in Handle<Texture> handle]
+        public ref readonly Texture2D this[in Handle<Texture2D> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _textures[handle];

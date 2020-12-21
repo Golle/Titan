@@ -23,13 +23,13 @@ namespace Titan.Graphics.Textures
             
             ref readonly var texture = ref _textureManager[textureHandle];
             var shaderResourceHandle = _shaderResourceViewManager.Create(texture.Resource, texture.Format);
-            return new Texture(textureHandle, shaderResourceHandle);
+            return new Texture(shaderResourceHandle, textureHandle);
         }
 
         public void UnloadTexture(Texture texture)
         {
-            _shaderResourceViewManager.Destroy(texture.ResourceViewHandle);
-            _textureManager.Destroy(texture.TextureHandle);
+            _shaderResourceViewManager.Destroy(texture.Resource);
+            _textureManager.Destroy(texture.Texture2D);
         }
     }
 }

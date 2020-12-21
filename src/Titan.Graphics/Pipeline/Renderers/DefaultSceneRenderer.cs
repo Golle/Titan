@@ -105,11 +105,11 @@ namespace Titan.Graphics.Pipeline.Renderers
                         ref readonly var material = ref _materialsManager[renderable.Materials[subset.MaterialIndex]];
                         if (material.IsTextured)
                         {
-                            context.SetPixelShaderResource(_shaderResourceViewManager[material.DiffuseMap.Handle]);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[material.DiffuseMap.Resource]);
                         }
                         else
                         {
-                            context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.Resource]);
                         }
 
                         //TODO: This is slow and bad
@@ -118,7 +118,7 @@ namespace Titan.Graphics.Pipeline.Renderers
                             context.SetInputLayout(_shaderManager[_normalMapShader.InputLayout]);
                             context.SetVertexShader(_shaderManager[_normalMapShader.VertexShader]);
                             context.SetPixelShader(_shaderManager[_normalMapShader.PixelShader]);
-                            context.SetPixelShaderResource(_shaderResourceViewManager[material.NormalMap.Handle], 1);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[material.NormalMap.Resource], 1);
                         }
 
                         context.DrawIndexed(subset.Count, subset.StartIndex);
@@ -126,7 +126,7 @@ namespace Titan.Graphics.Pipeline.Renderers
                 }
                 else
                 {
-                    context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
+                    context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.Resource]);
                     context.DrawIndexed(indexBuffer.NumberOfIndices);
                 }
             }

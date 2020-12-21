@@ -56,12 +56,7 @@ namespace Titan.Graphics.Materials
                 return default;
             }
 
-            var (textureHandle, shaderResourceViewHandle) = _textureLoader.LoadTexture(_configuration.GetPath(filename));
-            return new Texture
-            {
-                Handle = shaderResourceViewHandle,
-                TextureHandle = textureHandle
-            };
+            return _textureLoader.LoadTexture(_configuration.GetPath(filename));
         }
 
         public ref readonly Material this[in MaterialHandle handle]

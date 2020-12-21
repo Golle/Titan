@@ -1,6 +1,17 @@
+using System.Runtime.InteropServices;
 using Titan.Graphics.Resources;
 
 namespace Titan.Graphics.Textures
 {
-    public record Texture(Handle<Resources.Texture> TextureHandle, Handle<ShaderResourceView> ResourceViewHandle);
+    [StructLayout(LayoutKind.Sequential)]
+    public readonly struct Texture
+    {
+        public readonly Handle<ShaderResourceView> Resource;
+        public readonly Handle<Texture2D> Texture2D;
+        public Texture(in Handle<ShaderResourceView> resource, in Handle<Texture2D> texture2d)
+        {
+            Resource = resource;
+            Texture2D = texture2d;
+        }
+    }
 }

@@ -12,6 +12,6 @@ namespace Titan.EntitySystem.Components
     
     internal struct TextureComponent
     {
-        public Handle<Texture> Handle;
+        public Handle<Texture2D> Handle;
     }
 }
