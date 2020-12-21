@@ -37,7 +37,7 @@ namespace Titan.Graphics.Resources
             _maxBuffers = memory.Count;
         }
 
-        public IndexBufferHandle CreateIndexBuffer<T>(uint count, void* initialData = null, D3D11_USAGE usage = default, D3D11_CPU_ACCESS_FLAG cpuAccess = default, D3D11_RESOURCE_MISC_FLAG miscFlags = default) where T : unmanaged
+        public Handle<IndexBuffer> CreateIndexBuffer<T>(uint count, void* initialData = null, D3D11_USAGE usage = default, D3D11_CPU_ACCESS_FLAG cpuAccess = default, D3D11_RESOURCE_MISC_FLAG miscFlags = default) where T : unmanaged
         {
             Debug.Assert(typeof(T) == typeof(ushort) || typeof(T) == typeof(uint), "Only int/uint or short/ushort are supported");
             Debug.Assert(!_freeHandles.IsEmpty || _numberOfBuffers < _maxBuffers, "Max number of buffers have been reached.");
@@ -78,7 +78,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void DestroyBuffer(in IndexBufferHandle handle)
+        public void DestroyBuffer(in Handle<IndexBuffer> handle)
         {
             ref var buffer = ref _buffers[handle];
             if (buffer.Pointer != null)
@@ -89,7 +89,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly IndexBuffer this[in IndexBufferHandle handle]
+        public ref readonly IndexBuffer this[in Handle<IndexBuffer> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _buffers[handle];

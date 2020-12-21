@@ -38,7 +38,7 @@ namespace Titan.Graphics.Resources
             _maxBuffers = memory.Count;
         }
 
-        public ConstantBufferHandle CreateConstantBuffer<T>(in T data = default, D3D11_USAGE usage = default, D3D11_CPU_ACCESS_FLAG cpuAccess = default, D3D11_RESOURCE_MISC_FLAG miscFlags = default) where T : unmanaged
+        public Handle<ConstantBuffer> CreateConstantBuffer<T>(in T data = default, D3D11_USAGE usage = default, D3D11_CPU_ACCESS_FLAG cpuAccess = default, D3D11_RESOURCE_MISC_FLAG miscFlags = default) where T : unmanaged
         {
             Debug.Assert(sizeof(T) % 16 == 0, "ConstantBuffer must be 16 byte aligned");
             Debug.Assert(!_freeHandles.IsEmpty || _numberOfBuffers < _maxBuffers, "Max number of buffers have been reached.");
@@ -70,7 +70,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void DestroyBuffer(in ConstantBufferHandle handle)
+        public void DestroyBuffer(in Handle<ConstantBuffer> handle)
         {
             ref var buffer = ref _buffers[handle];
             if (buffer.Pointer != null)
@@ -99,7 +99,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly ConstantBuffer this[in ConstantBufferHandle handle]
+        public ref readonly ConstantBuffer this[in Handle<ConstantBuffer> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _buffers[handle];

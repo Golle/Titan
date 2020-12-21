@@ -36,8 +36,8 @@ namespace Titan.Graphics.Resources
             _maxTextures = memory.Count;
         }
    
-        public TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag) => CreateTexture(width, height, format, null, 0, bindFlag);
-        public TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint stride, D3D11_BIND_FLAG bindFlag = default)
+        public Handle<Texture> CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag) => CreateTexture(width, height, format, null, 0, bindFlag);
+        public Handle<Texture> CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint stride, D3D11_BIND_FLAG bindFlag = default)
         {
             var desc = new D3D11_TEXTURE2D_DESC
             {
@@ -81,9 +81,9 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void Destroy(in TextureHandle textureHandle)
+        public void Destroy(in Handle<Texture> handle)
         {
-            ref var texture = ref _textures[textureHandle];
+            ref var texture = ref _textures[handle];
             if (texture.Pointer != null)
             {
                 texture.Pointer->Release();
@@ -91,7 +91,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly Texture this[in TextureHandle handle]
+        public ref readonly Texture this[in Handle<Texture> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _textures[handle];

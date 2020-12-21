@@ -23,8 +23,8 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly ISamplerStateManager _samplerStateManager;
 
-        private readonly ConstantBufferHandle _perObjectHandle;
-        private readonly ConstantBufferHandle _cameraHandle;
+        private readonly Handle<ConstantBuffer> _perObjectHandle;
+        private readonly Handle<ConstantBuffer> _cameraHandle;
 
         private readonly SamplerStateHandle _samplerStatehandle;
 
@@ -92,9 +92,9 @@ namespace Titan.Graphics.Pipeline.Renderers
                 context.SetVertexShaderConstantBuffer(objectBuffer, 1u);
 
                 var mesh = renderable.Mesh;
-                ref readonly var indexBuffer = ref _indexBufferManager[mesh.IndexBufferHandle];
+                ref readonly var indexBuffer = ref _indexBufferManager[mesh.IndexBuffer];
                 context.SetIndexBuffer(indexBuffer);
-                context.SetVertexBuffer(_vertexBufferManager[mesh.VertexBufferHandle]);
+                context.SetVertexBuffer(_vertexBufferManager[mesh.VertexBuffer]);
 
                 var subsets = mesh.SubSets;
                 if (subsets.Length > 1)

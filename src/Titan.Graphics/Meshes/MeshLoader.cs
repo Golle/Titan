@@ -33,8 +33,8 @@ namespace Titan.Graphics.Meshes
 
         private unsafe Mesh CreateMesh(ChunkHeader chunkHeader, ByteReader reader)
         {
-            IndexBufferHandle indexBuffer;
-            VertexBufferHandle vertexBuffer;
+            Handle<IndexBuffer> indexBuffer;
+            Handle<VertexBuffer> vertexBuffer;
             var submeshes = new SubMesh[chunkHeader.SubMeshCount];
             reader.Read(ref submeshes);
 
@@ -68,7 +68,7 @@ namespace Titan.Graphics.Meshes
             return new Mesh(vertexBuffer, indexBuffer, submeshes);
         }
 
-        private unsafe IndexBufferHandle CreateIndexBuffer<T>(ByteReader reader, void* pIndices, uint count) where T : unmanaged
+        private unsafe Handle<IndexBuffer> CreateIndexBuffer<T>(ByteReader reader, void* pIndices, uint count) where T : unmanaged
         {
             reader.Read<T>(pIndices, count);
             return _indexBufferManager.CreateIndexBuffer<T>(count, pIndices);

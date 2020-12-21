@@ -36,7 +36,7 @@ namespace Titan.Graphics.Resources
             _maxResources = memory.Count;
         }
 
-        public ShaderResourceViewHandle Create(ID3D11Resource* resource, DXGI_FORMAT format)
+        public Handle<ShaderResourceView> Create(ID3D11Resource* resource, DXGI_FORMAT format)
         {
             var desc = new D3D11_SHADER_RESOURCE_VIEW_DESC
             {
@@ -54,7 +54,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void Destroy(in ShaderResourceViewHandle handle)
+        public void Destroy(in Handle<ShaderResourceView> handle)
         {
             ref var resource = ref _resources[handle];
             if (resource.Pointer != null)
@@ -64,7 +64,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly ShaderResourceView this[in ShaderResourceViewHandle handle]
+        public ref readonly ShaderResourceView this[in Handle<ShaderResourceView> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _resources[handle];

@@ -19,7 +19,7 @@ namespace Titan.Graphics.Resources
         private RenderTargetView* _views;
         private uint _maxViews;
         private int _numberOfViews;
-        public RenderTargetViewHandle BackbufferHandle { get; } = 0;
+        public Handle<RenderTargetView> BackbufferHandle { get; } = 0;
 
         public RenderTargetViewManager(IMemoryManager memoryManager)
         {
@@ -55,7 +55,7 @@ namespace Titan.Graphics.Resources
             _device = new ComPtr<ID3D11Device>(device.Ptr);
         }
 
-        public RenderTargetViewHandle Create(ID3D11Resource* resource, DXGI_FORMAT format)
+        public Handle<RenderTargetView> Create(ID3D11Resource* resource, DXGI_FORMAT format)
         {
             var desc = new D3D11_RENDER_TARGET_VIEW_DESC
             {
@@ -71,7 +71,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void Destroy(in RenderTargetViewHandle handle)
+        public void Destroy(in Handle<RenderTargetView> handle)
         {
             Debug.Assert(handle != 0, "Trying to destroy the backbuffer");
             ref var view = ref _views[handle];
@@ -82,7 +82,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly RenderTargetView this[in RenderTargetViewHandle handle]
+        public ref readonly RenderTargetView this[in Handle<RenderTargetView> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _views[handle];

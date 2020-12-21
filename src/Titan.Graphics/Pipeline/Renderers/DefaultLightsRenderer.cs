@@ -17,9 +17,9 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IConstantBufferManager _constantBufferManager;
         private readonly IShaderManager _shaderManager;
 
-        private readonly VertexBufferHandle _vertexBufferHandle;
-        private readonly IndexBufferHandle _indexBufferHandle;
-        private readonly ConstantBufferHandle _lightSourceHandle;
+        private readonly Handle<VertexBuffer> _vertexBuffer;
+        private readonly Handle<IndexBuffer> _indexBuffer;
+        private readonly Handle<ConstantBuffer> _lightSourceHandle;
         private readonly ShaderProgram _shader;
         
         public unsafe DefaultLightsRenderer(ILigthRenderQueue ligthRenderQueue, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, IShaderManager shaderManager)
@@ -35,7 +35,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             vertices[1] = new FullscreenVertex { Position = new Vector2(-1, 1), UV = new Vector2(0, 0) };
             vertices[2] = new FullscreenVertex { Position = new Vector2(1, 1), UV = new Vector2(1, 0) };
             vertices[3] = new FullscreenVertex { Position = new Vector2(1, -1), UV = new Vector2(1, 1) };
-            _vertexBufferHandle = _vertexBufferManager.CreateVertexBuffer(4u, (uint)sizeof(FullscreenVertex), vertices);
+            _vertexBuffer = _vertexBufferManager.CreateVertexBuffer(4u, (uint)sizeof(FullscreenVertex), vertices);
             
             var indices = stackalloc ushort[6];
             indices[0] = 0;
@@ -44,7 +44,7 @@ namespace Titan.Graphics.Pipeline.Renderers
             indices[3] = 0;
             indices[4] = 2;
             indices[5] = 3;
-            _indexBufferHandle = _indexBufferManager.CreateIndexBuffer<ushort>(6, indices);
+            _indexBuffer = _indexBufferManager.CreateIndexBuffer<ushort>(6, indices);
 
             _lightSourceHandle = _constantBufferManager.CreateConstantBuffer(new LightSource(), D3D11_USAGE.D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
@@ -67,8 +67,8 @@ namespace Titan.Graphics.Pipeline.Renderers
             
             context.SetPixelShaderConstantBuffer(lightSource);
             context.SetPritimiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            context.SetVertexBuffer(_vertexBufferManager[_vertexBufferHandle]);
-            context.SetIndexBuffer(_indexBufferManager[_indexBufferHandle]);
+            context.SetVertexBuffer(_vertexBufferManager[_vertexBuffer]);
+            context.SetIndexBuffer(_indexBufferManager[_indexBuffer]);
 
             context.SetInputLayout(_shaderManager[_shader.InputLayout]);
             context.SetVertexShader(_shaderManager[_shader.VertexShader]);
@@ -80,8 +80,8 @@ namespace Titan.Graphics.Pipeline.Renderers
         public void Dispose()
         {
             _constantBufferManager.DestroyBuffer(_lightSourceHandle);
-            _vertexBufferManager.DestroyBuffer(_vertexBufferHandle);
-            _indexBufferManager.DestroyBuffer(_indexBufferHandle);
+            _vertexBufferManager.DestroyBuffer(_vertexBuffer);
+            _indexBufferManager.DestroyBuffer(_indexBuffer);
         }
 
        

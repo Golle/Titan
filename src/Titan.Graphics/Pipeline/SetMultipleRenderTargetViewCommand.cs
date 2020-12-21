@@ -7,8 +7,8 @@ namespace Titan.Graphics.Pipeline
     {
         public uint Count;
         public fixed int Handles[4]; // TODO: increase this if we want to support a higher number of render targets
-        public DepthStencilViewHandle DepthStencilView;
+        public Handle<DepthStencilView> DepthStencilView;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(int i, RenderTargetViewHandle handle) => Handles[i] = handle;
+        public void Set(int i, Handle<RenderTargetView> handle) => Handles[i] = handle;
     }
 }

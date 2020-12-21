@@ -36,7 +36,7 @@ namespace Titan.Graphics.Resources
             _maxViews = memory.Count;
         }
 
-        public DepthStencilViewHandle Create(ID3D11Resource* resource, DXGI_FORMAT format)
+        public Handle<DepthStencilView> Create(ID3D11Resource* resource, DXGI_FORMAT format)
         {
             var desc = new D3D11_DEPTH_STENCIL_VIEW_DESC
             {
@@ -53,7 +53,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void Destroy(in DepthStencilViewHandle handle)
+        public void Destroy(in Handle<DepthStencilView> handle)
         {
             Debug.Assert(_views != null, $"{nameof(DepthStencilViewManager)} has not been initialized.");
             ref var view = ref _views[handle];
@@ -64,7 +64,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly DepthStencilView this[in DepthStencilViewHandle handle]
+        public ref readonly DepthStencilView this[in Handle<DepthStencilView> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _views[handle];

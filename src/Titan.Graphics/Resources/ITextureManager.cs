@@ -8,9 +8,9 @@ namespace Titan.Graphics.Resources
 
         void Initialize(IGraphicsDevice graphicsDevice);
         
-        TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag = default);
-        unsafe TextureHandle CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint stride, D3D11_BIND_FLAG bindFlag = default);
-        void Destroy(in TextureHandle textureHandle);
-        ref readonly Texture this[in TextureHandle textureHandle] { get; }
+        Handle<Texture> CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag = default);
+        unsafe Handle<Texture> CreateTexture(uint width, uint height, DXGI_FORMAT format, void* buffer, uint stride, D3D11_BIND_FLAG bindFlag = default);
+        void Destroy(in Handle<Texture> handle);
+        ref readonly Texture this[in Handle<Texture> handle] { get; }
     }
 }

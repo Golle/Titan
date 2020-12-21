@@ -101,7 +101,7 @@ namespace Titan.Graphics.Pipeline
                         var resource = _textureManager[textureHandle].Resource;
                         var renderTargetHandle = _renderTargetViewManager.Create(resource, renderTarget.Format);
                         builder.AddRenderTarget(renderTarget.Name, renderTargetHandle);
-                        //var resourceHandle = _device.ShaderResourceViewManager.Create(_device.TextureManager[textureHandle].Resource, renderTarget.Format);
+                        //var resourceHandle = _device.ShaderResourceViewManager.Create(_device.TextureManager[Handle<Texture>].Resource, renderTarget.Format);
                         //builder.AddShaderResource(renderTarget.Name, resourceHandle);
                     }
                 }

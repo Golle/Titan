@@ -40,7 +40,7 @@ namespace Titan.Graphics.Resources
             _maxBuffers = memory.Count;
         }
 
-        public VertexBufferHandle CreateVertexBuffer(uint count, uint stride, void* initialData, D3D11_USAGE usage, D3D11_CPU_ACCESS_FLAG cpuAccess, D3D11_RESOURCE_MISC_FLAG miscFlags)
+        public Handle<VertexBuffer> CreateVertexBuffer(uint count, uint stride, void* initialData, D3D11_USAGE usage, D3D11_CPU_ACCESS_FLAG cpuAccess, D3D11_RESOURCE_MISC_FLAG miscFlags)
         {
             Debug.Assert(!_freeHandles.IsEmpty || _numberOfBuffers < _maxBuffers, "Max number of buffers have been reached.");
 
@@ -80,7 +80,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void DestroyBuffer(in VertexBufferHandle handle)
+        public void DestroyBuffer(in Handle<VertexBuffer> handle)
         {
             ref var buffer = ref _buffers[handle];
             if (buffer.Pointer != null)
@@ -91,7 +91,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly VertexBuffer this[in VertexBufferHandle handle]
+        public ref readonly VertexBuffer this[in Handle<VertexBuffer> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _buffers[handle];

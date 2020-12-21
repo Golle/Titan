@@ -14,10 +14,10 @@ namespace Titan.Graphics.Pipeline
         private readonly IDictionary<string, IRenderer> _renderers = new Dictionary<string, IRenderer>();
         private readonly IDictionary<string, RenderPassConfiguration> _renderPasses = new Dictionary<string, RenderPassConfiguration>();
         private readonly IDictionary<string, ShaderProgram> _shaderProgramHandles = new Dictionary<string, ShaderProgram>();
-        private readonly IDictionary<string, RenderTargetViewHandle> _renderTargets = new Dictionary<string, RenderTargetViewHandle>();
-        private readonly IDictionary<string, ShaderResourceViewHandle> _shaderResources = new Dictionary<string, ShaderResourceViewHandle>();
+        private readonly IDictionary<string, Handle<RenderTargetView>> _renderTargets = new Dictionary<string, Handle<RenderTargetView>>();
+        private readonly IDictionary<string, Handle<ShaderResourceView>> _shaderResources = new Dictionary<string, Handle<ShaderResourceView>>();
 
-        private readonly IDictionary<string, DepthStencilViewHandle> _depthStencils = new Dictionary<string, DepthStencilViewHandle>();
+        private readonly IDictionary<string, Handle<DepthStencilView>> _depthStencils = new Dictionary<string, Handle<DepthStencilView>>();
         private readonly IDictionary<string, SamplerStateHandle> _samplers = new Dictionary<string, SamplerStateHandle>();
 
         internal RenderPassBuilder()
@@ -53,7 +53,7 @@ namespace Titan.Graphics.Pipeline
             _shaderProgramHandles.Add(name, shaderProgram);
         }
 
-        public void AddRenderTarget(string name, in RenderTargetViewHandle handle)
+        public void AddRenderTarget(string name, in Handle<RenderTargetView> handle)
         {
             if (_renderTargets.ContainsKey(name))
             {
@@ -62,7 +62,7 @@ namespace Titan.Graphics.Pipeline
             _renderTargets.Add(name, handle);
         }
 
-        public void AddShaderResource(string name, in ShaderResourceViewHandle handle)
+        public void AddShaderResource(string name, in Handle<ShaderResourceView> handle)
         {
             if (_shaderResources.ContainsKey(name))
             {
@@ -71,7 +71,7 @@ namespace Titan.Graphics.Pipeline
             _shaderResources.Add(name, handle);
         }
 
-        public void AddDepthStencil(string name, in DepthStencilViewHandle handle)
+        public void AddDepthStencil(string name, in Handle<DepthStencilView> handle)
         {
             if (_depthStencils.ContainsKey(name))
             {
