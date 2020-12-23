@@ -14,7 +14,7 @@ namespace Titan
     public record SystemsConfiguration(string Name, Type Type, string[] Dependencies);
     public record EventsConfiguration(uint MaxEventQueueSize);
 
-    internal record GameConfiguration(AssetsDirectory AssetsDirectory, SystemsConfiguration[] Systems, DisplayConfiguration DisplayConfiguration, LoggerConfiguration LoggerConfiguration, PipelineConfiguration PipelineConfiguration, EventsConfiguration EventsConfiguration);
+    internal record GameConfiguration(AssetsDirectory AssetsDirectory, SystemsConfiguration[] Systems, DisplayConfiguration DisplayConfiguration, LoggerConfiguration LoggerConfiguration, PipelineConfiguration PipelineConfiguration, EventsConfiguration EventsConfiguration, Type Startup);
 
     public class GameConfigurationBuilder
     {
@@ -27,6 +27,13 @@ namespace Titan
         private DisplayConfigurationFile _displayConfigurationFile;
         private EventsConfiguration _eventConfiguration;
         private static readonly EventsConfiguration DefaultEventConfiguration = new(10_000);
+        private Type _startupType;
+
+        public GameConfigurationBuilder WithStartup<T>() where T : IStartup
+        {
+            _startupType = typeof(T);
+            return this;
+        }
 
         public GameConfigurationBuilder WithDefaultConsoleLogger()
         {
@@ -78,7 +85,7 @@ namespace Titan
             var displayConfiguration = _displayConfiguration ?? loader.ReadConfig<DisplayConfiguration>(GetPath(_displayConfigurationFile.Path));
             var eventConfiguration = _eventConfiguration ?? DefaultEventConfiguration;
             
-            return new (_assetsDirectory, _systems.ToArray(), displayConfiguration, _loggerConfiguration, pipelineConfiguration, eventConfiguration);
+            return new (_assetsDirectory, _systems.ToArray(), displayConfiguration, _loggerConfiguration, pipelineConfiguration, eventConfiguration, _startupType);
         }
 
         private void Validate()
@@ -98,6 +105,10 @@ namespace Titan
             if (_pipelineConfigurationFile == null)
             {
                 throw new InvalidOperationException($"{nameof(PipelineConfigurationFile)} is not set. Use {nameof(WithPipelineConfigurationFromFile)} to configure.");
+            }
+            if (_startupType == null)
+            {
+                throw new InvalidOperationException($"A Startup class has not been set. Use {nameof(WithStartup)} to configure.");
             }
         }
     }

@@ -77,6 +77,12 @@ namespace Titan.ECS.World
             _eventQueue.Push(new EntityChangedEvent(entity, info.ComponentMask));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddManagedComponent<T>(in Entity entity, in T initialValue) where T : struct
+        {
+            _registry.GetManagedComponentPool<T>().Create(entity);
+        }
+
         public IComponentPool<T> GetComponentPool<T>() where T : unmanaged => _registry.GetPool<T>();
 
         public void Dispose() => WorldContainer.Remove(this);

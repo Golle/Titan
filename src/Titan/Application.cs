@@ -3,6 +3,7 @@ using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
+using Titan.ECS.World;
 using Titan.Graphics;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Resources;
@@ -23,6 +24,9 @@ namespace Titan
         private readonly IEventQueue _eventQueue;
         private readonly IMemoryManager _memoryManager;
         private readonly IInputHandler _inputHandler;
+        
+        private IStartup _startup;
+        private IWorld _world;
 
         public static Application Create(GameConfigurationBuilder configurationBuilder)
         {
@@ -52,7 +56,13 @@ namespace Titan
         public void Run()
         {
             _log.Debug("Application starting");
+
+            _log.Debug("Create and Configure the World");
+            _world = _startup.ConfigureWorld(new WorldBuilder()).Build(_container);
+            
+            _startup.OnStart(_world);
             StartMainLoop();
+            _startup.OnStop(_world);
             _log.Debug("Application finished, exiting.");
         }
 
@@ -62,7 +72,7 @@ namespace Titan
             {
                 _eventQueue.Update();
                 _inputHandler.Update();
-
+                _world.Update();
                 /*
                  *Insert multithreaded game system update here
                  */
@@ -89,6 +99,8 @@ namespace Titan
 
             LOGGER.Debug("Initialize the Graphics System");
             _graphicsSystem.Initialize(configuration.AssetsDirectory.Path, configuration.DisplayConfiguration.RefreshRate, configuration.PipelineConfiguration, true);
+
+            _startup = (IStartup)_container.CreateInstance(configuration.Startup);
         }
         
         private unsafe void InitMemoryManager()
@@ -117,6 +129,7 @@ namespace Titan
             _window?.Dispose();
             _container.Dispose();
             _memoryManager.Dispose();
+            (_startup as IDisposable)?.Dispose();
         }
     }
 }

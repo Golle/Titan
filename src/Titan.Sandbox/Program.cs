@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Titan;
+using Titan.Core.Logging;
 using Titan.ECS.Components;
 using Titan.ECS.Registry;
 using Titan.ECS.Systems;
@@ -18,16 +19,59 @@ var gameConfigurationBuilder = new GameConfigurationBuilder()
     .WithPipelineConfigurationFromFile(pipelineConfiguration)
     .WithSystem<SandboxSystem>(nameof(SandboxSystem), TitanSystems.Transform3D)
     .WithSystem<AnotherSandboxSystem>(nameof(AnotherSandboxSystem), nameof(SandboxSystem))
+    .WithStartup<SandboxStartup>()
     
     .WithDefaultConsoleLogger();
-
 
 using var application = Application.Create(gameConfigurationBuilder);
 application.Run();
 
 
+interface IAssetsStorage { }
+
+internal struct Asset<T> where T : unmanaged
+{
+    public string Identifier;
+    public Asset(string identifier)
+    {
+        Identifier = identifier;
+    }
+}
+
+internal class SandboxStartup : IStartup
+{
+    public WorldBuilder ConfigureWorld(WorldBuilder builder) =>
+        builder
+            .WithMaxEntities(10_000)
+            .WithComponent<Transform3D>(3000)
+            .WithComponent<SandboxComponent>(3000)
+            .WithComponent<Asset<TextureComponent>>(200)
+            .WithComponent<Asset<int>>(200)
+            .WithComponent<Asset<float>>(100);
 
 
+    public void OnStart(IWorld world)
+    {
+
+        var entity = world.CreateEntity();
+        entity.AddComponent<Transform3D>();
+        entity.AddComponent<SandboxComponent>();
+        entity.AddManagedComponent(new Asset<TextureComponent>("apa"));
+        //entity.AddComponent(new Asset<TextureComponent>("apa"));
+    }
+
+    public void OnStop(IWorld world)
+    {
+        
+    }
+}
+
+
+struct SandboxComponent
+{
+    public float X;
+    public int A;
+}
 
 
 
