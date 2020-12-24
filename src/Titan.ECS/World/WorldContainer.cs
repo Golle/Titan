@@ -75,7 +75,7 @@ namespace Titan.ECS.World
         public static void AddManagedComponent<T>(in Entity entity, in T initialValue) where T : struct
         {
             Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");
-            Worlds[entity.WorldId].AddManagedComponent<T>(entity, initialValue);
+            Worlds[entity.WorldId].AddManagedComponent(entity, initialValue);
         }
     }
 }

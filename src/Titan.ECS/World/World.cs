@@ -17,6 +17,9 @@ namespace Titan.ECS.World
             EntityManager.Update();
             _entityFactory.Update();
         }
+
+        
+
         public IEntityManager EntityManager { get; }
         public IEntityInfoRepository EntityInfo { get; }
         public IEntityFilterManager FilterManager { get; }
@@ -78,12 +81,12 @@ namespace Titan.ECS.World
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddManagedComponent<T>(in Entity entity, in T initialValue) where T : struct
-        {
-            _registry.GetManagedComponentPool<T>().Create(entity);
-        }
+        public void AddManagedComponent<T>(in Entity entity, in T initialValue) where T : struct => _registry.GetManagedComponentPool<T>().Create(entity, initialValue);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IComponentPool<T> GetComponentPool<T>() where T : unmanaged => _registry.GetPool<T>();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IManagedComponentPool<T> GetManagedComponentPool<T>() where T : struct => _registry.GetManagedComponentPool<T>();
 
         public void Dispose() => WorldContainer.Remove(this);
     }

@@ -61,7 +61,9 @@ namespace Titan
             _world = _startup.ConfigureWorld(new WorldBuilder()).Build(_container);
             
             _startup.OnStart(_world);
+            
             StartMainLoop();
+            
             _startup.OnStop(_world);
             _log.Debug("Application finished, exiting.");
         }
