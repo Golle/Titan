@@ -77,5 +77,12 @@ namespace Titan.ECS.World
             Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");
             Worlds[entity.WorldId].AddManagedComponent(entity, initialValue);
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void RemoveManagedComponent<T>(in Entity entity) where T : struct
+        {
+            Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");
+            Worlds[entity.WorldId].RemoveManagedComponent<T>(entity);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using Titan.Graphics.Resources;
+using Titan.Graphics.Textures;
 
 namespace Titan.EntitySystem.Components
 {
@@ -12,6 +13,6 @@ namespace Titan.EntitySystem.Components
     
     internal struct TextureComponent
     {
-        public Handle<Texture2D> Handle;
+        public Texture Texture;
     }
 }

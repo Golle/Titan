@@ -16,7 +16,7 @@ namespace Titan.Core.Messaging
         private int _count;
 
         private bool _high;
-        private byte* _evensLastFrame;
+        private byte* _eventsLastFrame;
         private int _numberOfEventsLastFrame;
         
         private const int EventTypeSize = sizeof(short);
@@ -26,8 +26,7 @@ namespace Titan.Core.Messaging
         
         public void Initialize(uint maxEventQueueSize)
         {
-            
-            if (_evensLastFrame != null)
+            if (_eventsLastFrame != null)
             {
                 throw new InvalidOperationException($"{nameof(EventQueue)} has already been initialized");
             }
@@ -58,9 +57,11 @@ namespace Titan.Core.Messaging
             Debug.Assert(_events != null, $"{nameof(EventQueue)} has not been initialized");
             Debug.Assert(!_high || (_count - _maxEvents) < _maxEvents, $"Event limit reached. max events {_maxEvents}, current: {_count - _maxEvents}");
             Debug.Assert(_high || _count < _maxEvents, $"Event limit reached. max events {_maxEvents}, current: {_count}");
+            
             var offset = Interlocked.Increment(ref _count) - 1;
             var pEvent = _events + (offset * EventSize);
             var eventId = EventId<T>.Value;
+            // TODO: is this faster than copy block? *(short*) pEvent = eventId;
             Unsafe.CopyBlock(pEvent, &eventId, EventTypeSize);
             fixed (T* ptr = &@event)
             {
@@ -69,7 +70,7 @@ namespace Titan.Core.Messaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<QueuedEvent> GetEvents() => new(_evensLastFrame, _numberOfEventsLastFrame);
+        public ReadOnlySpan<QueuedEvent> GetEvents() => new(_eventsLastFrame, _numberOfEventsLastFrame);
 
         public void Update()
         {
@@ -77,13 +78,13 @@ namespace Titan.Core.Messaging
             if (_high)
             {
                 _numberOfEventsLastFrame = _count;
-                _evensLastFrame = _events;
+                _eventsLastFrame = _events;
                 _count = _maxEvents;
             }
             else
             {
                 _numberOfEventsLastFrame = _count - _maxEvents;
-                _evensLastFrame = _events + (_maxEvents * EventSize);
+                _eventsLastFrame = _events + (_maxEvents * EventSize);
                 _count = 0;
             }
         }

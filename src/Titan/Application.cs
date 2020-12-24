@@ -108,7 +108,7 @@ namespace Titan
         private unsafe void InitMemoryManager()
         {
             LOGGER.Debug("Initialize memory manager");
-            // TODO: not sure how to do this yet. Could have each manager "request" a memory chunk.
+            // TODO: not sure how to do this yet. Could have each manager "request" a memory chunk. This should be a part of the graphics system
             _memoryManager.Initialize(new[]
             {
                 new ChunkDescriptor("VertexBuffer", (uint) sizeof(VertexBuffer), 2048),
@@ -116,7 +116,7 @@ namespace Titan
                 new ChunkDescriptor("ConstantBuffer", (uint) sizeof(ConstantBuffer), 100),
                 new ChunkDescriptor("Materials", (uint) sizeof(Material), 256),
                 new ChunkDescriptor("Shaders", (uint) IntPtr.Size, 1024),
-                new ChunkDescriptor("Texture", (uint) sizeof(Graphics.Resources.Texture2D), 1024),
+                new ChunkDescriptor("Texture", (uint) sizeof(Texture2D), 1024),
                 new ChunkDescriptor("ShaderResourceView", (uint) sizeof(ShaderResourceView), 1024),
                 new ChunkDescriptor("RenderTargetView", (uint) sizeof(RenderTargetView), 1024),
                 new ChunkDescriptor("DepthStencilView", (uint) sizeof(DepthStencilView), 10),

@@ -17,9 +17,6 @@ namespace Titan.ECS.World
             EntityManager.Update();
             _entityFactory.Update();
         }
-
-        
-
         public IEntityManager EntityManager { get; }
         public IEntityInfoRepository EntityInfo { get; }
         public IEntityFilterManager FilterManager { get; }
@@ -61,7 +58,20 @@ namespace Titan.ECS.World
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddComponent<T>(in Entity entity, in T value) where T : unmanaged
         {
-            _registry.GetPool<T>().Create(entity, value);
+            GetComponentPool<T>().Create(entity, value);
+            ComponentAdded<T>(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddManagedComponent<T>(in Entity entity, in T initialValue) where T : struct
+        {
+            GetManagedComponentPool<T>().Create(entity, initialValue);
+            ComponentAdded<T>(entity);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ComponentAdded<T>(Entity entity) where T : struct
+        {
             ref var info = ref EntityInfo[entity];
             var componentId = ComponentId<T>.Id;
             info.ComponentMask += componentId;
@@ -73,15 +83,25 @@ namespace Titan.ECS.World
         public void RemoveComponent<T>(in Entity entity) where T : unmanaged
         {
             _registry.GetPool<T>().Destroy(entity);
+            ComponentRemoved<T>(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveManagedComponent<T>(in Entity entity) where T : struct
+        {
+            _registry.GetManagedComponentPool<T>().Destroy(entity);
+            ComponentRemoved<T>(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ComponentRemoved<T>(Entity entity) where T : struct
+        {
             ref var info = ref EntityInfo[entity];
             var componentId = ComponentId<T>.Id;
             info.ComponentMask -= componentId;
             _eventQueue.Push(new ComponentRemovedEvent(entity, componentId));
             _eventQueue.Push(new EntityChangedEvent(entity, info.ComponentMask));
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddManagedComponent<T>(in Entity entity, in T initialValue) where T : struct => _registry.GetManagedComponentPool<T>().Create(entity, initialValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IComponentPool<T> GetComponentPool<T>() where T : unmanaged => _registry.GetPool<T>();
