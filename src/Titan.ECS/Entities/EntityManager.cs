@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Core.Messaging;
-using Titan.ECS.Events;
+using Titan.ECS.Messaging;
+using Titan.ECS.Messaging.Events;
 using Titan.ECS.World;
 
 namespace Titan.ECS.Entities
@@ -10,17 +10,16 @@ namespace Titan.ECS.Entities
     internal unsafe class EntityManager : IEntityManager
     {
         private readonly IEntityFactory _entityFactory;
-        private readonly IEventQueue _eventQueue;
+        private readonly IEventManager _eventManager;
 
         private Relationship* _relationships;
         private readonly uint _worldId;
 
-        public EntityManager(WorldConfiguration configuration, IEntityFactory entityFactory, IEventQueue eventQueue)
-
+        public EntityManager(WorldConfiguration configuration, IEntityFactory entityFactory, IEventManager eventManager)
         {
             _worldId = configuration.WorldId;
             _entityFactory = entityFactory;
-            _eventQueue = eventQueue;
+            _eventManager = eventManager;
             var size = sizeof(Relationship) * configuration.MaxEntities;
             _relationships = (Relationship*)Marshal.AllocHGlobal((int)size);
             Unsafe.InitBlockUnaligned(_relationships, 0, (uint)size);
@@ -31,7 +30,7 @@ namespace Titan.ECS.Entities
         public Entity Create()
         {
             var entity = _entityFactory.Create();
-            _eventQueue.Push(new EntityCreatedEvent(entity));
+            _eventManager.Push(new EntityCreatedEvent(entity));
             return entity;
         }
 
@@ -61,7 +60,7 @@ namespace Titan.ECS.Entities
                 // this is the first child on this parent
                 parentRel->ChildId = entity.Id;
             }
-            _eventQueue.Push(new EntityAttachedEvent(parent, entity));
+            _eventManager.Push(new EntityAttachedEvent(parent, entity));
         }
 
         public void Detach(in Entity entity)
@@ -94,7 +93,7 @@ namespace Titan.ECS.Entities
                 pSibling->NextId = relationship.NextId;
                 relationship.NextId = 0u;
             }
-            _eventQueue.Push(new EntityDetachedEvent(new Entity(relationship.ParentId, _worldId), entity));
+            _eventManager.Push(new EntityDetachedEvent(new Entity(relationship.ParentId, _worldId), entity));
             relationship.ParentId = 0u;
         }
 
@@ -104,7 +103,7 @@ namespace Titan.ECS.Entities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Entity GetParent(in Entity entity)
         {
-            Debug.Assert(_relationships[entity.Id].ParentId != 0u, $"ParentId for entoty {entity.Id} is 0. Trying to get a parent for an entity without a parent.");
+            Debug.Assert(_relationships[entity.Id].ParentId != 0u, $"ParentId for entity {entity.Id} is 0. Trying to get a parent for an entity without a parent.");
             return new(_relationships[entity.Id].ParentId, _worldId);
         }
 
@@ -117,7 +116,7 @@ namespace Titan.ECS.Entities
                 Detach(entity);
             }
             DestroyRecursive(relationship.ChildId);
-            _eventQueue.Push(new EntityBeingDestroyedEvent(entity));
+            _eventManager.Push(new EntityBeingDestroyedEvent(entity));
             
             relationship.Reset();
         }
@@ -142,18 +141,18 @@ namespace Titan.ECS.Entities
                 DestroyRecursive(idToDestroy);
             }
             DestroyRecursive(relationship.ChildId);
-            _eventQueue.Push(new EntityBeingDestroyedEvent(new Entity(entityId, _worldId)));
+            _eventManager.Push(new EntityBeingDestroyedEvent(new Entity(entityId, _worldId)));
             relationship.Reset();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Update()
         {
-            foreach (ref readonly var @event in _eventQueue.GetEvents())
+            foreach (ref readonly var @event in _eventManager.GetEvents())
             {
                 if (@event.Type == EntityBeingDestroyedEvent.Id)
                 {
-                    _eventQueue.Push(new EntityDestroyedEvent(@event.As<EntityBeingDestroyedEvent>().Entity.Id));
+                    _eventManager.Push(new EntityDestroyedEvent(@event.As<EntityBeingDestroyedEvent>().Entity.Id));
                 }
             }
         }

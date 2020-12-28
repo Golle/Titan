@@ -9,7 +9,7 @@ using static Titan.Windows.Win32.Common;
 
 namespace Titan.Graphics.Resources
 {
-    internal unsafe class TextureManager : ITextureManager
+    internal unsafe class Texture2DManager : ITexture2DManager
     {
         private readonly IMemoryManager _memoryManager;
         private ComPtr<ID3D11Device> _device;
@@ -19,7 +19,7 @@ namespace Titan.Graphics.Resources
 
         private int _numberOfTextures;
 
-        public TextureManager(IMemoryManager memoryManager)
+        public Texture2DManager(IMemoryManager memoryManager)
         {
             _memoryManager = memoryManager;
         }
@@ -28,9 +28,9 @@ namespace Titan.Graphics.Resources
         {
             if (_textures != null)
             {
-                throw new InvalidOperationException($"{nameof(TextureManager)} has already been initialized.");
+                throw new InvalidOperationException($"{nameof(Texture2DManager)} has already been initialized.");
             }
-            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(TextureManager)} with the wrong device.", nameof(graphicsDevice));
+            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(Texture2DManager)} with the wrong device.", nameof(graphicsDevice));
             var memory = _memoryManager.GetMemoryChunkValidated<Texture2D>("Texture");
             _textures = memory.Pointer;
             _maxTextures = memory.Count;

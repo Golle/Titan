@@ -12,7 +12,7 @@ namespace Titan.Graphics
     {
         private readonly IGraphicsDevice _device;
         private readonly IGraphicsPipeline _graphicsPipeline;
-        private readonly ITextureManager _textureManager;
+        private readonly ITexture2DManager _texture2DManager;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly IVertexBufferManager _vertexBufferManager;
         private readonly IIndexBufferManager _indexBufferManager;
@@ -23,11 +23,11 @@ namespace Titan.Graphics
         private readonly IDepthStencilStateManager _depthStencilStateManager;
         private readonly IShaderManager _shaderManager;
 
-        public GraphicsSystem(IGraphicsDevice device, IGraphicsPipeline graphicsPipeline, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IDepthStencilStateManager depthStencilStateManager, IShaderManager shaderManager)
+        public GraphicsSystem(IGraphicsDevice device, IGraphicsPipeline graphicsPipeline, ITexture2DManager texture2DManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IDepthStencilStateManager depthStencilStateManager, IShaderManager shaderManager)
         {
             _device = device;
             _graphicsPipeline = graphicsPipeline;
-            _textureManager = textureManager;
+            _texture2DManager = texture2DManager;
             _shaderResourceViewManager = shaderResourceViewManager;
             _vertexBufferManager = vertexBufferManager;
             _indexBufferManager = indexBufferManager;
@@ -45,7 +45,7 @@ namespace Titan.Graphics
             _device.Initialize(refreshRate, debug);
 
             LOGGER.Debug("Initialize GraphicManagers");
-            _textureManager.Initialize(_device);
+            _texture2DManager.Initialize(_device);
             _shaderResourceViewManager.Initialize(_device);
             _vertexBufferManager.Initialize(_device);
             _indexBufferManager.Initialize(_device);
@@ -71,7 +71,7 @@ namespace Titan.Graphics
 
             _shaderManager.Dispose();
             
-            _textureManager.Dispose();
+            _texture2DManager.Dispose();
             _shaderResourceViewManager.Dispose();
             _vertexBufferManager.Dispose();
             _indexBufferManager.Dispose();

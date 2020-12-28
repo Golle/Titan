@@ -2,23 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Titan.Core.Messaging;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
-using Titan.ECS.Events;
+using Titan.ECS.Messaging;
+using Titan.ECS.Messaging.Events;
 
 namespace Titan.ECS.World
 {
     internal class EntityFilterManager : IEntityFilterManager, IDisposable
     {
-        private readonly IEventQueue _eventQueue;
+        private readonly IEventManager _eventManager;
         private readonly IList<EntityFilter> _filters = new List<EntityFilter>(100);
 
         private readonly uint _maxEntities;
         
-        public EntityFilterManager(WorldConfiguration configuration, IEventQueue eventQueue)
+        public EntityFilterManager(WorldConfiguration configuration, IEventManager eventManager)
         {
-            _eventQueue = eventQueue;
+            _eventManager = eventManager;
             _maxEntities = configuration.MaxEntities;
         }
 
@@ -61,7 +61,7 @@ namespace Titan.ECS.World
 
         public void Update()
         {
-            foreach (ref readonly var @event in _eventQueue.GetEvents())
+            foreach (ref readonly var @event in _eventManager.GetEvents())
             {
                 if (@event.Type == EntityChangedEvent.Id)
                 {

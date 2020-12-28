@@ -20,7 +20,7 @@ namespace Titan.Sandbox
             var entity = world.CreateEntity();
             entity.AddComponent<Transform3D>();
             entity.AddComponent<SandboxComponent>();
-            entity.AddManagedComponent(new AssetTEMP<TextureComponent>("teh stuffs"));
+            entity.AddManagedComponent(new AssetTEMP<TextureComponent>("teh texture.png"));
         }
 
         public void OnStop(IWorld world)

@@ -19,7 +19,7 @@ namespace Titan.Graphics.Pipeline
         private readonly IWindow _window;
         private readonly IContainer _container;
         private readonly IGraphicsDevice _device;
-        private readonly ITextureManager _textureManager;
+        private readonly ITexture2DManager _texture2DManager;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly IRenderTargetViewManager _renderTargetViewManager;
         private readonly IDepthStencilViewManager _depthStencilViewManager;
@@ -31,12 +31,12 @@ namespace Titan.Graphics.Pipeline
         
         private RenderGraph _renderGraph;
 
-        public GraphicsPipeline(IContainer container, IWindow window, IGraphicsDevice device, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IShaderManager shaderManager, IRenderPassFactory renderPassFactory)
+        public GraphicsPipeline(IContainer container, IWindow window, IGraphicsDevice device, ITexture2DManager texture2DManager, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IShaderManager shaderManager, IRenderPassFactory renderPassFactory)
         {
             _window = window;
             _container = container;
             _device = device;
-            _textureManager = textureManager;
+            _texture2DManager = texture2DManager;
             _shaderResourceViewManager = shaderResourceViewManager;
             _renderTargetViewManager = renderTargetViewManager;
             _depthStencilViewManager = depthStencilViewManager;
@@ -88,8 +88,8 @@ namespace Titan.Graphics.Pipeline
                     LOGGER.Debug("Creating RenderTarget {0}", renderTarget.Name);
                     if (IsResource(renderPasses, renderTarget))
                     {
-                        var textureHandle = _textureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
-                        var resource = _textureManager[textureHandle].Resource;
+                        var textureHandle = _texture2DManager.CreateTexture((uint) _window.Width, (uint) _window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+                        var resource = _texture2DManager[textureHandle].Resource;
                         var resourceHandle = _shaderResourceViewManager.Create(resource, renderTarget.Format);
                         var renderTargetHandle = _renderTargetViewManager.Create(resource, renderTarget.Format);
                         builder.AddRenderTarget(renderTarget.Name, renderTargetHandle);
@@ -97,8 +97,8 @@ namespace Titan.Graphics.Pipeline
                     }
                     else
                     {
-                        var textureHandle = _textureManager.CreateTexture((uint)_window.Width, (uint)_window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET);
-                        var resource = _textureManager[textureHandle].Resource;
+                        var textureHandle = _texture2DManager.CreateTexture((uint)_window.Width, (uint)_window.Height, renderTarget.Format, D3D11_BIND_RENDER_TARGET);
+                        var resource = _texture2DManager[textureHandle].Resource;
                         var renderTargetHandle = _renderTargetViewManager.Create(resource, renderTarget.Format);
                         builder.AddRenderTarget(renderTarget.Name, renderTargetHandle);
                         //var resourceHandle = _device.ShaderResourceViewManager.Create(_device.TextureManager[Handle<Texture>].Resource, renderTarget.Format);
@@ -110,8 +110,8 @@ namespace Titan.Graphics.Pipeline
                 {
                     LOGGER.Debug("Creating DepthStencil {0}", renderPass.DepthStencil.Name);
                     // temp impl
-                    var stencilTextureHandle = _textureManager.CreateTexture((uint) _window.Width, (uint) _window.Height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
-                    var stencilHandle = _depthStencilViewManager.Create(_textureManager[stencilTextureHandle].Resource);
+                    var stencilTextureHandle = _texture2DManager.CreateTexture((uint) _window.Width, (uint) _window.Height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+                    var stencilHandle = _depthStencilViewManager.Create(_texture2DManager[stencilTextureHandle].Resource);
                     builder.AddDepthStencil(renderPass.DepthStencil.Name, stencilHandle);
                 }
                 

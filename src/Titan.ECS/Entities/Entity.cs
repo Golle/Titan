@@ -49,6 +49,6 @@ namespace Titan.ECS.Entities
         public void RemoveManagedComponent<T>() where T : struct => WorldContainer.RemoveManagedComponent<T>(this);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddManagedComponent<T>(in T initialValue) where T : struct => WorldContainer.AddManagedComponent<T>(this, initialValue);
+        public void AddManagedComponent<T>(in T initialValue) where T : struct => WorldContainer.AddManagedComponent(this, initialValue);
     }
 }

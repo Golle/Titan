@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;

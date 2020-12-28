@@ -1,9 +1,9 @@
 using Titan.Core.Messaging;
 using Titan.ECS.Entities;
 
-namespace Titan.ECS.Events
+namespace Titan.ECS.Messaging.Events
 {
-    [TitanEvent]
+    [ECSEvent]
     internal readonly struct EntityBeingDestroyedEvent
     {
         public static readonly short Id = EventId<EntityBeingDestroyedEvent>.Value;

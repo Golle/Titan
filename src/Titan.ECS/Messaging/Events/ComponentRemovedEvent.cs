@@ -2,10 +2,10 @@ using Titan.Core.Messaging;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 
-namespace Titan.ECS.Events
+namespace Titan.ECS.Messaging.Events
 {
-    [TitanEvent]
-    internal readonly struct ComponentRemovedEvent
+    [ECSEvent]
+    public readonly struct ComponentRemovedEvent
     {
         public static readonly short Id = EventId<ComponentRemovedEvent>.Value;
         public readonly Entity Entity;

@@ -3,9 +3,8 @@ using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Resources
 {
-    public interface ITextureManager : IDisposable
+    public interface ITexture2DManager : IDisposable
     {
-
         void Initialize(IGraphicsDevice graphicsDevice);
         
         Handle<Texture2D> CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D11_BIND_FLAG bindFlag = default);

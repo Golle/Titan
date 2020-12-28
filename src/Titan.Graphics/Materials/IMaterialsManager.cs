@@ -4,5 +4,6 @@ namespace Titan.Graphics.Materials
     {
         public MaterialHandle CreateFromConfiguration(in MaterialConfiguration materialConfiguration);
         ref readonly Material this[in MaterialHandle handle] { get; }
+        void Destroy(in MaterialHandle handle);
     }
 }

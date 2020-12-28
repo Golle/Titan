@@ -28,7 +28,7 @@ namespace Titan.Graphics
                 .Register<IShaderCompiler, ShaderCompiler>()
                 
                 // D3D11 Managers
-                .Register<ITextureManager, TextureManager>()
+                .Register<ITexture2DManager, Texture2DManager>()
                 .Register<IShaderResourceViewManager, ShaderResourceViewManager>()
                 .Register<IVertexBufferManager, VertexBufferManager>()
                 .Register<IIndexBufferManager, IndexBufferManager>()

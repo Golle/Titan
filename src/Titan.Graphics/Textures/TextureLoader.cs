@@ -6,30 +6,30 @@ namespace Titan.Graphics.Textures
     internal class TextureLoader : ITextureLoader
     {
         private readonly IImagingFactory _imagingFactory;
-        private readonly ITextureManager _textureManager;
+        private readonly ITexture2DManager _texture2DManager;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
 
-        public TextureLoader(IImagingFactory imagingFactory, ITextureManager textureManager, IShaderResourceViewManager shaderResourceViewManager)
+        public TextureLoader(IImagingFactory imagingFactory, ITexture2DManager texture2DManager, IShaderResourceViewManager shaderResourceViewManager)
         {
             _imagingFactory = imagingFactory;
-            _textureManager = textureManager;
+            _texture2DManager = texture2DManager;
             _shaderResourceViewManager = shaderResourceViewManager;
         }
 
-        public unsafe Texture LoadTexture(string filename)
+        public unsafe Texture Load(string filename)
         {
             using var image = _imagingFactory.LoadImageFromFile(filename);
-            var textureHandle = _textureManager.CreateTexture(image.Width, image.Height, image.Format, image.GetBuffer(), image.Stride, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+            var textureHandle = _texture2DManager.CreateTexture(image.Width, image.Height, image.Format, image.GetBuffer(), image.Stride, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
             
-            ref readonly var texture = ref _textureManager[textureHandle];
+            ref readonly var texture = ref _texture2DManager[textureHandle];
             var shaderResourceHandle = _shaderResourceViewManager.Create(texture.Resource, texture.Format);
             return new Texture(shaderResourceHandle, textureHandle);
         }
 
-        public void UnloadTexture(Texture texture)
+        public void Release(in Texture texture)
         {
             _shaderResourceViewManager.Destroy(texture.Resource);
-            _textureManager.Destroy(texture.Texture2D);
+            _texture2DManager.Destroy(texture.Texture2D);
         }
     }
 }

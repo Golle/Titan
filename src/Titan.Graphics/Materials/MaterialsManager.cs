@@ -56,13 +56,28 @@ namespace Titan.Graphics.Materials
                 return default;
             }
 
-            return _textureLoader.LoadTexture(_configuration.GetPath(filename));
+            return _textureLoader.Load(_configuration.GetPath(filename));
         }
 
         public ref readonly Material this[in MaterialHandle handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _materials[handle];
+        }
+
+        public void Destroy(in MaterialHandle handle)
+        {
+            ref var material = ref _materials[handle];
+            if (material.IsTextured)
+            {
+                _textureLoader.Release(material.DiffuseMap);
+            }
+            if (material.HasNormalMap)
+            {
+                _textureLoader.Release(material.NormalMap);
+            }
+            material = default;
+            // TODO: return the handle so it can be re-used.
         }
     }
 }

@@ -5,11 +5,6 @@ using Titan.ECS.World;
 
 namespace Titan.ECS.Registry
 {
-    struct Apa
-    {
-        public string Apan;
-    }
-
     public class ComponentRegistry : IDisposable
     {
         private readonly IDictionary<Type, IComponentPool> _pools = new Dictionary<Type, IComponentPool>();
