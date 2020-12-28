@@ -1,20 +1,17 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Titan.ECS.Components;
 using Titan.ECS.World;
 
 namespace Titan.ECS.Entities
 {
     [SkipLocalsInit]
     [DebuggerDisplay("Entity={Id} World={WorldId}")]
-    public readonly unsafe struct Entity
+    public readonly struct Entity
     {
         public static readonly Entity Null = new();
 
         public readonly uint Id;
         public readonly uint WorldId;
-
-
         public Entity(uint id, uint worldId)
         {
             Id = id;
@@ -45,8 +42,13 @@ namespace Titan.ECS.Entities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddComponent<T>() where T : unmanaged => WorldContainer.AddComponent<T>(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in T initialValue) where T : unmanaged => WorldContainer.AddComponent<T>(this, initialValue);
+        public void AddComponent<T>(in T initialValue) where T : unmanaged => WorldContainer.AddComponent(this, initialValue);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemoveComponent<T>() where T : unmanaged => WorldContainer.RemoveComponent<T>(this);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveManagedComponent<T>() where T : struct => WorldContainer.RemoveManagedComponent<T>(this);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddManagedComponent<T>(in T initialValue) where T : struct => WorldContainer.AddManagedComponent(this, initialValue);
     }
 }

@@ -5,8 +5,9 @@ namespace Titan.Graphics.Resources
 {
     public interface IShaderResourceViewManager : IDisposable
     {
-        unsafe ShaderResourceViewHandle Create(ID3D11Resource* resource, DXGI_FORMAT format);
-        void Destroy(in ShaderResourceViewHandle handle);
-        ref readonly ShaderResourceView this[in ShaderResourceViewHandle handle] { get; }
+        void Initialize(IGraphicsDevice graphicsDevice);
+        unsafe Handle<ShaderResourceView> Create(ID3D11Resource* resource, DXGI_FORMAT format);
+        void Destroy(in Handle<ShaderResourceView> handle);
+        ref readonly ShaderResourceView this[in Handle<ShaderResourceView> handle] { get; }
     }
 }

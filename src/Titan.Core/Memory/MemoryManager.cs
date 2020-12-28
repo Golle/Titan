@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
@@ -11,7 +12,7 @@ namespace Titan.Core.Memory
         private readonly IDictionary<string, MemoryChunk> _memory = new Dictionary<string, MemoryChunk>();
         private void* _memoryChunks;
 
-        public MemoryManager(in ChunkDescriptor[] descriptors)
+        public void Initialize(in ChunkDescriptor[] descriptors)
         {
             if (_memoryChunks != null)
             {
@@ -35,6 +36,24 @@ namespace Titan.Core.Memory
             }
         }
 
+        public MemoryChunk GetMemoryChunk(string identifier)
+        {
+            Debug.Assert(_memoryChunks != null, "MemoryManager has not been initialized.");
+            return _memory[identifier];
+        }
+
+        public MemoryChunk<T> GetMemoryChunkValidated<T>(string identifier) where T : unmanaged
+        {
+            Debug.Assert(_memoryChunks != null, "MemoryManager has not been initialized.");
+            
+            var chunk = _memory[identifier];
+            if (sizeof(T) != chunk.Stride)
+            {
+                throw new InvalidOperationException($"The stride of the memory chunk is {chunk.Stride} but the size of {typeof(T)} is {sizeof(T)}");
+            }
+            return new MemoryChunk<T>(chunk); ;
+        }
+
         public void Dispose()
         {
             if (_memoryChunks != null)
@@ -43,17 +62,6 @@ namespace Titan.Core.Memory
                 _memoryChunks = null;
                 _memory.Clear();
             }
-        }
-
-        public MemoryChunk GetMemoryChunk(string identifier) => _memory[identifier];
-        public MemoryChunk<T> GetMemoryChunkValidated<T>(string identifier) where T : unmanaged
-        {
-            var chunk = _memory[identifier];
-            if (sizeof(T) != chunk.Stride)
-            {
-                throw new InvalidOperationException($"The stride of the memory chunk is {chunk.Stride} but the size of {typeof(T)} is {sizeof(T)}");
-            }
-            return new MemoryChunk<T>(chunk); ;
         }
     }
 }

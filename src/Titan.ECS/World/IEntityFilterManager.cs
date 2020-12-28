@@ -1,4 +1,3 @@
-using System;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 

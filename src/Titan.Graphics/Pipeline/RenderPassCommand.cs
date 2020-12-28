@@ -12,11 +12,11 @@ namespace Titan.Graphics.Pipeline
         //[FieldOffset(0)]
         public CommandType Type;
         //[FieldOffset(8)]
-        public RenderTargetViewHandle RenderTarget;
+        public Handle<RenderTargetView> RenderTarget;
         //[FieldOffset(8)]
         public ShaderProgram ShaderProgram;
         //[FieldOffset(8)]
-        public DepthStencilViewHandle DepthStencil;
+        public Handle<DepthStencilView> DepthStencil;
         //[FieldOffset(16)] 
         public SetShaderResourceCommand ShaderResource;
         //[FieldOffset(8)]

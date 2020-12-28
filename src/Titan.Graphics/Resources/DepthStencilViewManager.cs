@@ -1,6 +1,9 @@
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
+using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -10,20 +13,30 @@ namespace Titan.Graphics.Resources
 {
     internal unsafe class DepthStencilViewManager : IDepthStencilViewManager
     {
+        private readonly IMemoryManager _memoryManager;
         private ComPtr<ID3D11Device> _device;
-        private readonly DepthStencilView* _views;
-        private readonly uint _maxViews;
+        private DepthStencilView* _views;
+        private uint _maxViews; // TODO: add implementation for this
         private int _numberOfViews;
 
-        public DepthStencilViewManager(ID3D11Device* device, IMemoryManager memoryManager)
+        public DepthStencilViewManager(IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device);
-            
-            var memory = memoryManager.GetMemoryChunkValidated<DepthStencilView>("DepthStencilView");
+            _memoryManager = memoryManager;
+        }
+
+        public void Initialize(IGraphicsDevice graphicsDevice)
+        {
+            if (_views != null)
+            {
+                throw new InvalidOperationException($"{nameof(DepthStencilViewManager)} has already been initialized.");
+            }
+            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(DepthStencilViewManager)} with the wrong device.", nameof(graphicsDevice));
+            var memory = _memoryManager.GetMemoryChunkValidated<DepthStencilView>("DepthStencilView");
             _views = memory.Pointer;
             _maxViews = memory.Count;
         }
-        public DepthStencilViewHandle Create(ID3D11Resource* resource, DXGI_FORMAT format)
+
+        public Handle<DepthStencilView> Create(ID3D11Resource* resource, DXGI_FORMAT format)
         {
             var desc = new D3D11_DEPTH_STENCIL_VIEW_DESC
             {
@@ -40,8 +53,9 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void Destroy(in DepthStencilViewHandle handle)
+        public void Destroy(in Handle<DepthStencilView> handle)
         {
+            Debug.Assert(_views != null, $"{nameof(DepthStencilViewManager)} has not been initialized.");
             ref var view = ref _views[handle];
             if (view.Pointer != null)
             {
@@ -50,7 +64,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly DepthStencilView this[in DepthStencilViewHandle handle]
+        public ref readonly DepthStencilView this[in Handle<DepthStencilView> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _views[handle];
@@ -58,17 +72,21 @@ namespace Titan.Graphics.Resources
 
         public void Dispose()
         {
-            for (var i = 0; i < _numberOfViews; ++i)
+            if (_views != null)
             {
-                ref var view = ref _views[i];
-                if (view.Pointer != null)
+                for (var i = 0; i < _numberOfViews; ++i)
                 {
-                    view.Pointer->Release();
-                    view.Pointer = null;
+                    ref var view = ref _views[i];
+                    if (view.Pointer != null)
+                    {
+                        view.Pointer->Release();
+                        view.Pointer = null;
+                    }
                 }
+                _numberOfViews = 0;
+                _views = null;
+                _device.Dispose();
             }
-            _numberOfViews = 0;
-            _device.Dispose();
         }
     }
 }

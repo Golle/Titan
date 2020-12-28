@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Textures;
 
 namespace Titan.Graphics.Materials
 {

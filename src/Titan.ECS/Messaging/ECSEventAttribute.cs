@@ -1,8 +1,9 @@
 using System;
+
 // ReSharper disable InconsistentNaming
 
-namespace Titan.ECS.Events
+namespace Titan.ECS.Messaging
 {
     [AttributeUsage(AttributeTargets.Struct)]
-    internal class ECSEventAttribute : Attribute{}
+    public class ECSEventAttribute : Attribute { }
 }

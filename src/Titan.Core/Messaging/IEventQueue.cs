@@ -2,11 +2,11 @@ using System;
 
 namespace Titan.Core.Messaging
 {
-    public interface IEventQueue
+    public interface IEventQueue : IDisposable
     {
-        void Push<T>(in T @event) where T : struct;
-        ReadOnlySpan<T> GetEvents<T>() where T : struct;
-        void Initialize(IEventTypeProvider eventTypeProvider);
+        void Initialize(uint maxEventQueueSize);
+        ReadOnlySpan<QueuedEvent> GetEvents();
         void Update();
+        void Push<T>(in T @event) where T : unmanaged;
     }
 }

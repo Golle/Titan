@@ -2,6 +2,7 @@ namespace Titan.Graphics.Textures
 {
     public interface ITextureLoader
     {
-        Texture LoadTexture(string filename);
+        Texture Load(string filename);
+        void Release(in Texture texture);
     }
 }

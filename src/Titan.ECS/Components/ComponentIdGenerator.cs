@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Titan.ECS.Components
 {
-    public static class ComponentId<T> where T : unmanaged
+    public static class ComponentId<T> where T : struct
     {
         public static ComponentId Id { get; } = ComponentIdGenerator.Next();
     }

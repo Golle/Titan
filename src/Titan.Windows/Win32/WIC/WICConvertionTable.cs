@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using static Titan.Windows.Win32.WIC.WICPixelFormats;
 // ReSharper disable InconsistentNaming
 namespace Titan.Windows.Win32.WIC

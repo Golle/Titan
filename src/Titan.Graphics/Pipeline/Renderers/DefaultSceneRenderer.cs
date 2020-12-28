@@ -1,4 +1,3 @@
-using System;
 using System.Numerics;
 using Titan.Core.Logging;
 using Titan.Graphics.Camera;
@@ -24,8 +23,8 @@ namespace Titan.Graphics.Pipeline.Renderers
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
         private readonly ISamplerStateManager _samplerStateManager;
 
-        private readonly ConstantBufferHandle _perObjectHandle;
-        private readonly ConstantBufferHandle _cameraHandle;
+        private readonly Handle<ConstantBuffer> _perObjectHandle;
+        private readonly Handle<ConstantBuffer> _cameraHandle;
 
         private readonly SamplerStateHandle _samplerStatehandle;
 
@@ -34,22 +33,22 @@ namespace Titan.Graphics.Pipeline.Renderers
         
         private bool _normalMapEnabled;
 
-        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager)
+        public DefaultSceneRenderer(IGraphicsDevice device, IMeshRenderQueue renderQueue, ICameraManager cameraManager, IMaterialsManager materialsManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, ISamplerStateManager samplerStateManager, IShaderManager shaderManager)
         {
             _renderQueue = renderQueue;
             _cameraManager = cameraManager;
             _materialsManager = materialsManager;
-            _shaderManager = device.ShaderManager;
-            _vertexBufferManager = device.VertexBufferManager;
-            _indexBufferManager = device.IndexBufferManager;
-            _constantBufferManager = device.ConstantBufferManager;
-            _shaderResourceViewManager = device.ShaderResourceViewManager;
-            _samplerStateManager = device.SamplerStateManager;
+            _shaderManager = shaderManager;
+            _vertexBufferManager = vertexBufferManager;
+            _indexBufferManager = indexBufferManager;
+            _constantBufferManager = constantBufferManager;
+            _shaderResourceViewManager = shaderResourceViewManager;
+            _samplerStateManager = samplerStateManager;
             
             _perObjectHandle = _constantBufferManager.CreateConstantBuffer<Matrix4x4>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
             _cameraHandle = _constantBufferManager.CreateConstantBuffer<CameraBuffer>(usage: D3D11_USAGE.D3D11_USAGE_DYNAMIC, cpuAccess: D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE);
 
-            _samplerStatehandle = device.SamplerStateManager.GetOrCreate();
+            _samplerStatehandle = samplerStateManager.GetOrCreate();
             _shader = _shaderManager.GetByName("GBufferDefault");
             
             try
@@ -93,9 +92,9 @@ namespace Titan.Graphics.Pipeline.Renderers
                 context.SetVertexShaderConstantBuffer(objectBuffer, 1u);
 
                 var mesh = renderable.Mesh;
-                ref readonly var indexBuffer = ref _indexBufferManager[mesh.IndexBufferHandle];
+                ref readonly var indexBuffer = ref _indexBufferManager[mesh.IndexBuffer];
                 context.SetIndexBuffer(indexBuffer);
-                context.SetVertexBuffer(_vertexBufferManager[mesh.VertexBufferHandle]);
+                context.SetVertexBuffer(_vertexBufferManager[mesh.VertexBuffer]);
 
                 var subsets = mesh.SubSets;
                 if (subsets.Length > 1)
@@ -106,11 +105,11 @@ namespace Titan.Graphics.Pipeline.Renderers
                         ref readonly var material = ref _materialsManager[renderable.Materials[subset.MaterialIndex]];
                         if (material.IsTextured)
                         {
-                            context.SetPixelShaderResource(_shaderResourceViewManager[material.DiffuseMap.Handle]);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[material.DiffuseMap.Resource]);
                         }
                         else
                         {
-                            context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.Resource]);
                         }
 
                         //TODO: This is slow and bad
@@ -119,7 +118,7 @@ namespace Titan.Graphics.Pipeline.Renderers
                             context.SetInputLayout(_shaderManager[_normalMapShader.InputLayout]);
                             context.SetVertexShader(_shaderManager[_normalMapShader.VertexShader]);
                             context.SetPixelShader(_shaderManager[_normalMapShader.PixelShader]);
-                            context.SetPixelShaderResource(_shaderResourceViewManager[material.NormalMap.Handle], 1);
+                            context.SetPixelShaderResource(_shaderResourceViewManager[material.NormalMap.Resource], 1);
                         }
 
                         context.DrawIndexed(subset.Count, subset.StartIndex);
@@ -127,7 +126,7 @@ namespace Titan.Graphics.Pipeline.Renderers
                 }
                 else
                 {
-                    context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.ResourceViewHandle]);
+                    context.SetPixelShaderResource(_shaderResourceViewManager[renderable.Texture.Resource]);
                     context.DrawIndexed(indexBuffer.NumberOfIndices);
                 }
             }

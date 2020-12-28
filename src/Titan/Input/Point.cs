@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Titan.Input
 {
+    [DebuggerDisplay("[{" + nameof(X) + "}, {" + nameof(Y) + "}]")]
     public readonly struct Point
     {
         public readonly int X;
@@ -16,5 +18,9 @@ namespace Titan.Input
         public static Point operator -(in Point lh, in Point rh) => new Point(lh.X - rh.X, lh.Y - rh.Y);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Point operator +(in Point lh, in Point rh) => new Point(lh.X + rh.X, lh.Y + rh.Y);
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => $"[{X}, {Y}]";
     }
 }

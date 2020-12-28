@@ -1,31 +1,46 @@
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
+using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Resources
 {
+    
+    
     internal unsafe class VertexBufferManager : IVertexBufferManager
     {
+        private readonly IMemoryManager _memoryManager;
         private ComPtr<ID3D11Device> _device;
-        private readonly VertexBuffer* _buffers;
-        private readonly uint _maxBuffers;
+        private VertexBuffer* _buffers;
+        private uint _maxBuffers;
         private int _numberOfBuffers;
 
-        private readonly ConcurrentQueue<int> _freeHandles = new ConcurrentQueue<int>();
-        public VertexBufferManager(ID3D11Device* device, IMemoryManager memoryManager)
+        private readonly ConcurrentQueue<int> _freeHandles = new();
+        public VertexBufferManager(IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device);
-            
-            var memory = memoryManager.GetMemoryChunkValidated<VertexBuffer>("VertexBuffer");
+            _memoryManager = memoryManager;
+
+        }
+
+        public void Initialize(IGraphicsDevice graphicsDevice)
+        {
+            if (_buffers != null)
+            {
+                throw new InvalidOperationException($"{nameof(VertexBufferManager)} has already been initialized.");
+            }
+            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(VertexBufferManager)} with the wrong device.", nameof(graphicsDevice));
+
+            var memory = _memoryManager.GetMemoryChunkValidated<VertexBuffer>("VertexBuffer");
             _buffers = memory.Pointer;
             _maxBuffers = memory.Count;
         }
 
-        public VertexBufferHandle CreateVertexBuffer(uint count, uint stride, void* initialData, D3D11_USAGE usage, D3D11_CPU_ACCESS_FLAG cpuAccess, D3D11_RESOURCE_MISC_FLAG miscFlags)
+        public Handle<VertexBuffer> CreateVertexBuffer(uint count, uint stride, void* initialData, D3D11_USAGE usage, D3D11_CPU_ACCESS_FLAG cpuAccess, D3D11_RESOURCE_MISC_FLAG miscFlags)
         {
             Debug.Assert(!_freeHandles.IsEmpty || _numberOfBuffers < _maxBuffers, "Max number of buffers have been reached.");
 
@@ -65,7 +80,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void DestroyBuffer(in VertexBufferHandle handle)
+        public void DestroyBuffer(in Handle<VertexBuffer> handle)
         {
             ref var buffer = ref _buffers[handle];
             if (buffer.Pointer != null)
@@ -76,7 +91,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly VertexBuffer this[in VertexBufferHandle handle]
+        public ref readonly VertexBuffer this[in Handle<VertexBuffer> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _buffers[handle];
@@ -84,17 +99,22 @@ namespace Titan.Graphics.Resources
 
         public void Dispose()
         {
-            for (var i = 0; i < _numberOfBuffers; ++i)
+            if (_buffers != null)
             {
-                ref var buffer = ref _buffers[i];
-                if (buffer.Pointer != null)
+                for (var i = 0; i < _numberOfBuffers; ++i)
                 {
-                    buffer.Pointer->Release();
-                    buffer.Pointer = null;
+                    ref var buffer = ref _buffers[i];
+                    if (buffer.Pointer != null)
+                    {
+                        buffer.Pointer->Release();
+                        buffer.Pointer = null;
+                    }
                 }
+                _numberOfBuffers = 0;
+                _device.Dispose();
+                _buffers = null;
             }
-            _numberOfBuffers = 0;
-            _device.Dispose();
+            
         }
     }
 }

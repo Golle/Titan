@@ -1,14 +1,11 @@
 using System;
-using System.Drawing.Drawing2D;
 using System.Numerics;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
-using Texture = Titan.Graphics.Textures.Texture;
+using Titan.Graphics.Textures;
 
 namespace Titan.Graphics.Pipeline.Graph
 {
-
-
     internal class NaiveLightRenderQueue : ILigthRenderQueue
     {
         private readonly Light[] _lights = new Light[100];

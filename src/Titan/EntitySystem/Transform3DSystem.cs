@@ -20,7 +20,6 @@ namespace Titan.EntitySystem
             _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
             _transform = world.GetComponentPool<Transform3D>();
             _entityManager = world.EntityManager;
-            
         }
 
         public void OnUpdate(in TimeStep timeStep)

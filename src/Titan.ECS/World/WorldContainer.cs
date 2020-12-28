@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Titan.ECS.Components;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.World
@@ -70,6 +69,20 @@ namespace Titan.ECS.World
         {
             Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");
             Worlds[entity.WorldId].RemoveComponent<T>(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddManagedComponent<T>(in Entity entity, in T initialValue) where T : struct
+        {
+            Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");
+            Worlds[entity.WorldId].AddManagedComponent(entity, initialValue);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void RemoveManagedComponent<T>(in Entity entity) where T : struct
+        {
+            Debug.Assert(Worlds[entity.WorldId] != null, "World does not exist");
+            Worlds[entity.WorldId].RemoveManagedComponent<T>(entity);
         }
     }
 }

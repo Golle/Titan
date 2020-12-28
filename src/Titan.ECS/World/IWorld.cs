@@ -6,10 +6,12 @@ namespace Titan.ECS.World
 {
     public interface IWorld : IDisposable
     {
-        Entity CreateEntity();
+        uint Id { get; }
+        Entity CreateEntity(); // TODO: replace with builder, so that entities can be added lazily and in a prefab
         IComponentPool<T> GetComponentPool<T>() where T : unmanaged;
-        void Update();
+        IManagedComponentPool<T> GetManagedComponentPool<T>() where T : struct;
         IEntityManager EntityManager { get; }
         IEntityFilterManager FilterManager { get; }
+        void Update();
     }
 }

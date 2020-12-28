@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Titan.ECS.Systems
 {
     public readonly ref struct TimeStep
@@ -7,5 +9,8 @@ namespace Titan.ECS.Systems
         {
             ElapsedTime = elapsedTime;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator float(in TimeStep timeStep) => timeStep.ElapsedTime;
     }
 }

@@ -7,6 +7,7 @@ namespace Titan.Graphics.Shaders
 
     public interface IShaderManager : IDisposable
     {
+        void Initialize(IGraphicsDevice graphicsDevice, string assetsPath);
         ShaderProgram GetByName(string name);
         ShaderProgram AddShader(string name, in VertexShaderDescriptor vertexShaderDescriptor, in PixelShaderDescriptor pixelShaderDescriptor, in InputLayoutDescriptor[] layout);
         ref readonly VertexShader this[in VertexShaderHandle handle] { get; }

@@ -1,9 +1,12 @@
 using Titan.Graphics.Camera;
+using Titan.Graphics.D3D11;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
-using Titan.Graphics.Pipeline.Configuration;
+using Titan.Graphics.Pipeline;
 using Titan.Graphics.Pipeline.Graph;
+using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
+using Titan.Graphics.States;
 using Titan.Graphics.Textures;
 using Titan.IOC;
 
@@ -14,19 +17,44 @@ namespace Titan.Graphics
         public void Register(IContainer container)
         {
             container
+                .Register<GraphicsSystem>()
+                .Register<IGraphicsDevice, GraphicsDevice>()
+                
+                // Graphics pipeline
+                .Register<IGraphicsPipeline, GraphicsPipeline>()
+                .Register<IRenderPassFactory, RenderPassFactory>()
+                
+                // Shaders
                 .Register<IShaderCompiler, ShaderCompiler>()
-
+                
+                // D3D11 Managers
+                .Register<ITexture2DManager, Texture2DManager>()
+                .Register<IShaderResourceViewManager, ShaderResourceViewManager>()
+                .Register<IVertexBufferManager, VertexBufferManager>()
+                .Register<IIndexBufferManager, IndexBufferManager>()
+                .Register<IConstantBufferManager, ConstantBufferManager>()
+                .Register<IRenderTargetViewManager, RenderTargetViewManager>()
+                .Register<IDepthStencilViewManager, DepthStencilViewManager>()
+                .Register<ISamplerStateManager, SamplerStateManager>()
+                .Register<IDepthStencilStateManager, DepthStencilStateManager>()
+                .Register<IShaderManager, ShaderManager>()
+                
+                // Image loading
                 .Register<IImagingFactory, ImagingFactory>()
                 .Register<ITextureLoader, TextureLoader>()
 
+                // Model loading
                 .Register<IMeshLoader, MeshLoader>()
+                
+                // Default render queues
                 .Register<IMeshRenderQueue, NaiveMeshRenderQueue>()
                 .Register<ILigthRenderQueue, NaiveLightRenderQueue>()
-                .Register<IPipelineConfigurationLoader, PipelineConfigurationLoader>()
-
+                
+                // Materials
                 .Register<IMaterialsLoader, MaterialsLoader>()
                 .Register<IMaterialsManager, MaterialsManager>()
 
+                // Temp camera
                 .Register<ICameraManager, CameraManager>()
 
                 ;

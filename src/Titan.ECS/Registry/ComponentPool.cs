@@ -20,7 +20,7 @@ namespace Titan.ECS.Registry
         private readonly uint _maxNumberOfComponents;
         public ComponentPool(uint numberOfComponents, uint maxEntities)
         {
-            LOGGER.Trace("Create ComponentPool<{0}> with a maximum of {1} components", typeof(T).Name, maxEntities);
+            LOGGER.Trace("Create ComponentPool<{0}> with a maximum of {1} components", typeof(T).Name, numberOfComponents);
             var componentsSize = sizeof(T) * numberOfComponents;
             var entitiesSize = sizeof(T*) * maxEntities;
             _components = (T*)Marshal.AllocHGlobal((int) (componentsSize + entitiesSize));

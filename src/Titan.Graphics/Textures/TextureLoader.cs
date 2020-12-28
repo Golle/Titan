@@ -1,3 +1,4 @@
+using Titan.Graphics.Resources;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Textures
@@ -5,22 +6,30 @@ namespace Titan.Graphics.Textures
     internal class TextureLoader : ITextureLoader
     {
         private readonly IImagingFactory _imagingFactory;
-        private readonly IGraphicsDevice _device;
+        private readonly ITexture2DManager _texture2DManager;
+        private readonly IShaderResourceViewManager _shaderResourceViewManager;
 
-        public TextureLoader(IImagingFactory imagingFactory, IGraphicsDevice device)
+        public TextureLoader(IImagingFactory imagingFactory, ITexture2DManager texture2DManager, IShaderResourceViewManager shaderResourceViewManager)
         {
             _imagingFactory = imagingFactory;
-            _device = device;
+            _texture2DManager = texture2DManager;
+            _shaderResourceViewManager = shaderResourceViewManager;
         }
 
-        public unsafe Texture LoadTexture(string filename)
+        public unsafe Texture Load(string filename)
         {
             using var image = _imagingFactory.LoadImageFromFile(filename);
-            var textureHandle = _device.TextureManager.CreateTexture(image.Width, image.Height, image.Format, image.GetBuffer(), image.Stride, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+            var textureHandle = _texture2DManager.CreateTexture(image.Width, image.Height, image.Format, image.GetBuffer(), image.Stride, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
             
-            ref readonly var texture = ref _device.TextureManager[textureHandle];
-            var shaderResourceHandle = _device.ShaderResourceViewManager.Create(texture.Resource, texture.Format);
-            return new Texture(textureHandle, shaderResourceHandle);
+            ref readonly var texture = ref _texture2DManager[textureHandle];
+            var shaderResourceHandle = _shaderResourceViewManager.Create(texture.Resource, texture.Format);
+            return new Texture(shaderResourceHandle, textureHandle);
+        }
+
+        public void Release(in Texture texture)
+        {
+            _shaderResourceViewManager.Destroy(texture.Resource);
+            _texture2DManager.Destroy(texture.Texture2D);
         }
     }
 }

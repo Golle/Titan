@@ -5,6 +5,7 @@ namespace Titan.Windows.Events
     [TitanEvent]
     public readonly struct KeyEvent
     {
+        public static readonly short Id = EventId<KeyEvent>.Value;
         public readonly int Code;
         public readonly bool Repeat;
         public readonly bool Down;

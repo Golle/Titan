@@ -2,6 +2,8 @@ using System;
 using System.Runtime.CompilerServices;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
+using Titan.Graphics.Shaders;
+using Titan.Graphics.States;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Pipeline
@@ -10,13 +12,21 @@ namespace Titan.Graphics.Pipeline
     {
         private readonly string _name;
         private readonly RenderPassCommand[] _commands;
-        private readonly IGraphicsDevice _device;
+        private readonly IShaderResourceViewManager _shaderResourceViewManager;
+        private readonly IRenderTargetViewManager _renderTargetViewManager;
+        private readonly IDepthStencilViewManager _depthStencilViewManager;
+        private readonly ISamplerStateManager _samplerStateManager;
+        private readonly IShaderManager _shaderManager;
 
-        public RenderPass(string name, RenderPassCommand[] commands, IGraphicsDevice device)
+        public RenderPass(string name, RenderPassCommand[] commands, IShaderResourceViewManager shaderResourceViewManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IShaderManager shaderManager)
         {
             _name = name;
             _commands = commands;
-            _device = device;
+            _shaderResourceViewManager = shaderResourceViewManager;
+            _renderTargetViewManager = renderTargetViewManager;
+            _depthStencilViewManager = depthStencilViewManager;
+            _samplerStateManager = samplerStateManager;
+            _shaderManager = shaderManager;
         }
 
         public void Render(IRenderContext renderContext)
@@ -31,16 +41,16 @@ namespace Titan.Graphics.Pipeline
                 switch (command.Type)
                 {
                     case CommandType.ClearRenderTarget:
-                        renderContext.ClearRenderTargetView(_device.RenderTargetViewManager[command.ClearRenderTarget.RenderTarget], command.ClearRenderTarget.Color);
+                        renderContext.ClearRenderTargetView(_renderTargetViewManager[command.ClearRenderTarget.RenderTarget], command.ClearRenderTarget.Color);
                         break;
                     case CommandType.ClearDepthStencil:
-                        renderContext.ClearDepthStencilView(_device.DepthStencilViewManager[command.DepthStencil]);
+                        renderContext.ClearDepthStencilView(_depthStencilViewManager[command.DepthStencil]);
                         break;
                     case CommandType.SetRenderTargetAndDepthStencil:
-                        renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget], _device.DepthStencilViewManager[command.DepthStencil]);
+                        renderContext.SetRenderTarget(_renderTargetViewManager[command.RenderTarget], _depthStencilViewManager[command.DepthStencil]);
                         break;
                     case CommandType.SetRenderTarget:
-                        renderContext.SetRenderTarget(_device.RenderTargetViewManager[command.RenderTarget]);
+                        renderContext.SetRenderTarget(_renderTargetViewManager[command.RenderTarget]);
                         break;
                     case CommandType.SetMultipleRenderTargetAndDepthStencil:
                         SetRenderTargets(renderContext, command.MultipleRenderTargets, true);
@@ -50,24 +60,24 @@ namespace Titan.Graphics.Pipeline
                         break;
                     case CommandType.SetShaderProgram:
                         var shader = command.ShaderProgram;
-                        renderContext.SetInputLayout(_device.ShaderManager[shader.InputLayout]);
-                        renderContext.SetPixelShader(_device.ShaderManager[shader.PixelShader]);
-                        renderContext.SetVertexShader(_device.ShaderManager[shader.VertexShader]);
+                        renderContext.SetInputLayout(_shaderManager[shader.InputLayout]);
+                        renderContext.SetPixelShader(_shaderManager[shader.PixelShader]);
+                        renderContext.SetVertexShader(_shaderManager[shader.VertexShader]);
                         break;
                     case CommandType.Render:
                         command.Renderer.Render(renderContext);
                         break;
                     case CommandType.SetVertexShaderResource:
-                        renderContext.SetVertexShaderResource(_device.ShaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
+                        renderContext.SetVertexShaderResource(_shaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
                         break;
                     case CommandType.SetPixelShaderResource:
-                        renderContext.SetPixelShaderResource(_device.ShaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
+                        renderContext.SetPixelShaderResource(_shaderResourceViewManager[command.ShaderResource.Handle], command.ShaderResource.Slot);
                         break;
                     case CommandType.SetVertexShaderSampler:
-                        renderContext.SetVertexShaderSampler(_device.SamplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
+                        renderContext.SetVertexShaderSampler(_samplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
                         break;
                     case CommandType.SetPixelShaderSampler:
-                        renderContext.SetPixelShaderSampler(_device.SamplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
+                        renderContext.SetPixelShaderSampler(_samplerStateManager[command.SamplerState.Sampler], command.SamplerState.Slot);
                         break;
                     case CommandType.UnbindRenderTargets:
                         UnbindRenderTargets(renderContext);
@@ -111,10 +121,10 @@ namespace Titan.Graphics.Pipeline
             var renderTargets = stackalloc ID3D11RenderTargetView*[(int)command.Count];
             for (var i = 0; i < command.Count; ++i)
             {
-                renderTargets[i] = _device.RenderTargetViewManager[command.Handles[i]].Pointer;
+                renderTargets[i] = _renderTargetViewManager[command.Handles[i]].Pointer;
             }
 
-            var depthStencilView = hasDepthStencil ? _device.DepthStencilViewManager[command.DepthStencilView].Pointer : null;
+            var depthStencilView = hasDepthStencil ? _depthStencilViewManager[command.DepthStencilView].Pointer : null;
             context.SetRenderTargets(renderTargets, command.Count, depthStencilView);
         }
     }

@@ -1,21 +1,22 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Titan.ECS.Events;
+using Titan.ECS.Messaging;
+using Titan.ECS.Messaging.Events;
 using Titan.ECS.World;
 
 namespace Titan.ECS.Entities
 {
     internal class EntityFactory : IEntityFactory
     {
-        private readonly IEventQueue _eventQueue;
+        private readonly IEventManager _eventManager;
         private readonly uint _worldId;
         private uint _nextId;
         private readonly ConcurrentQueue<uint> _freeIds = new();
 
-        public EntityFactory(WorldConfiguration configuration, IEventQueue eventQueue)
+        public EntityFactory(WorldConfiguration configuration, IEventManager eventManager)
         {
-            _eventQueue = eventQueue;
+            _eventManager = eventManager;
             _worldId = configuration.WorldId;
         }
 
@@ -26,7 +27,7 @@ namespace Titan.ECS.Entities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Update()
         {
-            foreach (ref readonly var @event in _eventQueue.GetEvents())
+            foreach (ref readonly var @event in _eventManager.GetEvents())
             {
                 if (@event.Type == EntityDestroyedEvent.Id)
                 {

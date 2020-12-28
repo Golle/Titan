@@ -11,6 +11,7 @@ namespace Titan.Windows
         bool Windowed { get; }
 
 
+        void Initialize(int width, int height, string title);
         void SetTitle(string title);
         void Hide();
         void Show();

@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Titan.ECS.Events
+namespace Titan.Core.Messaging
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4, Size = 32)]
-    internal readonly unsafe struct QueuedEvent
+    public readonly unsafe struct QueuedEvent
     {
         public readonly short Type;
         private readonly EventData Data;
@@ -14,7 +14,7 @@ namespace Titan.ECS.Events
         {
             fixed (EventData* pEvent = &Data)
             {
-                return ref *((T*) pEvent);
+                return ref *(T*) pEvent;
             }
         }
         internal struct EventData {}

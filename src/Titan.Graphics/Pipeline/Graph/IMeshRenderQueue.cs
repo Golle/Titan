@@ -2,7 +2,7 @@ using System;
 using System.Numerics;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
-using Texture = Titan.Graphics.Textures.Texture;
+using Titan.Graphics.Textures;
 
 namespace Titan.Graphics.Pipeline.Graph
 {

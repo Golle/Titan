@@ -1,6 +1,8 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
+using Titan.Graphics.D3D11;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -10,22 +12,31 @@ namespace Titan.Graphics.Resources
 {
     internal unsafe class ShaderResourceViewManager : IShaderResourceViewManager
     {
+        private readonly IMemoryManager _memoryManager;
         private ComPtr<ID3D11Device> _device;
-        private readonly ShaderResourceView* _resources;
+        private ShaderResourceView* _resources;
 
         private int _numberOfResources;
         private uint _maxResources;
 
-        public ShaderResourceViewManager(ID3D11Device* device, IMemoryManager memoryManager)
+        public ShaderResourceViewManager(IMemoryManager memoryManager)
         {
-            _device = new ComPtr<ID3D11Device>(device);
-            var memory = memoryManager.GetMemoryChunkValidated<ShaderResourceView>("ShaderResourceView");
+            _memoryManager = memoryManager;
+        }
+
+        public void Initialize(IGraphicsDevice graphicsDevice)
+        {
+            if (_resources != null)
+            {
+                throw new InvalidOperationException($"{nameof(ShaderResourceViewManager)} has already been initialized.");
+            }
+            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(ShaderResourceViewManager)} with the wrong device.", nameof(graphicsDevice));
+            var memory = _memoryManager.GetMemoryChunkValidated<ShaderResourceView>("ShaderResourceView");
             _resources = memory.Pointer;
             _maxResources = memory.Count;
         }
 
-
-        public ShaderResourceViewHandle Create(ID3D11Resource* resource, DXGI_FORMAT format)
+        public Handle<ShaderResourceView> Create(ID3D11Resource* resource, DXGI_FORMAT format)
         {
             var desc = new D3D11_SHADER_RESOURCE_VIEW_DESC
             {
@@ -43,7 +54,7 @@ namespace Titan.Graphics.Resources
             return handle;
         }
 
-        public void Destroy(in ShaderResourceViewHandle handle)
+        public void Destroy(in Handle<ShaderResourceView> handle)
         {
             ref var resource = ref _resources[handle];
             if (resource.Pointer != null)
@@ -53,7 +64,7 @@ namespace Titan.Graphics.Resources
             }
         }
 
-        public ref readonly ShaderResourceView this[in ShaderResourceViewHandle handle]
+        public ref readonly ShaderResourceView this[in Handle<ShaderResourceView> handle]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _resources[handle];
@@ -61,17 +72,21 @@ namespace Titan.Graphics.Resources
 
         public void Dispose()
         {
-            for (var i = 0; i < _numberOfResources; ++i)
+            if (_resources != null)
             {
-                ref var resource = ref _resources[i];
-                if (resource.Pointer != null)
+                for (var i = 0; i < _numberOfResources; ++i)
                 {
-                    resource.Pointer->Release();
-                    resource.Pointer = null;
+                    ref var resource = ref _resources[i];
+                    if (resource.Pointer != null)
+                    {
+                        resource.Pointer->Release();
+                        resource.Pointer = null;
+                    }
                 }
+                _numberOfResources = 0;
+                _resources = null;
+                _device.Dispose();
             }
-            _numberOfResources = 0;
-            _device.Dispose();
         }
     }
 }

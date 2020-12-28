@@ -1,10 +1,8 @@
 using System.Numerics;
-using Titan.ECS;
 
 namespace Titan.EntitySystem.Components
 {
-    [Component]
-    public partial struct Transform3D
+    public struct Transform3D
     {
         public Vector3 Position;
         public Vector3 Scale;

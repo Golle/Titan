@@ -5,7 +5,7 @@ namespace Titan.Graphics.Pipeline
 {
     internal struct ClearRenderTargetCommand
     {
-        public RenderTargetViewHandle RenderTarget;
+        public Handle<RenderTargetView> RenderTarget;
         public Color Color;
     }
 }
