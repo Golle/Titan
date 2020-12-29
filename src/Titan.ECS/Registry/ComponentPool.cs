@@ -15,7 +15,7 @@ namespace Titan.ECS.Registry
 
         private readonly ConcurrentQueue<nint> _freeComponents = new(); // use type nint because T* cant be stored in the queue
 
-        private int _numberOfComponents;
+        private volatile int _numberOfComponents;
         
         private readonly uint _maxNumberOfComponents;
         public ComponentPool(uint numberOfComponents, uint maxEntities)

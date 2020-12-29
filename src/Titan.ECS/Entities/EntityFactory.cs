@@ -11,7 +11,7 @@ namespace Titan.ECS.Entities
     {
         private readonly IEventManager _eventManager;
         private readonly uint _worldId;
-        private uint _nextId;
+        private volatile uint _nextId;
         private readonly ConcurrentQueue<uint> _freeIds = new();
 
         public EntityFactory(WorldConfiguration configuration, IEventManager eventManager)
