@@ -2,6 +2,7 @@ using Titan.Core.Common;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
+using Titan.Core.Threading;
 using Titan.IOC;
 
 namespace Titan.Core
@@ -18,6 +19,7 @@ namespace Titan.Core
                 .Register<IFileReader, FileReader>()
                 .Register<IJsonSerializer, JsonSerializerWrapper>()
                 .Register<IMemoryManager, MemoryManager>()
+                .Register<WorkerPool>()
                 ;
         }
     }
