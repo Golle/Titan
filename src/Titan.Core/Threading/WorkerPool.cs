@@ -6,10 +6,9 @@ using Titan.Core.Logging;
 
 namespace Titan.Core.Threading
 {
-    internal record WorkerPoolConfiguration(uint MaxQueuedJobs, uint NumberOfWorkers);
+    public record WorkerPoolConfiguration(uint MaxQueuedJobs, uint NumberOfWorkers);
 
-
-    internal sealed class WorkerPool : IDisposable
+    public sealed class WorkerPool : IDisposable
     {
         private WorkerInfo[] _workers;
         private Job[] _jobs;
@@ -38,6 +37,8 @@ namespace Titan.Core.Threading
             _jobs = new Job[configuration.MaxQueuedJobs];
             _jobQueue = new ConcurrentQueue<int>();
 
+            _notifier = new Semaphore(0, (int) configuration.MaxQueuedJobs);
+
             _workers = new WorkerInfo[configuration.NumberOfWorkers];
             for (var i = 0; i < configuration.NumberOfWorkers; ++i)
             {
@@ -54,6 +55,7 @@ namespace Titan.Core.Threading
                 };
                 worker.Thread.Start(i);
             }
+            
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
