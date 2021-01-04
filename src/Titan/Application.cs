@@ -5,6 +5,7 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
+using Titan.ECS.Systems;
 using Titan.ECS.World;
 using Titan.Graphics;
 using Titan.Graphics.Materials;
@@ -74,16 +75,30 @@ namespace Titan
 
         private void StartMainLoop()
         {
+            var dispatcher = _container.CreateInstance<MultiThreadedSystemsDispatcher>();
+
+            var s = Stopwatch.StartNew();
+            var frames = 0;
             while (_window.Update()) // Window events + inputs (mouse and keyboard)
             {
                 _eventQueue.Update();
                 _inputHandler.Update();
                 _world.Update();
-                /*
-                 *Insert multithreaded game system update here
-                 */
 
+                dispatcher.Update();
+                    
                 _graphicsSystem.RenderFrame();
+                
+                
+                // Temp code to see FPS
+                frames++;
+                if (s.Elapsed.TotalSeconds >= 1.0)
+                {
+                    var fps =(int) (frames / s.Elapsed.TotalSeconds);
+                    _window.SetTitle(fps.ToString());
+                    frames = 0;
+                    s.Restart();
+                }
             }
         }
 

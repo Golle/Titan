@@ -3,11 +3,13 @@ using Titan.Core.Threading;
 
 namespace Titan.ECS.Systems
 {
-    internal class MultiThreadedSystemsDispatcher : IDisposable
+    public class MultiThreadedSystemsDispatcher : IDisposable
     {
         private readonly WorkerPool _workerPool;
 
         private readonly JobProgress _progress = new(0); // use a single instance of the JobProgress class
+
+        private readonly JobDescription Desc = new(() => { });
         public MultiThreadedSystemsDispatcher(WorkerPool workerPool)
         {
             _workerPool = workerPool;
@@ -32,17 +34,13 @@ namespace Titan.ECS.Systems
         public void Update()
         {
             // Queue the systems in the worker pool, based on which can be executed async.
-
-            
             for (var stage = 2; stage <= 10; stage += 3)
             {
                 const int jobCountInStage = 4;
                 _progress.Reset(jobCountInStage);
                 for (var jobCount = 0; jobCount < jobCountInStage; ++jobCount)
                 {
-                    var count = jobCount;
-                    var stage1 = stage;
-                    _workerPool.Enqueue(new JobDescription(() => Console.WriteLine($"[{stage1},{count}] Doing some amazing work")), _progress);
+                    _workerPool.Enqueue(Desc, _progress);
                 }
                 _progress.Wait(); // each stage must wait until all jobs have been finished (might tweak this later)
             }
