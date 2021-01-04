@@ -68,6 +68,7 @@ namespace Titan.Core.Threading
             job.OnComplete = description.OnComplete;
             job.OnExecute = description.OnExecute;
             job.AutoReset = description.AutoReset;
+            job.Progress = progress;
             
             _jobQueue.Enqueue(jobIndex);
             _notifier.Release();
@@ -95,6 +96,7 @@ namespace Titan.Core.Threading
                 job.OnExecute();
                 Volatile.Write(ref job.State, JobState.Completed);
                 job.OnComplete?.Invoke();
+                job.Progress?.JobComplete();
                 if (job.AutoReset)
                 {
                     Volatile.Write(ref job.State, JobState.Available);
@@ -166,6 +168,7 @@ namespace Titan.Core.Threading
             internal volatile int State;
             internal Action OnExecute;
             internal Action OnComplete;
+            internal JobProgress Progress;
             internal bool AutoReset;
         }
 
