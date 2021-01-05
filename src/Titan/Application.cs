@@ -76,7 +76,7 @@ namespace Titan
         private void StartMainLoop()
         {
             var dispatcher = _container.CreateInstance<MultiThreadedSystemsDispatcher>();
-
+            dispatcher.Initialize();
             var s = Stopwatch.StartNew();
             var frames = 0;
             while (_window.Update()) // Window events + inputs (mouse and keyboard)
@@ -104,7 +104,7 @@ namespace Titan
 
         private void Initialize(GameConfiguration configuration)
         {
-            _container.RegisterSingleton(new TitanConfiguration(configuration.AssetsDirectory.Path, 144, 0.1f, true)); // TODO: not sure if we want this
+            _container.RegisterSingleton(new TitanConfiguration(configuration.AssetsDirectory.Path, 144, 1/60f, true)); // TODO: not sure if we want this
             
             // Use default logger for now
             LOGGER.InitializeLogger(_log);
@@ -112,7 +112,6 @@ namespace Titan
 
             LOGGER.Debug("Initialize EventQueue with max event queue size {0}", configuration.EventsConfiguration.MaxEventQueueSize);
             _eventQueue.Initialize(configuration.EventsConfiguration.MaxEventQueueSize);
-
 
             LOGGER.Debug("Initialize {0} with {1} workers and maximum of {2} queued jobs", nameof(WorkerPool), Environment.ProcessorCount - 1, 1000u);
             _workerPool.Initialize(new WorkerPoolConfiguration(1000u, (uint) (Environment.ProcessorCount - 1)));

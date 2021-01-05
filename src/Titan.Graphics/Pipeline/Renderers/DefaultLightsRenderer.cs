@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Core.Common;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Pipeline.Graph;
 using Titan.Graphics.Resources;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Titan.Core.Common;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;

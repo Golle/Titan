@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Titan.Graphics.Resources
+namespace Titan.Core.Common
 {
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     public readonly struct Handle<T>

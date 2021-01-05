@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Titan.Core.Common;
 using Titan.Graphics.Resources;
 
 namespace Titan.Graphics.Textures

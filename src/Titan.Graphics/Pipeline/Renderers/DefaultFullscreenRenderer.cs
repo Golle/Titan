@@ -1,4 +1,5 @@
 using System.Numerics;
+using Titan.Core.Common;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;

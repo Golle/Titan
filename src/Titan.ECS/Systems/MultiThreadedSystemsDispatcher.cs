@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using Titan.Core.Threading;
 
 namespace Titan.ECS.Systems
@@ -9,7 +10,11 @@ namespace Titan.ECS.Systems
 
         private readonly JobProgress _progress = new(0); // use a single instance of the JobProgress class
 
-        private readonly JobDescription Desc = new(() => { });
+        private readonly JobDescription Desc = new(() =>
+        {
+
+
+        });
         public MultiThreadedSystemsDispatcher(WorkerPool workerPool)
         {
             _workerPool = workerPool;
@@ -22,7 +27,7 @@ namespace Titan.ECS.Systems
             // Check dependencies (Read/Write), for example a system that writes to a component must be executed before something that reads from that component
             // Compile a Tree structure/Graph with different "stages"
             // Example:
-            // Stage 1: Transform2D, Transform3D, TransformRect systems
+            // Stage 1: Transform2D, Transform3D, TransformRect systems (these might be last ones to be updated)
             // Stage 2: NinePatchSprite (Uses TransformRect)
             // Stage 3: Render systems (Sprite, UI, World) -> Pushes things to the render queues
             // Stage 4: All renderers, async using Deferred context to draw lights, post processing (This is not a system and should not be a part of this class)
@@ -34,9 +39,9 @@ namespace Titan.ECS.Systems
         public void Update()
         {
             // Queue the systems in the worker pool, based on which can be executed async.
-            for (var stage = 2; stage <= 10; stage += 3)
+            for (var stage = 0; stage < 2; stage++)
             {
-                const int jobCountInStage = 4;
+                const int jobCountInStage = 8;
                 _progress.Reset(jobCountInStage);
                 for (var jobCount = 0; jobCount < jobCountInStage; ++jobCount)
                 {

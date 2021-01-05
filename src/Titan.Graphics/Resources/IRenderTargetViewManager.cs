@@ -1,4 +1,5 @@
 using System;
+using Titan.Core.Common;
 using Titan.Windows.Win32.D3D11;
 
 namespace Titan.Graphics.Resources
