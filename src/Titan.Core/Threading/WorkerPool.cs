@@ -14,7 +14,7 @@ namespace Titan.Core.Threading
         private Job[] _jobs;
         private Semaphore _notifier; // TODO: Replace with a custom Semaphore/Notifier later. But for now a Semaphore is enough
         private ConcurrentQueue<int> _jobQueue;
-        private int _nextJob;
+        private volatile int _nextJob;
         private int _maxJobs;
 
 
