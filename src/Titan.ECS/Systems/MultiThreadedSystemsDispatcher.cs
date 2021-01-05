@@ -1,5 +1,8 @@
 using System;
 using System.Numerics;
+using System.Threading;
+using Titan.Core.Common;
+using Titan.Core.Logging;
 using Titan.Core.Threading;
 
 namespace Titan.ECS.Systems
@@ -33,11 +36,18 @@ namespace Titan.ECS.Systems
             // Stage 4: All renderers, async using Deferred context to draw lights, post processing (This is not a system and should not be a part of this class)
             
             // Stage Unknown: ScriptSystem (execute application defined scripts, can both read and write to components), maybe it should be the first? :O
+            _resourceSample = _workerPool.Enqueue(new JobDescription(() => Thread.Sleep(TimeSpan.FromSeconds(10)), () => { Console.WriteLine("Resource loaded!");}, autoReset: false));
         }
-
-
+        
+        private Handle<WorkerPool> _resourceSample;
         public void Update()
         {
+            if (_resourceSample.IsValid() && _workerPool.IsCompleted(_resourceSample))
+            {
+                LOGGER.Debug("Resource loaded successfully!");
+                _workerPool.Reset(ref _resourceSample);
+            }
+
             // Queue the systems in the worker pool, based on which can be executed async.
             for (var stage = 0; stage < 2; stage++)
             {
@@ -49,6 +59,10 @@ namespace Titan.ECS.Systems
                 }
                 _progress.Wait(); // each stage must wait until all jobs have been finished (might tweak this later)
             }
+
+
+
+            
         }
 
         public void Dispose()

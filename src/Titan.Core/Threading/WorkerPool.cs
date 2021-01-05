@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Titan.Core.Common;
 using Titan.Core.Logging;
 
 namespace Titan.Core.Threading
 {
     public record WorkerPoolConfiguration(uint MaxQueuedJobs, uint NumberOfWorkers);
-
+    
     public sealed class WorkerPool : IDisposable
     {
         private WorkerInfo[] _workers;
@@ -16,8 +18,6 @@ namespace Titan.Core.Threading
         private ConcurrentQueue<int> _jobQueue;
         private volatile int _nextJob;
         private int _maxJobs;
-
-
         public void Initialize(WorkerPoolConfiguration configuration)
         {
             if (configuration.NumberOfWorkers >= Environment.ProcessorCount)
@@ -55,12 +55,40 @@ namespace Titan.Core.Threading
                 };
                 worker.Thread.Start(i);
             }
-            
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Enqueue(in JobDescription description) => Enqueue(description, null);
-        public void Enqueue(in JobDescription description, JobProgress progress)
+        public bool IsCompleted(in Handle<WorkerPool> handle)
+        {
+            Debug.Assert(handle.IsValid(), "Invalid handle");
+            ref var job = ref _jobs[handle.Value];
+            if (job.AutoReset)
+            {
+                ThrowException();
+            }
+            return job.State == JobState.Completed;
+            static void ThrowException() => throw new InvalidOperationException($"{nameof(IsCompleted)} is only supported when {nameof(Job.AutoReset)} is set to false");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Reset(ref Handle<WorkerPool> handle)
+        {
+            ref var job = ref _jobs[handle.Value];
+            if (job.AutoReset || job.State != JobState.Completed)
+            {
+                ThrowException();
+            }
+#pragma warning disable 420 // TODO: investigate why this is needed.
+            Volatile.Write(ref job.State, JobState.Available);
+#pragma warning restore 420
+
+            handle = -1; // Invalidate the Handle
+            static void ThrowException() => throw new InvalidOperationException($"{nameof(Reset)} can only be called on jobs with {nameof(Job.AutoReset)} set to false and that has been finished. Call {nameof(IsCompleted)} to check if the job has finished.");
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Handle<WorkerPool> Enqueue(in JobDescription description) => Enqueue(description, null);
+        public Handle<WorkerPool> Enqueue(in JobDescription description, JobProgress progress)
         {
             var jobIndex = GetNextJob();
 
@@ -72,6 +100,8 @@ namespace Titan.Core.Threading
             
             _jobQueue.Enqueue(jobIndex);
             _notifier.Release();
+            
+            return new(jobIndex);
         }
 
         private void RunWorker(object obj)
@@ -101,7 +131,7 @@ namespace Titan.Core.Threading
                 {
                     Volatile.Write(ref job.State, JobState.Available);
                 }
-#pragma warning restore 420                
+#pragma warning restore 420
             }
         }
 
