@@ -1,3 +1,4 @@
+using Titan.ECS.Systems;
 using Titan.ECS.World;
 using Titan.EntitySystem.Components;
 
@@ -13,6 +14,11 @@ namespace Titan.Sandbox
                 .WithComponent<AssetTEMP<TextureComponent>>(200)
                 .WithComponent<AssetTEMP<int>>(200)
                 .WithComponent<AssetTEMP<float>>(100);
+
+        public SystemsBuilder ConfigureSystems(SystemsBuilder builder) =>
+            builder
+                .With<SandboxSystem>()
+                .With<AnotherSandboxSystem>();
 
 
         public void OnStart(IWorld world)

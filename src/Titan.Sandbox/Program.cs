@@ -2,7 +2,6 @@ using System;
 using System.Numerics;
 using Titan;
 using Titan.ECS.Components;
-using Titan.ECS.Registry;
 using Titan.ECS.Systems;
 using Titan.ECS.World;
 using Titan.EntitySystem.Components;
@@ -17,8 +16,6 @@ var gameConfigurationBuilder = new GameConfigurationBuilder()
     .WithAssetsDirectory(assetDirectory)
     .WithDisplayConfigurationFile(displayConfiguration)
     .WithPipelineConfigurationFromFile(pipelineConfiguration)
-    .WithSystem<SandboxSystem>(nameof(SandboxSystem), TitanSystems.Transform3D)
-    .WithSystem<AnotherSandboxSystem>(nameof(AnotherSandboxSystem), nameof(SandboxSystem))
     .WithStartup<SandboxStartup>()
     
     .WithDefaultConsoleLogger();
@@ -223,11 +220,11 @@ struct SandboxComponent
 //}
 
 
-public class AnotherSandboxSystem : IEntitySystem
+public class AnotherSandboxSystem : SystemBase
 {
     private readonly IInputHandler _inputHandler;
 
-    public AnotherSandboxSystem(IInputHandler inputHandler)
+    public AnotherSandboxSystem(IInputHandler inputHandler, IWorld world) : base(world)
     {
         _inputHandler = inputHandler;
     }
@@ -249,24 +246,25 @@ public class AnotherSandboxSystem : IEntitySystem
 }
 
 
-public class SandboxSystem : IEntitySystem
+public class SandboxSystem : SystemBase
 {
-    private readonly IComponentPool<Transform3D> _transform;
+    private readonly MutableStorage<Transform3D> _transform;
     private readonly IEntityFilter _filter;
     private readonly IEntityFilter _filter2;
 
-    public SandboxSystem(IWorld world)
+    public SandboxSystem(IWorld world) : base(world)
     {
         _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
         _filter2 = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
-        _transform = world.GetComponentPool<Transform3D>();
+        
+        _transform = GetMutable<Transform3D>();
     }
 
     public void OnUpdate(in TimeStep timeStep)
     {
         foreach (ref readonly var entity in _filter.GetEntities())
         {
-            ref var transform = ref _transform[entity];
+            ref var transform = ref _transform.Get(entity);
             transform.Position += Vector3.UnitX * timeStep;
         }
     }
