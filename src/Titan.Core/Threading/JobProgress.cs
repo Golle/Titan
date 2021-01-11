@@ -56,6 +56,9 @@ namespace Titan.Core.Threading
             ThrowIfDisposed();
             _event.Wait();
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsComplete() => _count == 0;
 
         ~JobProgress() => Dispose(false);
         public void Dispose()

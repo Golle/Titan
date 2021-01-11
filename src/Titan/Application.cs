@@ -31,6 +31,7 @@ namespace Titan
 
         private IStartup _startup;
         private IWorld _world;
+        private SystemsDispatcher _dispatcher;
 
         public static Application Create(GameConfigurationBuilder configurationBuilder)
         {
@@ -63,8 +64,8 @@ namespace Titan
             _log.Debug("Application starting");
 
             _log.Debug("Create and Configure the World");
-            _world = _startup.ConfigureWorld(new WorldBuilder()).Build(_container);
-            
+            (_world, _dispatcher) = _startup.ConfigureWorld(new WorldBuilder()).Build(_container);
+
             _startup.OnStart(_world);
             
             StartMainLoop();
@@ -75,8 +76,6 @@ namespace Titan
 
         private void StartMainLoop()
         {
-            var dispatcher = _container.CreateInstance<MultiThreadedSystemsDispatcher>();
-            dispatcher.Initialize();
             var s = Stopwatch.StartNew();
             var frames = 0;
             while (_window.Update()) // Window events + inputs (mouse and keyboard)
@@ -85,10 +84,9 @@ namespace Titan
                 _inputHandler.Update();
                 _world.Update();
 
-                dispatcher.Update();
+                _dispatcher.Execute(_workerPool);
                     
                 _graphicsSystem.RenderFrame();
-                
                 
                 // Temp code to see FPS
                 frames++;
