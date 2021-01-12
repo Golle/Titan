@@ -5,7 +5,7 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
-using Titan.ECS.Systems;
+using Titan.ECS.Systems.Dispatcher;
 using Titan.ECS.World;
 using Titan.Graphics;
 using Titan.Graphics.Materials;

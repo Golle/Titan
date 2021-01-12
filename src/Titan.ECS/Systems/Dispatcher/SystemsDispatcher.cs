@@ -2,9 +2,8 @@ using System;
 using System.Threading;
 using Titan.Core.Common;
 using Titan.Core.Threading;
-using Titan.ECS.Systems.Dispatcher;
 
-namespace Titan.ECS.Systems
+namespace Titan.ECS.Systems.Dispatcher
 {
     public sealed class SystemsDispatcher
     {
