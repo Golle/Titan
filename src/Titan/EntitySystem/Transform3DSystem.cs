@@ -8,7 +8,7 @@ using Titan.EntitySystem.Components;
 
 namespace Titan.EntitySystem
 {
-    internal class Transform3DSystem : IEntitySystem
+    internal class Transform3DSystem
     {
         private readonly IEntityFilter _filter;
 

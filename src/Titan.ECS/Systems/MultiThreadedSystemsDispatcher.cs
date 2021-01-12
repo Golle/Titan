@@ -36,7 +36,7 @@ namespace Titan.ECS.Systems
             // Stage 4: All renderers, async using Deferred context to draw lights, post processing (This is not a system and should not be a part of this class)
             
             // Stage Unknown: ScriptSystem (execute application defined scripts, can both read and write to components), maybe it should be the first? :O
-            _resourceSample = _workerPool.Enqueue(new JobDescription(() => Thread.Sleep(TimeSpan.FromSeconds(1)), () => { Console.WriteLine("Resource loaded!");}, autoReset: false));
+            _resourceSample = _workerPool.Enqueue(new JobDescription(() => Thread.Sleep(TimeSpan.FromSeconds(1)), _ => { Console.WriteLine("Resource loaded!");}, autoReset: false));
         }
         
         private Handle<WorkerPool> _resourceSample;
