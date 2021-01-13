@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Titan.Core.Threading
 {
-    public class JobProgress : IDisposable
+    public sealed class JobProgress : IDisposable
     {
         private uint _initialCount;
 
@@ -67,7 +67,7 @@ namespace Titan.Core.Threading
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposing)
             {

@@ -139,7 +139,8 @@ namespace Titan.Core.Threading
         private int GetNextJob()
         {
             // TODO: if the queue is "full" for some reason (maybe AutoReset = false), this method will never return. How should it be handled?
-            while (true)
+            var maxIterations = _maxJobs;
+            while (maxIterations-- > 0)
             {
                 var current = _nextJob;
                 var index = Interlocked.CompareExchange(ref _nextJob, (current + 1) % _maxJobs, current);
@@ -157,6 +158,12 @@ namespace Titan.Core.Threading
                 }
                 return index;
             }
+            ThrowException(_maxJobs);
+            static void ThrowException(int maxIterations)
+            {
+                throw new InvalidOperationException($"MaxIterations to enqueue a job was exceeded. This could be happening due to AutoReset = false on some jobs and they are not being reset. Max Iterations = {maxIterations}");
+            }
+            return -1;
         }
 
         ~WorkerPool() => Dispose();

@@ -25,7 +25,6 @@ namespace Titan.ECS.Systems.Dispatcher
         {
             _progress.Reset();
             Array.Fill(_status, NodeStatus.Waiting);
-
             while (!_progress.IsComplete())
             {
                 for (var i = 0; i < _nodes.Length; ++i)
