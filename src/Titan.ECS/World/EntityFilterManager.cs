@@ -24,16 +24,16 @@ namespace Titan.ECS.World
 
         public IEntityFilter Create(EntityFilterConfiguration configuration)
         {
-            var filter = _filters.FirstOrDefault(f => f.ComponentMask == configuration.ComponentMask); // Re-use existing filters
+            var filter = _filters.FirstOrDefault(f => f.Components == configuration.Components); // Re-use existing filters
             if (filter == null)
             {
-                _filters.Add(filter = new EntityFilter(configuration.ComponentMask, _maxEntities));
+                _filters.Add(filter = new EntityFilter(configuration.Components, _maxEntities));
             }
             return filter;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void EntityChanged(in Entity entity, in ComponentMask components)
+        public void EntityChanged(in Entity entity, in ComponentId components)
         {
             foreach (var filter in _filters)
             {

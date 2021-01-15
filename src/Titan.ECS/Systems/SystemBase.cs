@@ -13,7 +13,7 @@ namespace Titan.ECS.Systems
         internal int Priority { get; }
 
         private ComponentId _read;
-        private ComponentId _mutable;
+        private ComponentId _mutable = new();
 
         private bool _locked = false;
         protected SystemBase(IWorld world, int priority = 0)
@@ -28,7 +28,8 @@ namespace Titan.ECS.Systems
             {
                 throw new InvalidOperationException("Failed to acquire a ReadStorage because the System has been locked.");
             }
-            _read |= ComponentId<T>.Id;
+
+            _read += ComponentId<T>.Id;
             return new(_world.GetComponentPool<T>());
         }
 
@@ -38,7 +39,7 @@ namespace Titan.ECS.Systems
             {
                 throw new InvalidOperationException("Failed to acquire a MutableStorage because the System has been locked.");
             }
-            _mutable |= ComponentId<T>.Id;
+            _mutable += ComponentId<T>.Id;
             return new(_world.GetComponentPool<T>());
         }
 

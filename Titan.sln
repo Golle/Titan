@@ -29,7 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.SourceGenerators", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.AssetConverter", "src\Titan.AssetConverter\Titan.AssetConverter.csproj", "{1E6CAA5C-77A1-4B40-879F-68DB3B28D529}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.ECS", "src\Titan.ECS\Titan.ECS.csproj", "{208728EA-6BA3-4955-89AF-32CD0DBE3A1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.ECS", "src\Titan.ECS\Titan.ECS.csproj", "{208728EA-6BA3-4955-89AF-32CD0DBE3A1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.ECS.Tests", "tests\Titan.ECS.Tests\Titan.ECS.Tests.csproj", "{0DBCD8D0-ADFA-4441-81B0-F29A24D4DBF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,10 @@ Global
 		{208728EA-6BA3-4955-89AF-32CD0DBE3A1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{208728EA-6BA3-4955-89AF-32CD0DBE3A1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{208728EA-6BA3-4955-89AF-32CD0DBE3A1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DBCD8D0-ADFA-4441-81B0-F29A24D4DBF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DBCD8D0-ADFA-4441-81B0-F29A24D4DBF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DBCD8D0-ADFA-4441-81B0-F29A24D4DBF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DBCD8D0-ADFA-4441-81B0-F29A24D4DBF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +97,7 @@ Global
 		{3331A4E3-BB22-41F5-812D-F7473B7972F2} = {F2F17201-8E65-4284-AB69-902FD25F1C63}
 		{1E6CAA5C-77A1-4B40-879F-68DB3B28D529} = {BE7E7A08-4444-4878-8BB4-D02F12E8EA37}
 		{208728EA-6BA3-4955-89AF-32CD0DBE3A1A} = {F2F17201-8E65-4284-AB69-902FD25F1C63}
+		{0DBCD8D0-ADFA-4441-81B0-F29A24D4DBF7} = {356E7F71-4ED3-406C-BD86-156D7AFCC57C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B379FCF9-0746-4E66-BFF2-78F67D73774A}

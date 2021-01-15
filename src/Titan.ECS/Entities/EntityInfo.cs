@@ -4,6 +4,6 @@ namespace Titan.ECS.Entities
 {
     public struct EntityInfo
     {
-        public ComponentMask ComponentMask;
+        public ComponentId Components;
     }
 }

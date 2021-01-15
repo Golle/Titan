@@ -17,6 +17,7 @@ namespace Titan.ECS.World
             _eventManager.Update();
             EntityManager.Update();
             _entityFactory.Update();
+            FilterManager.Update();
         }
         public IEntityManager EntityManager { get; }
         public IEntityInfoRepository EntityInfo { get; }
@@ -75,9 +76,9 @@ namespace Titan.ECS.World
         {
             ref var info = ref EntityInfo[entity];
             var componentId = ComponentId<T>.Id;
-            info.ComponentMask += componentId;
+            info.Components += componentId;
             _eventManager.Push(new ComponentAddedEvent(entity, componentId));
-            _eventManager.Push(new EntityChangedEvent(entity, info.ComponentMask));
+            _eventManager.Push(new EntityChangedEvent(entity, info.Components));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -99,9 +100,9 @@ namespace Titan.ECS.World
         {
             ref var info = ref EntityInfo[entity];
             var componentId = ComponentId<T>.Id;
-            info.ComponentMask -= componentId;
+            info.Components -= componentId;
             _eventManager.Push(new ComponentRemovedEvent(entity, componentId));
-            _eventManager.Push(new EntityChangedEvent(entity, info.ComponentMask));
+            _eventManager.Push(new EntityChangedEvent(entity, info.Components));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

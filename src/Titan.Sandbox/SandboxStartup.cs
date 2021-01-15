@@ -9,10 +9,12 @@ namespace Titan.Sandbox
             builder
                 .WithMaxEntities(10_000)
                 .WithComponent<Transform3D>(3000)
+                .WithComponent<Transform2D>(3000)
                 .WithComponent<SandboxComponent>(3000)
 
                 .WithSystem<SandboxSystem>()
                 .WithSystem<AnotherSandboxSystem>()
+                .WithSystem<ThirdSandboxSystem>()
             ;
 
         public void OnStart(IWorld world)

@@ -10,8 +10,8 @@ namespace Titan.ECS.Messaging.Events
         public static readonly short Id = EventId<EntityChangedEvent>.Value;
 
         public readonly Entity Entity;
-        public readonly ComponentMask Components;
-        public EntityChangedEvent(in Entity entity, in ComponentMask components)
+        public readonly ComponentId Components;
+        public EntityChangedEvent(in Entity entity, in ComponentId components)
         {
             Entity = entity;
             Components = components;

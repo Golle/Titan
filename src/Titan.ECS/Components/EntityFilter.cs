@@ -10,11 +10,11 @@ namespace Titan.ECS.Components
         private Entity* _entities;
         private int* _indexers;
         private int _numberOfEntities;
-        private readonly ComponentMask _mask;
-        public ref readonly ComponentMask ComponentMask => ref _mask;
-        public EntityFilter(in ComponentMask mask, uint maxEntities)
+        private readonly ComponentId _components;
+        public ref readonly ComponentId Components => ref _components;
+        public EntityFilter(in ComponentId components, uint maxEntities)
         {
-            _mask = mask;
+            _components = components;
             var size = (sizeof(Entity) + sizeof(int)) * maxEntities;
 
             _entities = (Entity*) Marshal.AllocHGlobal((int) size);
@@ -26,9 +26,9 @@ namespace Titan.ECS.Components
         }
 
 
-        public void OnEntityChanged(in Entity entity, in ComponentMask components)
+        public void OnEntityChanged(in Entity entity, in ComponentId components)
         {
-            var isMatch = components.Contains(_mask);
+            var isMatch = _components.Contains(components);
             ref var index = ref _indexers[entity.Id];
             if (index != -1 && isMatch)
             {

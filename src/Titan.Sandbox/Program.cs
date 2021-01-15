@@ -238,7 +238,6 @@ namespace Titan.Sandbox
 
         public override void OnUpdate()
         {
-            Thread.Sleep(TimeSpan.FromTicks(10));
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref readonly var transform = ref _transform.Get(entity);
@@ -265,14 +264,35 @@ namespace Titan.Sandbox
 
         public override void OnUpdate()
         {
-            Thread.Sleep(TimeSpan.FromTicks(10));
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref var transform = ref _transform.Get(entity);
                 transform.Position += Vector3.UnitX * 0.014f;
             }
         }
+    }
 
-        public void Dispose() { }
+    public sealed class ThirdSandboxSystem : SystemBase
+    {
+        private readonly ReadOnlyStorage<Transform2D> _transform2d;
+        private readonly ReadOnlyStorage<Transform3D> _transform3d;
+        private readonly IEntityFilter _filter;
+
+        public ThirdSandboxSystem(IWorld world) : base(world)
+        {
+            _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>().With<Transform2D>());
+
+            _transform3d = GetRead<Transform3D>();
+            _transform2d = GetRead<Transform2D>();
+        }
+
+        public override void OnUpdate()
+        {
+            foreach (ref readonly var entity in _filter.GetEntities())
+            {
+                ref readonly var transform = ref _transform3d.Get(entity);
+                //transform.Position += Vector3.UnitX * 0.014f;
+            }
+        }
     }
 }

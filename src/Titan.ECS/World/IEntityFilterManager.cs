@@ -6,7 +6,7 @@ namespace Titan.ECS.World
     public interface IEntityFilterManager
     {
         IEntityFilter Create(EntityFilterConfiguration configuration);
-        void EntityChanged(in Entity entity, in ComponentMask components);
+        void EntityChanged(in Entity entity, in ComponentId components);
         void Update();
     }
 }
