@@ -22,6 +22,7 @@ namespace Titan.Sandbox
             var entity = world.CreateEntity();
             entity.AddComponent<Transform3D>();
             entity.AddComponent<SandboxComponent>();
+            entity.AddComponent<Transform2D>();
             //entity.AddManagedComponent(new AssetTEMP<TextureComponent>("teh texture.png"));
         }
 

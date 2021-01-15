@@ -22,8 +22,8 @@ namespace Titan.ECS.Systems.Dispatcher
                         continue;
                     }
 
-                    var hasReadOnlyDependency = system.Read.Contains(sortedSystems[j].Mutable);
-                    var hasMutableDependency = j < i && system.Mutable.Contains(sortedSystems[j].Mutable); // Only look at systems before the current one
+                    var hasReadOnlyDependency = system.Read.MatchesAny(sortedSystems[j].Mutable);
+                    var hasMutableDependency = j < i && system.Mutable.MatchesAny(sortedSystems[j].Mutable); // Only look at systems before the current one
 
                     if (hasReadOnlyDependency || hasMutableDependency)
                     {

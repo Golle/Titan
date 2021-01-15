@@ -28,16 +28,16 @@ namespace Titan.ECS.Components
 
         public void OnEntityChanged(in Entity entity, in ComponentId components)
         {
-            var isMatch = _components.Contains(components);
+            var isMatch = _components.IsSubsetOf(components);
             ref var index = ref _indexers[entity.Id];
-            if (index != -1 && isMatch)
+            if (index != -1 && !isMatch)
             {
                 // Entity is in this filter with no match on the mask, remove the entity and replace it with the last one in the list.
                 _entities[index] = _entities[--_numberOfEntities];
                 _indexers[_entities[index]] = index;
                 index = -1;
             }
-            else if(isMatch)
+            else if(index == -1 && isMatch)
             {
                 // It's a match but it does not exist in the filter, add it
                 index = _numberOfEntities++;
