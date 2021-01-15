@@ -122,12 +122,13 @@ namespace Titan.Core.Threading
 
 #pragma warning disable 420 // TODO: investigate why this is needed.
                 ref var job = ref _jobs[jobIndex];
+                
+                var progress = job.Progress;
                 Volatile.Write(ref job.State, JobState.Running);
-                job.State = JobState.Running;
                 job.OnExecute();
-                Volatile.Write(ref job.State, JobState.Completed);
                 job.OnComplete?.Invoke(job.Metadata);
-                job.Progress?.JobComplete();
+                Volatile.Write(ref job.State, JobState.Completed);
+                progress?.JobComplete();
                 if (job.AutoReset)
                 {
                     Volatile.Write(ref job.State, JobState.Available);
@@ -206,7 +207,7 @@ namespace Titan.Core.Threading
             internal volatile int State;
             internal Action OnExecute;
             internal Action<int> OnComplete;
-            internal JobProgress Progress;
+            internal volatile JobProgress Progress;
             internal bool AutoReset;
             internal int Metadata;
         }

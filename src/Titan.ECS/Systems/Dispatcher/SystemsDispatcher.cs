@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Common;
 using Titan.Core.Threading;
@@ -12,7 +13,6 @@ namespace Titan.ECS.Systems.Dispatcher
         private readonly JobProgress _progress;
         private readonly NodeStatus[] _status;
         private readonly Handle<WorkerPool>[] _handles;
-
         public SystemsDispatcher(SystemNode[] nodes)
         {
             _nodes = nodes;
@@ -25,6 +25,7 @@ namespace Titan.ECS.Systems.Dispatcher
         {
             _progress.Reset();
             Array.Fill(_status, NodeStatus.Waiting);
+
             while (!_progress.IsComplete())
             {
                 for (var i = 0; i < _nodes.Length; ++i)
@@ -50,18 +51,27 @@ namespace Titan.ECS.Systems.Dispatcher
                     }
                 }
                 Thread.Yield();
-                for (var i = 0; i < _handles.Length; ++i)
+
+                ResetHandles(pool);
+            }
+            // Make sure all handles have been reset
+            ResetHandles(pool);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ResetHandles(WorkerPool pool)
+        {
+            for (var i = 0; i < _handles.Length; ++i)
+            {
+                ref var handle = ref _handles[i];
+                if (handle.IsValid() && pool.IsCompleted(handle))
                 {
-                    ref var handle = ref _handles[i];
-                    if (handle.IsValid() && pool.IsCompleted(handle))
-                    {
-                        pool.Reset(ref handle);
-                        _status[i] = NodeStatus.Completed;
-                    }
+                    pool.Reset(ref handle);
+                    _status[i] = NodeStatus.Completed;
                 }
             }
         }
-        
+
         private enum NodeStatus
         {
             Waiting,

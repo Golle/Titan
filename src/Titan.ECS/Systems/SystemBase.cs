@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Titan.ECS.Components;
 using Titan.ECS.World;
 
@@ -40,5 +41,20 @@ namespace Titan.ECS.Systems
             _mutable |= ComponentId<T>.Id;
             return new(_world.GetComponentPool<T>());
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Update()
+        {
+            OnPreUpdate();
+            OnUpdate();
+            OnPostUpdate();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public virtual void OnPreUpdate() { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public virtual void OnUpdate() { }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public virtual void OnPostUpdate() { }
     }
 }

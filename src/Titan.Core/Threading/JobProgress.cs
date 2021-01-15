@@ -13,7 +13,6 @@ namespace Titan.Core.Threading
         private volatile uint _count;
         private readonly ManualResetEventSlim _event = new();
         private bool _disposed;
-
         public JobProgress(uint initialCount)
         {
             _count = _initialCount = initialCount;
@@ -31,6 +30,7 @@ namespace Titan.Core.Threading
             {
                 ThrowException();
             }
+            
             var value = Interlocked.Decrement(ref _count);
             if (value == 0)
             {

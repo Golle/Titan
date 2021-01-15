@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using System.Threading;
 using Titan;
 using Titan.ECS.Components;
 using Titan.ECS.Systems;
@@ -25,15 +26,6 @@ application.Run();
 
 namespace Titan.Sandbox
 {
-    internal struct AssetTEMP<T> where T : unmanaged
-    {
-        public string Identifier;
-        public AssetTEMP(string identifier)
-        {
-            Identifier = identifier;
-        }
-    }
-
     struct SandboxComponent
     {
         public float X;
@@ -221,52 +213,63 @@ namespace Titan.Sandbox
 //}
 
 
-    public class AnotherSandboxSystem : SystemBase
+    public sealed class AnotherSandboxSystem : SystemBase
     {
         private readonly IInputHandler _inputHandler;
-
+        private readonly ReadOnlyStorage<Transform3D> _transform;
+        private readonly MutableStorage<SandboxComponent> _sandbox;
+        private readonly IEntityFilter _filter;
         public AnotherSandboxSystem(IInputHandler inputHandler, IWorld world) : base(world)
         {
             _inputHandler = inputHandler;
+            _transform = GetRead<Transform3D>();
+            _sandbox = GetMutable<SandboxComponent>();
+            _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>().With<SandboxComponent>());
         }
 
-        public void OnPreUpdate()
+        public override void OnPreUpdate()
         {
             if (_inputHandler.IsKeyPressed(KeyCode.F1))
             {
+                Console.WriteLine("Hey! you pressed the wrong button..");
                 Environment.Exit(1000);
             }
         }
 
-        public void OnUpdate(in TimeStep timeStep)
+        public override void OnUpdate()
         {
-        
-        }
+            Thread.Sleep(TimeSpan.FromTicks(10));
+            foreach (ref readonly var entity in _filter.GetEntities())
+            {
+                ref readonly var transform = ref _transform.Get(entity);
+                ref var sandbox = ref _sandbox.Get(entity);
 
-        public void Dispose() { }
+                sandbox.X = transform.Position.X;
+                sandbox.A = (int)transform.Rotation.X;
+            }
+        }
     }
 
 
-    public class SandboxSystem : SystemBase
+    public sealed class SandboxSystem : SystemBase
     {
         private readonly MutableStorage<Transform3D> _transform;
         private readonly IEntityFilter _filter;
-        private readonly IEntityFilter _filter2;
 
         public SandboxSystem(IWorld world) : base(world)
         {
             _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
-            _filter2 = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
         
             _transform = GetMutable<Transform3D>();
         }
 
-        public void OnUpdate(in TimeStep timeStep)
+        public override void OnUpdate()
         {
+            Thread.Sleep(TimeSpan.FromTicks(10));
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref var transform = ref _transform.Get(entity);
-                transform.Position += Vector3.UnitX * timeStep;
+                transform.Position += Vector3.UnitX * 0.014f;
             }
         }
 
