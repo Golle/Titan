@@ -15,43 +15,44 @@ namespace Titan.ECS.World
         {
             // TODO: this should not be in the World class, every service/manager should be added to a game loop where they can be executed async if needed.
             _eventManager.Update();
-            EntityManager.Update();
+            _entityManager.Update();
             _entityFactory.Update();
+            _filterManager.Update();
         }
-        public IEntityManager EntityManager { get; }
-        public IEntityInfoRepository EntityInfo { get; }
-        public IEntityFilterManager FilterManager { get; }
 
         private readonly ComponentRegistry _registry;
+        private readonly IEntityInfoRepository _entityInfo;
+        private readonly IEntityFilterManager _filterManager;
         private readonly IEntityFactory _entityFactory;
         private readonly IEventManager _eventManager;
+        private readonly IEntityManager _entityManager;
 
         public World(WorldConfiguration configuration, ComponentRegistry registry, IEntityManager entityManager, IEntityFactory entityFactory, IEntityInfoRepository entityInfoRepository, IEntityFilterManager entityFilterManager, IEventManager eventManager)
         {
             Id = configuration.WorldId;
             MaxEntities = configuration.MaxEntities;
             _registry = registry;
-            EntityManager = entityManager;
+            _entityManager = entityManager;
             _entityFactory = entityFactory;
             _eventManager = eventManager;
-            FilterManager = entityFilterManager;
+            _filterManager = entityFilterManager;
             
-            EntityInfo = entityInfoRepository;
+            _entityInfo = entityInfoRepository;
             
             WorldContainer.Add(this);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Entity CreateEntity() => EntityManager.Create();
+        public Entity CreateEntity() => _entityManager.Create();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Attach(in Entity parent, in Entity child) => EntityManager.Attach(parent, child);
+        public void Attach(in Entity parent, in Entity child) => _entityManager.Attach(parent, child);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Detach(in Entity child) => EntityManager.Detach(child);
+        public void Detach(in Entity child) => _entityManager.Detach(child);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DestroyEntity(in Entity entity) => EntityManager.Destroy(entity);
+        public void DestroyEntity(in Entity entity) => _entityManager.Destroy(entity);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddComponent<T>(in Entity entity) where T : unmanaged => AddComponent<T>(entity, default);
@@ -73,11 +74,11 @@ namespace Titan.ECS.World
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ComponentAdded<T>(Entity entity) where T : struct
         {
-            ref var info = ref EntityInfo[entity];
+            ref var info = ref _entityInfo[entity];
             var componentId = ComponentId<T>.Id;
-            info.ComponentMask += componentId;
+            info.Components += componentId;
             _eventManager.Push(new ComponentAddedEvent(entity, componentId));
-            _eventManager.Push(new EntityChangedEvent(entity, info.ComponentMask));
+            _eventManager.Push(new EntityChangedEvent(entity, info.Components));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -97,11 +98,11 @@ namespace Titan.ECS.World
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ComponentRemoved<T>(Entity entity) where T : struct
         {
-            ref var info = ref EntityInfo[entity];
+            ref var info = ref _entityInfo[entity];
             var componentId = ComponentId<T>.Id;
-            info.ComponentMask -= componentId;
+            info.Components -= componentId;
             _eventManager.Push(new ComponentRemovedEvent(entity, componentId));
-            _eventManager.Push(new EntityChangedEvent(entity, info.ComponentMask));
+            _eventManager.Push(new EntityChangedEvent(entity, info.Components));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

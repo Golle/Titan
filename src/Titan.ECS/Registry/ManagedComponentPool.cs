@@ -13,7 +13,7 @@ namespace Titan.ECS.Registry
         private readonly int[] _indexers;
         private readonly ConcurrentQueue<int> _freeComponents = new();
 
-        private int _numberOfComponents;
+        private volatile int _numberOfComponents;
         private readonly uint _maxNumberOfComponents;
 
         public ManagedComponentPool(uint numberOfComponents, uint maxEntities)

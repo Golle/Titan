@@ -25,7 +25,7 @@ namespace Titan.ECS.Messaging
     {
         private readonly int _maxEvents;
         private byte* _events;
-        private int _count;
+        private volatile int _count; // TODO: do we need it to be volatile? Multiple threads will write to this at the same time. 
 
         private bool _high;
         private byte* _eventsLastFrame;

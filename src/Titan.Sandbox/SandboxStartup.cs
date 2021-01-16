@@ -9,18 +9,21 @@ namespace Titan.Sandbox
             builder
                 .WithMaxEntities(10_000)
                 .WithComponent<Transform3D>(3000)
+                .WithComponent<Transform2D>(3000)
                 .WithComponent<SandboxComponent>(3000)
-                .WithComponent<AssetTEMP<TextureComponent>>(200)
-                .WithComponent<AssetTEMP<int>>(200)
-                .WithComponent<AssetTEMP<float>>(100);
 
+                .WithSystem<SandboxSystem>()
+                .WithSystem<AnotherSandboxSystem>()
+                .WithSystem<ThirdSandboxSystem>()
+            ;
 
         public void OnStart(IWorld world)
         {
             var entity = world.CreateEntity();
             entity.AddComponent<Transform3D>();
             entity.AddComponent<SandboxComponent>();
-            entity.AddManagedComponent(new AssetTEMP<TextureComponent>("teh texture.png"));
+            entity.AddComponent<Transform2D>();
+            //entity.AddManagedComponent(new AssetTEMP<TextureComponent>("teh texture.png"));
         }
 
         public void OnStop(IWorld world)

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Titan.Core.Common;
 using Titan.Core.Logging;
 using Titan.Graphics.Camera;
 using Titan.Graphics.D3D11;

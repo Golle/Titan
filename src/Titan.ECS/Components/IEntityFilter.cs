@@ -5,7 +5,7 @@ namespace Titan.ECS.Components
 {
     public interface IEntityFilter
     {
-        ref readonly ComponentMask ComponentMask { get; }
+        ref readonly ComponentId Components { get; }
         ReadOnlySpan<Entity> GetEntities();
     }
 }

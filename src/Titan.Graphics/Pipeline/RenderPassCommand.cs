@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Titan.Core.Common;
 using Titan.Graphics.Pipeline.Renderers;
 using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;

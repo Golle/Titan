@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Titan.Core.Common;
 using Titan.Graphics.Resources;
 
 namespace Titan.Graphics.Pipeline

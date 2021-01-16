@@ -1,4 +1,3 @@
-using System;
 using Titan.ECS.World;
 
 namespace Titan
