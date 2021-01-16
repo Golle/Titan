@@ -1,43 +1,42 @@
 using System.Numerics;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
-using Titan.ECS.Registry;
 using Titan.ECS.Systems;
 using Titan.ECS.World;
 using Titan.EntitySystem.Components;
 
 namespace Titan.EntitySystem
 {
-    internal class Transform3DSystem
+    // TODO: Use a sorted system base for this. This system needs to sort the entities based on the parent count, or a child could upate the transform before the parent causing a slight lag between parts.
+    internal sealed class Transform3DSystem : SystemBase
     {
         private readonly IEntityFilter _filter;
-
-        private readonly IComponentPool<Transform3D> _transform;
         private readonly IEntityManager _entityManager;
-
-        public Transform3DSystem(IWorld world, IEntityManager entityManager, IEntityFilterManager entityFilterManager)
+        private readonly MutableStorage<Transform3D> _transform;
+        
+        public Transform3DSystem(IWorld world, IEntityManager entityManager, IEntityFilterManager entityFilterManager) 
+            : base(world, priority: int.MinValue) // Set this to lowest priority, making it the last of the Transform3D systems to be executed. The WorldMatrix should then be up to date with the current frame
         {
             _filter = entityFilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
-            _transform = world.GetComponentPool<Transform3D>();
+            _transform = GetMutable<Transform3D>();
             _entityManager = entityManager;
         }
 
-        public void OnUpdate(in TimeStep timeStep)
+        public override void OnUpdate()
         {
             foreach (ref readonly var entity in _filter.GetEntities())
             {
-                ref var transform = ref _transform[entity];
-                
+                ref var transform = ref _transform.Get(entity);
+
                 transform.ModelMatrix =
                     Matrix4x4.CreateScale(transform.Scale) *
                     Matrix4x4.CreateFromQuaternion(transform.Rotation) *
                     Matrix4x4.CreateTranslation(transform.Position)
                     ;
 
-                var parent = _entityManager.GetParent(entity);
-                if (!parent.IsNull() && _transform.Contains(parent))
-                { 
-                    transform.WorldMatrix = transform.ModelMatrix * _transform[parent].WorldMatrix;
+                if (_entityManager.TryGetParent(entity, out var parent) && _transform.Contains(parent))
+                {
+                    transform.WorldMatrix = transform.ModelMatrix * _transform.Get(parent).WorldMatrix;
                 }
                 else
                 {
@@ -45,7 +44,5 @@ namespace Titan.EntitySystem
                 }
             }
         }
-
-        public void Dispose() { }
     }
 }

@@ -11,5 +11,6 @@ namespace Titan.ECS.Entities
         Entity GetParent(in Entity entity);
         void Destroy(in Entity entity);
         void Update();
+        bool TryGetParent(in Entity entity, out Entity parent);
     }
 }

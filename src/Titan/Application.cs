@@ -7,6 +7,7 @@ using Titan.Core.Messaging;
 using Titan.Core.Threading;
 using Titan.ECS.Systems.Dispatcher;
 using Titan.ECS.World;
+using Titan.EntitySystem;
 using Titan.Graphics;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Resources;
@@ -58,13 +59,19 @@ namespace Titan
             _log = log;
             _container = container;
         }
-        
+
+
+        private static WorldBuilder DefaultWorldBuilder() => new WorldBuilder()
+            .WithSystem<Transform3DSystem>();
+
         public void Run()
         {
             _log.Debug("Application starting");
 
             _log.Debug("Create and Configure the World");
-            (_world, _dispatcher) = _startup.ConfigureWorld(new WorldBuilder()).Build(_container);
+            
+
+            (_world, _dispatcher) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
 
             _startup.OnStart(_world);
             
