@@ -23,7 +23,6 @@ namespace Titan.ECS.Entities
             var size = sizeof(Relationship) * configuration.MaxEntities;
             _relationships = (Relationship*)Marshal.AllocHGlobal((int)size);
             Unsafe.InitBlockUnaligned(_relationships, 0, (uint)size);
-
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

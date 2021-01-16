@@ -15,11 +15,11 @@ namespace Titan.EntitySystem
         private readonly IComponentPool<Transform3D> _transform;
         private readonly IEntityManager _entityManager;
 
-        public Transform3DSystem(IWorld world)
+        public Transform3DSystem(IWorld world, IEntityManager entityManager, IEntityFilterManager entityFilterManager)
         {
-            _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
+            _filter = entityFilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
             _transform = world.GetComponentPool<Transform3D>();
-            _entityManager = world.EntityManager;
+            _entityManager = entityManager;
         }
 
         public void OnUpdate(in TimeStep timeStep)

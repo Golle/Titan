@@ -219,12 +219,12 @@ namespace Titan.Sandbox
         private readonly ReadOnlyStorage<Transform3D> _transform;
         private readonly MutableStorage<SandboxComponent> _sandbox;
         private readonly IEntityFilter _filter;
-        public AnotherSandboxSystem(IInputHandler inputHandler, IWorld world) : base(world)
+        public AnotherSandboxSystem(IInputHandler inputHandler, IWorld world, IEntityFilterManager entityFilterManager) : base(world)
         {
             _inputHandler = inputHandler;
             _transform = GetRead<Transform3D>();
             _sandbox = GetMutable<SandboxComponent>();
-            _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>().With<SandboxComponent>());
+            _filter = entityFilterManager.Create(new EntityFilterConfiguration().With<Transform3D>().With<SandboxComponent>());
         }
 
         public override void OnPreUpdate()
@@ -255,9 +255,9 @@ namespace Titan.Sandbox
         private readonly MutableStorage<Transform3D> _transform;
         private readonly IEntityFilter _filter;
 
-        public SandboxSystem(IWorld world) : base(world)
+        public SandboxSystem(IWorld world, IEntityFilterManager entityFilterManager) : base(world)
         {
-            _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
+            _filter = entityFilterManager.Create(new EntityFilterConfiguration().With<Transform3D>());
         
             _transform = GetMutable<Transform3D>();
         }
@@ -278,9 +278,9 @@ namespace Titan.Sandbox
         private readonly ReadOnlyStorage<Transform3D> _transform3d;
         private readonly IEntityFilter _filter;
 
-        public ThirdSandboxSystem(IWorld world) : base(world)
+        public ThirdSandboxSystem(IWorld world, IEntityFilterManager entityFilterManager) : base(world)
         {
-            _filter = world.FilterManager.Create(new EntityFilterConfiguration().With<Transform3D>().With<Transform2D>());
+            _filter = entityFilterManager.Create(new EntityFilterConfiguration().With<Transform3D>().With<Transform2D>());
 
             _transform3d = GetRead<Transform3D>();
             _transform2d = GetRead<Transform2D>();

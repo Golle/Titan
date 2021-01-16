@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
@@ -81,11 +80,17 @@ namespace Titan
             var frames = 0;
             while (_window.Update()) // Window events + inputs (mouse and keyboard)
             {
-                _eventQueue.Update();
+                _eventQueue.Update(); // Make the last frame + new inputs avaialable in this frame
                 _inputHandler.Update();
-                _world.Update();
 
-                _dispatcher.Execute(_workerPool);
+
+                {
+                    // Currently only supports a single world
+                    _world.Update();
+
+                    _dispatcher.Execute(_workerPool);
+                }
+                
                     
                 _graphicsSystem.RenderFrame();
                 
