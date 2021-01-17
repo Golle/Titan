@@ -42,10 +42,6 @@ namespace Titan.EntitySystem.Assets
             _textureLoader = textureLoader;
             _pool = world.GetManagedComponentPool<Asset<Texture>>();
             _eventManager = eventManager;
-            for (var i = 0; i < _activeLoaders.Length; ++i)
-            {
-                _activeLoaders[i].Handle = -1;
-            }
         }
 
         public void Update()
@@ -75,7 +71,10 @@ namespace Titan.EntitySystem.Assets
                     {
                         entity.AddComponent(loader.Texture);
                     }
-                    _activeLoaders[i] = _activeLoaders[--_activeLoadersCount];
+
+                    ref var lastLoader = ref _activeLoaders[--_activeLoadersCount];
+                    _activeLoaders[i] = lastLoader;
+                    lastLoader = default; // the GC will cleanup the List<T>
                 }
             }
         }
@@ -110,15 +109,7 @@ namespace Titan.EntitySystem.Assets
                 var index = _activeLoadersCount++;
                 ref var loader = ref _activeLoaders[index];
                 loader.Identifier = identifier;
-                if (loader.WaitingEntities != null)
-                {
-                    loader.WaitingEntities.Clear();
-                    loader.WaitingEntities.Add(entity);
-                }
-                else
-                {
-                    loader.WaitingEntities = new List<Entity> { entity };
-                }
+                loader.WaitingEntities = new List<Entity> { entity };
 
                 LOGGER.Trace("Asset has not been loaded, creating async job.", identifier);
                 loader.Handle = _workerPool.Enqueue(new JobDescription(() => _activeLoaders[index].Texture = _textureLoader.Load(identifier), autoReset: false)); // TODO: This will create a delegate, allocated on the heap. can it be prevented?;

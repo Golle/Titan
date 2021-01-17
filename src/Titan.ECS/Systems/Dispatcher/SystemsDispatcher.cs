@@ -19,7 +19,6 @@ namespace Titan.ECS.Systems.Dispatcher
             _progress = new JobProgress((uint) nodes.Length);
             _status = new NodeStatus[nodes.Length];
             _handles = new Handle<WorkerPool>[nodes.Length];
-            Array.Fill(_handles, -1); // Invalidate all handles at startup
         }
 
         public void Execute(WorkerPool pool)
