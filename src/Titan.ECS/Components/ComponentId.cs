@@ -5,12 +5,12 @@ using System.Runtime.CompilerServices;
 namespace Titan.ECS.Components
 {
     [DebuggerDisplay("{_high.ToString(\"X\")}:{_low.ToString(\"X\")}")]
+    [SkipLocalsInit]
     public readonly struct ComponentId
     {
         // TODO: If needed, add support for more than 128 components
         private readonly ulong _low;
         private readonly ulong _high;
-
         public ComponentId(ulong low, ulong high)
         {
             _low = low;

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core.Common;
 using Titan.Graphics.Resources;
@@ -5,6 +6,7 @@ using Titan.Graphics.Resources;
 namespace Titan.Graphics.Textures
 {
     [StructLayout(LayoutKind.Sequential)]
+    [SkipLocalsInit]
     public readonly struct Texture
     {
         public readonly Handle<ShaderResourceView> Resource;

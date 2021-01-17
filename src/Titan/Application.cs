@@ -5,13 +5,17 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
+using Titan.ECS.Assets;
 using Titan.ECS.Systems.Dispatcher;
 using Titan.ECS.World;
 using Titan.EntitySystem;
+using Titan.EntitySystem.Assets;
+using Titan.EntitySystem.Components;
 using Titan.Graphics;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Resources;
 using Titan.Graphics.States;
+using Titan.Graphics.Textures;
 using Titan.Input;
 using Titan.IOC;
 using Titan.Windows;
@@ -33,6 +37,7 @@ namespace Titan
         private IStartup _startup;
         private IWorld _world;
         private SystemsDispatcher _dispatcher;
+        private IAssetTestInterface[] _loaders; // TEMP
 
         public static Application Create(GameConfigurationBuilder configurationBuilder)
         {
@@ -62,16 +67,23 @@ namespace Titan
 
 
         private static WorldBuilder DefaultWorldBuilder() => new WorldBuilder()
-            .WithSystem<Transform3DSystem>();
+            .WithComponent<Transform3D>()
+            .WithComponent<Transform2D>()
+            .WithComponent<Asset<Texture>>()
+            .WithComponent<Texture>()
+            .WithSystem<Transform3DSystem>()
+            .WithAssetsLoader<Texture2DAssetsManager>();
 
         public void Run()
         {
             _log.Debug("Application starting");
 
             _log.Debug("Create and Configure the World");
-            
 
-            (_world, _dispatcher) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
+            
+            (_world, _dispatcher, _loaders) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
+
+
 
             _startup.OnStart(_world);
             
@@ -94,6 +106,10 @@ namespace Titan
                 {
                     // Currently only supports a single world
                     _world.Update();
+                    foreach (var assetTestInterface in _loaders)
+                    {
+                        assetTestInterface.Update();
+                    }
 
                     _dispatcher.Execute(_workerPool);
                 }

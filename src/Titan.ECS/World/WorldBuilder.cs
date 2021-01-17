@@ -38,7 +38,7 @@ namespace Titan.ECS.World
             return this;
         }
 
-        public WorldBuilder WithAssetsLoader<T>() where T : IAssetLoader
+        public WorldBuilder WithAssetsLoader<T>() where T : IAssetTestInterface
         {
             _assetLoaders.Add(typeof(T));
             return this;
@@ -55,7 +55,7 @@ namespace Titan.ECS.World
             _maxEvents = Math.Clamp(maxEvents, 1000, 1_000_000); // Not less than 1000 and not more than 1 000 000.
             return this;
         }
-        public (IWorld world, SystemsDispatcher dispatcher) Build(IContainer baseContainer)
+        public (IWorld world, SystemsDispatcher dispatcher, IAssetTestInterface[] loaders) Build(IContainer baseContainer)
         {
             var container = baseContainer
                 .CreateChildContainer()
@@ -97,7 +97,10 @@ namespace Titan.ECS.World
                     .GetInstance<SystemDispatcherFactory>()
                     .Create(systems);
 
-                return (world, dispatcher);
+                LOGGER.Debug("Creating Asset Loaders");
+                var loaders = _assetLoaders.Select(a => (IAssetTestInterface)container.CreateInstance(a)).ToArray();
+
+                return (world, dispatcher, loaders);
             }
             catch(Exception)
             {
