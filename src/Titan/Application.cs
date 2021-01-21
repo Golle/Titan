@@ -37,7 +37,7 @@ namespace Titan
         private IStartup _startup;
         private IWorld _world;
         private SystemsDispatcher _dispatcher;
-        private IAssetTestInterface[] _loaders; // TEMP
+        private IAssetsManager[] _managers; // TEMP
 
         public static Application Create(GameConfigurationBuilder configurationBuilder)
         {
@@ -72,7 +72,7 @@ namespace Titan
             .WithComponent<Asset<Texture>>()
             .WithComponent<Texture>()
             .WithSystem<Transform3DSystem>()
-            .WithAssetsLoader<Texture2DAssetsManager>();
+            .WithAssetsManager<Texture2DAssetsManager>();
 
         public void Run()
         {
@@ -81,7 +81,7 @@ namespace Titan
             _log.Debug("Create and Configure the World");
 
             
-            (_world, _dispatcher, _loaders) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
+            (_world, _dispatcher, _managers) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
 
 
 
@@ -106,7 +106,7 @@ namespace Titan
                 {
                     // Currently only supports a single world
                     _world.Update();
-                    foreach (var assetTestInterface in _loaders)
+                    foreach (var assetTestInterface in _managers)
                     {
                         assetTestInterface.Update();
                     }

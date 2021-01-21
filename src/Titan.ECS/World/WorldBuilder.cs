@@ -23,7 +23,7 @@ namespace Titan.ECS.World
         private uint _maxEntities = 1000;
         private uint _maxEvents = 10_000;
         private readonly List<(Type componentType, uint maxComponents, bool isManaged)> _components = new ();
-        private readonly List<Type> _assetLoaders = new();
+        private readonly List<Type> _assetManagers = new();
         private readonly List<Type> _systemTypes = new();
 
         public WorldBuilder WithMaxEntities(uint maxEntities)
@@ -38,9 +38,9 @@ namespace Titan.ECS.World
             return this;
         }
 
-        public WorldBuilder WithAssetsLoader<T>() where T : IAssetTestInterface
+        public WorldBuilder WithAssetsManager<T>() where T : IAssetsManager
         {
-            _assetLoaders.Add(typeof(T));
+            _assetManagers.Add(typeof(T));
             return this;
         }
 
@@ -55,7 +55,7 @@ namespace Titan.ECS.World
             _maxEvents = Math.Clamp(maxEvents, 1000, 1_000_000); // Not less than 1000 and not more than 1 000 000.
             return this;
         }
-        public (IWorld world, SystemsDispatcher dispatcher, IAssetTestInterface[] loaders) Build(IContainer baseContainer)
+        public (IWorld world, SystemsDispatcher dispatcher, IAssetsManager[] loaders) Build(IContainer baseContainer)
         {
             var container = baseContainer
                 .CreateChildContainer()
@@ -75,7 +75,7 @@ namespace Titan.ECS.World
                 LOGGER.Debug("Max entities: {0}", _maxEntities);
                 LOGGER.Debug("Max events: {0}", _maxEvents);
                 LOGGER.Debug("Number of Components: {0}", _components.Count);
-                LOGGER.Debug("Number of asset loaders: {0}", _assetLoaders.Count);
+                LOGGER.Debug("Number of asset loaders: {0}", _assetManagers.Count);
                 LOGGER.Debug("Number of systems: {0}", _systemTypes.Count);
 
                 var componentRegistry = container.GetInstance<ComponentRegistry>();
@@ -98,9 +98,9 @@ namespace Titan.ECS.World
                     .Create(systems);
 
                 LOGGER.Debug("Creating Asset Loaders");
-                var loaders = _assetLoaders.Select(a => (IAssetTestInterface)container.CreateInstance(a)).ToArray();
+                var managers = _assetManagers.Select(a => (IAssetsManager)container.CreateInstance(a)).ToArray();
 
-                return (world, dispatcher, loaders);
+                return (world, dispatcher, managers);
             }
             catch(Exception)
             {
