@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Titan.Core.Logging;
 
 namespace Titan.ECS.Systems.Dispatcher
 {
@@ -8,7 +10,7 @@ namespace Titan.ECS.Systems.Dispatcher
         public SystemsDispatcher Create(in SystemBase[] systems)
         {
             var count = systems.Length;
-            var sortedSystems = systems.OrderBy(s => s.Priority).ToArray();
+            var sortedSystems = systems.OrderByDescending(s => s.Priority).ToArray();
             var nodes = new SystemNode[count];
             for (var i = 0; i < count; ++i)
             {
@@ -33,7 +35,21 @@ namespace Titan.ECS.Systems.Dispatcher
                 nodes[i] = new SystemNode(system, dependencies.ToArray());
             }
 
+
+            LogDependencies(nodes);
             return new SystemsDispatcher(nodes);
+        }
+
+        [Conditional("DEBUG")]
+        private static void LogDependencies(SystemNode[] nodes)
+        {
+            foreach (var node in nodes)
+            {
+                var dependencies = string.Join(", ", node.Dependencies.Select(d => nodes[d].System.GetType().Name));
+                LOGGER.Debug(string.IsNullOrWhiteSpace(dependencies) ? 
+                    $"{node.System.GetType().Name} has no dependencies" : 
+                    $"{node.System.GetType().Name} depends on {dependencies}");
+            }
         }
     }
 }

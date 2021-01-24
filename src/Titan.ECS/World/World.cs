@@ -7,7 +7,7 @@ using Titan.ECS.Registry;
 
 namespace Titan.ECS.World
 {
-    internal class World : IWorld
+    internal sealed class World : IWorld
     {
         public uint Id { get; }
         public uint MaxEntities { get; }
@@ -38,7 +38,7 @@ namespace Titan.ECS.World
             _filterManager = entityFilterManager;
             
             _entityInfo = entityInfoRepository;
-            
+
             WorldContainer.Add(this);
         }
 
@@ -72,7 +72,7 @@ namespace Titan.ECS.World
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ComponentAdded<T>(Entity entity) where T : struct
+        private void ComponentAdded<T>(in Entity entity) where T : struct
         {
             ref var info = ref _entityInfo[entity];
             var componentId = ComponentId<T>.Id;

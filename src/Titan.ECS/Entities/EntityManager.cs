@@ -156,6 +156,19 @@ namespace Titan.ECS.Entities
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public bool TryGetParent(in Entity entity, out Entity parent)
+        {
+            var parentId = _relationships[entity.Id].ParentId;
+            if (parentId != 0)
+            {
+                parent = new(parentId, _worldId);
+                return true;
+            }
+            parent = default;
+            return false;
+        }
+
         public void Dispose()
         {
             if (_relationships != null)

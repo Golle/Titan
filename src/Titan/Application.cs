@@ -5,12 +5,17 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
+using Titan.ECS.Assets;
 using Titan.ECS.Systems.Dispatcher;
 using Titan.ECS.World;
+using Titan.EntitySystem;
+using Titan.EntitySystem.Assets;
+using Titan.EntitySystem.Components;
 using Titan.Graphics;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Resources;
 using Titan.Graphics.States;
+using Titan.Graphics.Textures;
 using Titan.Input;
 using Titan.IOC;
 using Titan.Windows;
@@ -32,6 +37,7 @@ namespace Titan
         private IStartup _startup;
         private IWorld _world;
         private SystemsDispatcher _dispatcher;
+        private IAssetsManager[] _managers; // TEMP
 
         public static Application Create(GameConfigurationBuilder configurationBuilder)
         {
@@ -58,13 +64,31 @@ namespace Titan
             _log = log;
             _container = container;
         }
-        
+
+
+        private static WorldBuilder DefaultWorldBuilder() => new WorldBuilder()
+            .WithComponent<Transform3D>()
+            .WithComponent<Transform2D>()
+            .WithComponent<Asset<Texture>>()
+            .WithComponent<Asset<MeshComponent>>()
+            .WithComponent<Texture>()
+            .WithComponent<MeshComponent>()
+            .WithSystem<Transform3DSystem>()
+            .WithAssetsManager<Texture2DAssetsManager>()
+            .WithAssetsManager<Model3DAssetsManager>()
+        ;
+            
+
         public void Run()
         {
             _log.Debug("Application starting");
 
             _log.Debug("Create and Configure the World");
-            (_world, _dispatcher) = _startup.ConfigureWorld(new WorldBuilder()).Build(_container);
+
+            
+            (_world, _dispatcher, _managers) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
+
+
 
             _startup.OnStart(_world);
             
@@ -83,11 +107,13 @@ namespace Titan
                 _eventQueue.Update(); // Make the last frame + new inputs avaialable in this frame
                 _inputHandler.Update();
 
-
                 {
                     // Currently only supports a single world
                     _world.Update();
-
+                    foreach (var assetManagers in _managers)
+                    {
+                        assetManagers.Update();
+                    }
                     _dispatcher.Execute(_workerPool);
                 }
                 

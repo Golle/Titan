@@ -5,7 +5,7 @@ using Titan.ECS.Entities;
 
 namespace Titan.ECS.Components
 {
-    public unsafe class EntityFilter : IEntityFilter, IDisposable
+    public sealed unsafe class EntityFilter : IEntityFilter, IDisposable
     {
         private Entity* _entities;
         private int* _indexers;

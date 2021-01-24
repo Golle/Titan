@@ -34,7 +34,7 @@ namespace Titan.Core.Threading
             LOGGER.Debug("Creating job queue with size {0}", configuration.MaxQueuedJobs);
 
             _maxJobs = (int) configuration.MaxQueuedJobs;
-            _jobs = new Job[configuration.MaxQueuedJobs];
+            _jobs = new Job[configuration.MaxQueuedJobs + 1]; // Index 0 will be invalid, so we create the array with one more element
             _jobQueue = new ConcurrentQueue<int>();
 
             _notifier = new Semaphore(0, (int) configuration.MaxQueuedJobs);
@@ -82,7 +82,7 @@ namespace Titan.Core.Threading
             Volatile.Write(ref job.State, JobState.Available);
 #pragma warning restore 420
 
-            handle = -1; // Invalidate the Handle
+            handle = default; // Invalidate the Handle
             static void ThrowException() => throw new InvalidOperationException($"{nameof(Reset)} can only be called on jobs with {nameof(Job.AutoReset)} set to false and that has been finished. Call {nameof(IsCompleted)} to check if the job has finished.");
         }
         
@@ -102,7 +102,7 @@ namespace Titan.Core.Threading
             _jobQueue.Enqueue(jobIndex);
             _notifier.Release();
             
-            return new(jobIndex);
+            return jobIndex;
         }
 
         private void RunWorker(object obj)
@@ -144,12 +144,13 @@ namespace Titan.Core.Threading
             while (maxIterations-- > 0)
             {
                 var current = _nextJob;
-                var index = Interlocked.CompareExchange(ref _nextJob, (current + 1) % _maxJobs, current);
+                var index = Interlocked.CompareExchange(ref _nextJob, (current + 1) % _maxJobs, current); 
                 // Some other thread updated the counter, do another lap
                 if (index != current)
                 {
                     continue;
                 }
+                index += 1; // Add 1 so we skip the invalid handle 0
 
                 var previousStatus = Interlocked.CompareExchange(ref _jobs[index].State, JobState.Waiting, JobState.Available);
                 // If the job is busy, loop again and try to find a new spot
@@ -189,9 +190,15 @@ namespace Titan.Core.Threading
                     worker.Thread.Join();
                 }
 
+                for (var i = 0; i < _jobs.Length; ++i)
+                {
+                    _jobs[i] = default;
+                }
+
                 _notifier.Dispose();
                 _workers = null;
                 _notifier = null;
+                _jobs = null;
             }
         }
 

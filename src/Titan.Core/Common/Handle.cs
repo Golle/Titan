@@ -16,6 +16,6 @@ namespace Titan.Core.Common
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Handle<T>(in int handle) => new(handle);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValid() => Value != -1;
+        public bool IsValid() => Value > 0;
     }
 }
