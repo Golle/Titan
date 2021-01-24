@@ -70,9 +70,14 @@ namespace Titan
             .WithComponent<Transform3D>()
             .WithComponent<Transform2D>()
             .WithComponent<Asset<Texture>>()
+            .WithComponent<Asset<MeshComponent>>()
             .WithComponent<Texture>()
+            .WithComponent<MeshComponent>()
             .WithSystem<Transform3DSystem>()
-            .WithAssetsManager<Texture2DAssetsManager>();
+            .WithAssetsManager<Texture2DAssetsManager>()
+            .WithAssetsManager<Model3DAssetsManager>()
+        ;
+            
 
         public void Run()
         {
@@ -102,15 +107,13 @@ namespace Titan
                 _eventQueue.Update(); // Make the last frame + new inputs avaialable in this frame
                 _inputHandler.Update();
 
-
                 {
                     // Currently only supports a single world
                     _world.Update();
-                    foreach (var assetTestInterface in _managers)
+                    foreach (var assetManagers in _managers)
                     {
-                        assetTestInterface.Update();
+                        assetManagers.Update();
                     }
-
                     _dispatcher.Execute(_workerPool);
                 }
                 

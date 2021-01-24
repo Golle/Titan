@@ -23,15 +23,17 @@ namespace Titan.Sandbox
         {
 
             var str = new []{ @"F:\Git\Titan\resources\textures\background.png", @"F:\Git\Titan\resources\textures\chain_texture.png", @"F:\Git\Titan\resources\textures\lion.png", };
+            var models = new []{ @"F:\Git\Titan\resources\models\sphere.dat", @"F:\Git\Titan\resources\models\sponza.dat" };
 
 
-            //for (var i = 0; i < ; ++i)
+            for (var i = 0; i < 2; ++i)
             {
                 var entity = world.CreateEntity();
                 entity.AddComponent<Transform3D>();
                 //entity.AddComponent<SandboxComponent>();
                 //entity.AddComponent<Transform2D>();
-                entity.AddManagedComponent(new Asset<Texture>(str[0]));
+                //entity.AddManagedComponent(new Asset<Texture>(str[0]));
+                entity.AddManagedComponent(new Asset<MeshComponent>(models[i]));
             }
 
 

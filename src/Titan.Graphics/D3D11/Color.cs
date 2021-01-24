@@ -21,12 +21,12 @@ namespace Titan.Graphics.D3D11
             A = a;
         }
 
-        public static readonly Color Red = new Color(1f, 0, 0);
-        public static readonly Color Green = new Color(0, 1f, 0);
-        public static readonly Color Blue = new Color(0, 0, 1f);
-        public static readonly Color White = new Color(1f, 1f, 1f);
-        public static readonly Color Black = new Color(0f, 0, 0);
-        public static readonly Color Zero = new Color(0f, 0, 0, 0);
+        public static readonly Color Red = new(1f, 0, 0);
+        public static readonly Color Green = new(0, 1f, 0);
+        public static readonly Color Blue = new(0, 0, 1f);
+        public static readonly Color White = new(1f, 1f, 1f);
+        public static readonly Color Black = new(0f, 0, 0);
+        public static readonly Color Zero = new(0f, 0, 0, 0);
 
         public static Color Parse(string value)
         {

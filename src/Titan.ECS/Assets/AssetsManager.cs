@@ -13,14 +13,14 @@ using Titan.ECS.World;
 
 namespace Titan.ECS.Assets
 {
-    public abstract class AssetsManager<T> : IAssetsManager, IDisposable where T : unmanaged
+    public abstract class AssetsManager<TComponent> : IAssetsManager, IDisposable where TComponent : unmanaged
     {
-        private static readonly ComponentId AssetId = ComponentId<Asset<T>>.Id;
+        private static readonly ComponentId AssetId = ComponentId<Asset<TComponent>>.Id;
 
         private readonly WorkerPool _workerPool;
         private readonly IEventManager _eventManager;
-        private readonly IManagedComponentPool<Asset<T>> _componentPool;
-        private readonly Dictionary<string, T> _loadedAssets = new();
+        private readonly IManagedComponentPool<Asset<TComponent>> _componentPool;
+        private readonly Dictionary<string, TComponent> _loadedAssets = new();
 
         private readonly AssetProgress[] _activeLoaders = new AssetProgress[100];
         private int _activeLoadersCount;
@@ -28,7 +28,7 @@ namespace Titan.ECS.Assets
         protected AssetsManager(WorkerPool workerPool, IWorld world, IEventManager eventManager)
         {
             _workerPool = workerPool;
-            _componentPool = world.GetManagedComponentPool<Asset<T>>();
+            _componentPool = world.GetManagedComponentPool<Asset<TComponent>>();
             _eventManager = eventManager;
         }
 
@@ -103,14 +103,9 @@ namespace Titan.ECS.Assets
             }
         }
 
-        protected abstract T Load(string identifier);
-        protected abstract void Release(in T asset);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual void OnLoaded(in T asset, in Entity entity)
-        {
-            entity.AddComponent(asset);
-        }
+        protected abstract TComponent Load(string identifier);
+        protected abstract void Release(in TComponent asset);
+        protected abstract void OnLoaded(in TComponent asset, in Entity entity);
 
         public void Dispose()
         {
@@ -124,7 +119,7 @@ namespace Titan.ECS.Assets
         {
             public string Identifier;
             public Handle<WorkerPool> Handle;
-            public T Asset;
+            public TComponent Asset;
             public List<Entity> WaitingEntities;
         }
     }
