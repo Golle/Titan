@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Titan.Windows.Win32.D3D11;
 
 using static Titan.Windows.Win32.WIC.WICPixelFormats;
@@ -10,7 +11,7 @@ namespace Titan.Graphics.Textures
 {
     internal class WICToDXGITranslationTable
     {
-        private static readonly IDictionary<Guid, DXGI_FORMAT> _table = new Dictionary<Guid, DXGI_FORMAT>
+        private static readonly Dictionary<Guid, DXGI_FORMAT> _table = new()
         {
             {GUID_WICPixelFormat128bppRGBAFloat, DXGI_FORMAT_R32G32B32A32_FLOAT},
 
@@ -45,6 +46,7 @@ namespace Titan.Graphics.Textures
 
         };
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DXGI_FORMAT Translate(in Guid guid) => _table.TryGetValue(guid, out var format) ? format : DXGI_FORMAT_UNKNOWN;
     }
 }

@@ -1,5 +1,6 @@
 using Titan.Graphics.Camera;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Images;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline;
@@ -18,7 +19,8 @@ namespace Titan.Graphics
         {
             container
                 .Register<GraphicsSystem>()
-                .Register<IGraphicsDevice, GraphicsDevice>()
+                .Register<IGraphicsDevice, D3D11GraphicsDevice>() // TODO: remove this, no need to have an interface for this device. All classes using it will be specific for D3D11
+                .Register<D3D11GraphicsDevice>()
                 
                 // Graphics pipeline
                 .Register<IGraphicsPipeline, GraphicsPipeline>()

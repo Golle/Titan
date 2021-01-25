@@ -1,3 +1,4 @@
+using Titan.Graphics.Images;
 using Titan.Graphics.Resources;
 using Titan.Windows.Win32.D3D11;
 

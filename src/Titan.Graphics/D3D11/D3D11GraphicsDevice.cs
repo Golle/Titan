@@ -7,7 +7,7 @@ using static Titan.Windows.Win32.D3D11.D3D11Common;
 
 namespace Titan.Graphics.D3D11
 {
-    public unsafe class GraphicsDevice : IGraphicsDevice
+    public unsafe class D3D11GraphicsDevice : IGraphicsDevice
     {
         private readonly IWindow _window;
         private ComPtr<ID3D11Device> _device;
@@ -16,7 +16,7 @@ namespace Titan.Graphics.D3D11
         public ID3D11Device* Ptr => _device.Get();
         public IDXGISwapChain* SwapChainPtr => _swapChain.Get();
         public ref readonly ComPtr<IDXGISwapChain> SwapChain => ref _swapChain;
-        public GraphicsDevice(IWindow window) => _window = window;
+        public D3D11GraphicsDevice(IWindow window) => _window = window;
         public void Initialize(uint refreshRate, bool debug = false)
         {
             var flags = debug ? 2u : 0u;

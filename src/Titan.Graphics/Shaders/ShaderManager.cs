@@ -48,7 +48,7 @@ namespace Titan.Graphics.Shaders
             {
                 throw new InvalidOperationException($"{nameof(ShaderManager)} has already been initialized.");
             }
-            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(ShaderManager)} with the wrong device.", nameof(graphicsDevice));
+            _device = graphicsDevice is D3D11GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(ShaderManager)} with the wrong device.", nameof(graphicsDevice));
             var memory = _memoryManager.GetMemoryChunk("Shaders");
             _memory = memory.Pointer;
             _maxHandles = memory.Count;

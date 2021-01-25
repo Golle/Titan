@@ -34,7 +34,7 @@ namespace Titan.Graphics.Resources
                 throw new InvalidOperationException($"{nameof(RenderTargetViewManager)} has already been initialized.");
             }
 
-            if (graphicsDevice is not GraphicsDevice device)
+            if (graphicsDevice is not D3D11GraphicsDevice device)
             {
                 throw new ArgumentException($"Trying to initialize a D3D11 {nameof(RenderTargetViewManager)} with the wrong device.", nameof(graphicsDevice));
             }

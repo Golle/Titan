@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
+using Titan.Graphics.Textures;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using Titan.Windows.Win32.WIC;
-
 using static Titan.Windows.Win32.Common;
 using static Titan.Windows.Win32.Native.CLSCTX;
 using static Titan.Windows.Win32.Native.GENERIC_RIGHTS;
@@ -12,7 +12,7 @@ using static Titan.Windows.Win32.WIC.WICBitmapDitherType;
 using static Titan.Windows.Win32.WIC.WICBitmapPaletteType;
 using static Titan.Windows.Win32.WIC.WICDecodeOptions;
 
-namespace Titan.Graphics.Textures
+namespace Titan.Graphics.Images
 {
     internal unsafe class ImagingFactory : IImagingFactory
     {
@@ -23,25 +23,25 @@ namespace Titan.Graphics.Textures
             fixed (Guid* clsid = &WICCLSID.CLSID_WICImagingFactory2)
             {
                 var riid = typeof(IWICImagingFactory).GUID;
-                CheckAndThrow(CoCreateInstance(clsid, null, CLSCTX_INPROC_SERVER, &riid, (void**)_factory.GetAddressOf()), "CoCreateInstance");
+                CheckAndThrow(CoCreateInstance(clsid, null, CLSCTX_INPROC_SERVER, &riid, (void**)_factory.GetAddressOf()), nameof(CoCreateInstance));
             }
         }
-        public IImage LoadImageFromFile(string filename)
+        public Image LoadImageFromFile(string filename)
         {
             using ComPtr<IWICBitmapDecoder> decoder = default;
             fixed (char* wzFilename = filename)
             {
-                CheckAndThrow(_factory.Get()->CreateDecoderFromFilename(wzFilename, null, (uint)GENERIC_READ, WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), "CreateDecoderFromFilename");
+                CheckAndThrow(_factory.Get()->CreateDecoderFromFilename(wzFilename, null, (uint)GENERIC_READ, WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), nameof(IWICImagingFactory.CreateDecoderFromFilename));
             }
 
             using ComPtr<IWICBitmapFrameDecode> frameDecode = default;
-            CheckAndThrow(decoder.Get()->GetFrame(0, frameDecode.GetAddressOf()), "GetFrame");
+            CheckAndThrow(decoder.Get()->GetFrame(0, frameDecode.GetAddressOf()), nameof(IWICBitmapDecoder.GetFrame));
 
             Guid pixelFormat;
-            CheckAndThrow(frameDecode.Get()->GetPixelFormat(&pixelFormat), "GetPixelFormat");
+            CheckAndThrow(frameDecode.Get()->GetPixelFormat(&pixelFormat), nameof(IWICBitmapFrameDecode.GetPixelFormat));
 
             uint height, width;
-            CheckAndThrow(frameDecode.Get()->GetSize(&width, &height), "GetSize");
+            CheckAndThrow(frameDecode.Get()->GetSize(&width, &height), nameof(IWICBitmapFrameDecode.GetSize));
 
             var dxgiFormat = WICToDXGITranslationTable.Translate(pixelFormat);
             if (dxgiFormat == DXGI_FORMAT.DXGI_FORMAT_UNKNOWN)
@@ -107,10 +107,10 @@ namespace Titan.Graphics.Textures
 
             var pixelFormatInfoGuid = typeof(IWICPixelFormatInfo).GUID;
             using ComPtr<IWICPixelFormatInfo> info = default;
-            CheckAndThrow(componentInfo.Get()->QueryInterface(&pixelFormatInfoGuid, (void**) info.GetAddressOf()), "QueryInterface");
+            CheckAndThrow(componentInfo.Get()->QueryInterface(&pixelFormatInfoGuid, (void**) info.GetAddressOf()), nameof(IWICComponentInfo.QueryInterface));
 
             uint bitsPerPixel;
-            CheckAndThrow(info.Get()->GetBitsPerPixel(&bitsPerPixel), "GetBitsPerPixel");
+            CheckAndThrow(info.Get()->GetBitsPerPixel(&bitsPerPixel), nameof(IWICPixelFormatInfo.GetBitsPerPixel));
             return bitsPerPixel;
         }
 

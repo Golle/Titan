@@ -26,7 +26,7 @@ namespace Titan.Graphics.States
 
         public void Initialize(IGraphicsDevice graphicsDevice)
         {
-            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(DepthStencilStateManager)} with the wrong device.", nameof(graphicsDevice));
+            _device = graphicsDevice is D3D11GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(DepthStencilStateManager)} with the wrong device.", nameof(graphicsDevice));
             var memory = _memoryManager.GetMemoryChunkValidated<DepthStencilState>("DepthStencilState");
             _states = memory.Pointer;
             _maxStates = memory.Count;

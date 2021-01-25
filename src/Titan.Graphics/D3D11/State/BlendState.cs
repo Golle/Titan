@@ -46,7 +46,7 @@ namespace Titan.Graphics.D3D11.State
             desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 
 
-            if (graphicsDevice is GraphicsDevice device)
+            if (graphicsDevice is D3D11GraphicsDevice device)
             {
                 CheckAndThrow(device.Ptr->CreateBlendState(&desc, _blendState.GetAddressOf()), "CreateBlendState");
             }
