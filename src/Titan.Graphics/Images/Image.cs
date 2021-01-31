@@ -1,9 +1,10 @@
+using System;
 using System.Runtime.InteropServices;
 using Titan.Windows.Win32.D3D11;
 
-namespace Titan.Graphics.Textures
+namespace Titan.Graphics.Images
 {
-    internal class Image : IImage
+    public class Image : IDisposable
     {
         public DXGI_FORMAT Format { get; }
         public uint Stride { get; }
@@ -25,16 +26,13 @@ namespace Titan.Graphics.Textures
         public uint GetBufferSize() => _imageSize;
 
         ~Image() => Dispose();
-        public void Dispose()
+        public unsafe void Dispose()
         {
-            unsafe
+            if (_buffer != null)
             {
-                if (_buffer != null)
-                {
-                    Marshal.FreeHGlobal((nint)_buffer);
-                    _buffer = null;
-                    _imageSize = 0;
-                }
+                Marshal.FreeHGlobal((nint)_buffer);
+                _buffer = null;
+                _imageSize = 0;
             }
         }
     }

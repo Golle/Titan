@@ -27,6 +27,7 @@ namespace Titan.Graphics.D3D11
         public static readonly Color White = new(1f, 1f, 1f);
         public static readonly Color Black = new(0f, 0, 0);
         public static readonly Color Zero = new(0f, 0, 0, 0);
+        public static readonly Color Magenta = new(1f, 0, 1f);
 
         public static Color Parse(string value)
         {

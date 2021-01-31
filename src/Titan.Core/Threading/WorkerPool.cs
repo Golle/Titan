@@ -9,7 +9,7 @@ using Titan.Core.Logging;
 namespace Titan.Core.Threading
 {
     public record WorkerPoolConfiguration(uint MaxQueuedJobs, uint NumberOfWorkers);
-    
+
     public sealed class WorkerPool : IDisposable
     {
         private WorkerInfo[] _workers;

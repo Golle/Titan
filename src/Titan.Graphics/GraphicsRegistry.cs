@@ -1,5 +1,8 @@
 using Titan.Graphics.Camera;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Shaders;
+using Titan.Graphics.D3D11.Textures;
+using Titan.Graphics.Images;
 using Titan.Graphics.Materials;
 using Titan.Graphics.Meshes;
 using Titan.Graphics.Pipeline;
@@ -8,6 +11,7 @@ using Titan.Graphics.Resources;
 using Titan.Graphics.Shaders;
 using Titan.Graphics.States;
 using Titan.Graphics.Textures;
+using Titan.Graphics.Textures.NewTest;
 using Titan.IOC;
 
 namespace Titan.Graphics
@@ -18,7 +22,11 @@ namespace Titan.Graphics
         {
             container
                 .Register<GraphicsSystem>()
-                .Register<IGraphicsDevice, GraphicsDevice>()
+                .Register<IGraphicsDevice, D3D11GraphicsDevice>() // TODO: remove this, no need to have an interface for this device. All classes using it will be specific for D3D11
+                //.Register<D3D11GraphicsDevice>() // Wont work
+                .Register<TextureFactory>()
+                .Register<Texture2DFactory>()
+                .Register<ShaderResourceViewFactory>()
                 
                 // Graphics pipeline
                 .Register<IGraphicsPipeline, GraphicsPipeline>()
@@ -40,7 +48,7 @@ namespace Titan.Graphics
                 .Register<IShaderManager, ShaderManager>()
                 
                 // Image loading
-                .Register<IImagingFactory, ImagingFactory>()
+                .Register<IImageFactory, WICImageFactory>(dispose: true)
                 .Register<ITextureLoader, TextureLoader>()
 
                 // Model loading

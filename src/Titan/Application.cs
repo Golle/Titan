@@ -82,16 +82,12 @@ namespace Titan
         public void Run()
         {
             _log.Debug("Application starting");
-
             _log.Debug("Create and Configure the World");
-
             
             (_world, _dispatcher, _managers) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
 
-
-
             _startup.OnStart(_world);
-            
+
             StartMainLoop();
             
             _startup.OnStop(_world);

@@ -31,7 +31,7 @@ namespace Titan.Graphics.Resources
             {
                 throw new InvalidOperationException($"{nameof(ShaderResourceViewManager)} has already been initialized.");
             }
-            _device = graphicsDevice is GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(ShaderResourceViewManager)} with the wrong device.", nameof(graphicsDevice));
+            _device = graphicsDevice is D3D11GraphicsDevice device ? new ComPtr<ID3D11Device>(device.Ptr) : throw new ArgumentException($"Trying to initialize a D3D11 {nameof(ShaderResourceViewManager)} with the wrong device.", nameof(graphicsDevice));
             var memory = _memoryManager.GetMemoryChunkValidated<ShaderResourceView>("ShaderResourceView");
             _resources = memory.Pointer;
             _maxResources = memory.Count;
