@@ -10,6 +10,8 @@ using Titan.ECS.Systems.Dispatcher;
 using Titan.ECS.World;
 using Titan.EntitySystem;
 using Titan.EntitySystem.Components;
+using Titan.GraphicsV2;
+using Titan.GraphicsV2.D3D11;
 using Titan.Input;
 using Titan.IOC;
 using Titan.Windows;
@@ -22,7 +24,7 @@ namespace Titan
         private readonly ILog _log;
 
         private readonly IWindow _window;
-        //private readonly GraphicsSystem _graphicsSystem;
+        private readonly GraphicsSystem _graphicsSystem;
         private readonly IEventQueue _eventQueue;
         private readonly IMemoryManager _memoryManager;
         private readonly IInputHandler _inputHandler;
@@ -50,7 +52,7 @@ namespace Titan
         private Application(IWindow window, /*GraphicsSystem graphicsSystem,*/ IEventQueue eventQueue, IMemoryManager memoryManager, IInputHandler inputHandler, WorkerPool workerPool, ILog log, IContainer container)
         {
             _window = window;
-            //_graphicsSystem = graphicsSystem;
+            _graphicsSystem = new GraphicsSystem();
             _eventQueue = eventQueue;
             _memoryManager = memoryManager;
             _inputHandler = inputHandler;
@@ -142,6 +144,7 @@ namespace Titan
             _window.Initialize((int) configuration.DisplayConfiguration.Width, (int) configuration.DisplayConfiguration.Height, configuration.DisplayConfiguration.Title);
 
             LOGGER.Debug("Initialize the Graphics System");
+            _graphicsSystem.Initialize(new DeviceConfiguration(_window.Handle, (uint) _window.Width, (uint) _window.Height, 144, true, true));
             //_graphicsSystem.Initialize(configuration.AssetsDirectory.Path, configuration.DisplayConfiguration.RefreshRate, configuration.PipelineConfiguration, true);
 
             _startup = (IStartup)_container.CreateInstance(configuration.Startup);
@@ -169,7 +172,7 @@ namespace Titan
 
         public void Dispose()
         {
-            //_graphicsSystem?.Dispose();
+            _graphicsSystem?.Dispose();
             _window?.Dispose();
             _container.Dispose();
             _memoryManager.Dispose();
