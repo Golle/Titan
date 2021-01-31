@@ -8,21 +8,21 @@ namespace Titan.Graphics.Textures.NewTest
 {
     internal class TextureFactory
     {
-        private readonly IImagingFactory _imagingFactory;
+        private readonly IImageFactory _imageFactory;
         private readonly Texture2DFactory _texture2DFactory;
         private readonly ShaderResourceViewFactory _shaderResourceViewFactory;
-        public TextureFactory(IImagingFactory imagingFactory, Texture2DFactory texture2DFactory, ShaderResourceViewFactory shaderResourceViewFactory)
+        public TextureFactory(IImageFactory imageFactory, Texture2DFactory texture2DFactory, ShaderResourceViewFactory shaderResourceViewFactory)
         {
-            _imagingFactory = imagingFactory;
+            _imageFactory = imageFactory;
             _texture2DFactory = texture2DFactory;
             _shaderResourceViewFactory = shaderResourceViewFactory;
         }
 
         internal unsafe Texture1 CreateFromFile(string filename)
         {
-            using var image = _imagingFactory.LoadImageFromFile(filename);
+            using var image = _imageFactory.LoadImageFromFile(filename);
             var texture2D = _texture2DFactory.Create(image.Width, image.Height, image.Format, image.GetBuffer(), image.Stride, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-            var shaderResource = _shaderResourceViewFactory.Create((ID3D11Resource*) texture2D.Resource, image.Format);
+            var shaderResource = _shaderResourceViewFactory.Create(texture2D, image.Format);
             return new Texture1(shaderResource, texture2D);
         }
 
@@ -32,7 +32,7 @@ namespace Titan.Graphics.Textures.NewTest
             {
                 const DXGI_FORMAT format = DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT;
                 var texture2D = _texture2DFactory.Create(1, 1, format, pColor, (uint) sizeof(Color), D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-                var shaderResource = _shaderResourceViewFactory.Create((ID3D11Resource*) texture2D.Resource, format);
+                var shaderResource = _shaderResourceViewFactory.Create(texture2D, format);
                 return new Texture1(shaderResource, texture2D);
             }
         }

@@ -6,20 +6,20 @@ namespace Titan.Graphics.Textures
 {
     internal class TextureLoader : ITextureLoader
     {
-        private readonly IImagingFactory _imagingFactory;
+        private readonly IImageFactory _imageFactory;
         private readonly ITexture2DManager _texture2DManager;
         private readonly IShaderResourceViewManager _shaderResourceViewManager;
 
-        public TextureLoader(IImagingFactory imagingFactory, ITexture2DManager texture2DManager, IShaderResourceViewManager shaderResourceViewManager)
+        public TextureLoader(IImageFactory imageFactory, ITexture2DManager texture2DManager, IShaderResourceViewManager shaderResourceViewManager)
         {
-            _imagingFactory = imagingFactory;
+            _imageFactory = imageFactory;
             _texture2DManager = texture2DManager;
             _shaderResourceViewManager = shaderResourceViewManager;
         }
 
         public unsafe Texture Load(string filename)
         {
-            using var image = _imagingFactory.LoadImageFromFile(filename);
+            using var image = _imageFactory.LoadImageFromFile(filename);
             var textureHandle = _texture2DManager.CreateTexture(image.Width, image.Height, image.Format, image.GetBuffer(), image.Stride, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
             
             ref readonly var texture = ref _texture2DManager[textureHandle];

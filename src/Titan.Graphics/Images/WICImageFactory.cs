@@ -11,14 +11,15 @@ using static Titan.Windows.Win32.Native.Ole32;
 using static Titan.Windows.Win32.WIC.WICBitmapDitherType;
 using static Titan.Windows.Win32.WIC.WICBitmapPaletteType;
 using static Titan.Windows.Win32.WIC.WICDecodeOptions;
+// ReSharper disable InconsistentNaming
 
 namespace Titan.Graphics.Images
 {
-    internal unsafe class ImagingFactory : IImagingFactory
+    internal unsafe class WICImageFactory : IImageFactory, IDisposable
     {
         private ComPtr<IWICImagingFactory> _factory;
 
-        public ImagingFactory()
+        public WICImageFactory()
         {
             fixed (Guid* clsid = &WICCLSID.CLSID_WICImagingFactory2)
             {
@@ -26,6 +27,7 @@ namespace Titan.Graphics.Images
                 CheckAndThrow(CoCreateInstance(clsid, null, CLSCTX_INPROC_SERVER, &riid, (void**)_factory.GetAddressOf()), nameof(CoCreateInstance));
             }
         }
+
         public Image LoadImageFromFile(string filename)
         {
             using ComPtr<IWICBitmapDecoder> decoder = default;

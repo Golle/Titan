@@ -1,8 +1,6 @@
-using System;
-
 namespace Titan.Graphics.Images
 {
-    public interface IImagingFactory : IDisposable
+    public interface IImageFactory
     {
         Image LoadImageFromFile(string filename);
     }

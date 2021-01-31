@@ -48,7 +48,7 @@ namespace Titan.Graphics
                 .Register<IShaderManager, ShaderManager>()
                 
                 // Image loading
-                .Register<IImagingFactory, ImagingFactory>()
+                .Register<IImageFactory, WICImageFactory>(dispose: true)
                 .Register<ITextureLoader, TextureLoader>()
 
                 // Model loading
