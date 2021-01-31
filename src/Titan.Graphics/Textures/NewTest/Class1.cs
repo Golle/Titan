@@ -28,11 +28,12 @@ namespace Titan.Graphics.Textures.NewTest
             _materialsLoader = materialsLoader;
         }
 
-        protected override Material[] OnLoad(string identifier)
+        protected override Material1[] OnLoad(string identifier)
         {
             var configuration = _materialsLoader.LoadMaterials(identifier);
+            return null;
 
-            
+
         }
     }
 
