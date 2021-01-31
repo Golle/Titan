@@ -19,5 +19,9 @@
     </AssemblyAttribute>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="GameLoop\" />
+  </ItemGroup>
+
 
 </Project>
