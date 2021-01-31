@@ -6,7 +6,7 @@ namespace Titan.Core.Common
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     public readonly struct Handle<T>
     {
-        public readonly int Value;
+        public readonly int Value; // TODO: test difference between using pack 4 vs pack 8 (8 is default, so this struct will take up 8 bytes of memory even though it's just an int.
         public Handle(int value)
         {
             Value = value;
