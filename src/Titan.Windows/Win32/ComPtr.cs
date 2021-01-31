@@ -21,6 +21,9 @@ namespace Titan.Windows.Win32
             InternalAddRef();
         }
 
+
+        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly T* Get() => _ptr;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,8 +64,10 @@ namespace Titan.Windows.Win32
                 _ptr = null;
             }
         }
-
-
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator T*(in ComPtr<T> p) => p._ptr;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator T**(in ComPtr<T> p) => p.GetAddressOf();
     }
 }
