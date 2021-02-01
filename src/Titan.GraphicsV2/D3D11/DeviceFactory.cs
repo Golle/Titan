@@ -46,5 +46,10 @@ namespace Titan.GraphicsV2.D3D11
             LOGGER.Debug("D3D11 Device Created");
             return (new Device(device, context), new Swapchain(swapChain, configuration.VSync));
         }
+
+        ~DeviceFactory()
+        {
+            LOGGER.Debug("Device factory desTRoryed!");
+        }
     }
 }

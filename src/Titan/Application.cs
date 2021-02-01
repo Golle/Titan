@@ -49,10 +49,10 @@ namespace Titan
             return application;
         }
         
-        private Application(IWindow window, /*GraphicsSystem graphicsSystem,*/ IEventQueue eventQueue, IMemoryManager memoryManager, IInputHandler inputHandler, WorkerPool workerPool, ILog log, IContainer container)
+        private Application(IWindow window, GraphicsSystem graphicsSystem, IEventQueue eventQueue, IMemoryManager memoryManager, IInputHandler inputHandler, WorkerPool workerPool, ILog log, IContainer container)
         {
             _window = window;
-            _graphicsSystem = new GraphicsSystem();
+            _graphicsSystem = graphicsSystem;
             _eventQueue = eventQueue;
             _memoryManager = memoryManager;
             _inputHandler = inputHandler;
@@ -98,7 +98,6 @@ namespace Titan
             {
                 _eventQueue.Update(); // Make the last frame + new inputs avaialable in this frame
                 _inputHandler.Update();
-
                 {
                     // Currently only supports a single world
                     _world.Update();
@@ -108,9 +107,8 @@ namespace Titan
                     }
                     _dispatcher.Execute(_workerPool);
                 }
-                
                     
-                //_graphicsSystem.RenderFrame();
+                _graphicsSystem.RenderFrame();
                 
                 // Temp code to see FPS
                 frames++;

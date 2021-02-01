@@ -10,7 +10,7 @@ namespace Titan.IOC
         TTypeToResolve CreateInstance<TTypeToResolve>();
         object CreateInstance(Type type);
         TTypeToResolve GetInstance<TTypeToResolve>();
-        IContainer RegisterSingleton<TTypeToResolve>(TTypeToResolve instance);
+        IContainer RegisterSingleton<TTypeToResolve>(TTypeToResolve instance, bool dispose = false);
         object GetInstance(Type type);
         IContainer AddRegistry<T>() where T : IRegistry;
         IEnumerable<T> GetAll<T>();

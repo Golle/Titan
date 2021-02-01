@@ -12,6 +12,7 @@ namespace Titan
             .AddRegistry<CoreRegistry>()
             .AddRegistry<WindowsRegistry>()
             .AddRegistry<GraphicsRegistry>()
+            .AddRegistry<Titan.GraphicsV2.GraphicsRegistry>()
         
         
             .Register<IInputHandler, InputHandler>()
