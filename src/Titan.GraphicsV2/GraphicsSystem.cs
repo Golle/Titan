@@ -46,6 +46,14 @@ namespace Titan.GraphicsV2
                 rtv1.View->Release();
                 rtv.View->Release();
 
+                _container.CreateInstance<ShaderResourceViewFactory>()
+                    .Create(texture)
+                    .View->Release();
+
+                _container.CreateInstance<ShaderResourceViewFactory>()
+                    .Create(texture.AsResource(), texture.Format)
+                    .View->Release();
+
                 texture.AsPtr()->Release();
             }
             
