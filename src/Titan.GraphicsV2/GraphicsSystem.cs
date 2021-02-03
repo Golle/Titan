@@ -54,6 +54,12 @@ namespace Titan.GraphicsV2
                     .Create(texture.AsResource(), texture.Format)
                     .View->Release();
 
+
+                _container
+                    .CreateInstance<BufferFactory>()
+                    .Create<uint>(100, null, D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER)
+                    .AsPointer()->Release();
+
                 texture.AsPtr()->Release();
             }
             
