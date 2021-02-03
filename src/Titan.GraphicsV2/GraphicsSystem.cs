@@ -27,8 +27,9 @@ namespace Titan.GraphicsV2
                 .RegisterSingleton(_device, dispose: true)
                 .RegisterSingleton(_swapchain, dispose: true);
 
-            _backbuffer = _container
-                .CreateInstance<RenderTargetFactory>()
+            var renderTargetFactory = _container.CreateInstance<RenderTargetViewFactory>();
+            
+            _backbuffer = renderTargetFactory
                 .CreateBackbuffer();
 
 
@@ -36,7 +37,15 @@ namespace Titan.GraphicsV2
             {
                 var texture = _container
                     .CreateInstance<Texture2DFactory>()
-                    .Create(100, 100, DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM);
+                    .Create(100, 100, DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM, bindFlag: D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+
+                var rtv = renderTargetFactory
+                    .Create(texture);
+                var rtv1 = renderTargetFactory.Create(texture.AsResource(), DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM);
+
+                rtv1.View->Release();
+                rtv.View->Release();
+
                 texture.AsPtr()->Release();
             }
             

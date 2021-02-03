@@ -12,7 +12,6 @@ namespace Titan.GraphicsV2.D3D11
             _device = device;
         }
 
-
         public Texture2D Create(uint width, uint height, DXGI_FORMAT format, void* buffer = null, uint stride = 0, D3D11_BIND_FLAG bindFlag = default)
         {
             var desc = new D3D11_TEXTURE2D_DESC
