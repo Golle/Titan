@@ -70,6 +70,14 @@ namespace Titan.GraphicsV2
                         .AsPointer()
                     ->Release();
 
+                _container.CreateInstance<ContextFactory>()
+                    .CreateDeferredContext()
+                    .Dispose();
+
+                _container.CreateInstance<ContextFactory>()
+                    .CreateImmediateContext()
+                    .Dispose();
+
                 texture2.AsPtr()->Release();
                 texture.AsPtr()->Release();
             }
