@@ -54,12 +54,23 @@ namespace Titan.GraphicsV2
                     .Create(texture.AsResource(), texture.Format)
                     .View->Release();
 
-
+                var p = stackalloc uint[10];
                 _container
                     .CreateInstance<BufferFactory>()
-                    .Create<uint>(100, null, D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER)
+                    .Create<uint>(1000, p, D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER)
                     .AsPointer()->Release();
 
+
+                var texture2 = _container
+                    .CreateInstance<Texture2DFactory>()
+                    .Create(100, 100, DXGI_FORMAT.DXGI_FORMAT_R32_TYPELESS, bindFlag: D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+
+                _container.CreateInstance<DepthStencilViewFactory>()
+                        .Create(texture2, DXGI_FORMAT.DXGI_FORMAT_D32_FLOAT)
+                        .AsPointer()
+                    ->Release();
+
+                texture2.AsPtr()->Release();
                 texture.AsPtr()->Release();
             }
             
