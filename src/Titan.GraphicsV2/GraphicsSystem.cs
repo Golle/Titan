@@ -1,6 +1,7 @@
 using System;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Shaders;
+using Titan.GraphicsV2.Resources;
 using Titan.IOC;
 using Titan.Windows.Win32.D3D11;
 
@@ -98,8 +99,13 @@ namespace Titan.GraphicsV2
                 _container.CreateInstance<ShaderFactory>()
                     .CreatePixelShader(pShader)
                     .Release();
+                var la = new[] {new InputLayoutDescriptor("POSITION", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT), new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT), new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT)};
+                _container.GetInstance<ShaderProgramHandler>()
+                    .Load(new ShaderProgramDescriptor("apa", new VertexShaderDescriptor(@"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl"), new PixelShaderDescriptor(@"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl"), la));
 
-                layout.Layout->Release();
+
+
+                layout.Release();
                 vShader.Release();
                 pShader.Release();
 

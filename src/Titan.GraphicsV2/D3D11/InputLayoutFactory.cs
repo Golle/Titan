@@ -9,7 +9,7 @@ using static Titan.Windows.Win32.D3D11.DXGI_FORMAT;
 
 namespace Titan.GraphicsV2.D3D11
 {
-    internal record InputLayoutDescriptor(string Name, DXGI_FORMAT Format, uint Slot = 0, D3D11_INPUT_CLASSIFICATION Classification = D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_VERTEX_DATA);
+    public record InputLayoutDescriptor(string Name, DXGI_FORMAT Format, uint Slot = 0, D3D11_INPUT_CLASSIFICATION Classification = D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_VERTEX_DATA);
 
     internal unsafe class InputLayoutFactory
     {
