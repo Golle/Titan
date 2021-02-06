@@ -18,10 +18,9 @@ namespace Titan.GraphicsV2.D3D11
 
         internal Context CreateDeferredContext(uint flags = 0u)
         {
-            ID3D11DeviceContext* deferredContext;
-            Common.CheckAndThrow(_device.Get()->CreateDeferredContext(flags, &deferredContext), nameof(ID3D11Device.CreateDeferredContext));
-
-            return new(deferredContext);
+            using var deferredContext = new ComPtr<ID3D11DeviceContext>();
+            Common.CheckAndThrow(_device.Get()->CreateDeferredContext(flags, deferredContext.GetAddressOf()), nameof(ID3D11Device.CreateDeferredContext));
+            return new(deferredContext.Get());
         }
 
     }

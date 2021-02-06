@@ -13,7 +13,6 @@ namespace Titan.GraphicsV2.D3D11
             _context = new ComPtr<ID3D11DeviceContext>(context);
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Draw(uint vertexCount, uint startVertexLocation) => _context.Get()->Draw(vertexCount, startVertexLocation);
 

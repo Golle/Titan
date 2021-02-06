@@ -7,14 +7,11 @@ namespace Titan.GraphicsV2.D3D11
     internal unsafe class BufferFactory
     {
         private readonly Device _device;
-
-
         public BufferFactory(Device device)
         {
             _device = device;
         }
-
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Buffer Create<T>(uint count, void* initialData, D3D11_USAGE usage, D3D11_CPU_ACCESS_FLAG cpuAccessFlags, D3D11_BIND_FLAG bindFlags, D3D11_RESOURCE_MISC_FLAG miscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED) where T : unmanaged 
             => Create(count, (uint) sizeof(T), initialData, usage, cpuAccessFlags, bindFlags, miscFlags);

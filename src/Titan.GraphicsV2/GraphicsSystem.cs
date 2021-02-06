@@ -1,5 +1,6 @@
 using System;
 using Titan.GraphicsV2.D3D11;
+using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.IOC;
 using Titan.Windows.Win32.D3D11;
 
@@ -77,6 +78,33 @@ namespace Titan.GraphicsV2
                 _container.CreateInstance<ContextFactory>()
                     .CreateImmediateContext()
                     .Dispose();
+
+                var shaderCompiler = _container.CreateInstance<ShaderCompiler>();
+                var vShader = shaderCompiler
+                    .CompileFromFile(@"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl", "main", "vs_5_0")
+                    ;
+                var pShader = shaderCompiler
+                        .CompileFromFile(@"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl", "main", "ps_5_0")
+                    ;
+
+                var layout = _container.CreateInstance<InputLayoutFactory>()
+                    .Create(vShader, new[] { new InputLayoutDescriptor("POSITION", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT), new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT), new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT) })
+                    ;
+
+                _container.CreateInstance<ShaderFactory>()
+                    .CreateVertexShader(vShader)
+                    .Release();
+
+                _container.CreateInstance<ShaderFactory>()
+                    .CreatePixelShader(pShader)
+                    .Release();
+
+                layout.Layout->Release();
+                vShader.Release();
+                pShader.Release();
+
+
+
 
                 texture2.AsPtr()->Release();
                 texture.AsPtr()->Release();

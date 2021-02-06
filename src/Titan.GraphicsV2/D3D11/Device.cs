@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 
