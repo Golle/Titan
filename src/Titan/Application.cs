@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Titan.Core;
+using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
@@ -35,18 +36,31 @@ namespace Titan
         private SystemsDispatcher _dispatcher;
         private IAssetsManager[] _managers; // TEMP
 
-        public static Application Create(GameConfigurationBuilder configurationBuilder)
+        public static Application Create(AssetsDirectory assetsDirectory, GameConfigurationBuilder configurationBuilder)
         {
             var container = Bootstrapper.CreateContainer();
-            var loader = container.CreateInstance<ConfigurationFileLoader>();
+            try
+            {
+                container
+                    .RegisterSingleton(container)
+                    .GetInstance<FileSystem>()
+                    .Initialize(new FileSystemConfiguration(assetsDirectory.Path, true));
 
-            var configuration = configurationBuilder.Build(loader);
-            
-            container.RegisterSingleton(container);
-            
-            var application = container.CreateInstance<Application>();
-            application.Initialize(configuration);
-            return application;
+                var loader = container
+                    .CreateInstance<ConfigurationFileLoader>();
+
+                var configuration = configurationBuilder
+                    .Build(loader);
+
+                return container
+                    .CreateInstance<Application>()
+                    .Initialize(configuration);
+            }
+            catch
+            {
+                container.Dispose();
+                throw;
+            }
         }
         
         private Application(IWindow window, GraphicsSystem graphicsSystem, IEventQueue eventQueue, IMemoryManager memoryManager, IInputHandler inputHandler, WorkerPool workerPool, ILog log, IContainer container)
@@ -122,10 +136,10 @@ namespace Titan
             }
         }
 
-        private void Initialize(GameConfiguration configuration)
+        private Application Initialize(GameConfiguration configuration)
         {
-            _container.RegisterSingleton(new TitanConfiguration(configuration.AssetsDirectory.Path, 144, 1/60f, true)); // TODO: not sure if we want this
-            
+            _container.RegisterSingleton(new TitanConfiguration(null, 144, 1/60f, true)); // TODO: not sure if we want this
+
             // Use default logger for now
             LOGGER.InitializeLogger(_log);
             LOGGER.Debug("LOGGER initialized with type: {0}", _log.GetType().Name);
@@ -146,6 +160,8 @@ namespace Titan
             //_graphicsSystem.Initialize(configuration.AssetsDirectory.Path, configuration.DisplayConfiguration.RefreshRate, configuration.PipelineConfiguration, true);
 
             _startup = (IStartup)_container.CreateInstance(configuration.Startup);
+            
+            return this;
         }
         
         private unsafe void InitMemoryManager()
