@@ -27,6 +27,30 @@ namespace Titan.GraphicsV2.D3D11.Shaders
          *
          */
 
+        internal CompiledShader Compile(string source, string entrypoint, string shaderVersion)
+        {
+            ID3DBlob* shader;
+            fixed (char* pSource = source)
+            fixed (byte* pEntrypoint = entrypoint.AsBytes())
+            fixed (byte* pTarget = shaderVersion.AsBytes())
+            {
+                ID3DBlob* error = null;
+                var result = D3DCompile(pSource, (nuint) source.Length, null, null, null, (sbyte*) pEntrypoint, (sbyte*) pTarget, 0, 0, &shader, &error);
+                if (FAILED(result) && error != null)
+                {
+                    LOGGER.Debug(new string((char*)error->GetBufferPointer(), 0, (int)error->GetBufferSize()));
+                }
+
+                if (error != null)
+                {
+                    error->Release();
+                }
+                CheckAndThrow(result, nameof(D3DCompileFromFile));
+            }
+
+            return new CompiledShader(shader);
+        }
+
 
         internal CompiledShader CompileFromFile(string filename, string entrypoint, string shaderVersion)
         {
@@ -41,7 +65,7 @@ namespace Titan.GraphicsV2.D3D11.Shaders
                 {
                     LOGGER.Debug(new string((char*) error->GetBufferPointer(), 0, (int) error->GetBufferSize()));
                 }
-                if( error != null)error->Release();
+                if( error != null) error->Release();
                 CheckAndThrow(result, nameof(D3DCompileFromFile));
             }
             return new CompiledShader(shader);
