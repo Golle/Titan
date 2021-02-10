@@ -27,5 +27,7 @@ namespace Titan.GraphicsV2.D3D11
         public static implicit operator ID3D11Resource*(in Texture2D texture) => (ID3D11Resource*) texture._texture;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator ID3D11Texture2D*(in Texture2D texture) => texture._texture;
+
+        public void Release() => _texture->Release();
     }
 }

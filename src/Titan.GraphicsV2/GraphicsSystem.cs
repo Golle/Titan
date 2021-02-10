@@ -1,6 +1,7 @@
 using System;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Shaders;
+using Titan.GraphicsV2.Rendering;
 using Titan.GraphicsV2.Resources;
 using Titan.IOC;
 using Titan.Windows.Win32.D3D11;
@@ -45,16 +46,16 @@ namespace Titan.GraphicsV2
                     .Create(texture);
                 var rtv1 = renderTargetFactory.Create(texture.AsResource(), DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM);
 
-                rtv1.View->Release();
-                rtv.View->Release();
+                rtv1.Release();
+                rtv.Release();
 
                 _container.CreateInstance<ShaderResourceViewFactory>()
                     .Create(texture)
-                    .View->Release();
+                    .Release();
 
                 _container.CreateInstance<ShaderResourceViewFactory>()
                     .Create(texture.AsResource(), texture.Format)
-                    .View->Release();
+                    .Release();
 
                 var p = stackalloc uint[10];
                 _container
@@ -100,6 +101,7 @@ namespace Titan.GraphicsV2
                     .CreatePixelShader(pShader)
                     .Release();
                 var la = new[] {new InputLayoutDescriptor("POSITION", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT), new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT), new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT)};
+                
                 _container.GetInstance<ShaderProgramHandler>()
                     .Load(new ShaderProgramDescriptor("apa", new VertexShaderDescriptor(@"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl"), new PixelShaderDescriptor(@"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl"), la));
 
@@ -114,6 +116,10 @@ namespace Titan.GraphicsV2
 
                 texture2.AsPtr()->Release();
                 texture.AsPtr()->Release();
+
+
+                _container.CreateInstance<RenderingPipeline>()
+                    .Initialize();
             }
             
         }
@@ -124,7 +130,7 @@ namespace Titan.GraphicsV2
             unsafe
             {
                 var color = new Color(1, 0, 1, 1);
-                _device.GetContext()->ClearRenderTargetView(_backbuffer.View, (float*) &color);
+                _device.GetContext()->ClearRenderTargetView(_backbuffer, (float*) &color);
             }
             _swapchain.Present();
         }
@@ -133,7 +139,7 @@ namespace Titan.GraphicsV2
         {
             unsafe
             {
-                _backbuffer.View->Release();
+                _backbuffer.Release();
             }
 
             _swapchain.Dispose();
