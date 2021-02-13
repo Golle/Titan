@@ -15,7 +15,6 @@ namespace Titan.GraphicsV2
 
                 .Register<ShaderCompiler>()
                 .Register<ShaderFactory>()
-                .Register<ShaderProgramHandler>()
                 .Register<InputLayoutFactory>()
 
 
@@ -24,6 +23,9 @@ namespace Titan.GraphicsV2
                 .Register<RenderTargetViewFactory>()
                 .Register<Texture2DFactory>()
                 .Register<DepthStencilViewFactory>()
+                .Register<RenderPassFactory>()
+                .Register<RenderPipelineFactory>()
+                .Register<ShaderManager>()
                 ;
         }
     }

@@ -7,14 +7,6 @@ using Titan.Windows.Win32.D3D11;
 namespace Titan.GraphicsV2.Textures
 {
 
-    struct Material
-    {
-
-        public Texture Texture;
-        public ShaderProgram Shader;
-    }
-
-  
     
     internal struct Texture
     {
@@ -25,7 +17,6 @@ namespace Titan.GraphicsV2.Textures
     internal struct Model
     {
         public Mesh Mesh;
-        public Material Material;
         
     }
 

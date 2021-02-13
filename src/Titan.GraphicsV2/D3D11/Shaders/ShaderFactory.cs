@@ -12,18 +12,19 @@ namespace Titan.GraphicsV2.D3D11.Shaders
             _device = device;
         }
 
-        internal VertexShader CreateVertexShader(in CompiledShader compiledShader)
+        internal VertexShader CreateVertexShader(in CompiledShader compiledShader) => new (CreateVertexShaderP(compiledShader));
+        internal ID3D11VertexShader* CreateVertexShaderP(in CompiledShader compiledShader)
         {
             ID3D11VertexShader* vertexShader;
             CheckAndThrow(_device.Get()->CreateVertexShader(compiledShader.GetBuffer(), compiledShader.GetSize(), null, &vertexShader), nameof(ID3D11Device.CreateVertexShader));
-            return new (vertexShader);
+            return vertexShader;
         }
-
-        internal PixelShader CreatePixelShader(in CompiledShader compiledShader)
+        internal PixelShader CreatePixelShader(in CompiledShader compiledShader) => new(CreatePixelShaderP(compiledShader));
+        internal ID3D11PixelShader* CreatePixelShaderP(in CompiledShader compiledShader)
         {
             ID3D11PixelShader* pixelShader;
             CheckAndThrow(_device.Get()->CreatePixelShader(compiledShader.GetBuffer(), compiledShader.GetSize(), null, &pixelShader), nameof(ID3D11Device.CreatePixelShader));
-            return new(pixelShader);
+            return pixelShader;
         }
     }
 }

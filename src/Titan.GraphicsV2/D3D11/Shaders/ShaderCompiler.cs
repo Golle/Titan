@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Windows.Win32.D3D11;
@@ -30,7 +31,7 @@ namespace Titan.GraphicsV2.D3D11.Shaders
         internal CompiledShader Compile(string source, string entrypoint, string shaderVersion)
         {
             ID3DBlob* shader;
-            fixed (char* pSource = source)
+            fixed (byte* pSource = source.AsBytes())
             fixed (byte* pEntrypoint = entrypoint.AsBytes())
             fixed (byte* pTarget = shaderVersion.AsBytes())
             {
@@ -38,14 +39,15 @@ namespace Titan.GraphicsV2.D3D11.Shaders
                 var result = D3DCompile(pSource, (nuint) source.Length, null, null, null, (sbyte*) pEntrypoint, (sbyte*) pTarget, 0, 0, &shader, &error);
                 if (FAILED(result) && error != null)
                 {
-                    LOGGER.Debug(new string((char*)error->GetBufferPointer(), 0, (int)error->GetBufferSize()));
+                    var errorMessage = Encoding.ASCII.GetString((byte*) error->GetBufferPointer(), (int) error->GetBufferSize());
+                    LOGGER.Debug(errorMessage);
                 }
 
                 if (error != null)
                 {
                     error->Release();
                 }
-                CheckAndThrow(result, nameof(D3DCompileFromFile));
+                CheckAndThrow(result, nameof(D3DCompile));
             }
 
             return new CompiledShader(shader);

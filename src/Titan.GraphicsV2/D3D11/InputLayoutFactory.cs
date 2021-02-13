@@ -19,7 +19,8 @@ namespace Titan.GraphicsV2.D3D11
             _device = device;
         }
 
-        // TODO: add VertexShaderblob
+        internal ID3D11InputLayout* CreateP(in CompiledShader shader, InputLayoutDescriptor[] descriptors) => Create(shader, descriptors);
+
         public InputLayout Create(in CompiledShader shader, InputLayoutDescriptor[] descriptors)
         {
             static uint GetSize(DXGI_FORMAT format) =>

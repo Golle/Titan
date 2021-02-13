@@ -1,7 +1,6 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using Titan.GraphicsV2.D3D11;
-using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.D3D11.DXGI_FORMAT;
 
 namespace Titan.GraphicsV2.Rendering
@@ -29,13 +28,12 @@ namespace Titan.GraphicsV2.Rendering
         public uint Width { get; init; }
         public uint Height { get; init; }
         public TextureSpecification[] Textures { get; init; }
-        public DepthStencilFormats DepthStencil { get; init; }
-        public bool ClearDepthStencil { get; init; }
-        public bool ClearRenderTargets { get; init; }
-        public Color ClearColor { get; init; }
+        public DepthStencilSpecification DepthStencil { get; init; }
     }
 
-    public record TextureSpecification(string Name, TextureFormats Format);
+    public record DepthStencilSpecification(string Name, DepthStencilFormats Format, bool Clear = false, Color ClearColor = default);
+
+    public record TextureSpecification(string Name, TextureFormats Format, bool Clear = false, Color ClearColor = default);
 
     public record InputLayoutSpecification(string SemanticName, TextureFormats Format);
 
@@ -52,42 +50,54 @@ namespace Titan.GraphicsV2.Rendering
     }
 
 
-    public record RenderPassSpecification(string Name)
+    internal record RenderPassSpecification(string Name)
     {
         public VertexShaderSpecification VertexShader { get; init; }
         public PixelShaderSpecification PixelShader { get; init; }
+        public string[] Sources { get; init; } = Array.Empty<string>();
+        public string[] Targets { get; init; } = Array.Empty<string>();
+
     }
 
-    public class RenderingPipeline
+    internal record PipelineConfiguration
     {
-        private FrameBufferFactory _frameBufferFactory;
+        internal RenderPassSpecification[] RenderPasses { get; init; } = Array.Empty<RenderPassSpecification>();
+        internal FrameBufferSpecification[] FrameBuffers { get; init; } = Array.Empty<FrameBufferSpecification>();
+    }
 
-        private RenderingPipeline(FrameBufferFactory frameBufferFactory)
+    internal class RenderingPipeline
+    {
+        private readonly RenderPipelineFactory _renderPipelineFactory;
+
+        internal RenderingPipeline(RenderPipelineFactory renderPipelineFactory)
         {
-            _frameBufferFactory = frameBufferFactory;
+            _renderPipelineFactory = renderPipelineFactory;
         }
 
-        public void Initialize()
+        public RenderPass[] Initialize()
         {
-            // create framebuffers
-            var geometryFrameBufferSpecification = new FrameBufferSpecification
+            // Special name to allow backbuffer creation
+            var backbuffer = new FrameBufferSpecification
             {
-                DepthStencil = DepthStencilFormats.D24S8,
+                Textures = new[] {new TextureSpecification("$Backbuffer", TextureFormats.RGBA32F, true, Color.Green)},
+                DepthStencil = new DepthStencilSpecification("DefaultDepthStencil", DepthStencilFormats.D24S8),
+            };
+
+            // create framebuffers
+            var gbufferSpec = new FrameBufferSpecification
+            {
+                
                 Textures = new TextureSpecification[]
                 {
-                    new ("GBufferPosition", TextureFormats.RGBA32F),
-                    new ("GBufferAlbedo", TextureFormats.RGBA32F),
-                    new ("GBufferNormal", TextureFormats.RGBA32F),
+                    new ("GBufferPosition", TextureFormats.RGBA32F, true, Color.Black),
+                    new ("GBufferAlbedo", TextureFormats.RGBA32F, true, Color.Black),
+                    new ("GBufferNormal", TextureFormats.RGBA32F, true, Color.Black),
                 },
-                ClearColor = Color.Black,
-                ClearRenderTargets = true,
-                Height =  1024,
-                Width = 1024
+                Height =  0, 
+                Width = 0
             };
-            var gbufferFrameBuffer = _frameBufferFactory.Create(geometryFrameBufferSpecification);
-
-
-            var geometryBufferRenderPassSpecification = new RenderPassSpecification("GBuffer")
+            
+            var gbufferRenderPass = new RenderPassSpecification("GBuffer")
             {
                 PixelShader = new PixelShaderSpecification("shaders/GBufferPixelShader.hlsl"),
                 VertexShader = new VertexShaderSpecification("shaders/GBufferVertexShader.hlsl", new InputLayoutSpecification []
@@ -96,118 +106,36 @@ namespace Titan.GraphicsV2.Rendering
                     new("Normal", TextureFormats.RGB32F),
                     new("Texture", TextureFormats.RG32F)
                 }),
-                Sources = Array.Empty<string>(),
-                Targets = new[] { "GBufferPosition", "GBufferAlbedo", "GBufferNormal" }
+                Targets = new[] { "GBufferPosition", "GBufferAlbedo", "GBufferNormal" },
+                //Renderer = "SceneRenderer"
             };
 
+            var backbufferRenderPass = new RenderPassSpecification("Backbuffer")
+            {
+                PixelShader = new PixelShaderSpecification("shaders/BackbufferPixelShader.hlsl"),
+                VertexShader = new VertexShaderSpecification("shaders/BackbufferVertexShader.hlsl", new []
+                {
+                    new InputLayoutSpecification("Position", TextureFormats.RG32F), 
+                    new InputLayoutSpecification("Texture", TextureFormats.RG32F)
+                }),
+                Sources = new[] {"GBufferAlbedo"},
+                Targets = new[] {"$Backbuffer"},
+                //Renderer = "FullscreenRenderer"
+            };
 
             // create render passes that we support
 
+            var config = new PipelineConfiguration
+            {
+                FrameBuffers = new[] {backbuffer, gbufferSpec},
+                RenderPasses = new[] {gbufferRenderPass, backbufferRenderPass}
+            };
+
+            return _renderPipelineFactory.CreatePipeline(config);
 
             // Schedule the render passes for execution
 
 
-
-        }
-    }
-
-    internal class FrameBuffer : IDisposable
-    {
-        private readonly RenderTargetView[] _renderTargets;
-        private readonly ShaderResourceView[] _shaderResources;
-        private readonly Texture2D[] _textures;
-
-        
-        private DepthStencilView _depthStencil;
-        private bool _hasDepthStencil;
-
-        public FrameBuffer(RenderTargetView[] renderTargets, ShaderResourceView[] shaderResources, Texture2D[] textures)
-        {
-            _renderTargets = renderTargets;
-            _shaderResources = shaderResources;
-            _textures = textures;
-            
-        }
-        public FrameBuffer(RenderTargetView[] renderTargets, ShaderResourceView[] shaderResources, Texture2D[] textures, DepthStencilView depthStencil)
-        {
-            _renderTargets = renderTargets;
-            _shaderResources = shaderResources;
-            _textures = textures;
-            _depthStencil = depthStencil;
-            _hasDepthStencil = false;
-        }
-
-
-        internal ref readonly RenderTargetView GetTarget(int index) => ref _renderTargets[index];
-        internal ref readonly ShaderResourceView GetSource(int index) => ref _shaderResources[index];
-
-
-
-        public void Dispose()
-        {
-            foreach (var view in _renderTargets)
-            {
-                view.Release();
-            }
-            foreach (var resource in _shaderResources)
-            {
-                resource.Release();
-            }
-            foreach (var texture in _textures)
-            {
-                texture.Release();
-            }
-        }
-    }
-    internal class FrameBufferFactory
-    {
-        private readonly Texture2DFactory _texture2DFactory;
-        private readonly ShaderResourceViewFactory _shaderResourceViewFactory;
-        private readonly RenderTargetViewFactory _renderTargetViewFactory;
-        private readonly DepthStencilViewFactory _depthStencilViewFactory;
-
-        public FrameBufferFactory(Texture2DFactory texture2DFactory, ShaderResourceViewFactory shaderResourceViewFactory, RenderTargetViewFactory renderTargetViewFactory, DepthStencilViewFactory depthStencilViewFactory)
-        {
-            _texture2DFactory = texture2DFactory;
-            _shaderResourceViewFactory = shaderResourceViewFactory;
-            _renderTargetViewFactory = renderTargetViewFactory;
-            _depthStencilViewFactory = depthStencilViewFactory;
-        }
-        
-        internal FrameBuffer Create(FrameBufferSpecification specification)
-        {
-            var textures = specification.Textures
-                .Select(t => _texture2DFactory.Create(specification.Width, specification.Height, (DXGI_FORMAT) t.Format, bindFlag: D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE))
-                .ToArray();
-
-            var renderTargets = textures.Select(t => _renderTargetViewFactory.Create(t)).ToArray();
-            var shaderResources = textures.Select(t => _shaderResourceViewFactory.Create(t)).ToArray();
-
-            if (specification.DepthStencil == DepthStencilFormats.None)
-            {
-                return new FrameBuffer(renderTargets, shaderResources, textures);
-            }
-
-
-            if(specification.DepthStencil != DepthStencilFormats.None)
-            {
-                var textureFormat = specification.DepthStencil switch
-                {
-                    DepthStencilFormats.D16 => DXGI_FORMAT_R16_TYPELESS,
-                    DepthStencilFormats.D24S8 => DXGI_FORMAT_R24G8_TYPELESS,
-                    _ => throw new NotSupportedException($"Format: {specification.DepthStencil} is not supported.")
-                };
-
-                var texture = _texture2DFactory.Create(specification.Width, specification.Height, textureFormat, bindFlag: D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-                unsafe
-                {
-
-                    var depthStencilView = _depthStencilViewFactory.Create(texture, (DXGI_FORMAT) specification.DepthStencil);
-                }
-            }
-            
-
-            return null;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Titan.Windows.Win32
     {
         private T* _ptr;
         
-        public ComPtr(T* ptr)
+        public ComPtr(in T* ptr)
         {
             _ptr = ptr;
             InternalAddRef();
@@ -20,9 +20,6 @@ namespace Titan.Windows.Win32
             _ptr = ptr._ptr;
             InternalAddRef();
         }
-
-
-        
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly T* Get() => _ptr;
@@ -43,6 +40,9 @@ namespace Titan.Windows.Win32
                 return ptr;
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ComPtr<T> Wrap(in T* ptr) => new() {_ptr = ptr}; // Use object initializer to avoid InternalAddRef
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()

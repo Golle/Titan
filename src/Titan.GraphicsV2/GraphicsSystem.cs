@@ -13,7 +13,8 @@ namespace Titan.GraphicsV2
         private readonly IContainer _container;
         private Device _device;
         private Swapchain _swapchain;
-        private RenderTargetView _backbuffer;
+        private RenderPass[] _passes;
+        private Context _context;
 
         public GraphicsSystem(IContainer container)
         {
@@ -30,118 +31,26 @@ namespace Titan.GraphicsV2
                 .RegisterSingleton(_device, dispose: true)
                 .RegisterSingleton(_swapchain, dispose: true);
 
-            var renderTargetFactory = _container.CreateInstance<RenderTargetViewFactory>();
-            
-            _backbuffer = renderTargetFactory
-                .CreateBackbuffer();
+            _context = _container
+                .CreateInstance<ContextFactory>()
+                .CreateImmediateContext();
 
+            _passes = _container.CreateInstance<RenderingPipeline>().Initialize();
 
-            unsafe
-            {
-                var texture = _container
-                    .CreateInstance<Texture2DFactory>()
-                    .Create(100, 100, DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM, bindFlag: D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-
-                var rtv = renderTargetFactory
-                    .Create(texture);
-                var rtv1 = renderTargetFactory.Create(texture.AsResource(), DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM);
-
-                rtv1.Release();
-                rtv.Release();
-
-                _container.CreateInstance<ShaderResourceViewFactory>()
-                    .Create(texture)
-                    .Release();
-
-                _container.CreateInstance<ShaderResourceViewFactory>()
-                    .Create(texture.AsResource(), texture.Format)
-                    .Release();
-
-                var p = stackalloc uint[10];
-                _container
-                    .CreateInstance<BufferFactory>()
-                    .Create<uint>(1000, p, D3D11_USAGE.D3D11_USAGE_DEFAULT, D3D11_CPU_ACCESS_FLAG.UNSPECIFIED, D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER)
-                    .AsPointer()->Release();
-
-
-                var texture2 = _container
-                    .CreateInstance<Texture2DFactory>()
-                    .Create(100, 100, DXGI_FORMAT.DXGI_FORMAT_R32_TYPELESS, bindFlag: D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-
-                _container.CreateInstance<DepthStencilViewFactory>()
-                        .Create(texture2, DXGI_FORMAT.DXGI_FORMAT_D32_FLOAT)
-                        .AsPointer()
-                    ->Release();
-
-                _container.CreateInstance<ContextFactory>()
-                    .CreateDeferredContext()
-                    .Dispose();
-
-                _container.CreateInstance<ContextFactory>()
-                    .CreateImmediateContext()
-                    .Dispose();
-
-                var shaderCompiler = _container.CreateInstance<ShaderCompiler>();
-                var vShader = shaderCompiler
-                    .CompileFromFile(@"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl", "main", "vs_5_0")
-                    ;
-                var pShader = shaderCompiler
-                        .CompileFromFile(@"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl", "main", "ps_5_0")
-                    ;
-
-                var layout = _container.CreateInstance<InputLayoutFactory>()
-                    .Create(vShader, new[] { new InputLayoutDescriptor("POSITION", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT), new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT), new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT) })
-                    ;
-
-                _container.CreateInstance<ShaderFactory>()
-                    .CreateVertexShader(vShader)
-                    .Release();
-
-                _container.CreateInstance<ShaderFactory>()
-                    .CreatePixelShader(pShader)
-                    .Release();
-                var la = new[] {new InputLayoutDescriptor("POSITION", DXGI_FORMAT.DXGI_FORMAT_R32G32B32_FLOAT), new InputLayoutDescriptor("Texture", DXGI_FORMAT.DXGI_FORMAT_R32G32_FLOAT), new InputLayoutDescriptor("Color", DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT)};
-                
-                _container.GetInstance<ShaderProgramHandler>()
-                    .Load(new ShaderProgramDescriptor("apa", new VertexShaderDescriptor(@"F:\Git\Titan\resources\shaders\SimpleVertexShader.hlsl"), new PixelShaderDescriptor(@"F:\Git\Titan\resources\shaders\SimplePixelShader.hlsl"), la));
-
-
-
-                layout.Release();
-                vShader.Release();
-                pShader.Release();
-
-
-
-
-                texture2.AsPtr()->Release();
-                texture.AsPtr()->Release();
-
-
-                _container.CreateInstance<RenderingPipeline>()
-                    .Initialize();
-            }
-            
         }
-
 
         public void RenderFrame()
         {
-            unsafe
+            foreach (var renderPass in _passes)
             {
-                var color = new Color(1, 0, 1, 1);
-                _device.GetContext()->ClearRenderTargetView(_backbuffer, (float*) &color);
+                renderPass.Execute(_context);
             }
             _swapchain.Present();
         }
 
         public void Dispose()
         {
-            unsafe
-            {
-                _backbuffer.Release();
-            }
-
+            _context.Dispose();
             _swapchain.Dispose();
             _device.Dispose();
             _container.Dispose();

@@ -19,6 +19,20 @@ namespace Titan.GraphicsV2.D3D11
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DrawIndexed(uint indexCount, uint startIndex = 0u, int baseVertexIndex = 0) => _context.Get()->DrawIndexed(indexCount, startIndex, baseVertexIndex);
 
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetRenderTargets(uint count, ID3D11RenderTargetView** renderTarget, ID3D11DepthStencilView* depthStencilView) => _context.Get()->OMSetRenderTargets(count, renderTarget, depthStencilView);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ClearRenderTarget(ID3D11RenderTargetView* renderTarget, in Color color)
+        {
+            fixed (Color* pColor = &color)
+            {
+                _context.Get()->ClearRenderTargetView(renderTarget, (float*) pColor);
+            }
+        }
+
         public void Dispose()
         {
             _context.Dispose();

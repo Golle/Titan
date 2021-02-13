@@ -44,7 +44,7 @@ namespace Titan.GraphicsV2.D3D11
             LOGGER.Debug("Creating D3D11 Device");
             Common.CheckAndThrow(D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, flags, null, 0, D3D11_SDK_VERSION, &desc, swapChain.GetAddressOf(), device.GetAddressOf(), null, context.GetAddressOf()), nameof(D3D11CreateDeviceAndSwapChain));
             LOGGER.Debug("D3D11 Device Created");
-            return (new Device(device, context), new Swapchain(swapChain, configuration.VSync));
+            return (new Device(device, context), new Swapchain(swapChain, configuration.VSync, configuration.Width, configuration.Height));
         }
 
         ~DeviceFactory()

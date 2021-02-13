@@ -16,7 +16,7 @@ namespace Titan.GraphicsV2.D3D11
             _swapchain = swapchain;
         }
 
-        internal RenderTargetView CreateBackbuffer()
+        internal ID3D11RenderTargetView* CreateBackbuffer()
         {
             using var backbufferResource = new ComPtr<ID3D11Resource>();
             fixed (Guid* resourcePointer = &D3D11Common.D3D11Resource)
@@ -25,11 +25,11 @@ namespace Titan.GraphicsV2.D3D11
             }
             ID3D11RenderTargetView* backbuffer;
             CheckAndThrow(_device.Get()->CreateRenderTargetView(backbufferResource.Get(), null, &backbuffer), nameof(ID3D11Device.CreateRenderTargetView));
-            return new RenderTargetView(backbuffer);
+            return backbuffer;
         }
 
-        internal RenderTargetView Create(in Texture2D texture) => Create(texture, texture.Format);
-        internal RenderTargetView Create(ID3D11Resource* resource, DXGI_FORMAT format)
+        internal ID3D11RenderTargetView* Create(in Texture2D texture) => Create(texture, texture.Format);
+        internal ID3D11RenderTargetView* Create(ID3D11Resource* resource, DXGI_FORMAT format)
         {
             var desc = new D3D11_RENDER_TARGET_VIEW_DESC
             {
@@ -42,7 +42,7 @@ namespace Titan.GraphicsV2.D3D11
             };
             ID3D11RenderTargetView* renderTargetView;
             CheckAndThrow(_device.Get()->CreateRenderTargetView(resource, &desc, &renderTargetView), nameof(ID3D11Device.CreateRenderTargetView));
-            return new RenderTargetView(renderTargetView);
+            return renderTargetView;
         }
     }
 }
