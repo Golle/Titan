@@ -1,0 +1,83 @@
+[
+    {
+        "Name": "Default",
+        "Textures": [
+            {
+                "Name": "GBufferAlbedo",
+                "Format": "RGBA32F"
+            },
+            {
+                "Name": "GBufferNormals",
+                "Format": "RGBA32F"
+            },
+            {
+                "Name": "GBufferProperties",
+                "Format": "RGBA32F"
+            },
+            {
+                "Name": "DefaultDepth",
+                "Format": "D24S8"
+            },
+            {
+                "Name": "BackbufferColor",
+                "Format": "RGBA32F"
+            }
+        ],
+        "Stages": [
+            {
+                "Name": "GBuffer",
+                "Stage": "Geometry",
+                "Depth": "DefaultDepth",
+                "Output": {
+                    "RenderTargets": [
+                        "GBufferAlbedo",
+                        "GBufferNormals",
+                        "GBufferProperties"
+                    ],
+                    "Clear": true,
+                    "ClearColor": "#ff000000",
+                    "ClearDepth": true,
+                    "ClearDepthValue": 1.0
+                },
+                "Inputs": [],
+                "Material": null
+            },
+            {
+                "Name": "DeferredShading",
+                "Stage": "PostProcessing",
+                "Inputs": [
+                    {
+                        "Name": "GBufferAlbedo",
+                        "Type": "PixelShader"
+                    },
+                    {
+                        "Name": "GBufferNormals",
+                        "Type": "PixelShader"
+                    },
+                    {
+                        "Name": "GBufferProperties",
+                        "Type": "PixelShader"
+                    }
+                ],
+                "Output": {
+                    "RenderTargets": [
+                        "BackbufferColor"
+                    ],
+                    "Clear": true,
+                    "ClearColor": "#ff000000"
+                },
+                "Material": "materials/DeferredShading.json"
+            },
+            {
+                "Name": "Backbuffer",
+                "Stage": "Swapchain",
+                "Inputs": [
+                    {
+                        "Name": "BackbufferColor",
+                        "Type": "PixelShader"
+                    }
+                ]
+            }
+        ]
+    }
+]
