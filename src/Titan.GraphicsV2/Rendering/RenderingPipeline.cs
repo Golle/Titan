@@ -1,10 +1,37 @@
 using System;
-using System.Collections.Generic;
 using Titan.GraphicsV2.D3D11;
+using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.D3D11.DXGI_FORMAT;
 
 namespace Titan.GraphicsV2.Rendering
 {
+    internal unsafe class GBufferRenderPass : IDisposable
+    {
+        private readonly FrameBuffer _frameBuffer;
+        private readonly ID3D11RenderTargetView*[] _renderTargets;
+        private Color _clearColor;
+
+        public GBufferRenderPass(FrameBuffer frameBuffer)
+        {
+            _frameBuffer = frameBuffer;
+
+            _renderTargets = new ID3D11RenderTargetView*[_frameBuffer.Textures.Length];
+
+        }
+
+        public void Execute(ID3D11DeviceContext* context)
+        {
+            fixed (Color* pColor = &_clearColor)
+            {
+                context->ClearRenderTargetView(_renderTargets[0], (float*) pColor);
+            }
+        }
+
+        public void Dispose()
+        {
+            _frameBuffer?.Dispose();
+        }
+    }
 
     public enum TextureFormats : uint
     {
@@ -67,15 +94,9 @@ namespace Titan.GraphicsV2.Rendering
 
     internal class RenderingPipeline
     {
-        private readonly RenderPipelineFactory _renderPipelineFactory;
-
-        internal RenderingPipeline(RenderPipelineFactory renderPipelineFactory)
+        public object Initialize()
         {
-            _renderPipelineFactory = renderPipelineFactory;
-        }
-
-        public RenderPass[] Initialize()
-        {
+            
             // Special name to allow backbuffer creation
             var backbuffer = new FrameBufferSpecification
             {
@@ -86,7 +107,6 @@ namespace Titan.GraphicsV2.Rendering
             // create framebuffers
             var gbufferSpec = new FrameBufferSpecification
             {
-                
                 Textures = new TextureSpecification[]
                 {
                     new ("GBufferPosition", TextureFormats.RGBA32F, true, Color.Black),
@@ -131,7 +151,7 @@ namespace Titan.GraphicsV2.Rendering
                 RenderPasses = new[] {gbufferRenderPass, backbufferRenderPass}
             };
 
-            return _renderPipelineFactory.CreatePipeline(config);
+            return null;
 
             // Schedule the render passes for execution
 

@@ -1,8 +1,6 @@
 using System;
 using Titan.GraphicsV2.D3D11;
-using Titan.GraphicsV2.D3D11.Shaders;
-using Titan.GraphicsV2.Rendering;
-using Titan.GraphicsV2.Resources;
+using Titan.GraphicsV2.Rendering2;
 using Titan.IOC;
 using Titan.Windows.Win32.D3D11;
 
@@ -13,7 +11,6 @@ namespace Titan.GraphicsV2
         private readonly IContainer _container;
         private Device _device;
         private Swapchain _swapchain;
-        private RenderPass[] _passes;
         private Context _context;
 
         public GraphicsSystem(IContainer container)
@@ -35,16 +32,14 @@ namespace Titan.GraphicsV2
                 .CreateInstance<ContextFactory>()
                 .CreateImmediateContext();
 
-            _passes = _container.CreateInstance<RenderingPipeline>().Initialize();
-
+            var config = _container.CreateInstance<RenderPipelineReader>()
+                .Read("render_pipeline_v2.json");
         }
 
         public void RenderFrame()
         {
-            foreach (var renderPass in _passes)
-            {
-                renderPass.Execute(_context);
-            }
+            ID3D11DeviceContext a;
+            
             _swapchain.Present();
         }
 

@@ -41,26 +41,26 @@ namespace Titan.GraphicsV2.Rendering
                 var shaderResource = _shaderResourceViewFactory.Create(texture2D.AsResource(), format);
                 return new FrameBufferTexture(t.Name, texture2D, shaderResource, renderTarget, format, height, width, t.Clear, t.ClearColor);
             }).ToArray();
+            throw new NotImplementedException("Woop");
+            //if (specification.DepthStencil == DepthStencilFormats.None)
+            //{
+            //    return new FrameBuffer(textures);
+            //}
 
-            if (specification.DepthStencil == DepthStencilFormats.None)
-            {
-                return new FrameBuffer(textures);
-            }
+            //var textureFormat = specification.DepthStencil switch
+            //{
+            //    DepthStencilFormats.D16 => DXGI_FORMAT.DXGI_FORMAT_R16_TYPELESS,
+            //    DepthStencilFormats.D24S8 => DXGI_FORMAT.DXGI_FORMAT_R24G8_TYPELESS,
+            //    _ => throw new NotSupportedException($"Format: {specification.DepthStencil} is not supported.")
+            //};
 
-            var textureFormat = specification.DepthStencil switch
-            {
-                DepthStencilFormats.D16 => DXGI_FORMAT.DXGI_FORMAT_R16_TYPELESS,
-                DepthStencilFormats.D24S8 => DXGI_FORMAT.DXGI_FORMAT_R24G8_TYPELESS,
-                _ => throw new NotSupportedException($"Format: {specification.DepthStencil} is not supported.")
-            };
 
-            
-            var texture = _texture2DFactory.Create(width, height, textureFormat, bindFlag: D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
-            
-            var depthStencilFormat = (DXGI_FORMAT)specification.DepthStencil;
-            var depthStencilView = _depthStencilViewFactory.Create(texture, depthStencilFormat);
-            var depthStencil = new DepthStencil(texture, depthStencilView.AsPointer(), depthStencilFormat, width, height);
-            return new FrameBuffer(textures, depthStencil);
+            //var texture = _texture2DFactory.Create(width, height, textureFormat, bindFlag: D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE);
+
+            //var depthStencilFormat = (DXGI_FORMAT)specification.DepthStencil;
+            //var depthStencilView = _depthStencilViewFactory.Create(texture, depthStencilFormat);
+            //var depthStencil = new DepthStencil(texture, depthStencilView.AsPointer(), depthStencilFormat, width, height);
+            //return new FrameBuffer(textures, depthStencil);
         }
     }
 }
