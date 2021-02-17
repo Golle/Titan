@@ -24,6 +24,8 @@ namespace Titan.GraphicsV2
                 .CreateInstance<DeviceFactory>() // Use create instance so that the factory till be GCed when the device has been created.
                 .Create(configuration);
 
+            _device.Init();
+
             _container
                 .RegisterSingleton(_device, dispose: true)
                 .RegisterSingleton(_swapchain, dispose: true);
@@ -34,6 +36,21 @@ namespace Titan.GraphicsV2
 
             var config = _container.CreateInstance<RenderPipelineReader>()
                 .Read("render_pipeline_v2.json");
+
+
+            var handle = _device.CreateTexture(new TextureCreation
+            {
+                Binding = TextureBindFlags.RenderTarget | TextureBindFlags.ShaderResource,
+                Format = DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_UINT,
+                Width = 1024,
+                Height = 1024,
+                Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT
+            });
+
+            ref readonly var texture = ref _device.AccessTexture(handle);
+            
+            _device.DestroyTexture(handle);
+
         }
 
         public void RenderFrame()
@@ -51,4 +68,5 @@ namespace Titan.GraphicsV2
             _container.Dispose();
         }
     }
+
 }

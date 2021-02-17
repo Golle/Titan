@@ -15,12 +15,14 @@
                 "Format": "RGBA32F"
             },
             {
-                "Name": "DefaultDepth",
-                "Format": "D24S8"
-            },
-            {
                 "Name": "BackbufferColor",
                 "Format": "RGBA32F"
+            }
+        ],
+        "Depth": [
+            {
+                "Name": "DefaultDepth",
+                "Format": "D24S8"
             }
         ],
         "Stages": [

@@ -7,6 +7,7 @@ namespace Titan.Windows.Win32.D3D11
     [Flags]
     public enum D3D11_BIND_FLAG : uint
     {
+        UNSPECIFIED = 0,
         D3D11_BIND_VERTEX_BUFFER = 0x1,
         D3D11_BIND_INDEX_BUFFER = 0x2,
         D3D11_BIND_CONSTANT_BUFFER = 0x4,
