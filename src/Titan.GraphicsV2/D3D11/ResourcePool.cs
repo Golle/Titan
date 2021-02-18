@@ -79,8 +79,8 @@ namespace Titan.GraphicsV2.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref T GetResourceReference(in Handle<Texture> handle) => ref _data[handle];
+        public ref T GetResourceReference(in Handle<T> handle) => ref _data[handle.Value];
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T* GetResourcePointer(in Handle<Texture> handle) => & _data[handle];
+        public T* GetResourcePointer(in Handle<T> handle) => & _data[handle.Value];
     }
 }

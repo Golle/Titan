@@ -18,14 +18,13 @@ namespace Titan.GraphicsV2.D3D11
         private ComPtr<ID3D11DeviceContext> _context;
         private ComPtr<IDXGISwapChain> _swapChain;
 
-
         // Swapchain and Context
         public Swapchain Swapchain { get; }
         public Context Context { get; }
 
-
         // Resources
         private ResourcePool<Texture> _textures;
+        private ResourcePool<Buffer> _buffers;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ID3D11Device* Get() => _device.Get();
@@ -71,11 +70,76 @@ namespace Titan.GraphicsV2.D3D11
             LOGGER.Debug("Initialize resource pools");
             
             _textures.Init(1000);
+            _buffers.Init(1000);
 
             LOGGER.Debug("Resource pools initialized");
         }
 
-        
+        internal Handle<Buffer> CreateBuffer(in BufferCreation args)
+        {
+            var handle = _buffers.CreateResource();
+            if (!handle.IsValid())
+            {
+                throw new InvalidOperationException("Failed to Create a Buffer Handle");
+            }
+            
+            var bindFlag = args.Type switch
+            {
+                BufferTypes.ConstantBuffer => D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER,
+                BufferTypes.IndexBuffer => D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER,
+                BufferTypes.VertexBuffer => D3D11_BIND_FLAG.D3D11_BIND_VERTEX_BUFFER,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            var desc = new D3D11_BUFFER_DESC
+            {
+                BindFlags = bindFlag,
+                Usage = args.Usage,
+                CpuAccessFlags = args.CpuAccessFlags,
+                MiscFlags = args.MiscFlags,
+                ByteWidth = args.Count * args.Stride,
+                StructureByteStride = args.Stride
+            };
+
+            var buffer = _buffers.GetResourcePointer(handle);
+            buffer->Handle = handle;
+            buffer->BindFlag = bindFlag;
+            buffer->Count = args.Count;
+            buffer->CpuAccessFlag = args.CpuAccessFlags;
+            buffer->MiscFlag = args.MiscFlags;
+            buffer->Stride = args.Stride;
+            buffer->Usage = args.Usage;
+
+            if (args.InitialData != null)
+            {
+                var subResource = new D3D11_SUBRESOURCE_DATA
+                {
+                    pSysMem = args.InitialData
+                };
+                CheckAndThrow(_device.Get()->CreateBuffer(&desc, &subResource, &buffer->Resource), nameof(ID3D11Device.CreateBuffer));
+            }
+            else
+            {
+                CheckAndThrow(_device.Get()->CreateBuffer(&desc, null, &buffer->Resource), nameof(ID3D11Device.CreateBuffer));
+            }
+            return handle;
+        }
+
+        internal void DestroyBuffer(in Handle<Buffer> handle)
+        {
+            var buffer = _buffers.GetResourcePointer(handle);
+            if (buffer->Resource != null)
+            {
+                buffer->Resource->Release();
+            }
+            *buffer = default;
+            _buffers.ReleaseResource(handle);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal ref readonly Buffer AccessBuffer(in Handle<Buffer> handle) => ref _buffers.GetResourceReference(handle);
+
+
         internal Handle<Texture> CreateTexture(in TextureCreation args)
         {
             var handle = _textures.CreateResource();
@@ -203,6 +267,7 @@ namespace Titan.GraphicsV2.D3D11
 
             // TODO: how do we track allocated textures? they needs to be released at shutdown
             _textures.Terminate();
+            _buffers.Terminate();
         }
     }
 }
