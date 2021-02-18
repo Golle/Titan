@@ -7,19 +7,11 @@ namespace Titan.GraphicsV2.Rendering
 {
     internal class FrameBufferFactory
     {
-        private readonly Texture2DFactory _texture2DFactory;
-        private readonly ShaderResourceViewFactory _shaderResourceViewFactory;
-        private readonly RenderTargetViewFactory _renderTargetViewFactory;
-        private readonly DepthStencilViewFactory _depthStencilViewFactory;
         private readonly Swapchain _swapchain;
 
-        public FrameBufferFactory(Texture2DFactory texture2DFactory, ShaderResourceViewFactory shaderResourceViewFactory, RenderTargetViewFactory renderTargetViewFactory, DepthStencilViewFactory depthStencilViewFactory, Swapchain swapchain)
+        public FrameBufferFactory(Device device)
         {
-            _texture2DFactory = texture2DFactory;
-            _shaderResourceViewFactory = shaderResourceViewFactory;
-            _renderTargetViewFactory = renderTargetViewFactory;
-            _depthStencilViewFactory = depthStencilViewFactory;
-            _swapchain = swapchain; // TODO: is the swapchain the best way to get the width/height of the screen?
+            _swapchain = device.Swapchain;
         }
         
         internal unsafe FrameBuffer Create(FrameBufferSpecification specification)
@@ -28,19 +20,19 @@ namespace Titan.GraphicsV2.Rendering
             var width = specification.Width == 0 ? _swapchain.Width : specification.Width;
             var height = specification.Height == 0 ? _swapchain.Height : specification.Height;
 
-            var textures = specification.Textures.Select(t =>
-            {
-                var format = (DXGI_FORMAT)t.Format;
-                if (t.Name == "$Backbuffer")
-                {
-                    return new FrameBufferTexture(t.Name, null, null, _renderTargetViewFactory.CreateBackbuffer(), format, 0, 0, t.Clear, t.ClearColor);
-                }
+            //var textures = specification.Textures.Select(t =>
+            //{
+            //    var format = (DXGI_FORMAT)t.Format;
+            //    if (t.Name == "$Backbuffer")
+            //    {
+            //        return new FrameBufferTexture(t.Name, null, null, _renderTargetViewFactory.CreateBackbuffer(), format, 0, 0, t.Clear, t.ClearColor);
+            //    }
 
-                var texture2D = _texture2DFactory.Create(width, height, format, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET);
-                var renderTarget = _renderTargetViewFactory.Create(texture2D.AsResource(), format);
-                var shaderResource = _shaderResourceViewFactory.Create(texture2D.AsResource(), format);
-                return new FrameBufferTexture(t.Name, texture2D, shaderResource, renderTarget, format, height, width, t.Clear, t.ClearColor);
-            }).ToArray();
+            //    var texture2D = _texture2DFactory.Create(width, height, format, D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET);
+            //    var renderTarget = _renderTargetViewFactory.Create(texture2D.AsResource(), format);
+            //    var shaderResource = _shaderResourceViewFactory.Create(texture2D.AsResource(), format);
+            //    return new FrameBufferTexture(t.Name, texture2D, shaderResource, renderTarget, format, height, width, t.Clear, t.ClearColor);
+            //}).ToArray();
             throw new NotImplementedException("Woop");
             //if (specification.DepthStencil == DepthStencilFormats.None)
             //{

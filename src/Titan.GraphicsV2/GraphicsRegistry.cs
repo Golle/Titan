@@ -12,19 +12,14 @@ namespace Titan.GraphicsV2
         {
             container
                 .Register<GraphicsSystem>()
-
                 .Register<ShaderCompiler>()
                 .Register<ShaderFactory>()
                 .Register<InputLayoutFactory>()
-
-
                 .Register<FrameBufferFactory>()
-                .Register<ShaderResourceViewFactory>()
-                .Register<RenderTargetViewFactory>()
-                .Register<Texture2DFactory>()
-                .Register<DepthStencilViewFactory>()
-                .Register<ShaderManager>()
-                ;
+                .Register<ShaderManager>();
+
+
+            ;
         }
     }
 }

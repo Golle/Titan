@@ -8,12 +8,6 @@ namespace Titan.GraphicsV2.Textures
 {
 
     
-    internal struct Texture
-    {
-        internal ShaderResourceView View;
-        internal Texture2D Resource;
-    }
-
     internal struct Model
     {
         public Mesh Mesh;
