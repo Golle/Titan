@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Titan.Windows.Win32.D3D11;
 
-namespace Titan.GraphicsV2.D3D11
+namespace Titan.GraphicsV2.D3D11.Textures
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal unsafe struct Texture

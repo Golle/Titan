@@ -1,5 +1,6 @@
 using System.Linq;
 using Titan.GraphicsV2.D3D11;
+using Titan.GraphicsV2.D3D11.Textures;
 using static Titan.Windows.Win32.D3D11.DXGI_FORMAT;
 
 namespace Titan.GraphicsV2.Rendering2
@@ -55,7 +56,7 @@ namespace Titan.GraphicsV2.Rendering2
 
         internal void Initialize(Device device)
         {
-            var texture = device.CreateTexture(new TextureCreation());
+            var texture = device.TextureManager.Create(new TextureCreation());
         }
         internal void Dispose() { }
 

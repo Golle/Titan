@@ -20,7 +20,7 @@ namespace Titan.Graphics.D3D11.Textures
                 Width = width,
                 Format = format,
                 BindFlags = bindFlag,
-                MiscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED,
+                MiscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFIED,
                 Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT,
                 CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED,
                 ArraySize = 1,

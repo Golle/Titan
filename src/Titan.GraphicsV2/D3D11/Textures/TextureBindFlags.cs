@@ -1,6 +1,6 @@
 using System;
 
-namespace Titan.GraphicsV2.D3D11
+namespace Titan.GraphicsV2.D3D11.Textures
 {
     [Flags]
     internal enum TextureBindFlags

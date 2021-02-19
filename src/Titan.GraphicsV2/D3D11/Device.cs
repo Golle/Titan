@@ -2,6 +2,8 @@ using System;
 using System.Runtime.CompilerServices;
 using Titan.Core.Common;
 using Titan.Core.Logging;
+using Titan.GraphicsV2.D3D11.Buffers;
+using Titan.GraphicsV2.D3D11.Textures;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 using static Titan.Windows.Win32.Common;
@@ -21,10 +23,9 @@ namespace Titan.GraphicsV2.D3D11
         // Swapchain and Context
         public Swapchain Swapchain { get; }
         public Context Context { get; }
+        public TextureManager TextureManager { get; }
+        public BufferManager BufferManager { get; }
 
-        // Resources
-        private ResourcePool<Texture> _textures;
-        private ResourcePool<Buffer> _buffers;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ID3D11Device* Get() => _device.Get();
@@ -67,207 +68,21 @@ namespace Titan.GraphicsV2.D3D11
             Context = new Context(_context.Get());
             Swapchain = new Swapchain(_swapChain.Get(), configuration.VSync, configuration.Width, configuration.Height);
 
-            LOGGER.Debug("Initialize resource pools");
-            
-            _textures.Init(1000);
-            _buffers.Init(1000);
-
-            LOGGER.Debug("Resource pools initialized");
+            TextureManager = new TextureManager(this, Swapchain);
+            BufferManager = new BufferManager(this);
         }
 
-        internal Handle<Buffer> CreateBuffer(in BufferCreation args)
-        {
-            var handle = _buffers.CreateResource();
-            if (!handle.IsValid())
-            {
-                throw new InvalidOperationException("Failed to Create a Buffer Handle");
-            }
-            
-            var bindFlag = args.Type switch
-            {
-                BufferTypes.ConstantBuffer => D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER,
-                BufferTypes.IndexBuffer => D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER,
-                BufferTypes.VertexBuffer => D3D11_BIND_FLAG.D3D11_BIND_VERTEX_BUFFER,
-                _ => throw new ArgumentOutOfRangeException()
-            };
 
-            var desc = new D3D11_BUFFER_DESC
-            {
-                BindFlags = bindFlag,
-                Usage = args.Usage,
-                CpuAccessFlags = args.CpuAccessFlags,
-                MiscFlags = args.MiscFlags,
-                ByteWidth = args.Count * args.Stride,
-                StructureByteStride = args.Stride
-            };
-
-            var buffer = _buffers.GetResourcePointer(handle);
-            buffer->Handle = handle;
-            buffer->BindFlag = bindFlag;
-            buffer->Count = args.Count;
-            buffer->CpuAccessFlag = args.CpuAccessFlags;
-            buffer->MiscFlag = args.MiscFlags;
-            buffer->Stride = args.Stride;
-            buffer->Usage = args.Usage;
-
-            if (args.InitialData != null)
-            {
-                var subResource = new D3D11_SUBRESOURCE_DATA
-                {
-                    pSysMem = args.InitialData
-                };
-                CheckAndThrow(_device.Get()->CreateBuffer(&desc, &subResource, &buffer->Resource), nameof(ID3D11Device.CreateBuffer));
-            }
-            else
-            {
-                CheckAndThrow(_device.Get()->CreateBuffer(&desc, null, &buffer->Resource), nameof(ID3D11Device.CreateBuffer));
-            }
-            return handle;
-        }
-
-        internal void DestroyBuffer(in Handle<Buffer> handle)
-        {
-            var buffer = _buffers.GetResourcePointer(handle);
-            if (buffer->Resource != null)
-            {
-                buffer->Resource->Release();
-            }
-            *buffer = default;
-            _buffers.ReleaseResource(handle);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ref readonly Buffer AccessBuffer(in Handle<Buffer> handle) => ref _buffers.GetResourceReference(handle);
-
-
-        internal Handle<Texture> CreateTexture(in TextureCreation args)
-        {
-            var handle = _textures.CreateResource();
-            if (!handle.IsValid())
-            {
-                throw new InvalidOperationException("Failed to Create Texture Handle");
-            }
-
-            D3D11_BIND_FLAG bindflags = 0;
-            if (args.Binding.HasFlag(TextureBindFlags.RenderTarget))
-            {
-                bindflags |= D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET;
-            }
-
-            if (args.Binding.HasFlag(TextureBindFlags.ShaderResource))
-            {
-                bindflags |= D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE;
-            }
-
-            if (bindflags == 0)
-            {
-                throw new InvalidOperationException("Can't create a Texture without a binding");
-            }
-            
-            var desc = new D3D11_TEXTURE2D_DESC
-            {
-                Format = args.Format,
-                ArraySize = 1,
-                MipLevels = 1,
-                BindFlags = bindflags,
-                CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED,
-                Height = args.Height,
-                Width = args.Width,
-                Usage = args.Usage,
-                MiscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFICED,
-                SampleDesc = new DXGI_SAMPLE_DESC
-                {
-                    Count = 1,
-                    Quality = 0
-                }
-            };
-
-            var texture = _textures.GetResourcePointer(handle);
-
-            texture->Handle = handle;
-            texture->BindFlags = bindflags;
-            texture->Format = args.Format;
-            texture->Height = args.Height;
-            texture->Width = args.Width;
-            texture->Usage = args.Usage;
-
-            var textureP = _textures.GetResourcePointer(handle);
-            if (args.InitialData != null && args.DataStride > 0)
-            {
-                var subresourceData = new D3D11_SUBRESOURCE_DATA
-                {
-                    pSysMem = args.InitialData
-                };
-                CheckAndThrow(_device.Get()->CreateTexture2D(&desc, &subresourceData, &textureP->D3DTexture), nameof(ID3D11Device.CreateTexture2D));
-            }
-            else
-            {
-                CheckAndThrow(_device.Get()->CreateTexture2D(&desc, null, &texture->D3DTexture), nameof(ID3D11Device.CreateTexture2D));
-            }
-
-            if ((bindflags & D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET) != 0)
-            {
-                var renderTargetDesc = new D3D11_RENDER_TARGET_VIEW_DESC
-                {
-                    Format = args.Format,
-                    Texture2D = new D3D11_TEX2D_RTV
-                    {
-                        MipSlice = 0
-                    },
-                    ViewDimension = D3D11_RTV_DIMENSION.D3D11_RTV_DIMENSION_TEXTURE2D
-                };
-                CheckAndThrow(_device.Get()->CreateRenderTargetView((ID3D11Resource*) texture->D3DTexture, &renderTargetDesc, &texture->D3DTarget), nameof(ID3D11Device.CreateRenderTargetView));
-            }
-
-            if ((bindflags & D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE) != 0)
-            {
-                var shadedResourceViewDesc = new D3D11_SHADER_RESOURCE_VIEW_DESC
-                {
-                    Format = args.Format,
-                    Texture2D = new D3D11_TEX2D_SRV
-                    {
-                        MipLevels = 1,
-                        MostDetailedMip = 0
-                    },
-                    ViewDimension = D3D_SRV_DIMENSION.D3D10_1_SRV_DIMENSION_TEXTURE2D
-                };
-                CheckAndThrow(_device.Get()->CreateShaderResourceView((ID3D11Resource*) texture->D3DTexture, &shadedResourceViewDesc, &texture->D3DResource), nameof(ID3D11Device.CreateShaderResourceView));
-            }
-            
-            return handle;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ref readonly Texture AccessTexture(in Handle<Texture> handle) => ref _textures.GetResourceReference(handle);
-
-        internal void DestroyTexture(in Handle<Texture> handle)
-        {
-            var texture = _textures.GetResourcePointer(handle);
-            if (texture->D3DResource != null)
-            {
-                texture->D3DResource->Release();
-            }
-            if (texture->D3DTexture != null)
-            {
-                texture->D3DTexture->Release();
-            }
-            if (texture->D3DTarget != null)
-            {
-                texture->D3DTarget->Release();
-            }
-            *texture = default; // TODO: is not really needed, but we can do it to "clean" up the pointers so they can't be used.
-            _textures.ReleaseResource(handle);
-        }
-
+        
         public void Dispose()
         {
+            TextureManager.Dispose();
+            BufferManager.Dispose();
+
             _context.Dispose();
             _swapChain.Dispose();
             _device.Dispose();
-
-            // TODO: how do we track allocated textures? they needs to be released at shutdown
-            _textures.Terminate();
-            _buffers.Terminate();
         }
     }
+    
 }
