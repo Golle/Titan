@@ -1,6 +1,6 @@
 using Titan.Windows.Win32.D3D11;
 
-namespace Titan.GraphicsV2.D3D11
+namespace Titan.GraphicsV2.D3D11.Buffers
 {
     internal unsafe struct Buffer
     {

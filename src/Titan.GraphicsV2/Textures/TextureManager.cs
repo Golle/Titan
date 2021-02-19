@@ -1,5 +1,6 @@
 using Titan.Core.Common;
 using Titan.GraphicsV2.D3D11;
+using Titan.GraphicsV2.D3D11.Buffers;
 using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.Resources;
 using Titan.Windows.Win32.D3D11;
