@@ -129,23 +129,29 @@ namespace Titan.GraphicsV2.D3D11.Textures
 
         public void Release(in Handle<Texture> handle)
         {
+            ReleaseInternal(handle);
+            _usedHandles.Remove(handle);
+            _resourcePool.ReleaseResource(handle);
+        }
+
+        private void ReleaseInternal(Handle<Texture> handle)
+        {
             var texture = _resourcePool.GetResourcePointer(handle);
             if (texture->D3DResource != null)
             {
                 texture->D3DResource->Release();
             }
+
             if (texture->D3DTexture != null)
             {
                 texture->D3DTexture->Release();
             }
+
             if (texture->D3DTarget != null)
             {
                 texture->D3DTarget->Release();
             }
             *texture = default; // TODO: is not really needed, but we can do it to "clean" up the pointers so they can't be used.
-            _resourcePool.ReleaseResource(handle);
-            
-            _usedHandles.Remove(handle);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -155,7 +161,7 @@ namespace Titan.GraphicsV2.D3D11.Textures
         {
             foreach (var handle in _usedHandles)
             {
-                Release(handle);
+                ReleaseInternal(handle);
             }
             _resourcePool.Terminate();
         }

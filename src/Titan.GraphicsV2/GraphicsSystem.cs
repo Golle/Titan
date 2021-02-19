@@ -1,4 +1,5 @@
 using System;
+using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Buffers;
@@ -6,7 +7,6 @@ using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.GraphicsV2.Rendering;
 using Titan.GraphicsV2.Rendering2;
-using Titan.GraphicsV2.Resources;
 using Titan.IOC;
 using Titan.Windows.Win32.D3D11;
 
@@ -64,6 +64,25 @@ namespace Titan.GraphicsV2
 
                 bufferManager.Release(handle);
             }
+            {
+                var shaderManager = _device.ShaderManager;
+                var handle = shaderManager.Create(new ShaderCreation
+                {
+                    PixelShader = new ShaderDescription(_container.GetInstance<IFileReader>().ReadText("shaders/GBufferPixelShader.hlsl"), "main", "ps_5_0"),
+                    InputLayout = new InputLayoutDescription[]
+                    {
+                        new("Position", TextureFormats.RGB32F),
+                        new("Normal", TextureFormats.RGB32F),
+                        new("Texture", TextureFormats.RG32F)
+                    },
+                    VertexShader = new ShaderDescription(_container.GetInstance<IFileReader>().ReadText("shaders/GBufferVertexShader.hlsl"), "main", "vs_5_0")
+                });
+
+                var shader = shaderManager.Access(handle);
+
+                //shaderManager.Release(handle);
+            }
+
 
 
         }

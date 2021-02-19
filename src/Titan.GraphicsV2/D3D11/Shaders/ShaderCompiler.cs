@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -28,7 +27,7 @@ namespace Titan.GraphicsV2.D3D11.Shaders
          *
          */
 
-        internal CompiledShader Compile(string source, string entrypoint, string shaderVersion)
+        internal ID3DBlob* Compile(string source, string entrypoint, string shaderVersion)
         {
             ID3DBlob* shader;
             fixed (byte* pSource = source.AsBytes())
@@ -50,27 +49,27 @@ namespace Titan.GraphicsV2.D3D11.Shaders
                 CheckAndThrow(result, nameof(D3DCompile));
             }
 
-            return new CompiledShader(shader);
+            return shader;
         }
 
 
-        internal CompiledShader CompileFromFile(string filename, string entrypoint, string shaderVersion)
-        {
-            ID3DBlob* shader;
-            fixed (byte* pEntrypoint = entrypoint.AsBytes())
-            fixed (byte* pTarget = shaderVersion.AsBytes())
-            fixed (char* pFilename = filename)
-            {
-                ID3DBlob* error = null;
-                var result = D3DCompileFromFile(pFilename, null, null, (sbyte*) pEntrypoint, (sbyte*) pTarget, 0, 0, &shader, &error);
-                if (FAILED(result) && error != null)
-                {
-                    LOGGER.Debug(new string((char*) error->GetBufferPointer(), 0, (int) error->GetBufferSize()));
-                }
-                if( error != null) error->Release();
-                CheckAndThrow(result, nameof(D3DCompileFromFile));
-            }
-            return new CompiledShader(shader);
-        }
+        //internal CompiledShader CompileFromFile(string filename, string entrypoint, string shaderVersion)
+        //{
+        //    ID3DBlob* shader;
+        //    fixed (byte* pEntrypoint = entrypoint.AsBytes())
+        //    fixed (byte* pTarget = shaderVersion.AsBytes())
+        //    fixed (char* pFilename = filename)
+        //    {
+        //        ID3DBlob* error = null;
+        //        var result = D3DCompileFromFile(pFilename, null, null, (sbyte*) pEntrypoint, (sbyte*) pTarget, 0, 0, &shader, &error);
+        //        if (FAILED(result) && error != null)
+        //        {
+        //            LOGGER.Debug(new string((char*) error->GetBufferPointer(), 0, (int) error->GetBufferSize()));
+        //        }
+        //        if( error != null) error->Release();
+        //        CheckAndThrow(result, nameof(D3DCompileFromFile));
+        //    }
+        //    return new CompiledShader(shader);
+        //}
     }
 }

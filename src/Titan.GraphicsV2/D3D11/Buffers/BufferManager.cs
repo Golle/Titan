@@ -72,14 +72,19 @@ namespace Titan.GraphicsV2.D3D11.Buffers
 
         internal void Release(in Handle<Buffer> handle)
         {
+            ReleaseInternal(handle);
+            _usedHandles.Remove(handle);
+            _resourcePool.ReleaseResource(handle);
+        }
+
+        private void ReleaseInternal(Handle<Buffer> handle)
+        {
             var buffer = _resourcePool.GetResourcePointer(handle);
             if (buffer->Resource != null)
             {
                 buffer->Resource->Release();
             }
             *buffer = default;
-            _usedHandles.Remove(handle);
-            _resourcePool.ReleaseResource(handle);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -89,7 +94,7 @@ namespace Titan.GraphicsV2.D3D11.Buffers
         {
             foreach (var handle in _usedHandles)
             {
-                Release(handle);
+                ReleaseInternal(handle);
             }
             _resourcePool.Terminate();
         }

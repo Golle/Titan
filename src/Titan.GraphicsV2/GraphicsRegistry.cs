@@ -1,7 +1,5 @@
-using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.Rendering;
-using Titan.GraphicsV2.Resources;
 using Titan.IOC;
 
 namespace Titan.GraphicsV2
@@ -13,8 +11,6 @@ namespace Titan.GraphicsV2
             container
                 .Register<GraphicsSystem>()
                 .Register<ShaderCompiler>()
-                .Register<ShaderFactory>()
-                .Register<InputLayoutFactory>()
                 .Register<FrameBufferFactory>()
                 .Register<ShaderManager>();
 
