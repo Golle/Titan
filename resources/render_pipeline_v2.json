@@ -19,7 +19,7 @@
                 "Format": "RGBA32F"
             }
         ],
-        "Depth": [
+        "DepthBuffers": [
             {
                 "Name": "DefaultDepth",
                 "Format": "D24S8"
@@ -66,7 +66,7 @@
                         "BackbufferColor"
                     ],
                     "Clear": true,
-                    "ClearColor": "#ff000000"
+                    "ClearColor": "#ff0000ff"
                 },
                 "Material": "materials/DeferredShading.json"
             },

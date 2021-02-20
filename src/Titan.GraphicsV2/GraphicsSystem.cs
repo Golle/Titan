@@ -6,7 +6,6 @@ using Titan.GraphicsV2.D3D11.Buffers;
 using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.GraphicsV2.Rendering;
-using Titan.GraphicsV2.Rendering2;
 using Titan.IOC;
 using Titan.Windows.Win32.D3D11;
 
@@ -16,6 +15,7 @@ namespace Titan.GraphicsV2
     {
         private readonly IContainer _container;
         private Device _device;
+        private RenderPipeline _pipeline;
 
         public GraphicsSystem(IContainer container)
         {
@@ -32,8 +32,7 @@ namespace Titan.GraphicsV2
                 .RegisterSingleton(_device);
 
             
-            var config = _container.CreateInstance<RenderPipelineReader>()
-                .Read("render_pipeline_v2.json");
+            
 
             {
                 var textureManager = _device.TextureManager;
@@ -84,13 +83,18 @@ namespace Titan.GraphicsV2
             }
 
 
+            _pipeline = _container.CreateInstance<RenderPipelineFactory>()
+                .CreateFromFile("render_pipeline_v2.json")
+;
+
 
         }
 
         public void RenderFrame()
         {
-           
-            _device.Swapchain.Present();
+           _pipeline.Render(_device.Context);
+
+           _device.Swapchain.Present();
         }
 
         public void Dispose()

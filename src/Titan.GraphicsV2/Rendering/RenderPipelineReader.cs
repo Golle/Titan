@@ -1,7 +1,7 @@
-﻿using Titan.Core.Common;
+using Titan.Core.Common;
 using Titan.Core.IO;
 
-namespace Titan.GraphicsV2.Rendering2
+namespace Titan.GraphicsV2.Rendering
 {
     internal class RenderPipelineReader
     {
