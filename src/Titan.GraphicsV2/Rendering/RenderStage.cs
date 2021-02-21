@@ -15,6 +15,8 @@ namespace Titan.GraphicsV2.Rendering
         
         public unsafe void Render(Context context)
         {
+            // TODO, can this be used to create some IL code instead of using a loop?
+
             var commands = _commands.Enumerate();
             RenderCommandTypes type;
             do
@@ -39,6 +41,16 @@ namespace Titan.GraphicsV2.Rendering
                     case ClearRenderTarget:
                         var clear = commands.GetAndMoveToNext<ClearRenderTargetCommand>();
                         context.ClearRenderTarget(clear->RenderTarget, clear->Color);
+                        break;
+                    
+                    case SetPixelShaderSamplers:
+                        var pixelShaderSampler = commands.GetAndMoveToNext<SetPixelShaderSamplersCommand>();
+                        context.SetPixelShaderSamplers(pixelShaderSampler->NumberOfSamplers, pixelShaderSampler->Samplers);
+                        break;
+                    
+                    case SetVertexShaderSamplers:
+                        var vertexShaderSampler = commands.GetAndMoveToNext<SetVertexShaderSamplersCommand>();
+                        context.SetVertexShaderSamplers(vertexShaderSampler->NumberOfSamplers, vertexShaderSampler->Samplers);
                         break;
                     case Invalid:
                         break;

@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <Folder Include="Rendering\Builder\" />
-    <Folder Include="Rendering\Commands\" />
   </ItemGroup>
 
 </Project>

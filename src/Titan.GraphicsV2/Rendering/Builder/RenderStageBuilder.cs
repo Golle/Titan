@@ -4,6 +4,7 @@ using System.Linq;
 using Titan.Core.Common;
 using Titan.Core.Logging;
 using Titan.GraphicsV2.D3D11;
+using Titan.GraphicsV2.D3D11.Samplers;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.GraphicsV2.Rendering.Commands;
 
@@ -12,31 +13,37 @@ namespace Titan.GraphicsV2.Rendering.Builder
     internal class RenderStageBuilder
     {
         private readonly IDictionary<string, Handle<Texture>> _framebuffers;
+        private readonly IDictionary<string, Handle<Sampler>> _samplers;
+
         private readonly List<Handle<Texture>> _outputs = new();
         private readonly List<Handle<Texture>> _pixelShaderInputs = new();
         private readonly List<Handle<Texture>> _vertexShaderInputs = new();
+        private readonly List<Handle<Sampler>> _vertexShaderSamplers = new();
+        private readonly List<Handle<Sampler>> _pixelShaderSamplers = new();
 
         
         private Color? _clearColor;
 
-        public RenderStageBuilder(string name, IDictionary<string, Handle<Texture>> framebuffers)
+        public RenderStageBuilder(string name, IDictionary<string, Handle<Texture>> framebuffers, IDictionary<string, Handle<Sampler>> samplers)
         {
             _framebuffers = framebuffers;
+            _samplers = samplers;
             LOGGER.Debug("Stage: {0}", name);
         }
 
-        internal void AddInput(string name, RenderInputTypes type)
+        internal void AddInput(string name, RenderBindingTypes type)
         {
             var framebuffer = _framebuffers[name];
             LOGGER.Debug("Input: {0}({1})  Framebuffer: {2}", name, type, framebuffer.Value);
             switch (type)
             {
-                case RenderInputTypes.PixelShader: _pixelShaderInputs.Add(framebuffer);break;
-                case RenderInputTypes.VertexShader: _vertexShaderInputs.Add(framebuffer);break;
+                case RenderBindingTypes.PixelShader: _pixelShaderInputs.Add(framebuffer);break;
+                case RenderBindingTypes.VertexShader: _vertexShaderInputs.Add(framebuffer);break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
+
         internal void AddOutput(string renderTarget)
         {
             var framebuffer = _framebuffers[renderTarget];
@@ -49,18 +56,52 @@ namespace Titan.GraphicsV2.Rendering.Builder
             _clearColor = color;
         }
 
+        internal void AddSampler(string name, RenderBindingTypes type)
+        {
+            var sampler = _samplers[name];
+            LOGGER.Debug("Sampler: {0}({1})  Handle: {2}", name, type, sampler.Value);
+            switch (type)
+            {
+                case RenderBindingTypes.PixelShader: _pixelShaderSamplers.Add(sampler); break;
+                case RenderBindingTypes.VertexShader: _vertexShaderSamplers.Add(sampler); break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
         internal RenderStage Build(Device device)
         {
             using var builder = new CommandBufferBuilder();
             BuildOutputs(device, builder);
-            BuilderInputs(device, builder);
-            
-
+            BuildInputs(device, builder);
+            BuildSamplers(device, builder);
 
             return new RenderStage(builder.Build());
         }
 
-        private unsafe void BuilderInputs(Device device, CommandBufferBuilder builder)
+        private unsafe void BuildSamplers(Device device, CommandBufferBuilder builder)
+        {
+            if (_pixelShaderSamplers.Any())
+            {
+                var command = new SetPixelShaderSamplersCommand((uint) _pixelShaderSamplers.Count);
+                for (var i = 0; i < _pixelShaderSamplers.Count; ++i)
+                {
+                    command.Samplers[i] = device.SamplerManager.Access(_pixelShaderSamplers[i]).SamplerState;
+                }
+                builder.Write(command);
+            }
+            if (_vertexShaderSamplers.Any())
+            {
+                var command = new SetVertexShaderSamplersCommand((uint)_vertexShaderSamplers.Count);
+                for (var i = 0; i < _vertexShaderSamplers.Count; ++i)
+                {
+                    command.Samplers[i] = device.SamplerManager.Access(_vertexShaderSamplers[i]).SamplerState;
+                }
+                builder.Write(command);
+            }
+        }
+
+        private unsafe void BuildInputs(Device device, CommandBufferBuilder builder)
         {
             if (_pixelShaderInputs.Any())
             {

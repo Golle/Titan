@@ -27,5 +27,9 @@ namespace Titan.GraphicsV2.D3D11
         public void SetPixelShaderResources(uint numberOfViews, ID3D11ShaderResourceView** resourceViews) => _context->PSSetShaderResources(0, numberOfViews, resourceViews);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetVertexShaderResources(uint numberOfViews, ID3D11ShaderResourceView** resourceViews) => _context->VSSetShaderResources(0, numberOfViews, resourceViews);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPixelShaderSamplers(uint numberOfSamplers, ID3D11SamplerState** samplers) => _context->PSSetSamplers(0, numberOfSamplers, samplers);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetVertexShaderSamplers(uint numberOfSamplers, ID3D11SamplerState** samplers) => _context->VSSetSamplers(0, numberOfSamplers, samplers);
     }
 }

@@ -25,6 +25,16 @@
                 "Format": "D24S8"
             }
         ],
+        "Samplers": [
+            {
+                "Name": "Default",
+                "Filter": "MinMagMipPoint",
+                "AddressU": "Wrap",
+                "AddressV": "Wrap",
+                "AddressW": "Wrap",
+                "ComparisonFunc": "Never"
+            }
+        ],
         "Stages": [
             {
                 "Name": "GBuffer",
@@ -47,20 +57,28 @@
             {
                 "Name": "DeferredShading",
                 "Stage": "PostProcessing",
-                "Inputs": [
-                    {
-                        "Name": "GBufferAlbedo",
-                        "Type": "PixelShader"
-                    },
-                    {
-                        "Name": "GBufferNormals",
-                        "Type": "PixelShader"
-                    },
-                    {
-                        "Name": "GBufferProperties",
-                        "Type": "PixelShader"
-                    }
-                ],
+                "Input": {
+                    "Samplers": [
+                        {
+                            "Name": "Default",
+                            "Type": "PixelShader"
+                        }
+                    ],
+                    "Textures": [
+                        {
+                            "Name": "GBufferAlbedo",
+                            "Type": "PixelShader"
+                        },
+                        {
+                            "Name": "GBufferNormals",
+                            "Type": "PixelShader"
+                        },
+                        {
+                            "Name": "GBufferProperties",
+                            "Type": "PixelShader"
+                        }
+                    ]
+                },
                 "Output": {
                     "RenderTargets": [
                         "BackbufferColor"
@@ -73,12 +91,14 @@
             {
                 "Name": "Backbuffer",
                 "Stage": "Swapchain",
-                "Inputs": [
-                    {
-                        "Name": "BackbufferColor",
-                        "Type": "PixelShader"
-                    }
-                ]
+                "Input": {
+                    "Textures": [
+                        {
+                            "Name": "BackbufferColor",
+                            "Type": "PixelShader"
+                        }
+                    ]
+                }
             }
         ]
     }

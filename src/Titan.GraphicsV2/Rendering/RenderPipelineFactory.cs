@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Titan.Core.Common;
 using Titan.GraphicsV2.D3D11;
+using Titan.GraphicsV2.D3D11.Samplers;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.GraphicsV2.Rendering.Builder;
 using Titan.Windows.Win32.D3D11;
@@ -35,23 +37,28 @@ namespace Titan.GraphicsV2.Rendering
         Swapchain
     }
 
-    internal enum RenderInputTypes
+    internal enum RenderBindingTypes
     {
+        ComputeShader,
         PixelShader,
         VertexShader
     }
 
-    internal record RenderPipelineSpecification(string Name, TextureSpecification[] Textures, RenderStageSpecification[] Stages, DepthBufferSpecification[] DepthBuffers);
+    internal record RenderPipelineSpecification(string Name, TextureSpecification[] Textures, RenderStageSpecification[] Stages, DepthBufferSpecification[] DepthBuffers, SamplerSpecification[] Samplers);
 
     internal record TextureSpecification(string Name, RenderTextureFormat Format);
 
     internal record DepthBufferSpecification(string Name, DepthTextureFormat Format);
 
-    internal record RenderStageSpecification(string Name, RenderStages Stage, string Depth, RenderOutputSpecification Output, RenderInputSpecificaiton[] Inputs, string Material);
+    internal record RenderStageSpecification(string Name, RenderStages Stage, string Depth, RenderOutputSpecification Output, RenderInputSpecificaiton Input, string Material);
 
     internal record RenderOutputSpecification(string[] RenderTargets, bool Clear, string ClearColor, bool ClearDepth, float ClearDepthValue);
 
-    internal record RenderInputSpecificaiton(string Name, RenderInputTypes Type);
+    internal record RenderInputSpecificaiton(RenderBinding[] Inputs, RenderBinding[] Samplers);
+
+    internal record RenderBinding(string Name, RenderBindingTypes Type);
+
+    internal record SamplerSpecification(string Name, TextureFilter Filter, TextureAddressMode AddressU, TextureAddressMode AddressV, TextureAddressMode AddressW, ComparisonFunc ComparisonFunc);
 
 
     internal class RenderPipelineFactory
@@ -80,12 +87,31 @@ namespace Titan.GraphicsV2.Rendering
                 framebuffers.Add(textureSpecification.Name, handle);
             }
 
+            var samplers = new Dictionary<string, Handle<Sampler>>();
+            foreach (var spec in config.Samplers)
+            {
+                var handle = _device.SamplerManager.Create(new SamplerCreation
+                {
+                    AddressU = spec.AddressU,
+                    AddressW = spec.AddressW,
+                    AddressV = spec.AddressV,
+                    ComparisonFunc = spec.ComparisonFunc,
+                    Filter = spec.Filter
+                });
+                samplers.Add(spec.Name, handle);
+            }
+
             var stages = config.Stages.Select(stage =>
             {
-                var builder = new RenderStageBuilder(stage.Name, framebuffers);
-                foreach (var (name, type) in stage.Inputs)
+                var builder = new RenderStageBuilder(stage.Name, framebuffers, samplers);
+                foreach (var texture in stage.Input?.Inputs ?? Enumerable.Empty<RenderBinding>())
                 {
-                    builder.AddInput(name, type);
+                    builder.AddInput(texture.Name, texture.Type);
+                }
+
+                foreach (var sampler in stage.Input?.Samplers ?? Enumerable.Empty<RenderBinding>())
+                {
+                    builder.AddSampler(sampler.Name, sampler.Type);
                 }
 
                 var output = stage.Output;
