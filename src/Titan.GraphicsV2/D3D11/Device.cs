@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core.Common;
 using Titan.Core.Logging;
 using Titan.GraphicsV2.D3D11.Buffers;
+using Titan.GraphicsV2.D3D11.Samplers;
 using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.Windows.Win32;
@@ -27,6 +28,7 @@ namespace Titan.GraphicsV2.D3D11
         public TextureManager TextureManager { get; }
         public BufferManager BufferManager { get; }
         public ShaderManager ShaderManager { get; }
+        public SamplerManager SamplerManager { get; }
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -73,6 +75,7 @@ namespace Titan.GraphicsV2.D3D11
             TextureManager = new TextureManager(this, Swapchain);
             BufferManager = new BufferManager(this);
             ShaderManager = new ShaderManager(this);
+            SamplerManager = new SamplerManager(this);
         }
 
 
@@ -82,6 +85,7 @@ namespace Titan.GraphicsV2.D3D11
             TextureManager.Dispose();
             BufferManager.Dispose();
             ShaderManager.Dispose();
+            SamplerManager.Dispose();
 
             _context.Dispose();
             _swapChain.Dispose();

@@ -3,6 +3,7 @@ using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Buffers;
+using Titan.GraphicsV2.D3D11.Samplers;
 using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.GraphicsV2.Rendering;
@@ -80,6 +81,19 @@ namespace Titan.GraphicsV2
                 var shader = shaderManager.Access(handle);
 
                 //shaderManager.Release(handle);
+            }
+            {
+
+                var samplerManager = _device.SamplerManager;
+                var handle = samplerManager.Create(new SamplerCreation
+                {
+                    AddressAll = TextureAddressMode.Wrap
+                });
+
+                var sampler = samplerManager.Access(handle);
+                
+                samplerManager.Release(handle);
+
             }
 
 
