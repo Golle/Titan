@@ -52,6 +52,13 @@ namespace Titan.GraphicsV2.Rendering
                         var vertexShaderSampler = commands.GetAndMoveToNext<SetVertexShaderSamplersCommand>();
                         context.SetVertexShaderSamplers(vertexShaderSampler->NumberOfSamplers, vertexShaderSampler->Samplers);
                         break;
+
+                    case SetShaders:
+                        var shaders = commands.GetAndMoveToNext<SetShadersCommand>();
+                        context.SetPixelShader(shaders->PixelShader);
+                        context.SetVertexShader(shaders->VertexShader);
+                        context.SetInputLayout(shaders->InputLayout);
+                        break;
                     case Invalid:
                         break;
 #if DEBUG

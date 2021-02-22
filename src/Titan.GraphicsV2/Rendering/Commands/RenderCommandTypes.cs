@@ -8,6 +8,8 @@ namespace Titan.GraphicsV2.Rendering.Commands
         SetVertexShaderResource,
         SetPixelShaderSamplers,
         SetVertexShaderSamplers,
+        SetShaders,
+
         ClearRenderTarget
     }
 }

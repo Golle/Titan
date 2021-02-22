@@ -35,6 +35,46 @@
                 "ComparisonFunc": "Never"
             }
         ],
+        "Shaders": [
+            {
+                "Name": "DeferredShading",
+                "VertexShader": {
+                    "Path": "shaders/BackbufferVertexShader.hlsl",
+                    "Layout": [
+                        {
+                            "Name": "Position",
+                            "Format": "RG32F"
+                        },
+                        {
+                            "Name": "Texture",
+                            "Format": "RG32F"
+                        }
+                    ]
+                },
+                "PixelShader": {
+                    "Path": "shaders/DeferredShadingPixelShader.hlsl"
+                }
+            },
+            {
+                "Name": "Fullscreen",
+                "VertexShader": {
+                    "Path": "shaders/BackbufferVertexShader.hlsl",
+                    "Layout": [
+                        {
+                            "Name": "Position",
+                            "Format": "RG32F"
+                        },
+                        {
+                            "Name": "Texture",
+                            "Format": "RG32F"
+                        }
+                    ]
+                },
+                "PixelShader": {
+                    "Path": "shaders/DeferredShadingPixelShader.hlsl"
+                }
+            }
+        ],
         "Stages": [
             {
                 "Name": "GBuffer",
@@ -86,7 +126,7 @@
                     "Clear": true,
                     "ClearColor": "#ff0000ff"
                 },
-                "Material": "materials/DeferredShading.json"
+                "Material": "DeferredShading"
             },
             {
                 "Name": "Backbuffer",
@@ -98,7 +138,8 @@
                             "Type": "PixelShader"
                         }
                     ]
-                }
+                },
+                "Material": "Fullscreen"
             }
         ]
     }

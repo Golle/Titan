@@ -5,6 +5,7 @@ using Titan.Core.Common;
 using Titan.Core.Logging;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Samplers;
+using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.GraphicsV2.Rendering.Commands;
 
@@ -14,6 +15,7 @@ namespace Titan.GraphicsV2.Rendering.Builder
     {
         private readonly IDictionary<string, Handle<Texture>> _framebuffers;
         private readonly IDictionary<string, Handle<Sampler>> _samplers;
+        private readonly IDictionary<string, Handle<Shader>> _shaders;
 
         private readonly List<Handle<Texture>> _outputs = new();
         private readonly List<Handle<Texture>> _pixelShaderInputs = new();
@@ -21,13 +23,17 @@ namespace Titan.GraphicsV2.Rendering.Builder
         private readonly List<Handle<Sampler>> _vertexShaderSamplers = new();
         private readonly List<Handle<Sampler>> _pixelShaderSamplers = new();
 
+
+        private Handle<Shader>? _shader;
+
         
         private Color? _clearColor;
 
-        public RenderStageBuilder(string name, IDictionary<string, Handle<Texture>> framebuffers, IDictionary<string, Handle<Sampler>> samplers)
+        public RenderStageBuilder(string name, IDictionary<string, Handle<Texture>> framebuffers, IDictionary<string, Handle<Sampler>> samplers, IDictionary<string, Handle<Shader>> shaders)
         {
             _framebuffers = framebuffers;
             _samplers = samplers;
+            _shaders = shaders;
             LOGGER.Debug("Stage: {0}", name);
         }
 
@@ -69,14 +75,38 @@ namespace Titan.GraphicsV2.Rendering.Builder
             }
         }
 
+        public void UseShader(string name)
+        {
+            if (_shader.HasValue)
+            {
+                throw new InvalidOperationException("Multiple shader programs set for a single pass");
+            }
+            _shader = _shaders[name];
+            LOGGER.Debug("Shader: {0}  Handle: {1}", name, _shader.Value);
+        }
+
         internal RenderStage Build(Device device)
         {
             using var builder = new CommandBufferBuilder();
             BuildOutputs(device, builder);
             BuildInputs(device, builder);
             BuildSamplers(device, builder);
+            BuildShader(device, builder);
 
             return new RenderStage(builder.Build());
+        }
+
+        private void BuildShader(Device device, CommandBufferBuilder builder)
+        {
+            if (!_shader.HasValue)
+            {
+                return;
+            }
+            var shader = device.ShaderManager.Access(_shader.Value);
+            unsafe
+            {
+                builder.Write(new SetShadersCommand(shader.VertexShader, shader.PixelShader, shader.InputLayout));
+            }
         }
 
         private unsafe void BuildSamplers(Device device, CommandBufferBuilder builder)

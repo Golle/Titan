@@ -150,38 +150,15 @@ namespace Titan
             LOGGER.Debug("Initialize {0} with {1} workers and maximum of {2} queued jobs", nameof(WorkerPool), Environment.ProcessorCount - 1, 1000u);
             _workerPool.Initialize(new WorkerPoolConfiguration(1000u, (uint) (Environment.ProcessorCount - 1)));
 
-            InitMemoryManager();
-
             LOGGER.Debug("Initialize Window with title '{0}' and dimensions {1}x{2}", configuration.DisplayConfiguration.Title, configuration.DisplayConfiguration.Width, configuration.DisplayConfiguration.Height);
             _window.Initialize((int) configuration.DisplayConfiguration.Width, (int) configuration.DisplayConfiguration.Height, configuration.DisplayConfiguration.Title);
 
             LOGGER.Debug("Initialize the Graphics System");
-            _graphicsSystem.Initialize(new DeviceConfiguration(_window.Handle, (uint) _window.Width, (uint) _window.Height, 144, true, true, true));
-            //_graphicsSystem.Initialize(configuration.AssetsDirectory.Path, configuration.DisplayConfiguration.RefreshRate, configuration.PipelineConfiguration, true);
+            _graphicsSystem.Initialize(new DeviceConfiguration(_window.Handle, (uint) _window.Width, (uint) _window.Height, 144, Windowed: _window.Windowed, VSync:false, Debug: false));
 
             _startup = (IStartup)_container.CreateInstance(configuration.Startup);
             
             return this;
-        }
-        
-        private unsafe void InitMemoryManager()
-        {
-            LOGGER.Debug("Initialize memory manager");
-            // TODO: not sure how to do this yet. Could have each manager "request" a memory chunk. This should be a part of the graphics system
-            //_memoryManager.Initialize(new[]
-            //{
-            //    new ChunkDescriptor("VertexBuffer", (uint) sizeof(VertexBuffer), 2048),
-            //    new ChunkDescriptor("IndexBuffer", (uint) sizeof(IndexBuffer), 2048),
-            //    new ChunkDescriptor("ConstantBuffer", (uint) sizeof(ConstantBuffer), 100),
-            //    new ChunkDescriptor("Materials", (uint) sizeof(Material), 256),
-            //    new ChunkDescriptor("Shaders", (uint) IntPtr.Size, 1024),
-            //    new ChunkDescriptor("Texture", (uint) sizeof(Texture2D), 1024),
-            //    new ChunkDescriptor("ShaderResourceView", (uint) sizeof(ShaderResourceView), 1024),
-            //    new ChunkDescriptor("RenderTargetView", (uint) sizeof(RenderTargetView), 1024),
-            //    new ChunkDescriptor("DepthStencilView", (uint) sizeof(DepthStencilView), 10),
-            //    new ChunkDescriptor("DepthStencilState", (uint) sizeof(DepthStencilState), 10),
-            //    new ChunkDescriptor("SamplerState", (uint) sizeof(SamplerState), 20),
-            //});
         }
 
         public void Dispose()

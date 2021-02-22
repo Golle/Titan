@@ -31,5 +31,11 @@ namespace Titan.GraphicsV2.D3D11
         public void SetPixelShaderSamplers(uint numberOfSamplers, ID3D11SamplerState** samplers) => _context->PSSetSamplers(0, numberOfSamplers, samplers);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetVertexShaderSamplers(uint numberOfSamplers, ID3D11SamplerState** samplers) => _context->VSSetSamplers(0, numberOfSamplers, samplers);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPixelShader(ID3D11PixelShader* shader) => _context->PSSetShader(shader, null, 0u);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetVertexShader(ID3D11VertexShader* shader) => _context->VSSetShader(shader, null, 0);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetInputLayout(ID3D11InputLayout* inputLayout) => _context->IASetInputLayout(inputLayout);
     }
 }
