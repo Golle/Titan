@@ -154,7 +154,7 @@ namespace Titan
             _window.Initialize((int) configuration.DisplayConfiguration.Width, (int) configuration.DisplayConfiguration.Height, configuration.DisplayConfiguration.Title);
 
             LOGGER.Debug("Initialize the Graphics System");
-            _graphicsSystem.Initialize(new DeviceConfiguration(_window.Handle, (uint) _window.Width, (uint) _window.Height, 144, Windowed: _window.Windowed, VSync:false, Debug: false));
+            _graphicsSystem.Initialize(new DeviceConfiguration(_window.Handle, (uint) _window.Width, (uint) _window.Height, 144, Windowed: _window.Windowed, VSync:true, Debug: true));
 
             _startup = (IStartup)_container.CreateInstance(configuration.Startup);
             

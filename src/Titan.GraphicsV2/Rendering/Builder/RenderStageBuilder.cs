@@ -13,6 +13,7 @@ namespace Titan.GraphicsV2.Rendering.Builder
 {
     internal class RenderStageBuilder
     {
+        private readonly RenderStages _renderStage;
         private readonly IDictionary<string, Handle<Texture>> _framebuffers;
         private readonly IDictionary<string, Handle<Sampler>> _samplers;
         private readonly IDictionary<string, Handle<Shader>> _shaders;
@@ -29,8 +30,9 @@ namespace Titan.GraphicsV2.Rendering.Builder
         
         private Color? _clearColor;
 
-        public RenderStageBuilder(string name, IDictionary<string, Handle<Texture>> framebuffers, IDictionary<string, Handle<Sampler>> samplers, IDictionary<string, Handle<Shader>> shaders)
+        public RenderStageBuilder(string name, RenderStages renderStage, IDictionary<string, Handle<Texture>> framebuffers, IDictionary<string, Handle<Sampler>> samplers, IDictionary<string, Handle<Shader>> shaders)
         {
+            _renderStage = renderStage;
             _framebuffers = framebuffers;
             _samplers = samplers;
             _shaders = shaders;
@@ -88,10 +90,31 @@ namespace Titan.GraphicsV2.Rendering.Builder
         internal RenderStage Build(Device device)
         {
             using var builder = new CommandBufferBuilder();
+            // Begin/Setup state
             BuildOutputs(device, builder);
             BuildInputs(device, builder);
             BuildSamplers(device, builder);
             BuildShader(device, builder);
+
+            // Execute the renderer
+            //builder.Write(new RenderCommand());
+
+            // Cleanup/unbind resources
+            if (_outputs.Any())
+            {
+                builder.Write(new UnbindRenderTargetsCommand(_outputs.Count));
+            }
+
+            if (_vertexShaderInputs.Any())
+            {
+                builder.Write(new UnbindVertexShaderResourcesCommand(_vertexShaderInputs.Count));
+            }
+            if (_pixelShaderInputs.Any())
+            {
+                builder.Write(new UnbindPixelShaderResourcesCommand(_pixelShaderInputs.Count));
+            }
+            
+            
 
             return new RenderStage(builder.Build());
         }

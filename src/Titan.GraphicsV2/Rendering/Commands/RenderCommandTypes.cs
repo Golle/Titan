@@ -10,6 +10,10 @@ namespace Titan.GraphicsV2.Rendering.Commands
         SetVertexShaderSamplers,
         SetShaders,
 
-        ClearRenderTarget
+        ClearRenderTarget,
+
+        UnbindVertexShaderResources,
+        UnbindPixelShaderResources,
+        UnbindRenderTargets
     }
 }

@@ -52,7 +52,7 @@ namespace Titan.GraphicsV2.Rendering
     internal record DepthBufferSpecification(string Name, DepthTextureFormat Format);
     internal record RenderStageSpecification(string Name, RenderStages Stage, string Depth, RenderOutputSpecification Output, RenderInputSpecificaiton Input, string Material);
     internal record RenderOutputSpecification(string[] RenderTargets, bool Clear, string ClearColor, bool ClearDepth, float ClearDepthValue);
-    internal record RenderInputSpecificaiton(RenderBinding[] Inputs, RenderBinding[] Samplers);
+    internal record RenderInputSpecificaiton(RenderBinding[] Textures, RenderBinding[] Samplers);
     internal record RenderBinding(string Name, RenderBindingTypes Type);
     internal record SamplerSpecification(string Name, TextureFilter Filter, TextureAddressMode AddressU, TextureAddressMode AddressV, TextureAddressMode AddressW, ComparisonFunc ComparisonFunc);
     internal record ShaderSpecification(string Name, VertexShaderSpecification VertexShader, PixelShaderSpecification PixelShader);
@@ -120,8 +120,8 @@ namespace Titan.GraphicsV2.Rendering
 
             var stages = config.Stages.Select(stage =>
             {
-                var builder = new RenderStageBuilder(stage.Name, framebuffers, samplers, shaders);
-                foreach (var texture in stage.Input?.Inputs ?? Enumerable.Empty<RenderBinding>())
+                var builder = new RenderStageBuilder(stage.Name, stage.Stage, framebuffers, samplers, shaders);
+                foreach (var texture in stage.Input?.Textures ?? Enumerable.Empty<RenderBinding>())
                 {
                     builder.AddInput(texture.Name, texture.Type);
                 }
