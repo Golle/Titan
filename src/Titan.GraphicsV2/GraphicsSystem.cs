@@ -94,7 +94,8 @@ namespace Titan.GraphicsV2
             //}
 
 
-            _pipeline = _container.CreateInstance<RenderPipelineFactory>()
+            _pipeline = _container
+                    .CreateInstance<RenderPipelineFactory>()
                 .CreateFromFile("render_pipeline_v2.json")
 ;
 
@@ -110,6 +111,8 @@ namespace Titan.GraphicsV2
 
         public void Dispose()
         {
+            _pipeline.Dispose();
+
             _device.Dispose();
             _container.Dispose();
         }

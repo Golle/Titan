@@ -1,8 +1,9 @@
+using System;
 using Titan.GraphicsV2.D3D11;
 
 namespace Titan.GraphicsV2.Rendering
 {
-    internal class RenderPipeline
+    internal class RenderPipeline : IDisposable
     {
         private readonly RenderStage[] _stages;
 
@@ -17,6 +18,14 @@ namespace Titan.GraphicsV2.Rendering
             foreach (var stage in _stages)
             {
                 stage.Render(context);
+            }
+        }
+
+        public void Dispose()
+        {
+            foreach (var stage in _stages)
+            {
+                stage.Dispose();
             }
         }
     }

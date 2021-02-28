@@ -8,12 +8,12 @@ using Titan.GraphicsV2.D3D11.Samplers;
 using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.GraphicsV2.Rendering.Commands;
+using Titan.GraphicsV2.Rendering.Renderers;
 
 namespace Titan.GraphicsV2.Rendering.Builder
 {
     internal class RenderStageBuilder
     {
-        private readonly RenderStages _renderStage;
         private readonly IDictionary<string, Handle<Texture>> _framebuffers;
         private readonly IDictionary<string, Handle<Sampler>> _samplers;
         private readonly IDictionary<string, Handle<Shader>> _shaders;
@@ -23,16 +23,18 @@ namespace Titan.GraphicsV2.Rendering.Builder
         private readonly List<Handle<Texture>> _vertexShaderInputs = new();
         private readonly List<Handle<Sampler>> _vertexShaderSamplers = new();
         private readonly List<Handle<Sampler>> _pixelShaderSamplers = new();
+        
+        private readonly IRenderer _renderer;
 
 
         private Handle<Shader>? _shader;
 
-        
+
         private Color? _clearColor;
 
-        public RenderStageBuilder(string name, RenderStages renderStage, IDictionary<string, Handle<Texture>> framebuffers, IDictionary<string, Handle<Sampler>> samplers, IDictionary<string, Handle<Shader>> shaders)
+        public RenderStageBuilder(string name, IRenderer renderer, IDictionary<string, Handle<Texture>> framebuffers, IDictionary<string, Handle<Sampler>> samplers, IDictionary<string, Handle<Shader>> shaders)
         {
-            _renderStage = renderStage;
+            _renderer = renderer;
             _framebuffers = framebuffers;
             _samplers = samplers;
             _shaders = shaders;
@@ -97,7 +99,7 @@ namespace Titan.GraphicsV2.Rendering.Builder
             BuildShader(device, builder);
 
             // Execute the renderer
-            //builder.Write(new RenderCommand());
+            builder.Write(RenderCommand.Default);
 
             // Cleanup/unbind resources
             if (_outputs.Any())
@@ -115,8 +117,8 @@ namespace Titan.GraphicsV2.Rendering.Builder
             }
             
             
-
-            return new RenderStage(builder.Build());
+            // TODO: add support for other renderers
+            return new RenderStage(builder.Build(), _renderer);
         }
 
         private void BuildShader(Device device, CommandBufferBuilder builder)

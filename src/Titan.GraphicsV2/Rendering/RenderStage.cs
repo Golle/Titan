@@ -2,19 +2,23 @@ using System;
 using System.Runtime.CompilerServices;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.Rendering.Commands;
+using Titan.GraphicsV2.Rendering.Renderers;
 using Titan.Windows.Win32.D3D11;
 using static Titan.GraphicsV2.Rendering.Commands.RenderCommandTypes;
 
 namespace Titan.GraphicsV2.Rendering
 {
-    internal sealed class RenderStage
+    internal class RenderStage : IDisposable
     {
         private readonly CommandBuffer _commands;
+        private readonly IRenderer _renderer;
 
-        public RenderStage(CommandBuffer commands)
+        internal RenderStage(CommandBuffer commands, IRenderer renderer)
         {
             _commands = commands;
+            _renderer = renderer;
         }
+
 
         public unsafe void Render(Context context)
         {
@@ -83,7 +87,10 @@ namespace Titan.GraphicsV2.Rendering
                         UnbindVertexShaderResource(context, command->Count);
                         break;
                     }
-
+                    case RenderCommandTypes.Render:
+                        _renderer.Render(context);
+                        break;
+                    
                     case Invalid:
                         break;
 #if DEBUG
@@ -108,5 +115,10 @@ namespace Titan.GraphicsV2.Rendering
             context.SetPixelShaderResources((uint) count, resources);
         }
 
+        public void Dispose()
+        {
+            _commands.Dispose();
+            _renderer.Dispose();
+        }
     }
 }

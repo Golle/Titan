@@ -35,6 +35,20 @@
                 "ComparisonFunc": "Never"
             }
         ],
+        "Renderers": [
+            {
+                "Name" : "Geometry",
+                "Type": "Titan.GraphicsV2.Rendering.Renderers.GeometryRenderer, Titan.GraphicsV2"
+            },
+            {
+                "Name" : "DeferredShading",
+                "Type": "Titan.GraphicsV2.Rendering.Renderers.DeferredShadingRenderer, Titan.GraphicsV2"
+            },
+            {
+                "Name" : "Swapchain",
+                "Type": "Titan.GraphicsV2.Rendering.Renderers.SwapchainRenderer, Titan.GraphicsV2"
+            }
+        ],
         "Shaders": [
             {
                 "Name": "DeferredShading",
@@ -78,7 +92,7 @@
         "Stages": [
             {
                 "Name": "GBuffer",
-                "Stage": "Geometry",
+                "Renderer": "Geometry",
                 "Depth": "DefaultDepth",
                 "Output": {
                     "RenderTargets": [
@@ -96,7 +110,7 @@
             },
             {
                 "Name": "DeferredShading",
-                "Stage": "PostProcessing",
+                "Renderer": "DeferredShading",
                 "Input": {
                     "Samplers": [
                         {
@@ -130,7 +144,7 @@
             },
             {
                 "Name": "Backbuffer",
-                "Stage": "Swapchain",
+                "Renderer": "Swapchain",
                 "Input": {
                     "Textures": [
                         {

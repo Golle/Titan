@@ -1,4 +1,4 @@
-namespace Titan.GraphicsV2.Rendering.Commands
+    namespace Titan.GraphicsV2.Rendering.Commands
 {
     internal enum RenderCommandTypes : uint
     {
@@ -14,6 +14,7 @@ namespace Titan.GraphicsV2.Rendering.Commands
 
         UnbindVertexShaderResources,
         UnbindPixelShaderResources,
-        UnbindRenderTargets
+        UnbindRenderTargets,
+        Render
     }
 }
