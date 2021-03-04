@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Titan.GraphicsV2.D3D11;
 using Titan.Windows.Win32.D3D11;
 
-namespace Titan.GraphicsV2.Rendering
+namespace Titan.GraphicsV2.Rendering.Pipepline
 {
 
     // TODO: is this better than the CommandBuffer? easier to debug, but will require a lot of if-statements in the render stage. 

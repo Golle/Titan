@@ -1,7 +1,7 @@
 using System;
 using Titan.GraphicsV2.D3D11;
 
-namespace Titan.GraphicsV2.Rendering
+namespace Titan.GraphicsV2.Rendering.Pipepline
 {
     internal class RenderPipeline : IDisposable
     {

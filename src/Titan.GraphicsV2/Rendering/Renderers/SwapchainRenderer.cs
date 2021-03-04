@@ -2,11 +2,11 @@ using Titan.GraphicsV2.D3D11;
 
 namespace Titan.GraphicsV2.Rendering.Renderers
 {
-    internal class GeometryRenderer : IRenderer
+    internal class SwapchainRenderer : IRenderer
     {
-        public GeometryRenderer()
+        public SwapchainRenderer()
         {
-            
+
         }
         public void Render(Context context)
         {

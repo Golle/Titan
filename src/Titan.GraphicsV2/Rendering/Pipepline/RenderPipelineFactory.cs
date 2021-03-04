@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core.Common;
 using Titan.Core.IO;
 using Titan.GraphicsV2.D3D11;
@@ -14,34 +11,9 @@ using Titan.GraphicsV2.Rendering.Builder;
 using Titan.GraphicsV2.Rendering.Renderers;
 using Titan.IOC;
 using Titan.Windows.Win32.D3D11;
-using static Titan.Windows.Win32.D3D11.DXGI_FORMAT;
 
-namespace Titan.GraphicsV2.Rendering
+namespace Titan.GraphicsV2.Rendering.Pipepline
 {
-    internal enum RenderTextureFormat : uint
-    {
-        None,
-        RG32F = DXGI_FORMAT_R32G32_FLOAT,
-        RGB32F = DXGI_FORMAT_R32G32B32_FLOAT,
-        RGBA32F = DXGI_FORMAT_R32G32B32A32_FLOAT,
-    }
-
-    internal enum DepthTextureFormat : uint
-    {
-        None,
-        D16 = DXGI_FORMAT_D16_UNORM,
-        D24S8 = DXGI_FORMAT_D24_UNORM_S8_UINT,
-        D32 = DXGI_FORMAT_D32_FLOAT,
-        D32S8X24 = DXGI_FORMAT_D32_FLOAT_S8X24_UINT
-    }
-
-    internal enum RenderBindingTypes
-    {
-        ComputeShader,
-        PixelShader,
-        VertexShader
-    }
-
     internal record RenderPipelineSpecification(string Name, TextureSpecification[] Textures, RenderStageSpecification[] Stages, DepthBufferSpecification[] DepthBuffers, SamplerSpecification[] Samplers, ShaderSpecification[] Shaders, RendererSpecification[] Renderers);
     internal record RendererSpecification(string Name, string Type);
     internal record TextureSpecification(string Name, RenderTextureFormat Format);
@@ -175,7 +147,7 @@ namespace Titan.GraphicsV2.Rendering
                 {
                     InputLayout = vertexShader.Layout.Select(i => new InputLayoutDescription(i.Name, i.Format)).ToArray(),
                     PixelShader = new ShaderDescription(pixelshaderSource, pixelShader.Entrypoint, pixelShader.Version),
-                    VertexShader = new ShaderDescription(vertexShaderSource, pixelShader.Entrypoint, vertexShader.Version)
+                    VertexShader = new ShaderDescription(vertexShaderSource, vertexShader.Entrypoint, vertexShader.Version)
                 });
                 shaders.Add(name, handle);
             }

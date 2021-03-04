@@ -17,7 +17,7 @@ namespace Titan.Graphics.D3D11
         public Swapchain(IGraphicsDevice graphicsDevice, bool vsync, uint flags = 0u)
         {
             _flags = flags;
-            _syncInterval = vsync ? 1 : 0;
+            _syncInterval = vsync ? 1u : 0u;
             if (graphicsDevice is D3D11GraphicsDevice device)
             {
                 _swapChain = new ComPtr<IDXGISwapChain>(device.SwapChain.Get());

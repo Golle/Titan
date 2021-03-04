@@ -6,7 +6,7 @@ using Titan.GraphicsV2.Rendering.Renderers;
 using Titan.Windows.Win32.D3D11;
 using static Titan.GraphicsV2.Rendering.Commands.RenderCommandTypes;
 
-namespace Titan.GraphicsV2.Rendering
+namespace Titan.GraphicsV2.Rendering.Pipepline
 {
     internal class RenderStage : IDisposable
     {

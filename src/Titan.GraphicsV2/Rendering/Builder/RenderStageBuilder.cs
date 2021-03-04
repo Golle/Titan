@@ -8,6 +8,7 @@ using Titan.GraphicsV2.D3D11.Samplers;
 using Titan.GraphicsV2.D3D11.Shaders;
 using Titan.GraphicsV2.D3D11.Textures;
 using Titan.GraphicsV2.Rendering.Commands;
+using Titan.GraphicsV2.Rendering.Pipepline;
 using Titan.GraphicsV2.Rendering.Renderers;
 
 namespace Titan.GraphicsV2.Rendering.Builder

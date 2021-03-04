@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
-using Titan.GraphicsV2.Rendering.Commands;
 
-namespace Titan.GraphicsV2.Rendering
+namespace Titan.GraphicsV2.Rendering.Commands
 {
     internal unsafe ref struct CommandBufferEnumerator
     {

@@ -2,11 +2,13 @@ using Titan.GraphicsV2.D3D11;
 
 namespace Titan.GraphicsV2.Rendering.Renderers
 {
-    internal class GeometryRenderer : IRenderer
+    internal class DeferredShadingRenderer : IRenderer
     {
-        public GeometryRenderer()
+        private readonly Device _device;
+
+        public DeferredShadingRenderer(Device device)
         {
-            
+            _device = device;
         }
         public void Render(Context context)
         {
@@ -15,7 +17,6 @@ namespace Titan.GraphicsV2.Rendering.Renderers
 
         public void Dispose()
         {
-
         }
     }
 }
