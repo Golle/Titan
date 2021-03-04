@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.CompilerServices;
-using Titan.Core.Common;
 using Titan.Core.Logging;
 using Titan.GraphicsV2.D3D11.Buffers;
 using Titan.GraphicsV2.D3D11.Samplers;
@@ -21,6 +20,7 @@ namespace Titan.GraphicsV2.D3D11
         private ComPtr<ID3D11Device> _device;
         private ComPtr<ID3D11DeviceContext> _context;
         private ComPtr<IDXGISwapChain> _swapChain;
+        private ComPtr<ID3D11RenderTargetView> _backbuffer;
 
         // Swapchain and Context
         public Swapchain Swapchain { get; }
@@ -29,7 +29,6 @@ namespace Titan.GraphicsV2.D3D11
         public BufferManager BufferManager { get; }
         public ShaderManager ShaderManager { get; }
         public SamplerManager SamplerManager { get; }
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ID3D11Device* Get() => _device.Get();
@@ -70,15 +69,22 @@ namespace Titan.GraphicsV2.D3D11
             LOGGER.Debug("D3D11 Device Created");
 
             Context = new Context(_context.Get());
-            Swapchain = new Swapchain(_swapChain.Get(), configuration.VSync, configuration.Width, configuration.Height);
+
+            // Get the backbuffer
+            using var backbufferResource = new ComPtr<ID3D11Resource>();
+            fixed (Guid* resourcePointer = &D3D11Resource)
+            {
+                CheckAndThrow(_swapChain.Get()->GetBuffer(0, resourcePointer, (void**)backbufferResource.GetAddressOf()), nameof(IDXGISwapChain.GetBuffer));
+            }
+            CheckAndThrow(_device.Get()->CreateRenderTargetView(backbufferResource.Get(), null, _backbuffer.GetAddressOf()), nameof(ID3D11Device.CreateRenderTargetView));
+
+            Swapchain = new Swapchain(_swapChain.Get(), _backbuffer.Get(), configuration.VSync, configuration.Width, configuration.Height);
 
             TextureManager = new TextureManager(this, Swapchain);
             BufferManager = new BufferManager(this);
             ShaderManager = new ShaderManager(this);
             SamplerManager = new SamplerManager(this);
         }
-
-
         
         public void Dispose()
         {
@@ -87,6 +93,7 @@ namespace Titan.GraphicsV2.D3D11
             ShaderManager.Dispose();
             SamplerManager.Dispose();
 
+            _backbuffer.Dispose();
             _context.Dispose();
             _swapChain.Dispose();
             _device.Dispose();

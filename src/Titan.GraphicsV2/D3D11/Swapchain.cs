@@ -8,21 +8,22 @@ namespace Titan.GraphicsV2.D3D11
         public bool Vsync { get; }
         public uint Width { get; }
         public uint Height { get; }
+        public ID3D11RenderTargetView* Backbuffer { get; }
 
         private readonly IDXGISwapChain* _swapChain;
         private readonly uint _syncInterval;
 
-        internal Swapchain(IDXGISwapChain* swapChain, bool vsync, uint width, uint height)
+        internal Swapchain(IDXGISwapChain* swapChain, ID3D11RenderTargetView* backbuffer, bool vsync, uint width, uint height)
         {
             Vsync = vsync;
             Width = width;
             Height = height;
+            Backbuffer = backbuffer;
             _swapChain = swapChain;
             _syncInterval = vsync ? 1u : 0u;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Present() => _swapChain->Present(_syncInterval, 0);
-
     }
 }

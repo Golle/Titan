@@ -28,7 +28,6 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
     internal record InputLayoutSpecification(string Name, TextureFormats Format);
     internal record PixelShaderSpecification(string Path, string Entrypoint = "main", string Version = "ps_5_0");
 
-
     internal class RenderPipelineFactory
     {
         private readonly RenderPipelineReader _reader;
@@ -56,7 +55,7 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
 
             var stages = config.Stages.Select(stage =>
             {
-                // TODO: this will create a new renderer for each stage. since renderers are stateless, we could re-used them. How do we handle the lifetime of a renderer? new instance = handled inside the RenderStage, shared instance = handled where?
+                // TODO: this will create a new renderer for each stage. since renderers are stateless, we could re-use them. How do we handle the lifetime of a renderer? new instance = handled inside the RenderStage, shared instance = handled where?
                 var rendererType = Type.GetType(renderers[stage.Renderer]);
                 if(rendererType == null)
                 {
@@ -94,15 +93,15 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
                     builder.UseShader(stage.Material);
                 }
 
-                return builder.Build(_device);
+                return builder.Build();
             }).ToArray();
             
             return new RenderPipeline(config.Name, stages);
         }
        
-        private Dictionary<string, Handle<Sampler>> CreateSamplers(RenderPipelineSpecification config)
+        private Dictionary<string, Sampler> CreateSamplers(RenderPipelineSpecification config)
         {
-            var samplers = new Dictionary<string, Handle<Sampler>>();
+            var samplers = new Dictionary<string, Sampler>();
             foreach (var spec in config.Samplers)
             {
                 var handle = _device.SamplerManager.Create(new SamplerCreation
@@ -113,15 +112,15 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
                     ComparisonFunc = spec.ComparisonFunc,
                     Filter = spec.Filter
                 });
-                samplers.Add(spec.Name, handle);
+                samplers.Add(spec.Name, _device.SamplerManager.Access(handle));
             }
 
             return samplers;
         }
 
-        private Dictionary<string, Handle<Texture>> CreateFramebuffers(RenderPipelineSpecification config)
+        private Dictionary<string, Texture> CreateFramebuffers(RenderPipelineSpecification config)
         {
-            var framebuffers = new Dictionary<string, Handle<Texture>>();
+            var framebuffers = new Dictionary<string, Texture>();
             foreach (var textureSpecification in config.Textures)
             {
                 var handle = _device.TextureManager.Create(new TextureCreation
@@ -129,15 +128,25 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
                     Binding = TextureBindFlags.RenderTarget | TextureBindFlags.ShaderResource,
                     Format = (DXGI_FORMAT) textureSpecification.Format
                 });
-                framebuffers.Add(textureSpecification.Name, handle);
+                var texture = _device.TextureManager.Access(handle);
+                framebuffers.Add(textureSpecification.Name, texture);
             }
 
+            // Add the Backbuffer to the framebuffers
+            unsafe
+            {
+                framebuffers.Add("$Backbuffer", new Texture
+                {
+                    D3DTarget = _device.Swapchain.Backbuffer
+                });
+            }
+            
             return framebuffers;
         }
 
-        private Dictionary<string, Handle<Shader>> CreateShaders(RenderPipelineSpecification config)
+        private Dictionary<string, Shader> CreateShaders(RenderPipelineSpecification config)
         {
-            var shaders = new Dictionary<string, Handle<Shader>>();
+            var shaders = new Dictionary<string, Shader>();
             foreach (var (name, vertexShader, pixelShader) in config.Shaders)
             {
                 // TOOD: this might not be the best way to do this
@@ -149,7 +158,7 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
                     PixelShader = new ShaderDescription(pixelshaderSource, pixelShader.Entrypoint, pixelShader.Version),
                     VertexShader = new ShaderDescription(vertexShaderSource, vertexShader.Entrypoint, vertexShader.Version)
                 });
-                shaders.Add(name, handle);
+                shaders.Add(name, _device.ShaderManager.Access(handle));
             }
 
             return shaders;

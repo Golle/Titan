@@ -88,6 +88,7 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
                         break;
                     }
                     case RenderCommandTypes.Render:
+                        _ = commands.GetAndMoveToNext<RenderCommand>();
                         _renderer.Render(context);
                         break;
                     

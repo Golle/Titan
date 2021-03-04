@@ -37,19 +37,42 @@
         ],
         "Renderers": [
             {
-                "Name" : "Geometry",
+                "Name": "Geometry",
                 "Type": "Titan.GraphicsV2.Rendering.Renderers.GeometryRenderer, Titan.GraphicsV2"
             },
             {
-                "Name" : "DeferredShading",
+                "Name": "DeferredShading",
                 "Type": "Titan.GraphicsV2.Rendering.Renderers.DeferredShadingRenderer, Titan.GraphicsV2"
             },
             {
-                "Name" : "Swapchain",
+                "Name": "Swapchain",
                 "Type": "Titan.GraphicsV2.Rendering.Renderers.SwapchainRenderer, Titan.GraphicsV2"
             }
         ],
         "Shaders": [
+            {
+                "Name": "GeometryTEMP",
+                "VertexShader": {
+                    "Path": "shaders/GBufferVertexShader.hlsl",
+                    "Layout": [
+                        {
+                            "Name": "Position",
+                            "Format": "RG32F"
+                        },
+                        {
+                            "Name": "Normal",
+                            "Format": "RGB32F"
+                        },
+                        {
+                            "Name": "Texture",
+                            "Format": "RG32F"
+                        }
+                    ]
+                },
+                "PixelShader": {
+                    "Path": "shaders/GBufferPixelShader.hlsl"
+                }
+            },
             {
                 "Name": "DeferredShading",
                 "VertexShader": {
@@ -106,7 +129,7 @@
                     "ClearDepthValue": 1.0
                 },
                 "Inputs": [],
-                "Material": null
+                "Material": "GeometryTEMP"
             },
             {
                 "Name": "DeferredShading",
@@ -152,6 +175,13 @@
                             "Type": "PixelShader"
                         }
                     ]
+                },
+                "Output": {
+                    "RenderTargets": [
+                        "$Backbuffer"
+                    ],
+                    "Clear": true,
+                    "ClearColor": "#ff0ff0ff"
                 },
                 "Material": "Fullscreen"
             }

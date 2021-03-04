@@ -12,7 +12,6 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
             _stages = stages;
         }
 
-
         public void Render(Context context)
         {
             foreach (var stage in _stages)

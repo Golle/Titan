@@ -1,11 +1,14 @@
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Windows.Win32.D3D11;
+using Buffer = Titan.GraphicsV2.D3D11.Buffers.Buffer;
 
 namespace Titan.GraphicsV2.D3D11
 {
     internal unsafe class Context
     {
-        public readonly ID3D11DeviceContext* _context;
+        private readonly ID3D11DeviceContext* _context;
         public Context(ID3D11DeviceContext* context)
         {
             _context = context;
@@ -37,5 +40,48 @@ namespace Titan.GraphicsV2.D3D11
         public void SetVertexShader(ID3D11VertexShader* shader) => _context->VSSetShader(shader, null, 0);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetInputLayout(ID3D11InputLayout* inputLayout) => _context->IASetInputLayout(inputLayout);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetTopology(in D3D_PRIMITIVE_TOPOLOGY topology) => _context->IASetPrimitiveTopology(topology);
+
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetVertexBuffer(in Buffer vertexBuffer)
+        {
+            Debug.Assert(vertexBuffer.BindFlag == D3D11_BIND_FLAG.D3D11_BIND_VERTEX_BUFFER);
+            
+            var stride = vertexBuffer.Stride;
+            var offset = 0u;
+            fixed (ID3D11Buffer** ppBuffer = &vertexBuffer.Resource)
+            {
+                _context->IASetVertexBuffers(0, 1, ppBuffer, &stride, &offset);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetIndexBuffer(in Buffer indexBuffer)
+        {
+            Debug.Assert(indexBuffer.BindFlag == D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER);
+            Debug.Assert(indexBuffer.Stride == 4u || indexBuffer.Stride == 2u, $"Stride {indexBuffer.Stride} is not supported. Only 2 or 4 is supported.");
+
+            var format = indexBuffer.Stride switch
+            {
+                2u => DXGI_FORMAT.DXGI_FORMAT_R16_UINT,
+                4u => DXGI_FORMAT.DXGI_FORMAT_R32_UINT,
+                _ => DXGI_FORMAT.DXGI_FORMAT_R16_UINT // this will not happen, but makes the compiler happy
+            };
+            // TODO: add support for offset if needed
+            _context->IASetIndexBuffer(indexBuffer.Resource, format, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetViewPort(in ViewPort viewPort)
+        {
+            fixed (D3D11_VIEWPORT* pViewPort = &viewPort.Resource)
+            {
+                _context->RSSetViewports(1, pViewPort);
+            }
+        }
     }
 }
