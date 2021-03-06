@@ -20,8 +20,9 @@ namespace Titan.GraphicsV2.Rendering.Renderers
 
         public void Render(Context context)
         {
-            context.SetTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             context.SetViewPort(_viewPort);
+
+            context.SetTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
             context.Draw(0, 0);

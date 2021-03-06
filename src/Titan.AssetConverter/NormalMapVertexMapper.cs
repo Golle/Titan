@@ -39,7 +39,7 @@ namespace Titan.AssetConverter
                 }
             }
 
-            //TODO: Add bouding box when we need it
+            //TODO: Add bounding box when we need it
             return new Mesh<VertexTangentBiNormal>(v, indices.ToArray(), submeshes.ToArray());
         }
     }

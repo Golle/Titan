@@ -13,8 +13,4 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Builder\" />
-  </ItemGroup>
-
 </Project>

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Titan.AssetConverter.Files
 {
-    internal class ByteWriter : IByteWriter
+    internal class ByteWriter
     {
         public void Write<T>(Stream stream, in T[] data) where T : unmanaged
         {

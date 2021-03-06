@@ -8,7 +8,7 @@ namespace Titan.AssetConverter.Exporter
 {
     internal class ModelExporter
     {
-        private readonly IByteWriter _byteWriter = new ByteWriter();
+        private readonly ByteWriter _byteWriter = new();
         
         // TODO: make this more dynamic in the future.
         public async Task ExportModel(Mesh<Vertex> mesh, Mesh<VertexTangentBiNormal> normalMapMesh, string filename)
