@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Titan.AssetConverter.WavefrontObj;
+using Titan.GraphicsV2.Resources;
 
 namespace Titan.AssetConverter.Exporter
 {
@@ -14,7 +15,7 @@ namespace Titan.AssetConverter.Exporter
             _model = model;
         }
 
-        public Mesh<VertexTangentBiNormal> Map(ReadOnlySpan<ObjVertex> vertices, ReadOnlyMemory<int> indices, ReadOnlyMemory<SubMesh> submeshes)
+        public Mesh<VertexTangentBiNormal> Map(ReadOnlySpan<ObjVertex> vertices, ReadOnlyMemory<int> indices, ReadOnlyMemory<SubMeshData> submeshes)
         {
             var v = new VertexTangentBiNormal[vertices.Length];
             for (var i = 0; i < vertices.Length; ++i)

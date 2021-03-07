@@ -57,7 +57,7 @@
                     "Layout": [
                         {
                             "Name": "Position",
-                            "Format": "RG32F"
+                            "Format": "RGB32F"
                         },
                         {
                             "Name": "Normal",
@@ -108,7 +108,7 @@
                     ]
                 },
                 "PixelShader": {
-                    "Path": "shaders/DeferredShadingPixelShader.hlsl"
+                    "Path": "shaders/BackbufferPixelShader.hlsl"
                 }
             }
         ],
@@ -124,7 +124,7 @@
                         "GBufferProperties"
                     ],
                     "Clear": true,
-                    "ClearColor": "#ff000000",
+                    "ClearColor": "#ffffffff",
                     "ClearDepth": true,
                     "ClearDepthValue": 1.0
                 },
@@ -160,7 +160,7 @@
                     "RenderTargets": [
                         "BackbufferColor"
                     ],
-                    "Clear": true,
+                    "Clear": false,
                     "ClearColor": "#ff0000ff"
                 },
                 "Material": "DeferredShading"
@@ -180,8 +180,8 @@
                     "RenderTargets": [
                         "$Backbuffer"
                     ],
-                    "Clear": true,
-                    "ClearColor": "#ff0ff0ff"
+                    "Clear": false,
+                    "ClearColor": "#ffffffff"
                 },
                 "Material": "Fullscreen"
             }

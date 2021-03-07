@@ -1,5 +1,6 @@
 using System;
 using Titan.AssetConverter.WavefrontObj;
+using Titan.GraphicsV2.Resources;
 
 namespace Titan.AssetConverter.Exporter
 {
@@ -7,7 +8,7 @@ namespace Titan.AssetConverter.Exporter
     {
         private readonly ObjVertex[] _vertices = new ObjVertex[200_000];
         private readonly int[] _indices = new int[800_000];
-        private readonly SubMesh[] _meshes = new SubMesh[10000];
+        private readonly SubMeshData[] _meshes = new SubMeshData[10000];
 
         private int _indexCount;
         private int _vertexCount;
@@ -63,7 +64,7 @@ namespace Titan.AssetConverter.Exporter
         public Mesh<T> Build<T>(IVertexMapper<T> mapper) where T : unmanaged
         {
             SetCountForCurrentMesh();
-            return mapper.Map(new ReadOnlySpan<ObjVertex>(_vertices, 0, _vertexCount), new ReadOnlyMemory<int>(_indices, 0, _indexCount), new ReadOnlyMemory<SubMesh>(_meshes, 0, _submeshCount));
+            return mapper.Map(new ReadOnlySpan<ObjVertex>(_vertices, 0, _vertexCount), new ReadOnlyMemory<int>(_indices, 0, _indexCount), new ReadOnlyMemory<SubMeshData>(_meshes, 0, _submeshCount));
         }
     }
 }

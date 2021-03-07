@@ -131,7 +131,7 @@ namespace Titan
                     var fps =(int) (frames / s.Elapsed.TotalSeconds);
                     _window.SetTitle(fps.ToString());
                     frames = 0;
-                    s.Restart();
+                    s.Restart();    
                 }
             }
         }

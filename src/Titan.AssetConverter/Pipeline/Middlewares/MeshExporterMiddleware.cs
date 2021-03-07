@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Titan.AssetConverter.Common;
 using Titan.AssetConverter.Exporter;
+using Titan.GraphicsV2.Resources;
 
 namespace Titan.AssetConverter.Pipeline.Middlewares
 {
@@ -29,11 +30,11 @@ namespace Titan.AssetConverter.Pipeline.Middlewares
                 writer.Write(new MeshDataHeader
                 {
                     Vertices = mesh.Vertices.Length,
-                    VertexSize = sizeof(Vertex),
+                    VertexSize = sizeof(VertexData),
                     Indicies = mesh.Indices.Length,
                     IndexSize = sizeof(int),
                     SubMeshes = mesh.SubMeshes.Length,
-                    SubMeshSize = sizeof(SubMesh)
+                    SubMeshSize = sizeof(SubMeshData)
                 });
             }
             

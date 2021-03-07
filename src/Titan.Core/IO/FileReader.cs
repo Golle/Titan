@@ -23,5 +23,7 @@ namespace Titan.Core.IO
             var fullPath = _fileSystem.GetFullPath(identifier);
             return File.ReadAllLines(fullPath);
         }
+
+        public Stream OpenRead(string identifier) => File.OpenRead(_fileSystem.GetFullPath(identifier));
     }
 }

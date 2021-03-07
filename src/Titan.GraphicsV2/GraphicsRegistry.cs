@@ -1,5 +1,6 @@
 using Titan.GraphicsV2.Rendering;
 using Titan.GraphicsV2.Rendering.Pipepline;
+using Titan.GraphicsV2.Resources;
 using Titan.IOC;
 
 namespace Titan.GraphicsV2
@@ -11,6 +12,7 @@ namespace Titan.GraphicsV2
             container
                 .Register<GraphicsSystem>()
                 .Register<RenderPipelineReader>()
+                .Register<ModelLoader>()
             ;
         }
     }

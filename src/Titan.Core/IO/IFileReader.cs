@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text;
 
 namespace Titan.Core.IO
@@ -7,5 +8,6 @@ namespace Titan.Core.IO
         string ReadText(string identifier);
         string ReadText(string identifier, Encoding encoding);
         string[] ReadLines(string identifier);
+        Stream OpenRead(string identifier);
     }
 }
