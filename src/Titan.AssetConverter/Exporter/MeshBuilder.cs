@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using Titan.AssetConverter.WavefrontObj;
 
 namespace Titan.AssetConverter.Exporter
@@ -20,8 +21,7 @@ namespace Titan.AssetConverter.Exporter
             var vertexIndex = -1;
             for (var i = 0; i < _vertexCount; ++i)
             {
-                ref var a = ref _vertices[i];
-                if (a.NormalIndex == objVertex.NormalIndex && a.TextureIndex == objVertex.TextureIndex && objVertex.VertexIndex == a.VertexIndex)
+                if (_vertices[i] == objVertex)
                 {
                     vertexIndex = i;
                     break;
@@ -60,11 +60,11 @@ namespace Titan.AssetConverter.Exporter
                 mesh.Count = _indexCount - mesh.StartIndex;
             }
         }
-   
+
         public Mesh<T> Build<T>(IVertexMapper<T> mapper) where T : unmanaged
         {
             SetCountForCurrentMesh();
-            return mapper.Map(new ReadOnlySpan<ObjVertex>(_vertices, 0, _vertexCount), new ReadOnlySpan<int>(_indices, 0, _indexCount), new ReadOnlySpan<SubMesh>(_meshes, 0, _submeshCount));
+            return mapper.Map(new ReadOnlySpan<ObjVertex>(_vertices, 0, _vertexCount), new ReadOnlyMemory<int>(_indices, 0, _indexCount), new ReadOnlyMemory<SubMesh>(_meshes, 0, _submeshCount));
         }
     }
 }

@@ -12,13 +12,12 @@ namespace Titan.AssetConverter
 
     internal class ModelConverter
     {
-        private readonly ObjParser _parser = new();
         private static readonly ModelExporter _exporter = new();
 
         public async Task Convert(string objFile, string outputModel, string outputMaterial)
         {
             var timer = Stopwatch.StartNew();
-            var model = await _parser.ReadFromFile(objFile);
+            var model = await ObjParser.ReadFromFile(objFile);
 
             var meshTask = ExportMesh(model, outputModel);
             var materialTask = model.Materials != null ? _exporter.ExportMaterials(model.Materials.Select(ConvertMaterial).ToArray(), outputMaterial) : Task.CompletedTask;

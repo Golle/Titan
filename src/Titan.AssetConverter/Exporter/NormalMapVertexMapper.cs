@@ -1,9 +1,8 @@
 using System;
 using System.Numerics;
-using Titan.AssetConverter.Exporter;
 using Titan.AssetConverter.WavefrontObj;
 
-namespace Titan.AssetConverter
+namespace Titan.AssetConverter.Exporter
 {
     internal class NormalMapVertexMapper : IVertexMapper<VertexTangentBiNormal>
     {
@@ -14,7 +13,7 @@ namespace Titan.AssetConverter
             _model = model;
         }
 
-        public Mesh<VertexTangentBiNormal> Map(ReadOnlySpan<ObjVertex> vertices, ReadOnlySpan<int> indices, ReadOnlySpan<SubMesh> submeshes)
+        public Mesh<VertexTangentBiNormal> Map(ReadOnlySpan<ObjVertex> vertices, ReadOnlyMemory<int> indices, ReadOnlyMemory<SubMesh> submeshes)
         {
             var v = new VertexTangentBiNormal[vertices.Length];
             for (var i = 0; i < vertices.Length; ++i)
@@ -40,7 +39,7 @@ namespace Titan.AssetConverter
             }
 
             //TODO: Add bounding box when we need it
-            return new Mesh<VertexTangentBiNormal>(v, indices.ToArray(), submeshes.ToArray());
+            return new Mesh<VertexTangentBiNormal>(v, indices, submeshes);
         }
     }
 }

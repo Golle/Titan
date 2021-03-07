@@ -41,11 +41,11 @@ namespace Titan.AssetConverter.Exporter
             }
 
             Console.WriteLine($"Writing chunk 1 with submeshes {mesh.SubMeshes.Length}");
-            _byteWriter.Write(file, mesh.SubMeshes);
+            _byteWriter.Write(file, mesh.SubMeshes.ToArray());
             Console.WriteLine($"Writing chunk 1 with vertices {mesh.Vertices.Length}");
             _byteWriter.Write(file, mesh.Vertices);
             Console.WriteLine($"Writing chunk 1 with indices {mesh.Indices.Length}");
-            _byteWriter.Write(file, mesh.Indices);
+            _byteWriter.Write(file, mesh.Indices.ToArray());
 
             if (numberOfChunks > 1)
             {
@@ -56,11 +56,11 @@ namespace Titan.AssetConverter.Exporter
                     _byteWriter.Write(file, chunkHeader);
                 }
                 Console.WriteLine($"Writing chunk 2 with submeshes {normalMapMesh.SubMeshes.Length}");
-                _byteWriter.Write(file, normalMapMesh.SubMeshes);
+                _byteWriter.Write(file, normalMapMesh.SubMeshes.ToArray());
                 Console.WriteLine($"Writing chunk 2 with vertices {normalMapMesh.Vertices.Length}");
                 _byteWriter.Write(file, normalMapMesh.Vertices);
                 Console.WriteLine($"Writing chunk 2 with indices {normalMapMesh.Indices.Length}");
-                _byteWriter.Write(file, normalMapMesh.Indices);
+                _byteWriter.Write(file, normalMapMesh.Indices.ToArray());
             }
         }
 

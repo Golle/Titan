@@ -1,9 +1,8 @@
 using System;
 using System.Numerics;
-using Titan.AssetConverter.Exporter;
 using Titan.AssetConverter.WavefrontObj;
 
-namespace Titan.AssetConverter
+namespace Titan.AssetConverter.Exporter
 {
     internal class VertexMapper : IVertexMapper<Vertex>
     {
@@ -13,7 +12,7 @@ namespace Titan.AssetConverter
         {
             _model = model;
         }
-        public Mesh<Vertex> Map(ReadOnlySpan<ObjVertex> vertices, ReadOnlySpan<int> indices, ReadOnlySpan<SubMesh> submeshes)
+        public Mesh<Vertex> Map(ReadOnlySpan<ObjVertex> vertices, ReadOnlyMemory<int> indices, ReadOnlyMemory<SubMesh> submeshes)
         {
             var v = new Vertex[vertices.Length];
             for (var i = 0; i < vertices.Length; ++i)
@@ -39,7 +38,7 @@ namespace Titan.AssetConverter
             }
 
             //TODO: Add bouding box when we need it
-            return new Mesh<Vertex>(v, indices.ToArray(), submeshes.ToArray());
+            return new Mesh<Vertex>(v, indices, submeshes);
         }
 
         

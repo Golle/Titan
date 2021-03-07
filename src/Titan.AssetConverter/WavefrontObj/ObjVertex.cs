@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Titan.AssetConverter.WavefrontObj
 {
     public readonly struct ObjVertex
@@ -12,5 +14,11 @@ namespace Titan.AssetConverter.WavefrontObj
             TextureIndex = textureIndex;
             NormalIndex = normalIndex;
         }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(in ObjVertex lh, in ObjVertex rh) => lh.NormalIndex == rh.NormalIndex && lh.TextureIndex == rh.TextureIndex && lh.NormalIndex == rh.NormalIndex;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(in ObjVertex lh, in ObjVertex rh) => lh.NormalIndex != rh.NormalIndex || lh.TextureIndex != rh.TextureIndex || lh.NormalIndex != rh.NormalIndex;
     }
 }

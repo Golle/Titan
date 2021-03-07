@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Titan.AssetConverter.Pipeline;
 
 namespace Titan.AssetConverter.WavefrontObj
 {
@@ -49,7 +50,7 @@ namespace Titan.AssetConverter.WavefrontObj
                 // Ignored values
                 case "Ni": break;
                 case "Tf": break;
-                default: Console.WriteLine($"{command} is not recognized as a material identifier"); break;
+                default: Logger.Warning($"{command} is not recognized as a material identifier"); break;
             }
         }
     }
