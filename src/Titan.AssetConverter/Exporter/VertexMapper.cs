@@ -12,13 +12,13 @@ namespace Titan.AssetConverter.Exporter
         {
             _model = model;
         }
-        public Mesh<Vertex> Map(ReadOnlySpan<ObjVertex> vertices, ReadOnlyMemory<int> indices, ReadOnlyMemory<SubMesh> submeshes)
+        public Mesh<Vertex> Map(ReadOnlySpan<ObjVertex> objVertices, ReadOnlyMemory<int> indices, ReadOnlyMemory<SubMesh> submeshes)
         {
-            var v = new Vertex[vertices.Length];
-            for (var i = 0; i < vertices.Length; ++i)
+            var vertices = new Vertex[objVertices.Length];
+            for (var i = 0; i < objVertices.Length; ++i)
             {
-                ref readonly var vertex = ref vertices[i];
-                ref var targetVertex = ref v[i];
+                ref readonly var vertex = ref objVertices[i];
+                ref var targetVertex = ref vertices[i];
                 
                 // .obj file is RightHanded, the engine only supports LeftHanded coordinates so we flip position and normal Z coordinate
                 ref var position = ref _model.Positions[vertex.VertexIndex];
@@ -38,7 +38,7 @@ namespace Titan.AssetConverter.Exporter
             }
 
             //TODO: Add bouding box when we need it
-            return new Mesh<Vertex>(v, indices, submeshes);
+            return new Mesh<Vertex>(vertices, indices, submeshes);
         }
 
         

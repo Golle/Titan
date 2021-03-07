@@ -1,5 +1,4 @@
 using System;
-using System.Numerics;
 using Titan.AssetConverter.WavefrontObj;
 
 namespace Titan.AssetConverter.Exporter

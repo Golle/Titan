@@ -12,7 +12,7 @@ x86/
 .vs/
 
 # Generated models
-/resources/models/
+/resources/models*/
 
 # A lot of temp textures, dont put on git yet.
 /resources/textures/

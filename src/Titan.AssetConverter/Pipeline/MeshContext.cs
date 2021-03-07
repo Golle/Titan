@@ -1,4 +1,5 @@
 using Titan.AssetConverter.Exporter;
+using Titan.AssetConverter.Pipeline.Middlewares;
 using Titan.AssetConverter.WavefrontObj;
 
 namespace Titan.AssetConverter.Pipeline
@@ -10,5 +11,6 @@ namespace Titan.AssetConverter.Pipeline
         public Mesh<Vertex> Mesh { get; init; }
         public string OutputFolder { get; init; }
         public string Name { get; init; }
+        public Material[] Materials { get; init; }
     }
 }

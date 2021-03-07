@@ -12,17 +12,24 @@ var context = new MeshContext
     OutputFolder = @"F:\Git\Titan\resources\models1\"
 };
 
+if (!Directory.Exists(context.OutputFolder))
+{
+    Logger.Info($"Creating output directory {context.OutputFolder}");
+    Directory.CreateDirectory(context.OutputFolder);
+}
+
 
 var pipeline = new PipelineBuilder<MeshContext>()
-    .Use(new MeshExporterMiddlware())
+    .Use(new MaterialExporterMiddleware())
+    .Use(new MeshExporterMiddleware())
     .Use(new WavefronObjectReaderMiddleware())
     .Use(new ObjConverterMiddleware())
-    .Use(new ModelBuilderMiddleware())
+    .Use(new MaterialConverterMiddleware())
     .Build();
 
 
 var tasks = Directory
-    .GetFiles(input, "door.obj", SearchOption.AllDirectories)
+    .GetFiles(input, "*.obj", SearchOption.AllDirectories)
     .Select(f => Task.Run(() => pipeline(context with {Filename = f})));
 
 await Task.WhenAll(tasks);

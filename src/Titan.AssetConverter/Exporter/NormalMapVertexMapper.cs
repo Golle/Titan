@@ -4,6 +4,7 @@ using Titan.AssetConverter.WavefrontObj;
 
 namespace Titan.AssetConverter.Exporter
 {
+    [Obsolete("Not used")]
     internal class NormalMapVertexMapper : IVertexMapper<VertexTangentBiNormal>
     {
         private readonly WavefrontObject _model;
