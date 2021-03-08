@@ -5,11 +5,14 @@ using Titan.ECS.Entities;
 using Titan.ECS.Systems;
 using Titan.ECS.World;
 using Titan.EntitySystem.Components;
+using Titan.GraphicsV2.Rendering.Queue;
 
 namespace Titan.EntitySystem
 {
     internal class CameraSystem : SystemBase
     {
+        private readonly ModelRenderQueue _queue;
+
         // TODO: read this from configuration?
         private static readonly Vector3 Forward = Vector3.UnitZ;
         private static readonly Vector3 Up = Vector3.UnitY;
@@ -20,9 +23,10 @@ namespace Titan.EntitySystem
         
         private Entity _activeCamera;
 
-        public CameraSystem(IWorld world, IEntityFilterManager entityFilterManager) 
+        public CameraSystem(IWorld world, IEntityFilterManager entityFilterManager, ModelRenderQueue queue) 
             : base(world)
         {
+            _queue = queue;
             _camera = GetMutable<CameraComponent>();
             _transform = GetRead<Transform3D>();
             _filter = entityFilterManager.Create(new EntityFilterConfiguration().With<CameraComponent>().With<Transform3D>());
@@ -58,6 +62,7 @@ namespace Titan.EntitySystem
             if (!_activeCamera.IsNull())
             {
                 ref readonly var camera = ref _camera.Get(_activeCamera);
+                _queue.SetActiveCamera(camera.View, camera.ViewProjection);
             }
 #if DEBUG
             else

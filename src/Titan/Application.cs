@@ -84,8 +84,11 @@ namespace Titan
             //.WithComponent<Texture>()
             .WithComponent<MeshComponent>()
             .WithComponent<CameraComponent>(100)
+            .WithComponent<TEMPModel3D>(100)
             .WithSystem<Transform3DSystem>()
             .WithSystem<CameraSystem>()
+            .WithSystem<Render3DSystem>()
+            
             //.WithAssetsManager<Texture2DAssetsManager>()
             //.WithAssetsManager<Model3DAssetsManager>()
         ;

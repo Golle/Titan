@@ -1,5 +1,7 @@
+using System.Numerics;
 using Titan.ECS.Assets;
 using Titan.ECS.World;
+using Titan.EntitySystem;
 using Titan.EntitySystem.Components;
 using Titan.Graphics.Textures;
 
@@ -13,6 +15,7 @@ namespace Titan.Sandbox
                 .WithMaxEvents(100_000)
                 
                 .WithComponent<SandboxComponent>(3000)
+                .WithSystem<FirstPersonCameraSystem>()
             
                 //.WithSystem<SandboxSystem>()
                 //.WithSystem<AnotherSandboxSystem>()
@@ -39,6 +42,10 @@ namespace Titan.Sandbox
             var entity = world.CreateEntity();
             entity.AddComponent<Transform3D>();
             entity.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
+
+            var modelEntity = world.CreateEntity();
+            modelEntity.AddComponent(new Transform3D {Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(0, 0, 10)});
+            modelEntity.AddComponent<TEMPModel3D>();
 
             //entity.AddManagedComponent(new AssetTEMP<TextureComponent>("teh texture.png"));
         }
