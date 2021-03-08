@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Titan.AssetConverter.Common;
-using Titan.AssetConverter.Exporter;
 using Titan.GraphicsV2.Resources;
 
 namespace Titan.AssetConverter.Pipeline.Middlewares

@@ -83,7 +83,9 @@ namespace Titan
             .WithComponent<Asset<MeshComponent>>()
             //.WithComponent<Texture>()
             .WithComponent<MeshComponent>()
+            .WithComponent<CameraComponent>(100)
             .WithSystem<Transform3DSystem>()
+            .WithSystem<CameraSystem>()
             //.WithAssetsManager<Texture2DAssetsManager>()
             //.WithAssetsManager<Model3DAssetsManager>()
         ;
@@ -96,7 +98,7 @@ namespace Titan
             
             (_world, _dispatcher, _managers) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
 
-            //_startup.OnStart(_world);
+            _startup.OnStart(_world);
 
             StartMainLoop();
             
