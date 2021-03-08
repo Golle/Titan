@@ -12,7 +12,7 @@ namespace Titan.GraphicsV2.Resources
     }
     internal struct SubMesh
     {
-        internal int Start;
-        internal int Count;
+        internal uint Start;
+        internal uint Count;
     }
 }

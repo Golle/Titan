@@ -112,8 +112,4 @@ namespace Titan.GraphicsV2.Resources
             }
         }
     }
-
-    
-
-
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices.ComTypes;
 using Titan.GraphicsV2.D3D11;
@@ -5,6 +7,7 @@ using Titan.GraphicsV2.D3D11.Buffers;
 using Titan.GraphicsV2.Resources;
 using Titan.Windows;
 using Titan.Windows.Win32.D3D11;
+using Buffer = Titan.GraphicsV2.D3D11.Buffers.Buffer;
 
 namespace Titan.GraphicsV2.Rendering.Renderers
 {
@@ -35,14 +38,12 @@ namespace Titan.GraphicsV2.Rendering.Renderers
             _camera = new Camera(window);
             _camera.MoveForward(10f);
             _camera.Update();
-            
         }
 
         public void Init()
         {
             _viewPort = new ViewPort((int) _device.Swapchain.Width, (int) _device.Swapchain.Height);
-
-            _model = _loader.Load("models1/table.dat");
+            _model = _loader.Load("models1/sponza.dat");
             
             unsafe
             {
@@ -74,7 +75,6 @@ namespace Titan.GraphicsV2.Rendering.Renderers
             _worldMatrix = Matrix4x4.CreateScale(1f) *
                 Matrix4x4.CreateFromQuaternion(Quaternion.Identity) *
                 Matrix4x4.CreateTranslation(new Vector3(0, 0, 1f));
-
         }
 
 
@@ -82,7 +82,7 @@ namespace Titan.GraphicsV2.Rendering.Renderers
         public unsafe void Render(Context context)
         {
             //_camera.Rotate(new Vector3(1, 0.5f, 2f));
-            _camera.MoveForward(0.2f);
+            _camera.MoveForward(10.2f);
             
             //_camera.MoveForward(-1.1f);
             _camera.Update();
@@ -127,11 +127,20 @@ namespace Titan.GraphicsV2.Rendering.Renderers
             context.SetTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
             context.SetVertexBuffer(_device.BufferManager.Access(_model.VertexBuffer));
-            context.SetIndexBuffer(_device.BufferManager.Access(_model.IndexBuffer));
-
-            var a = _device.BufferManager.Access(_model.IndexBuffer).Count;
-            
-            context.DrawIndexed(a);
+            ref readonly var indexBuffer = ref _device.BufferManager.Access(_model.IndexBuffer);
+            context.SetIndexBuffer(indexBuffer);
+            if (_model.SubMeshCount > 1)
+            {
+                for (var i = 0; i < _model.SubMeshCount; ++i)
+                {
+                    ref readonly var submesh = ref _model.SubMeshes[i];
+                    context.DrawIndexed(submesh.Count, submesh.Start);
+                }
+            }
+            else
+            {
+                context.DrawIndexed(indexBuffer.Count);
+            }
         }
 
         public void Dispose()

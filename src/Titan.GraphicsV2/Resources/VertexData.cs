@@ -6,8 +6,8 @@ namespace Titan.GraphicsV2.Resources
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct SubMeshData
     {
-        public int StartIndex;
-        public int Count;
+        public uint StartIndex;
+        public uint Count;
         public int MaterialIndex;
         public Vector3 Min;
         public Vector3 Max;

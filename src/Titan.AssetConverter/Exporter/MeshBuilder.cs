@@ -48,7 +48,7 @@ namespace Titan.AssetConverter.Exporter
             _currentMaterial = material;
             SetCountForCurrentMesh();
             ref var mesh = ref _meshes[_submeshCount++];
-            mesh.StartIndex = _indexCount;
+            mesh.StartIndex = (uint) _indexCount;
             mesh.MaterialIndex = _currentMaterial;
         }
 
@@ -57,7 +57,7 @@ namespace Titan.AssetConverter.Exporter
             if (_submeshCount > 0)
             {
                 ref var mesh = ref _meshes[_submeshCount - 1];
-                mesh.Count = _indexCount - mesh.StartIndex;
+                mesh.Count = (uint) (_indexCount - mesh.StartIndex);
             }
         }
 
