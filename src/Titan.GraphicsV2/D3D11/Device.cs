@@ -32,9 +32,6 @@ namespace Titan.GraphicsV2.D3D11
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ID3D11Device* Get() => _device.Get();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ID3D11DeviceContext* GetContext() => _context.Get();
         
         internal Device(DeviceConfiguration configuration)
         {
