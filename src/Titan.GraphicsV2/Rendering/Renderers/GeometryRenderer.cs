@@ -46,7 +46,6 @@ namespace Titan.GraphicsV2.Rendering.Renderers
                 _cameraBuffer = _device.BufferManager.Access(handle);
             }
 
-
             unsafe
             {
                 var handle = _device.BufferManager.Create(new BufferCreation
@@ -62,25 +61,10 @@ namespace Titan.GraphicsV2.Rendering.Renderers
         }
 
 
-        public unsafe void Render(Context context)
+        public void Render(Context context)
         {
-            /// Temp camera code
-            var context1 = _device.GetContext();
-            {
-
-                D3D11_MAPPED_SUBRESOURCE mappedResource;
-                context1->Map((ID3D11Resource*) _cameraBuffer.Resource, 0, D3D11_MAP.D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-                var buff = new CameraBuffer {View = _queue.View, ViewProjection = Matrix4x4.Transpose(_queue.ViewProjection)};
-                var size = sizeof(CameraBuffer);
-                System.Buffer.MemoryCopy(&buff, mappedResource.pData, size, size);
-                context1->Unmap((ID3D11Resource*) _cameraBuffer.Resource, 0);
-            }
-            
-
-            var buffers = stackalloc ID3D11Buffer*[2];
-            /// Temp camera code
-
-
+            context.Map(_cameraBuffer, new CameraBuffer { View = _queue.View, ViewProjection = Matrix4x4.Transpose(_queue.ViewProjection) });
+            context.SetVSConstantBuffer(_cameraBuffer);
             context.SetViewPort(_viewPort);
 
             foreach (ref readonly var renderable in _queue.GetRendereables())
@@ -88,23 +72,8 @@ namespace Titan.GraphicsV2.Rendering.Renderers
                 ref readonly var world = ref renderable.World;
                 ref readonly var model = ref renderable.Model;
 
-                /*TEMP*/
-                {
-
-                    D3D11_MAPPED_SUBRESOURCE mappedResource;
-                    context1->Map((ID3D11Resource*)_worldBuffer.Resource, 0, D3D11_MAP.D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-                    fixed (Matrix4x4* pWorld = &world)
-                    {
-                        var size = sizeof(Matrix4x4);
-                        System.Buffer.MemoryCopy(&pWorld, mappedResource.pData, size, size);
-                    }
-                    context1->Unmap((ID3D11Resource*)_worldBuffer.Resource, 0);
-                }
-
-                buffers[0] = _cameraBuffer.Resource;
-                buffers[1] = _worldBuffer.Resource;
-                context1->VSSetConstantBuffers(0, 2, buffers);
-                /*TEMP*/
+                context.Map(_worldBuffer, world);
+                context.SetVSConstantBuffer(_worldBuffer, 1);
 
                 context.SetTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
                 context.SetVertexBuffer(_device.BufferManager.Access(model.VertexBuffer));
@@ -123,13 +92,16 @@ namespace Titan.GraphicsV2.Rendering.Renderers
                     context.DrawIndexed(indexBuffer.Count);
                 }
             }
-            
             _queue.Reset();
         }
 
         public void Dispose()
         {
-
+            _device.BufferManager.Release(_cameraBuffer.Handle);
+            _device.BufferManager.Release(_worldBuffer.Handle);
+            _cameraBuffer = default;
+            _worldBuffer = default;
+            _viewPort = default;
         }
     }
 }

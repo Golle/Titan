@@ -1,8 +1,10 @@
-using System;
+//using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Titan.GraphicsV2.D3D11.Buffers;
+using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
-using Buffer = Titan.GraphicsV2.D3D11.Buffers.Buffer;
+// ReSharper disable InconsistentNaming
 
 namespace Titan.GraphicsV2.D3D11
 {
@@ -82,6 +84,43 @@ namespace Titan.GraphicsV2.D3D11
             {
                 _context->RSSetViewports(1, pViewPort);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetVSConstantBuffer(in Buffer buffer, uint slot = 0)
+        {
+            Debug.Assert(buffer.BindFlag == D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER);
+            var buffers = stackalloc ID3D11Buffer*[1];
+            buffers[0] = buffer.Resource;
+
+            _context->VSSetConstantBuffers(slot, 1, buffers);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPSConstantBuffer(in Buffer buffer, uint slot = 0)
+        {
+            Debug.Assert(buffer.BindFlag == D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER);
+            var buffers = stackalloc ID3D11Buffer*[1];
+            buffers[0] = buffer.Resource;
+
+            _context->PSSetConstantBuffers(slot, 1, buffers);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Map<T>(in Buffer buffer, in T value) where T : unmanaged
+        {
+            D3D11_MAPPED_SUBRESOURCE subresource;
+            var resource = (ID3D11Resource*) buffer.Resource;
+            var result = _context->Map(resource, 0, D3D11_MAP.D3D11_MAP_WRITE_DISCARD, 0, &subresource);
+#if DEBUG
+            Common.CheckAndThrow(result, nameof(ID3D11DeviceContext.Map));
+#endif
+            var size = sizeof(T);
+            fixed (T* pValue = &value)
+            {
+                System.Buffer.MemoryCopy(pValue, subresource.pData, size, size);
+            }
+            _context->Unmap(resource, 0);
         }
     }
 }

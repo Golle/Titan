@@ -2,7 +2,6 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.GraphicsV2.Resources;
-using Titan.Windows.Win32.D3D11;
 
 namespace Titan.GraphicsV2.Rendering.Queue
 {
@@ -24,7 +23,7 @@ namespace Titan.GraphicsV2.Rendering.Queue
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<Renderable> GetRendereables() => new ReadOnlySpan<Renderable>(_renderables, 0, _count);
+        public ReadOnlySpan<Renderable> GetRendereables() => new(_renderables, 0, _count);
 
         public void Reset() => _count = 0;
         
