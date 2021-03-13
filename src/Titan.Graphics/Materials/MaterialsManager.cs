@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Titan.Core;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Textures;
@@ -12,17 +11,15 @@ namespace Titan.Graphics.Materials
     internal unsafe class MaterialsManager : IMaterialsManager
     {
         private readonly ITextureLoader _textureLoader;
-        private readonly TitanConfiguration _configuration;
 
         private readonly Material* _materials;
         private readonly uint _maxMaterials;
 
         private int _numberOfMaterials;
         
-        public MaterialsManager(ITextureLoader textureLoader, IMemoryManager memoryManager, TitanConfiguration configuration)
+        public MaterialsManager(ITextureLoader textureLoader, IMemoryManager memoryManager)
         {
             _textureLoader = textureLoader;
-            _configuration = configuration;
             var memory = memoryManager.GetMemoryChunkValidated<Material>("Materials");
             _materials = memory.Pointer;
             _maxMaterials = memory.Count;
@@ -56,7 +53,7 @@ namespace Titan.Graphics.Materials
                 return default;
             }
 
-            return _textureLoader.Load(_configuration.GetPath(filename));
+            return _textureLoader.Load(filename);
         }
 
         public ref readonly Material this[in MaterialHandle handle]

@@ -9,15 +9,15 @@ namespace Titan.AssetConverter.WavefrontObj
 {
     internal class ObjBuilder
     {
-        private readonly IList<Vector3> _vertices = new List<Vector3>();
-        private readonly IList<Vector3> _normals = new List<Vector3>();
-        private readonly IList<Vector2> _textures = new List<Vector2>();
+        private readonly List<Vector3> _vertices = new();
+        private readonly List<Vector3> _normals = new();
+        private readonly List<Vector2> _textures = new();
 
         private ObjMaterial[] _materials;
 
         private ObjGroup _currentGroup;
 
-        private readonly IList<ObjGroup> _groups = new List<ObjGroup>();
+        private readonly List<ObjGroup> _groups = new();
 
         private int _smoothGroup;
         private int _currentMaterialIndex = -1;
@@ -120,16 +120,13 @@ namespace Titan.AssetConverter.WavefrontObj
             _materials = materials;
         }
 
-        internal WavefrontObject Build()
-        {
-            return new WavefrontObject(_groups.ToArray(), _materials, _vertices.ToArray(), _normals.ToArray(), _textures.ToArray());
-        }
+        internal WavefrontObject Build() => new(_groups.ToArray(), _materials, _vertices.ToArray(), _normals.ToArray(), _textures.ToArray());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Vector3 ParseVector3(in ReadOnlySpan<string> values) => new Vector3(ParseFloat(values[0]), ParseFloat(values[1]), ParseFloat(values[2]));
+        private static Vector3 ParseVector3(in ReadOnlySpan<string> values) => new(ParseFloat(values[0]), ParseFloat(values[1]), ParseFloat(values[2]));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Vector2 ParseVector2(in ReadOnlySpan<string> values) => new Vector2(ParseFloat(values[0]), ParseFloat(values[1]));
+        private static Vector2 ParseVector2(in ReadOnlySpan<string> values) => new(ParseFloat(values[0]), ParseFloat(values[1]));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static float ParseFloat(in string value) => float.Parse(value, CultureInfo.InvariantCulture);

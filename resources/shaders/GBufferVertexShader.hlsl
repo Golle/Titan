@@ -48,7 +48,7 @@ VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
 
-    output.WorldPosition = mul(float4(input.Position, 1.0f), World);
+    output.WorldPosition = float4(input.Position, 1.0f); //mul(float4(input.Position, 1.0f), World);
     output.Position = mul(output.WorldPosition, ViewProjection);
     output.Texture = input.Texture;
     output.Normal = mul(input.Normal, (float3x3) World);

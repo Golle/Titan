@@ -9,7 +9,7 @@ namespace Titan.Windows.Win32
     {
         private T* _ptr;
         
-        public ComPtr(T* ptr)
+        public ComPtr(in T* ptr)
         {
             _ptr = ptr;
             InternalAddRef();
@@ -42,6 +42,9 @@ namespace Titan.Windows.Win32
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ComPtr<T> Wrap(in T* ptr) => new() {_ptr = ptr}; // Use object initializer to avoid InternalAddRef
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             InternalRelease();
@@ -61,8 +64,10 @@ namespace Titan.Windows.Win32
                 _ptr = null;
             }
         }
-
-
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator T*(in ComPtr<T> p) => p._ptr;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator T**(in ComPtr<T> p) => p.GetAddressOf();
     }
 }

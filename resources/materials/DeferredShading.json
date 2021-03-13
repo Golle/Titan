@@ -1,0 +1,19 @@
+{
+    "Name": "DeferredShading",
+    "VertexShader": {
+        "Path": "shaders/DeferredShadingVertexShader.hlsl",
+        "Layout": [
+            {
+                "Name": "Position",
+                "Format": "RG32"
+            },
+            {
+                "Name": "Texture",
+                "Format": "RG32"
+            }
+        ]
+    },
+    "PixelShader": {
+        "Path": "shaders/DeferredShadingPixelShader.hlsl"
+    }
+}

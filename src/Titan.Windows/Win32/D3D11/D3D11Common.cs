@@ -25,7 +25,17 @@ namespace Titan.Windows.Win32.D3D11
             [Out] D3D_FEATURE_LEVEL* pFeatureLevel,
             [Out] ID3D11DeviceContext** ppImmediateContext
         );
-        
+
+        [DllImport("Dxgi", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern HRESULT CreateSwapChainForHwnd(
+            [In] ID3D11Device* pDevice,
+            [In] HWND hWnd,
+            [In] DXGI_SWAP_CHAIN_DESC1* pDesc,
+            [In] DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc,
+            [In] IDXGIOutput* pRestrictToOutput,
+            [In] IDXGISwapChain1** ppSwapChain
+        );
+
         [DllImport("d3d11", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern HRESULT D3D11CreateDeviceAndSwapChain(
             [In] IDXGIAdapter* pAdapter,

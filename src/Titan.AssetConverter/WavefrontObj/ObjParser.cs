@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Titan.AssetConverter.WavefrontObj
 {
-    internal class ObjParser
+    internal static class ObjParser
     {
-        public async Task<WavefrontObject> ReadFromFile(string filename)
+        public static async Task<WavefrontObject> ReadFromFile(string filename)
         {
             var builder = new ObjBuilder();
             await using var file = File.OpenRead(filename);

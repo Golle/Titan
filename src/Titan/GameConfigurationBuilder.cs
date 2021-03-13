@@ -4,18 +4,18 @@ using Titan.Graphics.Pipeline;
 
 namespace Titan
 {
+    public record AssetsDirectory(string Path);
+
+
     public record DisplayConfigurationFile(string Path);
     public record DisplayConfiguration(string Title, uint Width, uint Height, uint RefreshRate);
     public record PipelineConfigurationFile(string Path);
     public record LoggerConfiguration();
-    public record AssetsDirectory(string Path);
     public record EventsConfiguration(uint MaxEventQueueSize);
-
-    internal record GameConfiguration(AssetsDirectory AssetsDirectory, DisplayConfiguration DisplayConfiguration, LoggerConfiguration LoggerConfiguration, PipelineConfiguration PipelineConfiguration, EventsConfiguration EventsConfiguration, Type Startup);
+    internal record GameConfiguration(DisplayConfiguration DisplayConfiguration, LoggerConfiguration LoggerConfiguration, PipelineConfiguration PipelineConfiguration, EventsConfiguration EventsConfiguration, Type Startup);
 
     public class GameConfigurationBuilder
     {
-        private AssetsDirectory _assetsDirectory;
         private DisplayConfiguration _displayConfiguration;
         private LoggerConfiguration _loggerConfiguration;
         
@@ -34,12 +34,6 @@ namespace Titan
         public GameConfigurationBuilder WithDefaultConsoleLogger()
         {
             _loggerConfiguration = new LoggerConfiguration();
-            return this;
-        }
-
-        public GameConfigurationBuilder WithAssetsDirectory(AssetsDirectory assetsDirectory)
-        {
-            _assetsDirectory = assetsDirectory;
             return this;
         }
 
@@ -68,22 +62,16 @@ namespace Titan
         internal GameConfiguration Build(ConfigurationFileLoader loader)
         {
             Validate();
-
-            string GetPath(string filename) => Path.Combine(_assetsDirectory.Path, filename);
             
-            var pipelineConfiguration = loader.ReadConfig<PipelineConfiguration>(GetPath(_pipelineConfigurationFile.Path));
-            var displayConfiguration = _displayConfiguration ?? loader.ReadConfig<DisplayConfiguration>(GetPath(_displayConfigurationFile.Path));
+            var pipelineConfiguration = loader.ReadConfig<PipelineConfiguration>(_pipelineConfigurationFile.Path);
+            var displayConfiguration = _displayConfiguration ?? loader.ReadConfig<DisplayConfiguration>(_displayConfigurationFile.Path);
             var eventConfiguration = _eventConfiguration ?? DefaultEventConfiguration;
             
-            return new (_assetsDirectory, displayConfiguration, _loggerConfiguration, pipelineConfiguration, eventConfiguration, _startupType);
+            return new (displayConfiguration, _loggerConfiguration, pipelineConfiguration, eventConfiguration, _startupType);
         }
 
         private void Validate()
         {
-            if(_assetsDirectory == null)
-            {
-                throw new InvalidOperationException($"{nameof(AssetsDirectory)} is not set. Use {nameof(WithAssetsDirectory)} to configure.");
-            }
             if (_displayConfiguration == null && _displayConfigurationFile == null)
             {
                 throw new InvalidOperationException($"{nameof(DisplayConfiguration)} is not set. Use {nameof(WithDisplayConfiguration)} or {nameof(WithDisplayConfigurationFile)} to configure.");

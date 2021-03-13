@@ -126,11 +126,11 @@ namespace Titan.Graphics.Shaders
                 }
 
                 //TODO: This needs some changes to support different things properly
-                desc.InstanceDataStepRate = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0;
+                desc.InstanceDataStepRate = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1u : 0;
                 //desc.InputSlot = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0; //TODO: How do we support instance data?
                 desc.InputSlot = slot;
                 desc.InputSlotClass = classification;
-                desc.SemanticIndex = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1 : 0;
+                desc.SemanticIndex = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 1u : 0;
                 desc.AlignedByteOffset = classification == D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_INSTANCE_DATA ? 0 : size;
                 desc.Format = format;
 

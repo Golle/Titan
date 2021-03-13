@@ -1,6 +1,5 @@
 using System;
 using System.Numerics;
-using System.Threading;
 using Titan;
 using Titan.ECS.Components;
 using Titan.ECS.Systems;
@@ -12,16 +11,14 @@ using Titan.Sandbox;
 var pipelineConfiguration = new PipelineConfigurationFile("render_pipeline.json");
 var displayConfiguration = new DisplayConfigurationFile("display.json");
 var assetDirectory = new AssetsDirectory(@"F:\Git\Titan\resources");
-
 var gameConfigurationBuilder = new GameConfigurationBuilder()
-    .WithAssetsDirectory(assetDirectory)
     .WithDisplayConfigurationFile(displayConfiguration)
     .WithPipelineConfigurationFromFile(pipelineConfiguration)
     .WithStartup<SandboxStartup>()
     
     .WithDefaultConsoleLogger();
 
-using var application = Application.Create(gameConfigurationBuilder);
+using var application = Application.Create(assetDirectory, gameConfigurationBuilder);
 application.Run();
 
 namespace Titan.Sandbox
@@ -248,6 +245,7 @@ namespace Titan.Sandbox
             }
         }
     }
+
 
 
     public sealed class SandboxSystem : SystemBase

@@ -16,7 +16,7 @@ namespace Titan.IOC
             return (TTypeToResolve)ResolveObject(typeof(TTypeToResolve));
         }
 
-        public IContainer RegisterSingleton<TTypeToResolve>(TTypeToResolve instance)
+        public IContainer RegisterSingleton<TTypeToResolve>(TTypeToResolve instance, bool dispose)
         {
             if (instance == null)
             {
@@ -29,7 +29,7 @@ namespace Titan.IOC
             }
             lock (_containerObjects)
             {
-                _containerObjects.Add(typeToResolve, new ContainerObject(typeToResolve, instance.GetType(), instance));
+                _containerObjects.Add(typeToResolve, new ContainerObject(typeToResolve, instance.GetType(), instance, dispose));
             }
             return this;
         }

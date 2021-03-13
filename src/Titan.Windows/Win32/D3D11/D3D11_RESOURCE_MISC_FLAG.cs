@@ -7,7 +7,7 @@ namespace Titan.Windows.Win32.D3D11
     [Flags]
     public enum D3D11_RESOURCE_MISC_FLAG : uint
     {
-        UNSPECIFICED = 0,
+        UNSPECIFIED = 0,
         D3D11_RESOURCE_MISC_GENERATE_MIPS = 0x1,
         D3D11_RESOURCE_MISC_SHARED = 0x2,
         D3D11_RESOURCE_MISC_TEXTURECUBE = 0x4,
