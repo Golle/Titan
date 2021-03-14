@@ -1,7 +1,7 @@
 using Titan.Core.Common;
 using Titan.GraphicsV2.D3D11.Buffers;
 
-namespace Titan.GraphicsV2.Resources
+namespace Titan.GraphicsV2.Resources.Models
 {
     internal struct Model3D
     {

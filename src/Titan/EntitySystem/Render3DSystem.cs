@@ -5,6 +5,7 @@ using Titan.ECS.World;
 using Titan.EntitySystem.Components;
 using Titan.GraphicsV2.Rendering.Queue;
 using Titan.GraphicsV2.Resources;
+using Titan.GraphicsV2.Resources.Models;
 
 namespace Titan.EntitySystem
 {

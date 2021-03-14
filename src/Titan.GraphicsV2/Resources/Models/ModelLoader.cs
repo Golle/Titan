@@ -1,13 +1,11 @@
-using System;
 using System.Runtime.InteropServices;
 using Titan.Core.Common;
 using Titan.Core.IO;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Buffers;
 using Titan.Windows.Win32.D3D11;
-using Buffer = Titan.GraphicsV2.D3D11.Buffers.Buffer;
 
-namespace Titan.GraphicsV2.Resources
+namespace Titan.GraphicsV2.Resources.Models
 {
     internal class ModelLoader
     {
@@ -45,7 +43,7 @@ namespace Titan.GraphicsV2.Resources
         {
             if (header.SubMeshes == 0)
             {
-                return Array.Empty<SubMesh>();
+                return System.Array.Empty<SubMesh>();
             }
 
             var totalSize = header.SubMeshes * header.SubMeshSize;
