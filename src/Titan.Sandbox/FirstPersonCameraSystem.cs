@@ -53,7 +53,6 @@ namespace Titan.Sandbox
                 ref var transform = ref _transform.Get(entity);
                 //transform.Rotation = Quaternion.CreateFromYawPitchRoll(0,0,0);
 
-
                 var multiplier = _input.IsKeyDown(KeyCode.Shift) ? 15f : 1f;
                 var speed = 0.2f * multiplier;
                 var delta = _input.MouseLastPosition - _input.MousePosition;

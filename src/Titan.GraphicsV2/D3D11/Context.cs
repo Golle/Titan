@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.GraphicsV2.D3D11.Buffers;
+using Titan.GraphicsV2.D3D11.Samplers;
+using Titan.GraphicsV2.D3D11.Textures;
 using Titan.Windows.Win32;
 using Titan.Windows.Win32.D3D11;
 // ReSharper disable InconsistentNaming
@@ -90,20 +92,17 @@ namespace Titan.GraphicsV2.D3D11
         public void SetVSConstantBuffer(in Buffer buffer, uint slot = 0)
         {
             Debug.Assert(buffer.BindFlag == D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER);
-            var buffers = stackalloc ID3D11Buffer*[1];
-            buffers[0] = buffer.Resource;
-
-            _context->VSSetConstantBuffers(slot, 1, buffers);
+            var resource = buffer.Resource;
+            _context->VSSetConstantBuffers(slot, 1, &resource);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPSConstantBuffer(in Buffer buffer, uint slot = 0)
         {
             Debug.Assert(buffer.BindFlag == D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER);
-            var buffers = stackalloc ID3D11Buffer*[1];
-            buffers[0] = buffer.Resource;
+            var resource = buffer.Resource;
 
-            _context->PSSetConstantBuffers(slot, 1, buffers);
+            _context->PSSetConstantBuffers(slot, 1, &resource);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -121,6 +120,20 @@ namespace Titan.GraphicsV2.D3D11
                 System.Buffer.MemoryCopy(pValue, subresource.pData, size, size);
             }
             _context->Unmap(resource, 0);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPixelShaderSampler(in Sampler sampler, uint slot = 0u)
+        {
+            var samplerState = sampler.SamplerState;
+            _context->PSSetSamplers(slot, 1, &samplerState);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPixelShaderResource(in Texture texture, uint slot = 0u)
+        {
+            var resourceView = texture.D3DResource;
+            _context->PSSetShaderResources(0, 1, &resourceView);
         }
     }
 }

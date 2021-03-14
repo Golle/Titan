@@ -1,6 +1,7 @@
 using System.Numerics;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Buffers;
+using Titan.GraphicsV2.D3D11.Samplers;
 using Titan.GraphicsV2.Rendering.Queue;
 using Titan.Windows.Win32.D3D11;
 using Buffer = Titan.GraphicsV2.D3D11.Buffers.Buffer;
@@ -22,6 +23,7 @@ namespace Titan.GraphicsV2.Rendering.Renderers
         
         private Buffer _cameraBuffer;
         private Buffer _worldBuffer;
+        private Sampler _tempSampler;
 
         public GeometryRenderer(Device device, ModelRenderQueue queue)
         {
@@ -58,6 +60,14 @@ namespace Titan.GraphicsV2.Rendering.Renderers
                 });
                 _worldBuffer = _device.BufferManager.Access(handle);
             }
+
+            _tempSampler = _device.SamplerManager.Access(_device.SamplerManager.Create(new SamplerCreation
+            {
+                AddressU = TextureAddressMode.Wrap,
+                AddressW = TextureAddressMode.Wrap,
+                AddressV = TextureAddressMode.Wrap,
+                Filter = TextureFilter.MinMagMipLinear
+            }));
         }
 
 
@@ -66,7 +76,7 @@ namespace Titan.GraphicsV2.Rendering.Renderers
             context.Map(_cameraBuffer, new CameraBuffer { View = _queue.View, ViewProjection = Matrix4x4.Transpose(_queue.ViewProjection) });
             context.SetVSConstantBuffer(_cameraBuffer);
             context.SetViewPort(_viewPort);
-
+            context.SetPixelShaderSampler(_tempSampler);
             foreach (ref readonly var renderable in _queue.GetRendereables())
             {
                 ref readonly var world = ref renderable.World;
@@ -84,6 +94,10 @@ namespace Titan.GraphicsV2.Rendering.Renderers
                     for (var i = 0; i < model.SubMeshCount; ++i)
                     {
                         ref readonly var submesh = ref model.SubMeshes[i];
+                        if (submesh.HasMaterial && submesh.Material.DiffuseTexture.IsValid())
+                        {
+                            context.SetPixelShaderResource(_device.TextureManager.Access(submesh.Material.DiffuseTexture));
+                        }
                         context.DrawIndexed(submesh.Count, submesh.Start);
                     }
                 }

@@ -33,7 +33,7 @@ namespace Titan.EntitySystem
         {
             if (_loaded == false)
             {
-                _model = _modelLoader.Load("models1/table.dat");
+                _model = _modelLoader.Load("models1/clock_obj");
                 _loaded = true;
             }
 

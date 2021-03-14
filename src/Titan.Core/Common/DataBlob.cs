@@ -20,5 +20,11 @@ namespace Titan.Core.Common
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasValue() => _data != null;
+
+        public uint Size
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _size;
+        }
     }
 }

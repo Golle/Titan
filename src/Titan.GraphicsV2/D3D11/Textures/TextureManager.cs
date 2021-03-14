@@ -85,7 +85,8 @@ namespace Titan.GraphicsV2.D3D11.Textures
             {
                 var subresourceData = new D3D11_SUBRESOURCE_DATA
                 {
-                    pSysMem = args.InitialData
+                    pSysMem = args.InitialData,
+                    SysMemPitch = args.DataStride
                 };
                 CheckAndThrow(_device->CreateTexture2D(&desc, &subresourceData, &texture->D3DTexture), nameof(ID3D11Device.CreateTexture2D));
             }
@@ -118,7 +119,7 @@ namespace Titan.GraphicsV2.D3D11.Textures
                         MipLevels = 1,
                         MostDetailedMip = 0
                     },
-                    ViewDimension = D3D_SRV_DIMENSION.D3D10_1_SRV_DIMENSION_TEXTURE2D
+                    ViewDimension = D3D_SRV_DIMENSION.D3D11_SRV_DIMENSION_TEXTURE2D
                 };
                 CheckAndThrow(_device->CreateShaderResourceView((ID3D11Resource*)texture->D3DTexture, &shadedResourceViewDesc, &texture->D3DResource), nameof(ID3D11Device.CreateShaderResourceView));
             }
