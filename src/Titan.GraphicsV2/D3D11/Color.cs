@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -6,6 +7,7 @@ using System.Runtime.InteropServices;
 namespace Titan.GraphicsV2.D3D11
 {
     [StructLayout(LayoutKind.Sequential)]
+    [DebuggerDisplay("R:{R} G:{G} B:{B} A:{A} ")]
     public struct Color
     {
         public float R;
@@ -28,6 +30,20 @@ namespace Titan.GraphicsV2.D3D11
         public static readonly Color Black = new(0f, 0, 0);
         public static readonly Color Zero = new(0f, 0, 0, 0);
         public static readonly Color Magenta = new(1f, 0, 1f);
+
+        public static Color ParseF(string value)
+        {
+            var values = value.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(v => float.Parse(v, CultureInfo.InvariantCulture))
+                .ToArray();
+
+            return values.Length switch
+            {
+                3 => new Color(values[0], values[1], values[2]),
+                4 => new Color(values[0], values[1], values[2], values[4]),
+                _ => throw new NotSupportedException("Wrong format, must be one of these '0.1 0.1 0.1' or '0.1 0.1 0.1 0.1'")
+            };
+        }
 
         public static Color Parse(string value)
         {

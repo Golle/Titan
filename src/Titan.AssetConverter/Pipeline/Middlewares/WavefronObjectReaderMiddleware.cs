@@ -10,7 +10,7 @@ namespace Titan.AssetConverter.Pipeline.Middlewares
         {
             var result = await ObjParser.ReadFromFile(context.Filename);
 
-            return await next(context with {Object = result, Name = Path.GetFileNameWithoutExtension(context.Filename)});
+            return await next(context with {Object = result, Name = Path.GetFileNameWithoutExtension(context.Filename)?.ToLower()});
         }
     }
 }

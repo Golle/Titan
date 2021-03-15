@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace Titan.GraphicsV2.Resources
+namespace Titan.GraphicsV2.Resources.Models
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct SubMeshData

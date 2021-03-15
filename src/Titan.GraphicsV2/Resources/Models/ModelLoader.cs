@@ -1,35 +1,39 @@
-using System;
 using System.Runtime.InteropServices;
 using Titan.Core.Common;
 using Titan.Core.IO;
 using Titan.GraphicsV2.D3D11;
 using Titan.GraphicsV2.D3D11.Buffers;
+using Titan.GraphicsV2.Resources.Materials;
 using Titan.Windows.Win32.D3D11;
-using Buffer = Titan.GraphicsV2.D3D11.Buffers.Buffer;
 
-namespace Titan.GraphicsV2.Resources
+namespace Titan.GraphicsV2.Resources.Models
 {
     internal class ModelLoader
     {
         private readonly Device _device;
         private readonly IFileReader _fileReader;
+        private readonly MaterialsLoader _materialsLoader;
 
-        public ModelLoader(Device device, IFileReader fileReader)
+        public ModelLoader(Device device, IFileReader fileReader, MaterialsLoader materialsLoader)
         {
             _device = device;
             _fileReader = fileReader;
+            _materialsLoader = materialsLoader;
         }
-
 
         public Model3D Load(string identifier)
         {
-            using var file = new ByteReader(_fileReader.OpenRead(identifier));
+            var modelIdentifier = $"{identifier}.dat";
+            var materialIdentifier = $"{identifier}.json";
+
+            using var file = new ByteReader(_fileReader.OpenRead(modelIdentifier));
+            var materials = _materialsLoader.Load(materialIdentifier);
 
             file.Read<MeshDataHeader>(out var header);
 
             var vertexBuffer = CreateVertexBuffer(header, file);
             var indexBuffer = CreateIndexBuffer(header, file);
-            var submeshes = CreateSubMeshes(header, file);
+            var submeshes = CreateSubMeshes(header, file, materials);
 
 
             return new Model3D
@@ -41,11 +45,11 @@ namespace Titan.GraphicsV2.Resources
             };
         }
 
-        private unsafe SubMesh[] CreateSubMeshes(MeshDataHeader header, ByteReader file)
+        private static unsafe SubMesh[] CreateSubMeshes(MeshDataHeader header, ByteReader file, Material[] materials)
         {
             if (header.SubMeshes == 0)
             {
-                return Array.Empty<SubMesh>();
+                return System.Array.Empty<SubMesh>();
             }
 
             var totalSize = header.SubMeshes * header.SubMeshSize;
@@ -56,8 +60,13 @@ namespace Titan.GraphicsV2.Resources
                 var result = new SubMesh[header.SubMeshes];
                 for (var i = 0; i < header.SubMeshes; ++i)
                 {
-                    ref readonly var submesh = ref buffer[i];
-                    result[i] = new SubMesh {Count = submesh.Count, Start = submesh.StartIndex};
+                    ref readonly var subMeshData = ref buffer[i];
+                    result[i] = new SubMesh {Count = subMeshData.Count, Start = subMeshData.StartIndex};
+                    if (subMeshData.MaterialIndex < materials.Length)
+                    {
+                        result[i].HasMaterial = true;
+                        result[i].Material = materials[subMeshData.MaterialIndex];
+                    }
                 }
                 return result;
             }

@@ -1,7 +1,8 @@
 using Titan.Core.Common;
 using Titan.GraphicsV2.D3D11.Buffers;
+using Titan.GraphicsV2.Resources.Materials;
 
-namespace Titan.GraphicsV2.Resources
+namespace Titan.GraphicsV2.Resources.Models
 {
     internal struct Model3D
     {
@@ -14,5 +15,7 @@ namespace Titan.GraphicsV2.Resources
     {
         internal uint Start;
         internal uint Count;
+        internal bool HasMaterial;
+        internal Material Material;
     }
 }

@@ -1,7 +1,7 @@
 using Titan.AssetConverter.Exporter;
 using Titan.AssetConverter.Pipeline.Middlewares;
 using Titan.AssetConverter.WavefrontObj;
-using Titan.GraphicsV2.Resources;
+using Titan.GraphicsV2.Resources.Models;
 
 namespace Titan.AssetConverter.Pipeline
 {

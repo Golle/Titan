@@ -22,8 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Images\" />
     <Folder Include="Rendering\Builder\" />
-    <Folder Include="Textures\" />
+    <Folder Include="Resources\Shaders\" />
   </ItemGroup>
 
 </Project>

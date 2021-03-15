@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using Titan.AssetConverter.WavefrontObj;
 using Titan.GraphicsV2.Resources;
+using Titan.GraphicsV2.Resources.Models;
 
 namespace Titan.AssetConverter.Exporter
 {

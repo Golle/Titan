@@ -5,6 +5,7 @@ using Titan.ECS.World;
 using Titan.EntitySystem.Components;
 using Titan.GraphicsV2.Rendering.Queue;
 using Titan.GraphicsV2.Resources;
+using Titan.GraphicsV2.Resources.Models;
 
 namespace Titan.EntitySystem
 {
@@ -32,7 +33,7 @@ namespace Titan.EntitySystem
         {
             if (_loaded == false)
             {
-                _model = _modelLoader.Load("models1/table.dat");
+                _model = _modelLoader.Load("models1/clock_obj");
                 _loaded = true;
             }
 

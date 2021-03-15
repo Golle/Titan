@@ -5,6 +5,11 @@
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="GameLoop\**" />
+    <EmbeddedResource Remove="GameLoop\**" />
+    <None Remove="GameLoop\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
@@ -18,10 +23,6 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Titan.Sandbox</_Parameter1>
     </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="GameLoop\" />
   </ItemGroup>
 
 

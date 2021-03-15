@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.GraphicsV2.Resources;
+using Titan.GraphicsV2.Resources.Models;
 
 namespace Titan.GraphicsV2.Rendering.Queue
 {
