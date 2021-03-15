@@ -8,4 +8,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Titan.GraphicsV2\Titan.GraphicsV2.csproj" />
+  </ItemGroup>
+
 </Project>
