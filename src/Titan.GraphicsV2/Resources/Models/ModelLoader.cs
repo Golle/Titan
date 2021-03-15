@@ -21,7 +21,6 @@ namespace Titan.GraphicsV2.Resources.Models
             _materialsLoader = materialsLoader;
         }
 
-
         public Model3D Load(string identifier)
         {
             var modelIdentifier = $"{identifier}.dat";
