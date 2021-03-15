@@ -74,16 +74,25 @@ namespace Titan.GraphicsV2.Rendering.Renderers
         public void Render(Context context)
         {
             context.Map(_cameraBuffer, new CameraBuffer { View = _queue.View, ViewProjection = Matrix4x4.Transpose(_queue.ViewProjection) });
-            context.SetVSConstantBuffer(_cameraBuffer);
             context.SetViewPort(_viewPort);
             context.SetPixelShaderSampler(_tempSampler);
+            
+            context.SetVSConstantBuffer(_cameraBuffer);
+            context.SetVSConstantBuffer(_worldBuffer, 1);
+            //unsafe
+            //{
+            //    var constantBuffers = stackalloc ID3D11Buffer*[2];
+                
+            //}
+            
+
             foreach (ref readonly var renderable in _queue.GetRendereables())
             {
                 ref readonly var world = ref renderable.World;
                 ref readonly var model = ref renderable.Model;
 
                 context.Map(_worldBuffer, world);
-                context.SetVSConstantBuffer(_worldBuffer, 1);
+                
 
                 context.SetTopology(D3D_PRIMITIVE_TOPOLOGY.D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
                 context.SetVertexBuffer(_device.BufferManager.Access(model.VertexBuffer));
