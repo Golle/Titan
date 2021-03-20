@@ -1,7 +1,7 @@
 using System;
 using Titan.GraphicsV2.Resources.Models;
 
-namespace Titan.BundleBuilder.Meshes
+namespace Titan.BundleBuilder.Models.Meshes
 {
     internal class Mesh<T> where T : unmanaged
     {

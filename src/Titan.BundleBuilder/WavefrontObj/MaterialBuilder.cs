@@ -131,7 +131,7 @@ namespace Titan.BundleBuilder.WavefrontObj
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ObjColor ParseColor(in ReadOnlySpan<string> values) => new ObjColor(values, ParseFloat(values[0]), ParseFloat(values[1]), ParseFloat(values[2]));
+        private static ObjColor ParseColor(in ReadOnlySpan<string> values) => new(values, ParseFloat(values[0]), ParseFloat(values[1]), ParseFloat(values[2]));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static float ParseFloat(in string value) => float.Parse(value, CultureInfo.InvariantCulture);

@@ -2,7 +2,7 @@ using System;
 using Titan.BundleBuilder.WavefrontObj;
 using Titan.GraphicsV2.Resources.Models;
 
-namespace Titan.BundleBuilder.Meshes
+namespace Titan.BundleBuilder.Models.Meshes
 {
     internal class MeshBuilder
     {

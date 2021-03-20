@@ -16,6 +16,8 @@ namespace Titan.BundleBuilder.WavefrontObj
             Green = g;
         }
 
+        public bool HasValue => !string.IsNullOrWhiteSpace(Original);
+
         public override string ToString() => Original;
     }
 }

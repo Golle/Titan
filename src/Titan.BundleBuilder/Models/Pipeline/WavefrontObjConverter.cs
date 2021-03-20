@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using Titan.BundleBuilder.Meshes;
+using Titan.BundleBuilder.Models.Meshes;
 
-namespace Titan.BundleBuilder.Pipeline
+namespace Titan.BundleBuilder.Models.Pipeline
 {
     internal class WavefrontObjConverter : IMiddleware<ModelContext>
     {
