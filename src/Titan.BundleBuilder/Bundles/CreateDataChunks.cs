@@ -86,7 +86,6 @@ namespace Titan.BundleBuilder.Bundles
                 });
             }
             
-            
             await writer.FlushAsync();
 
             return await next(context with
@@ -98,11 +97,5 @@ namespace Titan.BundleBuilder.Bundles
             });
 
         }
-    }
-
-
-    struct MaterialDataChunk
-    {
-        
     }
 }

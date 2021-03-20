@@ -24,8 +24,8 @@ var textureConverterPipeline = new PipelineBuilder<TextureContext>()
 
 
 var bundlePipeline = new PipelineBuilder<BundleContext>()
-    .Use(new WriteBundle())
     .Use(new CreateDataChunks())
+    .Use(new WriteBundle())
     .Build();
 
 var fileContents = File.ReadAllText(Path.Combine(Configuration.AssetsPath, "bundle_01.json"));
