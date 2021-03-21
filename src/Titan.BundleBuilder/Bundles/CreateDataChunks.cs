@@ -45,19 +45,19 @@ namespace Titan.BundleBuilder.Bundles
 
             foreach (var texture in context.Textures)
             {
-                var image = texture.Image;
+                //var image = texture.Image;
                 var offset = stream.Position;
-                writer.Write(new ReadOnlyMemory<byte>(image.Buffer));
+                writer.Write(new ReadOnlyMemory<byte>(texture.Data));
                 textures.Add(new TextureDescriptor
                 {
                     Name = texture.TextureSpecification.Name,
                     Filename = texture.TextureSpecification.Filename,
                     Offset = offset,
-                    Format = image.Format,
-                    Height = image.Height,
-                    Width = image.Width,
-                    Size = image.ImageSize,
-                    Stride = image.Stride
+                    //Format = image.Format,
+                    //Height = image.Height,
+                    //Width = image.Width,
+                    //Size = image.ImageSize,
+                    //Stride = image.Stride
                 });
             }
 

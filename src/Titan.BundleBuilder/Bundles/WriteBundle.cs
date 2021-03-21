@@ -2,7 +2,6 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Titan.Windows.Win32.D3D11;
 
 namespace Titan.BundleBuilder.Bundles
 {
@@ -44,11 +43,12 @@ namespace Titan.BundleBuilder.Bundles
     {
         public string Name { get; init; }
         public long Offset { get; init; }
-        public uint Height { get; init; }
-        public uint Width { get; init; }
-        public uint Stride { get; init; }
-        public uint Size { get; init; }
-        public DXGI_FORMAT Format { get; init; } // TODO: maybe use some format that is cross platform?
+        // TODO: should we use this metadata? we wont need it unless we do compression
+        //public uint Height { get; init; }
+        //public uint Width { get; init; }
+        //public uint Stride { get; init; }
+        //public uint Size { get; init; }
+        //public DXGI_FORMAT Format { get; init; } // TODO: maybe use some format that is cross platform?
         
         
         internal string Filename { get; init; }

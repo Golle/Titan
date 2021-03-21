@@ -19,7 +19,7 @@ var modelConverterPipeline = new PipelineBuilder<ModelContext>()
     .Build();
 
 var textureConverterPipeline = new PipelineBuilder<TextureContext>()
-    .Use(new LoadAndConvertTexture())
+    .Use(new LoadTexture())
     .Build();
 
 

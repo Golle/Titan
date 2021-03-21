@@ -1,5 +1,6 @@
 using System;
 using Titan.Windows.Win32;
+using Titan.Windows.Win32.D3D11;
 using Titan.Windows.Win32.WIC;
 using static Titan.Windows.Win32.Common;
 using static Titan.Windows.Win32.D3D11.DXGI_FORMAT;
@@ -9,6 +10,7 @@ using static Titan.Windows.Win32.Native.Ole32;
 
 namespace Titan.BundleBuilder.Common
 {
+    internal record Image(byte[] Buffer, uint ImageSize, DXGI_FORMAT Format, uint Stride, uint Width, uint Height);
     internal unsafe class ImageLoader : IDisposable
     {
         private ComPtr<IWICImagingFactory> _factory;
@@ -24,6 +26,7 @@ namespace Titan.BundleBuilder.Common
 
         public Image Load(string path)
         {
+
             using ComPtr<IWICBitmapDecoder> decoder = default;
             fixed (char* wzFilename = path)
             {
