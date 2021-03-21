@@ -12,6 +12,5 @@ namespace Titan.BundleBuilder.Bundles
         
         public MeshDescriptor[] MeshDescriptors { get; init; }
         public TextureDescriptor[] TextureDescriptors { get; set; }
-        public MaterialDescriptor[] MaterialDescriptors { get; set; }
     }
 }

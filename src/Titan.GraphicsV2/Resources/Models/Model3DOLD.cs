@@ -4,7 +4,7 @@ using Titan.GraphicsV2.Resources.Materials;
 
 namespace Titan.GraphicsV2.Resources.Models
 {
-    internal struct Model3D
+    internal struct Model3DOLD
     {
         internal Handle<Buffer> VertexBuffer;
         internal Handle<Buffer> IndexBuffer;

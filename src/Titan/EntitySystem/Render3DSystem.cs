@@ -5,6 +5,7 @@ using Titan.ECS.World;
 using Titan.EntitySystem.Components;
 using Titan.GraphicsV2.Rendering.Queue;
 using Titan.GraphicsV2.Resources;
+using Titan.GraphicsV2.Resources.Bundles;
 using Titan.GraphicsV2.Resources.Models;
 
 namespace Titan.EntitySystem
@@ -15,15 +16,18 @@ namespace Titan.EntitySystem
     internal class Render3DSystem : SystemBase
     {
         private readonly ModelLoader _modelLoader;
+        private readonly BundleLoader _bundleLoader;
         private readonly ModelRenderQueue _queue;
         private readonly ReadOnlyStorage<Transform3D> _transform;
         private bool _loaded;
-        private Model3D _model;
+        //private Model3D _model;
         private IEntityFilter _filter;
+        private Bundle _bundle;
 
-        public Render3DSystem(IWorld world, IEntityFilterManager entityFilterManager, ModelLoader modelLoader, ModelRenderQueue queue) : base(world)
+        public Render3DSystem(IWorld world, IEntityFilterManager entityFilterManager, ModelLoader modelLoader, BundleLoader bundleLoader, ModelRenderQueue queue) : base(world)
         {
             _modelLoader = modelLoader;
+            _bundleLoader = bundleLoader;
             _queue = queue;
             _transform = GetRead<Transform3D>();
             _filter = entityFilterManager.Create(new EntityFilterConfiguration().With<Transform3D>().With<TEMPModel3D>());
@@ -33,18 +37,25 @@ namespace Titan.EntitySystem
         {
             if (_loaded == false)
             {
-                _model = _modelLoader.Load("models1/clock_obj");
+                //_model = _modelLoader.Load("models1/clock_obj");
                 _loaded = true;
+
+                _bundle = _bundleLoader.Load("bundles/bundle01");
             }
 
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref readonly var transform = ref _transform.Get(entity);
-                _queue.Enqueue(new Renderable
+
+                foreach (var bundleModel in _bundle.Models)
                 {
-                    Model = _model,
-                    World = transform.WorldMatrix
-                });
+                    _queue.Enqueue(new Renderable
+                    {
+                        Model = bundleModel,
+                        World = transform.WorldMatrix
+                    });
+                }
+                
             }
             
         }

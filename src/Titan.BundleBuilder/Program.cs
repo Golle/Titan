@@ -68,6 +68,6 @@ var result = await bundlePipeline(new BundleContext(bundle.Name)
     Models = models
 });
 
-Console.WriteLine("Hello World!");
+ Console.WriteLine("Hello World!");
 
 

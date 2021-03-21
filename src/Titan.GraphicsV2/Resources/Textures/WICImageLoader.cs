@@ -30,6 +30,17 @@ namespace Titan.GraphicsV2.Resources.Textures
             }
         }
 
+        public Image Load(byte* buffer, uint size)
+        {
+            using ComPtr<IWICStream> stream = default;
+            CheckAndThrow(_factory.Get()->CreateStream(stream.GetAddressOf()), nameof(IWICImagingFactory.CreateStream));
+            CheckAndThrow(stream.Get()->InitializeFromMemory(buffer, size), nameof(IWICStream.InitializeFromMemory));
+
+            using ComPtr<IWICBitmapDecoder> decoder = default;
+            CheckAndThrow(_factory.Get()->CreateDecoderFromStream((IStream*) stream.Get(), null, WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), nameof(IWICImagingFactory.CreateDecoderFromStream));
+            return LoadInternal(decoder);
+        }
+
         public Image Load(string identifier)
         {
             var fullPath = _fileSystem.GetFullPath(identifier);
@@ -39,7 +50,11 @@ namespace Titan.GraphicsV2.Resources.Textures
             {
                 CheckAndThrow(_factory.Get()->CreateDecoderFromFilename(wzFilename, null, (uint)GENERIC_READ, WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), nameof(IWICImagingFactory.CreateDecoderFromFilename));
             }
+            return LoadInternal(decoder);
+        }
 
+        private Image LoadInternal(in ComPtr<IWICBitmapDecoder> decoder)
+        {
             using ComPtr<IWICBitmapFrameDecode> frameDecode = default;
             CheckAndThrow(decoder.Get()->GetFrame(0, frameDecode.GetAddressOf()), nameof(IWICBitmapDecoder.GetFrame));
 
@@ -55,16 +70,16 @@ namespace Titan.GraphicsV2.Resources.Textures
                 // needs conversion
                 var newFormatGuid = WICConvertionTable.Convert(pixelFormat);
                 var newBitsPerPixel = GetBitsPerPixel(newFormatGuid);
-                
-                var rowPitch = (width* newBitsPerPixel + 7) / 8;
+
+                var rowPitch = (width * newBitsPerPixel + 7) / 8;
                 var imageSize = rowPitch * height;
 
-                var buffer = (byte*)Marshal.AllocHGlobal((int)imageSize);
+                var buffer = (byte*) Marshal.AllocHGlobal((int) imageSize);
                 try
                 {
                     using ComPtr<IWICFormatConverter> converter = default;
                     CheckAndThrow(_factory.Get()->CreateFormatConverter(converter.GetAddressOf()), nameof(IWICImagingFactory.CreateFormatConverter));
-                    CheckAndThrow(converter.Get()->Initialize((IWICBitmapSource*)frameDecode.Get(), &newFormatGuid, WICBitmapDitherTypeErrorDiffusion, null, 0, WICBitmapPaletteTypeCustom), nameof(IWICFormatConverter.Initialize));
+                    CheckAndThrow(converter.Get()->Initialize((IWICBitmapSource*) frameDecode.Get(), &newFormatGuid, WICBitmapDitherTypeErrorDiffusion, null, 0, WICBitmapPaletteTypeCustom), nameof(IWICFormatConverter.Initialize));
                     CheckAndThrow(converter.Get()->CopyPixels(null, rowPitch, imageSize, buffer), nameof(IWICFormatConverter.CopyPixels));
 
                     return new Image(buffer, imageSize, WICToDXGITranslationTable.Translate(newFormatGuid), rowPitch, width, height);
@@ -72,18 +87,17 @@ namespace Titan.GraphicsV2.Resources.Textures
                 catch
                 {
                     // If there's an exception, free the buffer
-                    Marshal.FreeHGlobal((nint)buffer);
+                    Marshal.FreeHGlobal((nint) buffer);
                     throw;
                 }
             }
             else
             {
-
                 var bitsPerPixel = GetBitsPerPixel(pixelFormat);
                 var stride = (width * bitsPerPixel + 7) / 8;
                 var imageSize = stride * height;
 
-                var buffer = (byte*)Marshal.AllocHGlobal((int)imageSize);
+                var buffer = (byte*) Marshal.AllocHGlobal((int) imageSize);
                 try
                 {
                     CheckAndThrow(frameDecode.Get()->CopyPixels(null, stride, imageSize, buffer), nameof(IWICBitmapFrameDecode.CopyPixels));
@@ -91,11 +105,11 @@ namespace Titan.GraphicsV2.Resources.Textures
                 catch
                 {
                     // If there's an exception, free the buffer
-                    Marshal.FreeHGlobal((nint)buffer);
+                    Marshal.FreeHGlobal((nint) buffer);
                     throw;
                 }
-                
-                return new Image(buffer, imageSize, dxgiFormat, stride,  width, height);
+
+                return new Image(buffer, imageSize, dxgiFormat, stride, width, height);
             }
         }
 

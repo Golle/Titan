@@ -13,35 +13,21 @@ namespace Titan.BundleBuilder.Bundles
         public async Task<BundleContext> Invoke(BundleContext context, MiddlewareDelegate<BundleContext> next)
         {
             List<TextureDescriptor> textures = new();
-            List<MaterialDescriptor> materials = new();
             List<MeshDescriptor> meshes = new();
 
             var stream = new MemoryStream();
             using var writer = new ByteStreamWriter(stream);
-            
-            foreach (var model in context.Models)
-            {
-                var offset = stream.Position;
-                var mesh = model.Mesh;
-                writer.Write(mesh.Vertices);
-                writer.Write(mesh.Indices);
-                writer.Write(mesh.SubMeshes);
-                
-                unsafe
-                {
-                    meshes.Add(new MeshDescriptor
-                    {
-                        Name = model.ModelSpecification.Name,
-                        Offset = offset,
-                        IndexCount = mesh.Indices.Length,
-                        IndexSize = sizeof(int),
-                        VertexCount = mesh.Vertices.Length,
-                        VertexSize = sizeof(VertexData),
-                        SubmeshCount = mesh.SubMeshes.Length,
-                        SubmeshSize = sizeof(SubMeshData)
-                    });
-                }
-            }
+
+            /*
+             * Data structure
+             * TEXTURES
+             * MESH
+             * MATERIALS
+             * MESH
+             * MATERIALS
+             *
+             *
+             */
 
             foreach (var texture in context.Textures)
             {
@@ -53,6 +39,7 @@ namespace Titan.BundleBuilder.Bundles
                     Name = texture.TextureSpecification.Name,
                     Filename = texture.TextureSpecification.Filename,
                     Offset = offset,
+                    Size = texture.Data.Length
                     //Format = image.Format,
                     //Height = image.Height,
                     //Width = image.Width,
@@ -60,12 +47,16 @@ namespace Titan.BundleBuilder.Bundles
                     //Stride = image.Stride
                 });
             }
-
             int GetTextureIndex(string path) => string.IsNullOrWhiteSpace(path) ? -1 : textures.FindIndex(descriptor => descriptor.Filename == path);
 
             foreach (var model in context.Models)
             {
                 var offset = stream.Position;
+                var mesh = model.Mesh;
+                writer.Write(mesh.Vertices);
+                writer.Write(mesh.Indices);
+                writer.Write(mesh.SubMeshes);
+                
                 foreach (var material in model.Materials)
                 {
                     var data = new MaterialData
@@ -79,11 +70,25 @@ namespace Titan.BundleBuilder.Bundles
                     };
                     writer.Write(data);
                 }
-                materials.Add(new MaterialDescriptor
+
+                unsafe
                 {
-                    Count = model.Materials.Length,
-                    Offset = offset
-                });
+                    meshes.Add(new MeshDescriptor
+                    {
+                        Name = model.ModelSpecification.Name,
+                        Offset = offset,
+                        IndexCount = mesh.Indices.Length,
+                        IndexSize = sizeof(int),
+                        VertexCount = mesh.Vertices.Length,
+                        VertexSize = sizeof(VertexData),
+                        SubmeshCount = mesh.SubMeshes.Length,
+                        SubmeshSize = sizeof(SubMeshData),
+                        Materials = new MaterialDescriptor
+                        {
+                            Count = model.Materials.Length
+                        }
+                    });
+                }
             }
             
             await writer.FlushAsync();
@@ -92,8 +97,7 @@ namespace Titan.BundleBuilder.Bundles
             {
                 DataBlob = stream.ToArray(),
                 MeshDescriptors = meshes.ToArray(),
-                TextureDescriptors = textures.ToArray(),
-                MaterialDescriptors = materials.ToArray(),
+                TextureDescriptors = textures.ToArray()
             });
 
         }

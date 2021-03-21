@@ -10,7 +10,7 @@ namespace Titan.BundleBuilder.Bundles
     {
         public MeshDescriptor[] Meshes { get; init; }
         public TextureDescriptor[] Textures { get; init; }
-        public MaterialDescriptor[] Materials { get; init; }
+        public int Size { get; init; }
     }
     internal class WriteBundle : IMiddleware<BundleContext>
     {
@@ -27,7 +27,7 @@ namespace Titan.BundleBuilder.Bundles
         {
             var json = JsonSerializer.Serialize(new BundleDescriptor
             {
-                Materials = context.MaterialDescriptors,
+                Size = context.DataBlob.Length,
                 Textures = context.TextureDescriptors,
                 Meshes = context.MeshDescriptors
             }, Options);
@@ -43,6 +43,7 @@ namespace Titan.BundleBuilder.Bundles
     {
         public string Name { get; init; }
         public long Offset { get; init; }
+        public int Size { get; init; }
         // TODO: should we use this metadata? we wont need it unless we do compression
         //public uint Height { get; init; }
         //public uint Width { get; init; }
@@ -64,11 +65,11 @@ namespace Titan.BundleBuilder.Bundles
         public int IndexCount { get; init; }
         public int SubmeshSize { get; init; }
         public int SubmeshCount { get; init; }
+        public MaterialDescriptor Materials { get; init; }
     }
 
     internal record MaterialDescriptor
     {
-        public long Offset { get; init; }
         public int Count { get; init; }
     }
 }

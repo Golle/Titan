@@ -98,9 +98,9 @@ namespace Titan.GraphicsV2.Rendering.Renderers
                 context.SetVertexBuffer(_device.BufferManager.Access(model.VertexBuffer));
                 ref readonly var indexBuffer = ref _device.BufferManager.Access(model.IndexBuffer);
                 context.SetIndexBuffer(indexBuffer);
-                if (model.SubMeshCount > 1)
+                if (model.SubMeshes.Length > 1)
                 {
-                    for (var i = 0; i < model.SubMeshCount; ++i)
+                    for (var i = 0; i < model.SubMeshes.Length; ++i)
                     {
                         ref readonly var submesh = ref model.SubMeshes[i];
                         if (submesh.HasMaterial && submesh.Material.DiffuseTexture.IsValid())

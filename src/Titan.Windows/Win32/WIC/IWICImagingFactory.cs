@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Windows.Win32.WIC
 {
+
     [Guid("ec5ec8a9-c395-4314-9c77-54d7a935ff70")]
     public unsafe struct IWICImagingFactory
     {
@@ -26,12 +27,9 @@ namespace Titan.Windows.Win32.WIC
         public HRESULT CreateDecoderFromFilename(char* wzFilename, Guid* pguidVendor, uint dwDesiredAccess, WICDecodeOptions metadataOptions, IWICBitmapDecoder** ppIDecoder)
         => ((delegate* unmanaged[Stdcall]<void*, char*, Guid*, uint, WICDecodeOptions, IWICBitmapDecoder**,  HRESULT>)_vtbl[3])(Unsafe.AsPointer(ref this), wzFilename, pguidVendor, dwDesiredAccess, metadataOptions, ppIDecoder);
 
-        //HRESULT(STDMETHODCALLTYPE* CreateDecoderFromStream)(
-        // __RPC__in IWICImagingFactory * This,
-        // /* [in] */ __RPC__in_opt IStream* pIStream,
-        // /* [unique][in] */ __RPC__in_opt const GUID* pguidVendor,
-        // /* [in] */ WICDecodeOptions metadataOptions,
-        //    /* [retval][out] */ __RPC__deref_out_opt IWICBitmapDecoder **ppIDecoder);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateDecoderFromStream(IStream* pIStream, Guid* pguidVendor, WICDecodeOptions metadataOptions, IWICBitmapDecoder** ppIDecoder) 
+            => ((delegate* unmanaged[Stdcall]<void*, IStream*, Guid*, WICDecodeOptions, IWICBitmapDecoder**, HRESULT>)_vtbl[4])(Unsafe.AsPointer(ref this), pIStream, pguidVendor, metadataOptions, ppIDecoder);
 
         //HRESULT(STDMETHODCALLTYPE* CreateDecoderFromFileHandle)(
         // __RPC__in IWICImagingFactory * This,
@@ -72,10 +70,9 @@ namespace Titan.Windows.Win32.WIC
         //HRESULT(STDMETHODCALLTYPE* CreateBitmapFlipRotator)(
         // __RPC__in IWICImagingFactory * This,
         // /* [out] */ __RPC__deref_out_opt IWICBitmapFlipRotator** ppIBitmapFlipRotator);
-
-        //HRESULT(STDMETHODCALLTYPE* CreateStream)(
-        // __RPC__in IWICImagingFactory * This,
-        // /* [out] */ __RPC__deref_out_opt IWICStream** ppIWICStream);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CreateStream(IWICStream** ppIWICStream) => ((delegate* unmanaged[Stdcall]<void*, IWICStream**, HRESULT>)_vtbl[14])(Unsafe.AsPointer(ref this), ppIWICStream);
 
         //HRESULT(STDMETHODCALLTYPE* CreateColorContext)(
         // __RPC__in IWICImagingFactory * This,

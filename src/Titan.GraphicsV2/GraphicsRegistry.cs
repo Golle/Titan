@@ -1,5 +1,6 @@
 using Titan.GraphicsV2.Rendering.Pipepline;
 using Titan.GraphicsV2.Rendering.Queue;
+using Titan.GraphicsV2.Resources.Bundles;
 using Titan.GraphicsV2.Resources.Materials;
 using Titan.GraphicsV2.Resources.Models;
 using Titan.GraphicsV2.Resources.Textures;
@@ -18,6 +19,7 @@ namespace Titan.GraphicsV2
                 .Register<TextureLoader>()
                 .Register<MaterialsLoader>()
                 .Register<IImageLoader, WICImageLoader>()
+                .Register<BundleLoader>()
 
                 .Register<ModelRenderQueue>()
             ;
