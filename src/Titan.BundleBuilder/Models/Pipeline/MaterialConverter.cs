@@ -25,7 +25,7 @@ namespace Titan.BundleBuilder.Models.Pipeline
             var modelPath = Path.GetDirectoryName(Path.Combine(Configuration.ModelsPath, context.ModelSpecification.Filename)) ?? throw new InvalidOperationException("Failed to get the path to the model");
             
             string GetPath(string name) => string.IsNullOrWhiteSpace(name) ? null : Path.GetFullPath(Path.Combine(modelPath, name));
-            static Color Parse(in ObjColor color) => color.HasValue ? Color.ParseF(color.Original) : Color.Zero;
+            static Color Parse(in ObjColor color, in Color defaultValue) => color.HasValue ? Color.ParseF(color.Original) : defaultValue;
 
             var materials = context
                 .Object
@@ -35,10 +35,10 @@ namespace Titan.BundleBuilder.Models.Pipeline
                     Name = m.Name,
                     DiffuseMapPath = GetPath(m.DiffuseMap),
                     NormalMapPath = GetPath(m.BumpMap),
-                    Ambient = Parse(m.AmbientColor),
-                    Diffuse = Parse(m.DiffuseColor),
-                    Emissive = Parse(m.EmissiveColor),
-                    Specular = Parse(m.SpecularColor),
+                    Ambient = Parse(m.AmbientColor, Color.Zero),
+                    Diffuse = Parse(m.DiffuseColor, Color.White),
+                    Emissive = Parse(m.EmissiveColor, Color.Zero),
+                    Specular = Parse(m.SpecularColor, Color.Zero),
                 })
                 .ToArray();
             
