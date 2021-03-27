@@ -24,7 +24,7 @@ namespace Titan.ECS.World
 
         public IEntityFilter Create(EntityFilterConfiguration configuration)
         {
-            var filter = _filters.FirstOrDefault(f => f.Components == configuration.Components && f.Components == configuration.ExcludeComponents); // Re-use existing filters
+            var filter = _filters.FirstOrDefault(f => f.Components == configuration.Components && f.Exclude == configuration.ExcludeComponents); // Re-use existing filters
             if (filter == null)
             {
                 _filters.Add(filter = new EntityFilter(configuration.Components, configuration.ExcludeComponents, _maxEntities));
