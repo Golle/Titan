@@ -16,6 +16,7 @@ namespace Titan.EntitySystem.Assets
         {
             _loader = loader;
         }
+
         protected override Texture Load(string identifier) => _loader.Load(identifier);
         protected override void Release(in Texture asset) => _loader.Release(asset);
         
