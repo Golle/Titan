@@ -13,7 +13,7 @@ namespace Titan.ECS.Systems
         internal int Priority { get; }
 
         private ComponentId _read;
-        private ComponentId _mutable = new();
+        private ComponentId _mutable;
 
         private bool _locked = false;
         protected SystemBase(IWorld world, int priority = 0)

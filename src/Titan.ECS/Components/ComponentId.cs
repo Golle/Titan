@@ -40,12 +40,17 @@ namespace Titan.ECS.Components
         public bool IsSubsetOf(in ComponentId id) => (_low & id._low) == _low && (_high & id._high) == _high;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool MatchesAny(in ComponentId id) => (_low & id._low) != 0ul || (_high & id._high) != 0ul;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MatchesNone(in ComponentId id) => (_low & id._low) == 0ul && (_high & id._high) == 0ul;
 
         public override string ToString() => $"{_high}:{_low}";
 
         //public override bool Equals(object obj) => obj is ComponentId other && Equals(other);
+
         //public override int GetHashCode() => HashCode.Combine(_low, _high);
+
         public override bool Equals(object obj) => throw new NotSupportedException("Use == to avoid boxing");
+
         public override int GetHashCode() => throw new NotSupportedException("Use == to avoid boxing");
     }
 }

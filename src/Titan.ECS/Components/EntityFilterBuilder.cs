@@ -2,11 +2,20 @@ namespace Titan.ECS.Components
 {
     public class EntityFilterConfiguration
     {
-        public ref readonly ComponentId Components => ref _components;
-        private ComponentId _components;
+        public ref readonly ComponentId Components => ref _includeComponents;
+        public ref readonly ComponentId ExcludeComponents => ref _excludeComponents;
+
+        private ComponentId _includeComponents;
+        private ComponentId _excludeComponents;
         public EntityFilterConfiguration With<T>() where T : unmanaged
         {
-            _components = _components += ComponentId<T>.Id;
+            _includeComponents += ComponentId<T>.Id;
+            return this;
+        }
+
+        public EntityFilterConfiguration Not<T>() where T : unmanaged
+        {
+            _excludeComponents += ComponentId<T>.Id;
             return this;
         }
     }

@@ -1,4 +1,4 @@
-﻿using Titan.GraphicsV2.D3D11;
+using Titan.GraphicsV2.D3D11;
 
 namespace Titan.GraphicsV2.Resources.Materials
 {
@@ -7,5 +7,6 @@ namespace Titan.GraphicsV2.Resources.Materials
         internal Color Diffue;
         internal Color Specular;
         internal Color Ambient;
+        internal Color Emissive;
     }
 }

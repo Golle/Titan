@@ -33,7 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.ECS", "src\Titan.ECS\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.ECS.Tests", "tests\Titan.ECS.Tests\Titan.ECS.Tests.csproj", "{0DBCD8D0-ADFA-4441-81B0-F29A24D4DBF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.GraphicsV2", "src\Titan.GraphicsV2\Titan.GraphicsV2.csproj", "{3F63B181-E65B-4763-9078-4838A45811B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.GraphicsV2", "src\Titan.GraphicsV2\Titan.GraphicsV2.csproj", "{3F63B181-E65B-4763-9078-4838A45811B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.BundleBuilder", "src\Titan.BundleBuilder\Titan.BundleBuilder.csproj", "{82AAC2D0-649B-4868-A6F7-56AF8DF60033}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +91,10 @@ Global
 		{3F63B181-E65B-4763-9078-4838A45811B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F63B181-E65B-4763-9078-4838A45811B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F63B181-E65B-4763-9078-4838A45811B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82AAC2D0-649B-4868-A6F7-56AF8DF60033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82AAC2D0-649B-4868-A6F7-56AF8DF60033}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82AAC2D0-649B-4868-A6F7-56AF8DF60033}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82AAC2D0-649B-4868-A6F7-56AF8DF60033}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +111,7 @@ Global
 		{208728EA-6BA3-4955-89AF-32CD0DBE3A1A} = {F2F17201-8E65-4284-AB69-902FD25F1C63}
 		{0DBCD8D0-ADFA-4441-81B0-F29A24D4DBF7} = {356E7F71-4ED3-406C-BD86-156D7AFCC57C}
 		{3F63B181-E65B-4763-9078-4838A45811B9} = {F2F17201-8E65-4284-AB69-902FD25F1C63}
+		{82AAC2D0-649B-4868-A6F7-56AF8DF60033} = {BE7E7A08-4444-4878-8BB4-D02F12E8EA37}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B379FCF9-0746-4E66-BFF2-78F67D73774A}

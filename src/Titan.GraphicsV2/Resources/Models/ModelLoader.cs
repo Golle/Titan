@@ -21,7 +21,7 @@ namespace Titan.GraphicsV2.Resources.Models
             _materialsLoader = materialsLoader;
         }
 
-        public Model3D Load(string identifier)
+        public Model3DOLD Load(string identifier)
         {
             var modelIdentifier = $"{identifier}.dat";
             var materialIdentifier = $"{identifier}.json";
@@ -36,7 +36,7 @@ namespace Titan.GraphicsV2.Resources.Models
             var submeshes = CreateSubMeshes(header, file, materials);
 
 
-            return new Model3D
+            return new Model3DOLD
             {
                 SubMeshes = submeshes,
                 IndexBuffer = indexBuffer,

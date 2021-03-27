@@ -3,7 +3,6 @@ using Titan.ECS.Assets;
 using Titan.ECS.World;
 using Titan.EntitySystem;
 using Titan.EntitySystem.Components;
-using Titan.Graphics.Textures;
 
 namespace Titan.Sandbox
 {
@@ -12,7 +11,7 @@ namespace Titan.Sandbox
         public WorldBuilder ConfigureWorld(WorldBuilder builder) =>
             builder
                 .WithMaxEntities(10_000)
-                .WithMaxEvents(100_000)
+                .WithMaxEvents(1_000)
                 
                 .WithComponent<SandboxComponent>(3000)
                 .WithSystem<FirstPersonCameraSystem>()
@@ -42,6 +41,10 @@ namespace Titan.Sandbox
             var entity = world.CreateEntity();
             entity.AddComponent<Transform3D>();
             entity.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
+
+            var meshEntity = world.CreateEntity();
+            meshEntity.AddComponent(new Transform3D { Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(0, 0, 10) });
+            meshEntity.AddManagedComponent(new Asset<MeshComponent>("clock"));
 
             var modelEntity = world.CreateEntity();
             modelEntity.AddComponent(new Transform3D {Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(0, 0, 10)});

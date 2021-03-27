@@ -13,6 +13,9 @@ x86/
 
 # Generated models
 /resources/models*/
+/assets/*
+/resources/bundles/
+!/assets/README.md
 
 # A lot of temp textures, dont put on git yet.
 /resources/textures/
