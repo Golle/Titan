@@ -29,7 +29,7 @@ namespace Titan.GraphicsV2.Resources.Textures
                 CheckAndThrow(CoCreateInstance(clsid, null, CLSCTX_INPROC_SERVER, &riid, (void**)_factory.GetAddressOf()), nameof(CoCreateInstance));
             }
         }
-
+        
         public Image Load(byte* buffer, uint size)
         {
             using ComPtr<IWICStream> stream = default;

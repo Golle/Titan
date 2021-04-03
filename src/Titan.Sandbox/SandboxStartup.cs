@@ -38,6 +38,7 @@ namespace Titan.Sandbox
             //    entity.AddManagedComponent(new Asset<MeshComponent>(models[i]));
             //}
 
+     
             var entity = world.CreateEntity();
             entity.AddComponent<Transform3D>();
             entity.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
@@ -45,6 +46,7 @@ namespace Titan.Sandbox
             var meshEntity = world.CreateEntity();
             meshEntity.AddComponent(new Transform3D { Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(0, 0, 10) });
             meshEntity.AddManagedComponent(new Asset<MeshComponent>("clock"));
+            meshEntity.AddComponent(new UnmanagedAsset<MeshComponent>("clock"));
 
             var modelEntity = world.CreateEntity();
             modelEntity.AddComponent(new Transform3D {Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(0, 0, 10)});

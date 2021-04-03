@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Titan.Assets\Titan.Assets.csproj" />
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
     <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
     <ProjectReference Include="..\Titan.GraphicsV2\Titan.GraphicsV2.csproj" />
