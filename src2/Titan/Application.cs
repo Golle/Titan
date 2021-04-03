@@ -5,6 +5,6 @@ namespace Titan
         
         
         public virtual void OnStart() { }
-        public virtual void OnShutdown() { }
+        public virtual void OnTerminate() { }
     }
 }

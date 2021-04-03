@@ -14,7 +14,6 @@ using static Titan.Windows.D3D11.DXGI_USAGE;
 
 namespace Titan.Graphics.D3D11
 {
-
     public record DeviceConfiguration(uint RefreshRate, bool Vsync, bool Debug);
 
     public static class GraphicsDevice
@@ -59,15 +58,15 @@ namespace Titan.Graphics.D3D11
                 Windowed = window.Windowed
             };
 
-            Logger.Debug<ID3D11Device>("Creating device");
+            Logger.Trace<ID3D11Device>("Creating device");
             unsafe
             {
                 CheckAndThrow(D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, flags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _context.GetAddressOf()), nameof(D3D11CreateDeviceAndSwapChain));
             }
-            Logger.Debug<ID3D11Device>("Device created");
+            Logger.Trace<ID3D11Device>("Device created");
 
             // Get the backbuffer
-            Logger.Debug<ID3D11Device>($"Creating Backbuffer ({D3D11Resource})");
+            Logger.Trace<ID3D11Device>($"Creating Backbuffer ({D3D11Resource})");
             using var backbufferResource = new ComPtr<ID3D11Resource>();
             unsafe
             {
@@ -77,16 +76,18 @@ namespace Titan.Graphics.D3D11
                 }
                 CheckAndThrow(_device.Get()->CreateRenderTargetView(backbufferResource.Get(), null, _backbuffer.GetAddressOf()), nameof(ID3D11Device.CreateRenderTargetView));
             }
-            Logger.Debug<ID3D11Device>("Backbuffer created");
+            Logger.Trace<ID3D11Device>("Backbuffer created");
 
             _initialized = true;
         }
 
 
-        public static void Shutdown()
+        public static void Terminate()
         {
+            
             if (_initialized)
             {
+                Logger.Trace<ID3D11Device>("Disposing resources");
                 _backbuffer.Dispose();
                 _swapChain.Dispose();
                 _context.Dispose();

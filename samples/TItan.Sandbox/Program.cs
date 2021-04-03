@@ -18,7 +18,7 @@ namespace Titan.Sandbox
             Logger.Info("Sandbox application starting");
         }
 
-        public override void OnShutdown()
+        public override void OnTerminate()
         {
             Logger.Info("Sandbox application shutting down");
         }

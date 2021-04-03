@@ -1,5 +1,6 @@
 using System;
 using Titan.Core.Logging;
+using Titan.Core.Threading;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Windows;
 
@@ -29,12 +30,15 @@ namespace Titan
 
             Logger.Start();
 
-            Trace("Creating the Window");
+            Trace($"Initialize {nameof(WorkerPool)}");
+            WorkerPool.Init(new WorkerPoolConfiguration(100, (uint) ((Environment.ProcessorCount/2) - 1)));
+
+            Trace($"Creating the {nameof(Window)}");
             _window = Window.Create(new WindowConfiguration("Titan is a moon ?!", 1920, 1080));
-            Trace("Showing the Window");
+            Trace($"Showing the {nameof(Window)}");
             _window.Show();
 
-            Trace($"Init the GraphicsDevice: {typeof(GraphicsDevice).FullName}");
+            Trace($"Init {typeof(GraphicsDevice).FullName}");
             GraphicsDevice.Init(_window, new DeviceConfiguration(144, true, true));
 
             Info("Engine has been initialized.");
@@ -43,6 +47,8 @@ namespace Titan
 
             while (_window.Update())
             {
+
+
                 // Do stuff with the engine
             }
         }
@@ -50,10 +56,17 @@ namespace Titan
         public void Dispose()
         {
             Logger.Info<Engine>("Disposing the application");
-            
+            _app.OnTerminate();
+
             Logger.Info<Engine>("Disposing the engine");
 
-            GraphicsDevice.Shutdown();
+            Logger.Trace<Engine>($"Terminate {nameof(WorkerPool)}");
+            WorkerPool.Terminate();
+            
+            Logger.Trace<Engine>($"Terminate {nameof(GraphicsDevice)}");
+            GraphicsDevice.Terminate();
+
+            Logger.Trace<Engine>($"Close/Dispose {nameof(Window)}");
             _window.Dispose();
             Logger.Shutdown();
         }
