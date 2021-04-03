@@ -9,9 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{741276
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{31969BD8-6C6B-44E4-85C5-526E46F52C9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Sandbox", "samples\Titan.Sandbox\Titan.Sandbox.csproj", "{D3624F7E-8F6B-4994-AA86-CB1C084652F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Sandbox", "samples\Titan.Sandbox\Titan.Sandbox.csproj", "{D3624F7E-8F6B-4994-AA86-CB1C084652F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Core", "src2\Titan.Core\Titan.Core.csproj", "{387D90C1-A3E5-4D61-AD3B-422CD6A42283}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Core", "src2\Titan.Core\Titan.Core.csproj", "{387D90C1-A3E5-4D61-AD3B-422CD6A42283}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Windows", "src2\Titan.Windows\Titan.Windows.csproj", "{DEADA75B-515F-4A03-8178-ACB4E2913738}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,10 @@ Global
 		{387D90C1-A3E5-4D61-AD3B-422CD6A42283}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{387D90C1-A3E5-4D61-AD3B-422CD6A42283}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{387D90C1-A3E5-4D61-AD3B-422CD6A42283}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEADA75B-515F-4A03-8178-ACB4E2913738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEADA75B-515F-4A03-8178-ACB4E2913738}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEADA75B-515F-4A03-8178-ACB4E2913738}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEADA75B-515F-4A03-8178-ACB4E2913738}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{025925E7-2C0E-45D7-864D-021620636B18} = {74127627-7DB8-4DB4-B491-454C750DB930}
 		{D3624F7E-8F6B-4994-AA86-CB1C084652F8} = {31969BD8-6C6B-44E4-85C5-526E46F52C9B}
 		{387D90C1-A3E5-4D61-AD3B-422CD6A42283} = {74127627-7DB8-4DB4-B491-454C750DB930}
+		{DEADA75B-515F-4A03-8178-ACB4E2913738} = {74127627-7DB8-4DB4-B491-454C750DB930}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {78854958-BC31-4FAE-99A7-2C398C2607BD}
