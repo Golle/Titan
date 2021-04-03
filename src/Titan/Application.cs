@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Titan.Assets;
 using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
@@ -10,6 +11,7 @@ using Titan.ECS.Assets;
 using Titan.ECS.Systems.Dispatcher;
 using Titan.ECS.World;
 using Titan.EntitySystem;
+using Titan.EntitySystem.Assets;
 using Titan.EntitySystem.Components;
 using Titan.GraphicsV2;
 using Titan.GraphicsV2.D3D11;
@@ -81,10 +83,13 @@ namespace Titan
             .WithComponent<Transform2D>()
             //.WithComponent<Asset<Texture>>()
             .WithComponent<Asset<MeshComponent>>()
+            
+            .WithComponent<UnmanagedAsset<MeshComponent>>(1_000)
             //.WithComponent<Texture>()
             .WithComponent<MeshComponent>()
             .WithComponent<CameraComponent>(100)
             .WithComponent<TEMPModel3D>(100)
+            .WithSystem<ModelAssetSystem>()
             .WithSystem<Transform3DSystem>()
             .WithSystem<CameraSystem>()
             .WithSystem<Render3DSystem>()
@@ -102,6 +107,8 @@ namespace Titan
             (_world, _dispatcher, _managers) = _startup.ConfigureWorld(DefaultWorldBuilder()).Build(_container);
 
             _startup.OnStart(_world);
+
+            new TestClassForASsets().Run(_container);
 
             StartMainLoop();
             

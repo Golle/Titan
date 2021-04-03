@@ -4,7 +4,7 @@ using Titan.Windows.Win32.D3D11;
 namespace Titan.GraphicsV2.D3D11.Textures
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal unsafe struct Texture
+    public unsafe struct Texture
     {
         internal ID3D11Texture2D* D3DTexture;
         internal ID3D11RenderTargetView* D3DTarget;

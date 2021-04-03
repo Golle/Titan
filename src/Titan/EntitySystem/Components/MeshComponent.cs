@@ -1,11 +1,11 @@
 using Titan.Core.Common;
-using Titan.Graphics.Resources;
+using Titan.GraphicsV2.D3D11.Buffers;
 
 namespace Titan.EntitySystem.Components
 {
     internal struct MeshComponent
     {
-        public Handle<VertexBuffer> VertexBuffer;
-        public Handle<IndexBuffer> IndexBuffer;
+        public Handle<Buffer> VertexBuffer;
+        public Handle<Buffer> IndexBuffer;
     }
 }
