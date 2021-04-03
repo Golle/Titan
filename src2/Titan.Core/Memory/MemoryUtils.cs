@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Core.Memory
 {
-    
     public static unsafe class MemoryUtils
     {
         public static MemoryChunk<T> AllocateBlock<T>(uint count, bool zeroMemory = false) where T : unmanaged

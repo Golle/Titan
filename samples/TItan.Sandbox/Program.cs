@@ -1,9 +1,9 @@
 using System;
 using Titan;
 
-Console.WriteLine($"Hello World from {typeof(Class1).Assembly.GetName().Name}!");
+Console.WriteLine($"Hello World!");
 
 
+new Engine()
 
-new Class1()
-    .Run();
+    .Dispose();
