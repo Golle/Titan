@@ -45,11 +45,24 @@ namespace Titan
             Info("Initialize Application.");
             _app.OnStart();
 
-            while (_window.Update())
+
+            unsafe
             {
+                var color = stackalloc float[4];
+                color[0] = 1f;
+                color[1] = 0f;
+                color[2] = 0f;
+                color[3] = 1f;
 
+                while (_window.Update())
+                {
+                    // Do stuff with the engine
 
-                // Do stuff with the engine
+                        var backbuffer = GraphicsDevice.SwapChain.Backbuffer;
+
+                        GraphicsDevice.ImmediateContext.ClearRenderTarget(backbuffer, color);
+                    GraphicsDevice.SwapChain.Present();
+                }
             }
         }
 

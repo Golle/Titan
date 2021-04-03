@@ -14,6 +14,8 @@ using static Titan.Windows.D3D11.DXGI_USAGE;
 
 namespace Titan.Graphics.D3D11
 {
+    
+    
     public record DeviceConfiguration(uint RefreshRate, bool Vsync, bool Debug);
 
     public static class GraphicsDevice
@@ -24,6 +26,12 @@ namespace Titan.Graphics.D3D11
         private static ComPtr<ID3D11RenderTargetView> _backbuffer;
 
         private static bool _initialized;
+
+        private static SwapChain _swapChainInternal;
+        public static ref readonly SwapChain SwapChain => ref _swapChainInternal;
+        private static Context _contextInternal;
+        public static ref readonly Context ImmediateContext => ref _contextInternal;
+
         public static void Init(Window window, DeviceConfiguration config)
         {
             if (_initialized)
@@ -78,6 +86,12 @@ namespace Titan.Graphics.D3D11
             }
             Logger.Trace<ID3D11Device>("Backbuffer created");
 
+
+            unsafe
+            {
+                _contextInternal = new Context(_context.Get());
+                _swapChainInternal = new SwapChain(_swapChain.Get(), _backbuffer.Get(), config.Vsync, window.Width, window.Height);
+            }
             _initialized = true;
         }
 
