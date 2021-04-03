@@ -1,9 +1,26 @@
 using System;
 using Titan;
+using Titan.Core.Logging;
+using Titan.Sandbox;
 
 Console.WriteLine($"Hello World!");
 
 
-new Engine()
+using var app = Engine.StartNew<SandboxApplication>();
 
-    .Dispose();
+
+namespace Titan.Sandbox
+{
+    internal class SandboxApplication : Application
+    {
+        public override void OnStart()
+        {
+            Logger.Info("Sandbox application starting");
+        }
+
+        public override void OnShutdown()
+        {
+            Logger.Info("Sandbox application shutting down");
+        }
+    }
+}
