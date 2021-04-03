@@ -11,16 +11,23 @@ namespace Titan.Graphics.Windows
 
     public record WindowConfiguration(string Title, uint Width, uint Height, bool Windowed = true);
 
-
     public unsafe class Window : IDisposable
     {
-        private readonly HWND _handle;
-        private string _title;
+        public uint Width { get; }
+        public uint Height{ get; }
+        public bool Windowed { get; }
+        internal HWND Handle { get; }
 
-        private Window(HWND handle, string title)
+        private string _title;
+        private readonly string _className;
+        private Window(HWND handle, string title, string className, uint width, uint height, bool windowed)
         {
-            _handle = handle;
+            Width = width;
+            Height = height;
+            Windowed = windowed;
+            Handle = handle;
             _title = title;
+            _className = className;
         }
 
         public static Window Create(WindowConfiguration config)
@@ -41,9 +48,10 @@ namespace Titan.Graphics.Windows
                 LpszClassName = className,
                 Style = 0
             };
+            Logger.Trace<Window>($"RegisterClass {className}");
             if (RegisterClassExA(wndClassExA) == 0)
             {
-                Logger.Error($"RegisterClassExA failed with Win32Error {Marshal.GetLastWin32Error()}");
+                Logger.Error<Window>($"RegisterClassExA failed with Win32Error {Marshal.GetLastWin32Error()}");
                 return null;
             }
 
@@ -59,6 +67,7 @@ namespace Titan.Graphics.Windows
             };
             AdjustWindowRect(ref windowRect, wsStyle, false);
 
+            Logger.Trace<Window>($"Create window with size Width: {config.Width} Height: {config.Height}");
             // Create the Window
             var handle = CreateWindowExA(
                 0,
@@ -81,7 +90,7 @@ namespace Titan.Graphics.Windows
                 return null;
             }
 
-            return new Window(handle, config.Title);
+            return new Window(handle, config.Title, className, config.Width, config.Height, config.Windowed);
         }
 
         public bool Update()
@@ -90,7 +99,7 @@ namespace Titan.Graphics.Windows
             {
                 if (msg.Message == WM_QUIT)
                 {
-                    SetWindowLongPtrA(_handle, GWLP_USERDATA, 0);
+                    SetWindowLongPtrA(Handle, GWLP_USERDATA, 0);
                     return false;
                 }
                 TranslateMessage(msg);
@@ -128,12 +137,13 @@ namespace Titan.Graphics.Windows
 
         public void Dispose()
         {
-            DestroyWindow(_handle);
+            DestroyWindow(Handle);
+            UnregisterClassA(_className, Marshal.GetHINSTANCE(typeof(Window).Module));
         }
 
         public void Show()
         {
-            ShowWindow(_handle, ShowWindowCommand.Show);
+            ShowWindow(Handle, ShowWindowCommand.Show);
         }
     }
 }

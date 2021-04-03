@@ -1,5 +1,6 @@
 using System;
 using Titan.Core.Logging;
+using Titan.Graphics.D3D11;
 using Titan.Graphics.Windows;
 
 namespace Titan
@@ -23,12 +24,21 @@ namespace Titan
 
         public void Start()
         {
+            static void Info(string message) => Logger.Info<Engine>(message);
+            static void Trace(string message) => Logger.Trace<Engine>(message);
+
             Logger.Start();
 
+            Trace("Creating the Window");
             _window = Window.Create(new WindowConfiguration("Titan is a moon ?!", 1920, 1080));
+            Trace("Showing the Window");
             _window.Show();
-            Logger.Info("Engine has been initialized.");
-            Logger.Info("Initialize Application.");
+
+            Trace($"Init the GraphicsDevice: {typeof(GraphicsDevice).FullName}");
+            GraphicsDevice.Init(_window, new DeviceConfiguration(144, true, true));
+
+            Info("Engine has been initialized.");
+            Info("Initialize Application.");
             _app.OnStart();
 
             while (_window.Update())
@@ -39,13 +49,13 @@ namespace Titan
 
         public void Dispose()
         {
-            Logger.Info("Disposing the application");
+            Logger.Info<Engine>("Disposing the application");
             
-            Logger.Info("Disposing the engine");
+            Logger.Info<Engine>("Disposing the engine");
 
+            GraphicsDevice.Shutdown();
             _window.Dispose();
             Logger.Shutdown();
         }
-
     }
 }

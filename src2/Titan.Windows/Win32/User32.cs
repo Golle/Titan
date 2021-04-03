@@ -81,6 +81,13 @@ namespace Titan.Windows.Win32
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool UnregisterClassA(
+            [In, MarshalAs(UnmanagedType.LPStr)] string LpszClassName,
+            [In] nint hInstance
+        );
+
+        [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetWindowTextA(
             [In] HWND hWnd,
             [In] string lpString
