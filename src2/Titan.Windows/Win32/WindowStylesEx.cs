@@ -3,7 +3,7 @@ using System;
 namespace Titan.Windows.Win32
 {
     [Flags]
-    internal enum WindowStylesEx : uint
+    public enum WindowStylesEx : uint
     {
         AcceptFiles = 0x00000010,
         AppWindow = 0x00040000,

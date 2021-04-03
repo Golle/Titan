@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Windows.Win32
 {
-    internal unsafe class User32
+    public unsafe class User32
     {
         public const int GWLP_USERDATA = -21;
 

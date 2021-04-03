@@ -5,19 +5,19 @@ using System.Runtime.InteropServices;
 namespace Titan.Windows.Win32
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct WNDCLASSEXA
+    public struct WNDCLASSEXA
     {
-        internal uint CbSize;
-        internal uint Style;
-        internal unsafe delegate*<HWND, WindowsMessage, nuint, nuint, nint> LpFnWndProc;
-        internal int CbClsExtra;
-        internal int CbWndExtra;
-        internal nint HInstance;
-        internal nint HIcon;
-        internal nint HCursor;
-        internal nint HbrBackground;
-        internal string LpszMenuName;
-        internal string LpszClassName;
-        internal nint HIconSm;
+        public uint CbSize;
+        public uint Style;
+        public unsafe delegate* unmanaged <HWND, WindowsMessage, nuint, nuint, nint> LpFnWndProc;
+        public int CbClsExtra;
+        public int CbWndExtra;
+        public nint HInstance;
+        public nint HIcon;
+        public nint HCursor;
+        public nint HbrBackground;
+        public string LpszMenuName;
+        public string LpszClassName;
+        public nint HIconSm;
     }
 }

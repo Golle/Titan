@@ -7,9 +7,9 @@ namespace Titan.Windows.Win32
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT
     {
-        internal int Left;
-        internal int Top;
-        internal int Right;
-        internal int Bottom;
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
     }
 }

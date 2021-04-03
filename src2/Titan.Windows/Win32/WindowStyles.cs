@@ -3,7 +3,7 @@ using System;
 namespace Titan.Windows.Win32
 {
     [Flags]
-    internal enum WindowStyles : uint
+    public enum WindowStyles : uint
     {
         Border = 0x00800000,
         Caption = 0x00C00000,

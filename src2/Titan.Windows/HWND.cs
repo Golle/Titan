@@ -22,6 +22,9 @@ namespace Titan.Windows
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(in HWND lh, in HWND rh) => lh.Value != rh.Value;
+
+        public bool IsValid => Value != 0;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj) => obj is HWND other && other.Value == Value;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

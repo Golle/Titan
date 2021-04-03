@@ -5,6 +5,7 @@
     <LangVersion>preview</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;0649;0169</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

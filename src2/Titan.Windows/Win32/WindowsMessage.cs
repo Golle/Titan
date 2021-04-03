@@ -1,7 +1,7 @@
 // ReSharper disable InconsistentNaming
 namespace Titan.Windows.Win32
 {
-    internal enum WindowsMessage : uint
+    public enum WindowsMessage : uint
 	{
 		WM_NULL = 0x0000,
 		WM_CREATE = 0x0001,

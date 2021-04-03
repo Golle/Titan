@@ -1,6 +1,6 @@
 namespace Titan.Windows.Win32
 {
-    internal enum ShowWindowCommand
+    public enum ShowWindowCommand
     {
         Hide = 0,
         Shownormal = 1,
