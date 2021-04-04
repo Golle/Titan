@@ -8,7 +8,13 @@ namespace Titan.Core.Memory
         private readonly void* _ptr;
         internal MemoryChunk(void* ptr) => _ptr = ptr;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Free() => Marshal.FreeHGlobal((nint)_ptr);
+        public void Free()
+        {
+            if (_ptr != null)
+            {
+                Marshal.FreeHGlobal((nint)_ptr);
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void* AsPointer() => _ptr;
@@ -24,7 +30,13 @@ namespace Titan.Core.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T* AsPointer() => _ptr;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Free() => Marshal.FreeHGlobal((nint)_ptr);
+        public void Free()
+        {
+            if (_ptr != null)
+            {
+                Marshal.FreeHGlobal((nint)_ptr);
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator T*(in MemoryChunk<T> memory) => memory._ptr;
@@ -37,5 +49,8 @@ namespace Titan.Core.Memory
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _ptr[index];
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T* GetPointer(int index) => &_ptr[index];
     }
 }

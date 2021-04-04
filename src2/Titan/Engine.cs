@@ -1,8 +1,10 @@
 using System;
 using Titan.Core.Logging;
 using Titan.Core.Threading;
+using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Windows;
+using Titan.Windows.D3D11;
 
 namespace Titan
 {
@@ -45,22 +47,21 @@ namespace Titan
             Info("Initialize Application.");
             _app.OnStart();
 
+            var graphicsSystem = GraphicsSystem.Create();
+
 
             unsafe
             {
                 var color = stackalloc float[4];
                 color[0] = 1f;
-                color[1] = 0f;
+                color[1] = 0.4f;
                 color[2] = 0f;
                 color[3] = 1f;
 
                 while (_window.Update())
                 {
                     // Do stuff with the engine
-
-                        var backbuffer = GraphicsDevice.SwapChain.Backbuffer;
-
-                        GraphicsDevice.ImmediateContext.ClearRenderTarget(backbuffer, color);
+                    GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
                     GraphicsDevice.SwapChain.Present();
                 }
             }

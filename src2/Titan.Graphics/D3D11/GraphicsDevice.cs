@@ -14,8 +14,6 @@ using static Titan.Windows.D3D11.DXGI_USAGE;
 
 namespace Titan.Graphics.D3D11
 {
-    
-    
     public record DeviceConfiguration(uint RefreshRate, bool Vsync, bool Debug);
 
     public static class GraphicsDevice
@@ -25,16 +23,17 @@ namespace Titan.Graphics.D3D11
         private static ComPtr<IDXGISwapChain> _swapChain;
         private static ComPtr<ID3D11RenderTargetView> _backbuffer;
 
-        private static bool _initialized;
-
         private static SwapChain _swapChainInternal;
         public static ref readonly SwapChain SwapChain => ref _swapChainInternal;
         private static Context _contextInternal;
         public static ref readonly Context ImmediateContext => ref _contextInternal;
+        public static bool IsInitialized { get; private set; }
+
+        public static BufferManager BufferManager { get; private set; }
 
         public static void Init(Window window, DeviceConfiguration config)
         {
-            if (_initialized)
+            if (IsInitialized)
             {
                 throw new InvalidOperationException($"{nameof(GraphicsDevice)} has already been initialized.");
             }
@@ -91,23 +90,30 @@ namespace Titan.Graphics.D3D11
             {
                 _contextInternal = new Context(_context.Get());
                 _swapChainInternal = new SwapChain(_swapChain.Get(), _backbuffer.Get(), config.Vsync, window.Width, window.Height);
+
+                BufferManager = new BufferManager(_device);
             }
-            _initialized = true;
+
+            
+
+            IsInitialized = true;
         }
 
 
         public static void Terminate()
         {
-            
-            if (_initialized)
+            if (IsInitialized)
             {
                 Logger.Trace<ID3D11Device>("Disposing resources");
                 _backbuffer.Dispose();
                 _swapChain.Dispose();
                 _context.Dispose();
                 _device.Dispose();
+
+                BufferManager.Dispose();
+                BufferManager = null;
             }
-            _initialized = false;
+            IsInitialized = false;
         }
     }
 }
