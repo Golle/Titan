@@ -14,10 +14,14 @@ namespace Titan.Graphics.D3D11.Samplers
         private readonly ID3D11Device* _device;
         private ResourcePool<Sampler> _resourcePool;
         private readonly List<Handle<Sampler>> _usedHandles = new();
+        private const uint MaxSamplers = 32u;
         internal SamplerManager(ID3D11Device* device)
         {
+            Logger.Trace<SamplerManager>($"Init with {MaxSamplers} slots");
             _device = device;
-            _resourcePool.Init(32);
+            
+            _resourcePool.Init(MaxSamplers);
+            
         }
 
         internal Handle<Sampler> Create(SamplerCreation args)

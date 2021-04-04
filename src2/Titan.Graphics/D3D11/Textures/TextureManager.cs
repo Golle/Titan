@@ -22,6 +22,7 @@ namespace Titan.Graphics.D3D11.Textures
 
         internal TextureManager(ID3D11Device* device, SwapChain swapChain)
         {
+            Logger.Trace<TextureManager>($"Init with {MaxNumberOfTextures} slots");
             _device = device;
             _swapChain = swapChain;
             _resourcePool.Init(MaxNumberOfTextures);

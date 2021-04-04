@@ -14,9 +14,11 @@ namespace Titan.Graphics.D3D11.Buffers
         private readonly ID3D11Device* _device;
         private ResourcePool<Buffer> _resourcePool;
         private readonly List<Handle<Buffer>> _usedHandles = new (); // TODO: maybe this can be handled inside the resource pool?
+        private const uint MaxBuffers = 1000u;
         internal BufferManager(ID3D11Device* device)
         {
-            _resourcePool.Init(1000);
+            Logger.Trace<BufferManager>($"Init with {MaxBuffers} slots");
+            _resourcePool.Init(MaxBuffers);
             _device = device;
         }
 
