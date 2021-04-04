@@ -1,9 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using Titan.Windows.D3D11;
 
 namespace Titan.Graphics.D3D11
 {
-    public readonly unsafe struct Context
+    public unsafe class Context
     {
         private readonly ID3D11DeviceContext* _context;
         public Context(ID3D11DeviceContext* context)

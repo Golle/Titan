@@ -1,9 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using Titan.Windows.D3D11;
 
 namespace Titan.Graphics.D3D11
 {
-    public readonly unsafe struct SwapChain
+    public unsafe class SwapChain
     {
         public bool Vsync { get; }
         public uint Width { get; }

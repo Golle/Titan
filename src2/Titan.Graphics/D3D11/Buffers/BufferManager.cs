@@ -7,7 +7,7 @@ using Titan.Core.Memory;
 using Titan.Windows;
 using Titan.Windows.D3D11;
 
-namespace Titan.Graphics.D3D11
+namespace Titan.Graphics.D3D11.Buffers
 {
     public unsafe class BufferManager : IDisposable
     {

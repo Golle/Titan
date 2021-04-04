@@ -1,5 +1,8 @@
 using System;
+using System.Net.Mime;
 using Titan.Core.Logging;
+using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Windows;
 using Titan.Windows;
 using Titan.Windows.D3D11;
@@ -23,13 +26,13 @@ namespace Titan.Graphics.D3D11
         private static ComPtr<IDXGISwapChain> _swapChain;
         private static ComPtr<ID3D11RenderTargetView> _backbuffer;
 
-        private static SwapChain _swapChainInternal;
-        public static ref readonly SwapChain SwapChain => ref _swapChainInternal;
-        private static Context _contextInternal;
-        public static ref readonly Context ImmediateContext => ref _contextInternal;
+
+        public static SwapChain SwapChain { get; private set; }
+        public static Context ImmediateContext { get; private set; }
         public static bool IsInitialized { get; private set; }
 
         public static BufferManager BufferManager { get; private set; }
+        public static TextureManager TextureManager { get; private set; }
 
         public static void Init(Window window, DeviceConfiguration config)
         {
@@ -88,13 +91,12 @@ namespace Titan.Graphics.D3D11
 
             unsafe
             {
-                _contextInternal = new Context(_context.Get());
-                _swapChainInternal = new SwapChain(_swapChain.Get(), _backbuffer.Get(), config.Vsync, window.Width, window.Height);
+                ImmediateContext = new Context(_context.Get());
+                SwapChain = new SwapChain(_swapChain.Get(), _backbuffer.Get(), config.Vsync, window.Width, window.Height);
 
                 BufferManager = new BufferManager(_device);
+                TextureManager = new TextureManager(_device.Get(), SwapChain);
             }
-
-            
 
             IsInitialized = true;
         }
@@ -112,6 +114,8 @@ namespace Titan.Graphics.D3D11
 
                 BufferManager.Dispose();
                 BufferManager = null;
+                TextureManager.Dispose();
+                TextureManager = null;
             }
             IsInitialized = false;
         }

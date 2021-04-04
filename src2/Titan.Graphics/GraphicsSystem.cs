@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Buffers;
 using Titan.Windows.D3D11;
 
 namespace Titan.Graphics
