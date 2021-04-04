@@ -3,6 +3,7 @@ using System.Net.Mime;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Samplers;
+using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Windows;
 using Titan.Windows;
@@ -35,6 +36,7 @@ namespace Titan.Graphics.D3D11
         public static BufferManager BufferManager { get; private set; }
         public static TextureManager TextureManager { get; private set; }
         public static SamplerManager SamplerManager { get; private set; }
+        public static ShaderManager ShaderManager { get; private set; }
 
         public static void Init(Window window, DeviceConfiguration config)
         {
@@ -99,6 +101,7 @@ namespace Titan.Graphics.D3D11
                 BufferManager = new BufferManager(_device);
                 TextureManager = new TextureManager(_device.Get(), SwapChain);
                 SamplerManager = new SamplerManager(_device.Get());
+                ShaderManager = new ShaderManager(_device.Get());
             }
 
             IsInitialized = true;
@@ -116,6 +119,8 @@ namespace Titan.Graphics.D3D11
                 TextureManager = null;
                 SamplerManager.Dispose();
                 SamplerManager = null;
+                ShaderManager.Dispose();
+                ShaderManager = null;
 
                 Logger.Trace<ID3D11Device>("Disposing resources");
                 _backbuffer.Dispose();

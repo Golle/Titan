@@ -96,10 +96,16 @@ namespace Titan.Graphics.D3D11.Buffers
 
         public void Dispose()
         {
+            if (_usedHandles.Count > 0)
+            {
+                Logger.Warning<BufferManager>($"{_usedHandles.Count} unreleased resources when disposing the manager");
+                Logger.Trace<BufferManager>($"Releasing {_usedHandles.Count} buffers");
+            }
             foreach (var handle in _usedHandles)
             {
                 ReleaseInternal(handle);
             }
+            Logger.Trace<BufferManager>("Terminate resource pool");
             _resourcePool.Terminate();
         }
     }

@@ -78,10 +78,17 @@ namespace Titan.Graphics.D3D11.Samplers
 
         public void Dispose()
         {
+            if (_usedHandles.Count > 0)
+            {
+                Logger.Warning<SamplerManager>($"{_usedHandles.Count} unreleased resources when disposing the manager");
+                Logger.Trace<SamplerManager>($"Releasing {_usedHandles.Count} samplers");
+            }
+            
             foreach (var handle in _usedHandles)
             {
                 ReleaseInternal(handle);
-            }   
+            }
+            Logger.Trace<SamplerManager>("Terminate resource pool");
             _resourcePool.Terminate();
         }
     }

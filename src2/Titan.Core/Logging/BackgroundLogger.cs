@@ -33,7 +33,7 @@ namespace Titan.Core.Logging
 
         private static void Run()
         {
-            static string DateTimeNow() => DateTime.Now.ToString("u");
+            static string DateTimeNow() => DateTime.Now.ToString("HH:mm:ss.fff");
             static void WriteLine(in LogMessage logMessage)
             {
                 var color = logMessage.Level switch
@@ -47,7 +47,7 @@ namespace Titan.Core.Logging
                 Console.Write("{0} [", DateTimeNow());
                 if (logMessage.Scope != null)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.Write(logMessage.Scope);
                     Console.ResetColor();
                     Console.Write("][");

@@ -44,6 +44,9 @@ namespace Titan.Core.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator void*(in MemoryChunk<T> memory) => memory._ptr;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static explicit operator MemoryChunk<T>(T* ptr) => new(ptr);
+
         public ref T this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

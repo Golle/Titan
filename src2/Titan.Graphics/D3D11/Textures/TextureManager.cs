@@ -162,10 +162,16 @@ namespace Titan.Graphics.D3D11.Textures
 
         public void Dispose()
         {
+            if (_usedHandles.Count > 0)
+            {
+                Logger.Warning<TextureManager>($"{_usedHandles.Count} unreleased resources when disposing the manager");
+                Logger.Trace<TextureManager>($"Releasing {_usedHandles.Count} textures");
+            }
             foreach (var handle in _usedHandles)
             {
                 ReleaseInternal(handle);
             }
+            Logger.Trace<TextureManager>("Terminate resource pool");
             _resourcePool.Terminate();
         }
     }
