@@ -82,6 +82,9 @@ namespace Titan.Graphics.D3D11.Textures
             texture->Height = height;
             texture->Width = width;
             texture->Usage = args.Usage;
+            texture->D3DTexture = null;
+            texture->D3DResource = null;
+            texture->D3DTarget = null;
 
             if (args.InitialData.HasValue() && args.DataStride > 0)
             {
