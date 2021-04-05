@@ -1,4 +1,5 @@
 using System;
+using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Threading;
 using Titan.Graphics;
@@ -31,11 +32,16 @@ namespace Titan
 
             Logger.Start();
 
-            Trace($"Initialize {nameof(WorkerPool)}");
+            Trace($"Init {nameof(FileSystem)}");
+            FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan"));
+
+            Trace($"Init {nameof(WorkerPool)}");
             WorkerPool.Init(new WorkerPoolConfiguration(100, (uint) ((Environment.ProcessorCount/2) - 1)));
             
-            Trace($"Initialize {nameof(IOWorkerPool)}");
+            Trace($"Init {nameof(IOWorkerPool)}");
             IOWorkerPool.Init(2, 100);
+
+            
 
             Trace($"Creating the {nameof(Window)}");
             _window = Window.Create(new WindowConfiguration("Titan is a moon ?!", 1920, 1080));
@@ -87,6 +93,9 @@ namespace Titan
 
             Logger.Trace<Engine>($"Close/Dispose {nameof(Window)}");
             _window.Dispose();
+
+            FileSystem.Terminate();
+
             Logger.Shutdown();
         }
     }
