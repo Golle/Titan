@@ -3,7 +3,7 @@ using System;
 namespace Titan.Graphics.D3D11.Textures
 {
     [Flags]
-    internal enum TextureBindFlags
+    public enum TextureBindFlags
     {
         None = 0,
         ShaderResource = 1,

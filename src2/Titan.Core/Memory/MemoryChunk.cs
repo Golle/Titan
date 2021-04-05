@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -25,7 +26,13 @@ namespace Titan.Core.Memory
     public readonly unsafe struct MemoryChunk<T> where T : unmanaged
     {
         private readonly T* _ptr;
-        internal MemoryChunk(T* ptr) => _ptr = ptr;
+        private readonly uint _size;
+        public uint Size => _size;
+        internal MemoryChunk(T* ptr, uint size)
+        {
+            _ptr = ptr;
+            _size = size;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T* AsPointer() => _ptr;
@@ -45,7 +52,7 @@ namespace Titan.Core.Memory
         public static implicit operator void*(in MemoryChunk<T> memory) => memory._ptr;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator MemoryChunk<T>(T* ptr) => new(ptr);
+        public static explicit operator MemoryChunk<T>(T* ptr) => new(ptr, 0u);
 
         public ref T this[int index]
         {
@@ -55,5 +62,7 @@ namespace Titan.Core.Memory
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T* GetPointer(int index) => &_ptr[index];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Span<byte> AsSpan() => new (_ptr, (int) _size);
     }
 }

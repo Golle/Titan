@@ -5,14 +5,14 @@ namespace Titan.Graphics.D3D11.Textures
     public record TextureCreation
     {
         // TODO: create new enums for these
-        internal DXGI_FORMAT Format { get; init; }
-        internal D3D11_USAGE Usage { get; init; }
+        public DXGI_FORMAT Format { get; init; }
+        public D3D11_USAGE Usage { get; init; }
 
-        internal TextureBindFlags Binding { get; init; }
-        internal uint Width { get; init; }
-        internal uint Height { get; init; }
+        public TextureBindFlags Binding { get; init; }
+        public uint Width { get; init; }
+        public uint Height { get; init; }
 
-        internal DataBlob InitialData { get; init; }
-        internal uint DataStride { get; init; }
+        public DataBlob InitialData { get; init; }
+        public  uint DataStride { get; init; }
     }
 }

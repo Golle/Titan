@@ -140,6 +140,13 @@ namespace Titan.Graphics.D3D11.Textures
         private void ReleaseInternal(Handle<Texture> handle)
         {
             var texture = _resourcePool.GetResourcePointer(handle);
+            Console.WriteLine($"Target: {(long)texture->D3DTarget}");
+            Console.WriteLine($"Resource: {(long)texture->D3DResource}");
+            Console.WriteLine($"Texture: {(long)texture->D3DTexture}");
+            if (texture->D3DTarget != null)
+            {
+                texture->D3DTarget->Release();
+            }
             if (texture->D3DResource != null)
             {
                 texture->D3DResource->Release();
@@ -148,11 +155,6 @@ namespace Titan.Graphics.D3D11.Textures
             if (texture->D3DTexture != null)
             {
                 texture->D3DTexture->Release();
-            }
-
-            if (texture->D3DTarget != null)
-            {
-                texture->D3DTarget->Release();
             }
             *texture = default; // TODO: is not really needed, but we can do it to "clean" up the pointers so they can't be used.
         }

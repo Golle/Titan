@@ -29,16 +29,7 @@ namespace Titan.Sandbox
         public int A;
     }
 
-
-
-
-
-
-
-
-
-
-
+    
 
 //var simpleMesh = @"F:\Git\Titan\resources\models\sphere.dat";
 //var simpleMesh2 = @"F:\Git\Titan\resources\models\sponza.dat";

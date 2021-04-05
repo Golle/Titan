@@ -13,9 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Sandbox", "samples\Ti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Core", "src2\Titan.Core\Titan.Core.csproj", "{387D90C1-A3E5-4D61-AD3B-422CD6A42283}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Windows", "src2\Titan.Windows\Titan.Windows.csproj", "{DEADA75B-515F-4A03-8178-ACB4E2913738}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Windows", "src2\Titan.Windows\Titan.Windows.csproj", "{DEADA75B-515F-4A03-8178-ACB4E2913738}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Graphics", "src2\Titan.Graphics\Titan.Graphics.csproj", "{088C5B7B-115D-49C9-963C-EBBE9D995648}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Graphics", "src2\Titan.Graphics\Titan.Graphics.csproj", "{088C5B7B-115D-49C9-963C-EBBE9D995648}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Assets", "src2\Titan.Assets\Titan.Assets.csproj", "{09AE8312-C593-4D53-9895-8556CACCFB11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{088C5B7B-115D-49C9-963C-EBBE9D995648}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{088C5B7B-115D-49C9-963C-EBBE9D995648}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{088C5B7B-115D-49C9-963C-EBBE9D995648}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09AE8312-C593-4D53-9895-8556CACCFB11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09AE8312-C593-4D53-9895-8556CACCFB11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09AE8312-C593-4D53-9895-8556CACCFB11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09AE8312-C593-4D53-9895-8556CACCFB11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{387D90C1-A3E5-4D61-AD3B-422CD6A42283} = {74127627-7DB8-4DB4-B491-454C750DB930}
 		{DEADA75B-515F-4A03-8178-ACB4E2913738} = {74127627-7DB8-4DB4-B491-454C750DB930}
 		{088C5B7B-115D-49C9-963C-EBBE9D995648} = {74127627-7DB8-4DB4-B491-454C750DB930}
+		{09AE8312-C593-4D53-9895-8556CACCFB11} = {74127627-7DB8-4DB4-B491-454C750DB930}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {78854958-BC31-4FAE-99A7-2C398C2607BD}

@@ -16,7 +16,7 @@ namespace Titan.Core.Memory
 
         public void Init(uint count)
         {
-            _data = MemoryUtils.AllocateBlock<T>(count);
+            _data = MemoryUtils.AllocateBlock<T>(count, true);
             _freeIndices = MemoryUtils.AllocateBlock<int>(count);
             for (var i = 0; i < count; ++i)
             {

@@ -1,9 +1,13 @@
 using System;
+using Titan.Assets;
+using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.Core.Threading;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Windows;
 
 namespace Titan
@@ -57,6 +61,16 @@ namespace Titan
 
             var graphicsSystem = GraphicsSystem.Create();
 
+            //var t = new AssetTestClass();
+
+            var loader = new Loader(1);
+            unsafe
+            {
+                loader.RequestLoad<TextureAsset>("assets/textures/lion.png");
+            }
+            
+
+            //t.Run();
 
             unsafe
             {
@@ -68,6 +82,9 @@ namespace Titan
 
                 while (_window.Update())
                 {
+                    //t.Update();
+                    loader.ProcessState();
+
                     // Do stuff with the engine
                     GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
                     GraphicsDevice.SwapChain.Present();
@@ -75,6 +92,7 @@ namespace Titan
             }
         }
 
+        
         public void Dispose()
         {
             Logger.Info<Engine>("Disposing the application");
