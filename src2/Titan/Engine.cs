@@ -4,7 +4,6 @@ using Titan.Core.Threading;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Windows;
-using Titan.Windows.D3D11;
 
 namespace Titan
 {
@@ -34,6 +33,9 @@ namespace Titan
 
             Trace($"Initialize {nameof(WorkerPool)}");
             WorkerPool.Init(new WorkerPoolConfiguration(100, (uint) ((Environment.ProcessorCount/2) - 1)));
+            
+            Trace($"Initialize {nameof(IOWorkerPool)}");
+            IOWorkerPool.Init(2, 100);
 
             Trace($"Creating the {nameof(Window)}");
             _window = Window.Create(new WindowConfiguration("Titan is a moon ?!", 1920, 1080));
@@ -76,6 +78,9 @@ namespace Titan
 
             Logger.Trace<Engine>($"Terminate {nameof(WorkerPool)}");
             WorkerPool.Terminate();
+
+            Logger.Trace<Engine>($"Terminate {nameof(IOWorkerPool)}");
+            IOWorkerPool.Terminate();
             
             Logger.Trace<Engine>($"Terminate {nameof(GraphicsDevice)}");
             GraphicsDevice.Terminate();

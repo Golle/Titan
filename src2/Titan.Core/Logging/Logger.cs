@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Threading.Channels;
 
@@ -21,7 +22,10 @@ namespace Titan.Core.Logging
         public static void Trace(string message) => Log(LogLevel.Trace, message);
 
         [Conditional("TRACE")]
-        public static void Trace<T>(string message) => Log(LogLevel.Trace, message, typeof(T).Name);
+        public static void Trace<T>(string message) => Trace(message, typeof(T));
+
+        [Conditional("TRACE")]
+        public static void Trace(string message, Type type) => Log(LogLevel.Trace, message, type.Name);
 
 
         public static void Info<T>(string message) => Log(LogLevel.Info, message, typeof(T).Name);
