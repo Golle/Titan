@@ -75,16 +75,13 @@ namespace Titan.Graphics.D3D11.Textures
             };
 
             var texture = _resourcePool.GetResourcePointer(handle);
-
             texture->Handle = handle;
             texture->BindFlags = bindflags;
             texture->Format = args.Format;
             texture->Height = height;
             texture->Width = width;
             texture->Usage = args.Usage;
-            texture->D3DTexture = null;
-            texture->D3DResource = null;
-            texture->D3DTarget = null;
+
 
             if (args.InitialData.HasValue() && args.DataStride > 0)
             {
@@ -113,6 +110,10 @@ namespace Titan.Graphics.D3D11.Textures
                 };
                 CheckAndThrow(_device->CreateRenderTargetView((ID3D11Resource*)texture->D3DTexture, &renderTargetDesc, &texture->D3DTarget), nameof(ID3D11Device.CreateRenderTargetView));
             }
+            else
+            {
+                texture->D3DTarget = null;
+            }
 
             if ((bindflags & D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE) != 0)
             {
@@ -127,6 +128,10 @@ namespace Titan.Graphics.D3D11.Textures
                     ViewDimension = D3D_SRV_DIMENSION.D3D11_SRV_DIMENSION_TEXTURE2D
                 };
                 CheckAndThrow(_device->CreateShaderResourceView((ID3D11Resource*)texture->D3DTexture, &shadedResourceViewDesc, &texture->D3DResource), nameof(ID3D11Device.CreateShaderResourceView));
+            }
+            else
+            {
+                texture->D3DResource = null;
             }
             
             _usedHandles.Add(handle);
@@ -154,7 +159,6 @@ namespace Titan.Graphics.D3D11.Textures
             {
                 texture->D3DResource->Release();
             }
-
             if (texture->D3DTexture != null)
             {
                 texture->D3DTexture->Release();
