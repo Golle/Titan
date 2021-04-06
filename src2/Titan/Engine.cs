@@ -1,13 +1,10 @@
 using System;
 using Titan.Assets;
-using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
-using Titan.Core.Memory;
 using Titan.Core.Threading;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Windows;
 
 namespace Titan

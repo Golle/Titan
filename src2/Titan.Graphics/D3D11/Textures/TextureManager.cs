@@ -148,9 +148,6 @@ namespace Titan.Graphics.D3D11.Textures
         private void ReleaseInternal(Handle<Texture> handle)
         {
             var texture = _resourcePool.GetResourcePointer(handle);
-            Console.WriteLine($"Target: {(long)texture->D3DTarget}");
-            Console.WriteLine($"Resource: {(long)texture->D3DResource}");
-            Console.WriteLine($"Texture: {(long)texture->D3DTexture}");
             if (texture->D3DTarget != null)
             {
                 texture->D3DTarget->Release();
