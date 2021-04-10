@@ -2,7 +2,7 @@ using System;
 
 namespace Titan.Graphics.Images
 {
-    public interface IImageLoader
+    public interface IImageLoader : IDisposable
     {
         Image Load(string identifier);
         unsafe Image Load(byte* buffer, uint size);

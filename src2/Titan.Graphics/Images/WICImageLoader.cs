@@ -16,7 +16,7 @@ using static Titan.Windows.WIC.WICDecodeOptions;
 
 namespace Titan.Graphics.Images
 {
-    public unsafe class WICImageLoader : IImageLoader, IDisposable
+    public unsafe class WICImageLoader : IImageLoader 
     {
         private ComPtr<IWICImagingFactory> _factory;
 

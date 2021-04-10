@@ -1,10 +1,14 @@
 using System;
 using Titan.Assets;
+using Titan.Assets.Database;
+using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Threading;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Textures;
+using Titan.Graphics.Images;
 using Titan.Graphics.Windows;
 
 namespace Titan
@@ -34,14 +38,13 @@ namespace Titan
             Logger.Start();
 
             Trace($"Init {nameof(FileSystem)}");
-            FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan"));
+            FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan\assetsv2"));
 
             Trace($"Init {nameof(WorkerPool)}");
             WorkerPool.Init(new WorkerPoolConfiguration(100, (uint) ((Environment.ProcessorCount/2) - 1)));
             
             Trace($"Init {nameof(IOWorkerPool)}");
             IOWorkerPool.Init(2, 100);
-
             
 
             Trace($"Creating the {nameof(Window)}");
@@ -57,17 +60,13 @@ namespace Titan
             _app.OnStart();
 
             var graphicsSystem = GraphicsSystem.Create();
-
-            //var t = new AssetTestClass();
-
-            var loader = new Loader(1);
-            unsafe
-            {
-                loader.RequestLoad<TextureAsset>("assets/textures/lion.png");
-            }
             
+            var assetsManager = new AssetsManager()
+                .Register(new TextureLoader(new WICImageLoader()))
+                .Register(new ModelLoader())
+                .Init(new AssetManagerConfiguration("manifest.json", 2));
 
-            //t.Run();
+            var count = 1000;
 
             unsafe
             {
@@ -79,12 +78,24 @@ namespace Titan
 
                 while (_window.Update())
                 {
+
+                    if (count-- == 0)
+                    {
+                        assetsManager.Load("textures/lion");
+                    }
+
+                    if (count == -1000)
+                    {
+                        assetsManager.Unload("textures/lion");
+                    }
                     //t.Update();
-                    loader.ProcessState();
+                    assetsManager.Update();
 
                     // Do stuff with the engine
                     GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
                     GraphicsDevice.SwapChain.Present();
+
+
                 }
             }
         }
@@ -114,4 +125,5 @@ namespace Titan
             Logger.Shutdown();
         }
     }
+
 }

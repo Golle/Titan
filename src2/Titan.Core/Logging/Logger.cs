@@ -16,7 +16,10 @@ namespace Titan.Core.Logging
         public static void Debug(string message) => Log(LogLevel.Debug, message);
 
         [Conditional("DEBUG")]
-        public static void Debug<T>(string message) => Log(LogLevel.Debug, message, typeof(T).Name);
+        public static void Debug<T>(string message) => Debug(message, typeof(T));
+
+        [Conditional("DEBUG")]
+        public static void Debug(string message, Type type) => Log(LogLevel.Debug, message, type.Name);
 
         [Conditional("TRACE")]
         public static void Trace(string message) => Log(LogLevel.Trace, message);
@@ -31,7 +34,8 @@ namespace Titan.Core.Logging
         public static void Info<T>(string message) => Log(LogLevel.Info, message, typeof(T).Name);
         public static void Info(string message) => Log(LogLevel.Info, message);
 
-        public static void Error<T>(string message) => Log(LogLevel.Error, message, typeof(T).Name);
+        public static void Error<T>(string message) => Error(message, typeof(T));
+        public static void Error(string message, Type type) => Log(LogLevel.Error, message, type.Name);
         public static void Error(string message) => Log(LogLevel.Error, message);
 
         public static void Warning<T>(string message) => Log(LogLevel.Warning, message, typeof(T).Name);

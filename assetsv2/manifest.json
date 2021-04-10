@@ -1,0 +1,19 @@
+[
+    {
+        "Name": "textures/lion",
+        "File": "textures/lion.png",
+        "Type": "texture",
+        "Preload": false,
+        "Static": false
+},
+    {
+        "Name": "models/clock",
+        "File": "models/clock/clock.geo",
+        "Type": "model",
+        "Dependencies": [
+            "textures/lion"
+        ],
+        "Preload": true,
+        "Static": false
+    }
+]
