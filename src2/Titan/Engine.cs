@@ -68,6 +68,7 @@ namespace Titan
 
             var count = 1000;
 
+            Handle<Asset> asset = 0;
             unsafe
             {
                 var color = stackalloc float[4];
@@ -78,14 +79,16 @@ namespace Titan
 
                 while (_window.Update())
                 {
-
                     if (count-- == 0)
                     {
-                        assetsManager.Load("textures/lion");
+                        asset = assetsManager.Load("textures/lion");
                     }
 
-                    if (count == -1000)
+                    if (assetsManager.IsLoaded(asset))
                     {
+                        Logger.Trace<Engine>("Asset is loaded");
+                        var texture = assetsManager.GetAssetHandle<Texture>(asset);
+                        Logger.Trace<Engine>($"Texture handle: {texture.Value}");
                         assetsManager.Unload("textures/lion");
                     }
                     //t.Update();

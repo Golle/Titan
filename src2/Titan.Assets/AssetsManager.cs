@@ -70,6 +70,8 @@ namespace Titan.Assets
             return _assets[handle.Value].AssetHandle;
 #endif
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsLoaded(in Handle<Asset> handle) => _loader.GetAsset(handle).Status == AssetStatus.Loaded;
     }
 
 
@@ -95,7 +97,6 @@ namespace Titan.Assets
         CreatingAsset,
         AssetCreated,
         Loaded,
-        UnloadRequested,
-        
+        UnloadRequested
     }
 }

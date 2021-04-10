@@ -23,12 +23,13 @@ namespace Titan.Assets
         {
             _assets = assets;
             _map = _assets
-                .Select((asset, i) => (asset, i))
-                .ToDictionary(tuple => tuple.asset.Identifier, tuple => tuple.i);
+                .Select((asset, index) => (asset, index))
+                .ToDictionary(tuple => tuple.asset.Identifier, tuple => tuple.index);
 
             _maxConcurrentFileReads = maxConcurrentFileReads;
         }
 
+        // TODO: handle invalid handles (_assets is 0 indexed right now)
         public Handle<Asset> Load(string identifier)
         {
             lock (_map) // TOOD: replace this with an action queue to avoid locks
