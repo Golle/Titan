@@ -81,15 +81,15 @@ namespace Titan
                 {
                     if (count-- == 0)
                     {
-                        asset = assetsManager.Load("textures/lion");
+                        asset = assetsManager.Load("models/clock");
                     }
 
                     if (assetsManager.IsLoaded(asset))
                     {
-                        Logger.Trace<Engine>("Asset is loaded");
-                        var texture = assetsManager.GetAssetHandle<Texture>(asset);
-                        Logger.Trace<Engine>($"Texture handle: {texture.Value}");
-                        assetsManager.Unload("textures/lion");
+                        //Logger.Trace<Engine>("Asset is loaded");
+                        //var texture = assetsManager.GetAssetHandle<Texture>(asset);
+                        //Logger.Trace<Engine>($"Texture handle: {texture.Value}");
+                        assetsManager.Unload("models/clock");
                     }
                     //t.Update();
                     assetsManager.Update();

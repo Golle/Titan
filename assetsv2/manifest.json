@@ -1,19 +1,61 @@
-[
-    {
-        "Name": "textures/lion",
-        "File": "textures/lion.png",
-        "Type": "texture",
-        "Preload": false,
-        "Static": false
-},
-    {
-        "Name": "models/clock",
-        "File": "models/clock/clock.geo",
-        "Type": "model",
-        "Dependencies": [
-            "textures/lion"
-        ],
-        "Preload": true,
-        "Static": false
-    }
-]
+{
+    "Assets": [
+        {
+            "Name": "textures/lion",
+            "File": "textures/lion.png",
+            "Type": "texture",
+            "Preload": false,
+            "Static": false
+        },
+        {
+            "Name": "textures/lion1",
+            "File": "textures/lion.png",
+            "Type": "texture",
+            "Preload": false,
+            "Static": false
+        },
+        {
+            "Name": "textures/lion2",
+            "File": "textures/lion.png",
+            "Type": "texture",
+            "Preload": false,
+            "Static": false
+        },
+        {
+            "Name": "textures/lion3",
+            "File": "textures/lion.png",
+            "Type": "texture",
+            "Preload": false,
+            "Static": false
+        },
+        {
+            "Name": "textures/lion4",
+            "File": "textures/lion.png",
+            "Type": "texture",
+            "Preload": false,
+            "Static": false
+        },
+        {
+            "Name": "textures/lion5",
+            "File": "textures/lion.png",
+            "Type": "texture",
+            "Preload": true,
+            "Static": false
+        },
+        {
+            "Name": "models/clock",
+            "File": "models/clock/clock.geo",
+            "Type": "model",
+            "Dependencies": [
+                "textures/lion",
+                "textures/lion1",
+                "textures/lion2",
+                "textures/lion3",
+                "textures/lion4",
+                "textures/lion5"
+            ],
+            "Preload": false,
+            "Static": false
+        }
+    ]
+}

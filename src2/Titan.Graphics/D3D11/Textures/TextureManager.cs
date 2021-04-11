@@ -140,6 +140,7 @@ namespace Titan.Graphics.D3D11.Textures
 
         public void Release(in Handle<Texture> handle)
         {
+            Logger.Trace<TextureManager>($"Releasing texture with handle {handle}");
             ReleaseInternal(handle);
             _usedHandles.Remove(handle);
             _resourcePool.ReleaseResource(handle);

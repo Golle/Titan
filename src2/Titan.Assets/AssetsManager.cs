@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Core.Memory;
 
 namespace Titan.Assets
 {
@@ -24,10 +25,11 @@ namespace Titan.Assets
         public AssetsManager Init(AssetManagerConfiguration config)
         {
             var manifest = AssetManifest.CreateFromFile(config.Manifest);
-            
-            var assets = new Asset[manifest.Descriptors.Length];
+
+            var assets = new Asset[manifest.Assets.Length];
+
             var i = 0;
-            foreach (var descriptor in manifest.Descriptors)
+            foreach (var descriptor in manifest.Assets)
             {
                 if (!_loaders.TryGetValue(descriptor.Type, out var loader))
                 {
@@ -38,9 +40,12 @@ namespace Titan.Assets
                     assets[i++] = new Asset
                     {
                         Identifier = descriptor.Name,
-                        File = descriptor.File,
+                        File = Path.Combine(descriptor.File),
                         Loader = loader,
-                        Status = descriptor.Preload ? AssetStatus.LoadRequested : AssetStatus.Unloaded
+                        Status = descriptor.Preload ? AssetStatus.LoadRequested : AssetStatus.Unloaded,
+                        AssetHandle = Handle<Asset>.Null,
+                        Static = descriptor.Static,
+                        Dependencies = descriptor.Dependencies ?? Array.Empty<string>()
                     };
                 }
             }
@@ -72,31 +77,5 @@ namespace Titan.Assets
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsLoaded(in Handle<Asset> handle) => _loader.GetAsset(handle).Status == AssetStatus.Loaded;
-    }
-
-
-    public struct Asset
-    {
-        public string Identifier;
-        public IAssetLoader Loader;
-        public AssetStatus Status;
-        public string File;
-        public int ReferenceCount;
-        public MemoryChunk<byte> FileBytes;
-        public int AssetHandle;
-    }
-
-    public enum AssetStatus
-    {
-        Unloaded,
-        LoadRequested,
-        ReadingFile,
-        FileReadComplete,
-        RequestDependencies,
-        WaitingForDependencies,
-        CreatingAsset,
-        AssetCreated,
-        Loaded,
-        UnloadRequested
     }
 }

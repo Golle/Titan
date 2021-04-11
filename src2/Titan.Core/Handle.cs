@@ -19,5 +19,8 @@ namespace Titan.Core
         public bool IsValid() => Value > 0;
 
         public static Handle<T> Null = 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => IsValid() ? Value.ToString() : "INVALID";
     }
 }

@@ -50,6 +50,12 @@ namespace Titan.Assets
             lock (_map)
             {
                 ref var asset = ref _assets[IndexOf(identifier)];
+                if (asset.Static)
+                {
+                    Logger.Warning<Loader>("Trying to unload a static asset.");
+                    return;
+                }
+                
                 if (asset.Status is not AssetStatus.UnloadRequested or AssetStatus.Unloaded)
                 {
                     asset.ReferenceCount--;
@@ -79,49 +85,74 @@ namespace Titan.Assets
 
                 switch (asset.Status)
                 {
-
                     // Ignored by ProcessState
                     case AssetStatus.Unloaded:
                     case AssetStatus.ReadingFile:
                     case AssetStatus.CreatingAsset:
                     case AssetStatus.Loaded:
                         break;
-                    
                     case AssetStatus.LoadRequested:
                         if (_fileReadCounts >= _maxConcurrentFileReads)
                         {
-                            Logger.Trace<Loader>($"Max file loads reached");
+                            //Logger.Trace<Loader>($"Max file loads reached");
                             continue;
                         }
                         Interlocked.Increment(ref _fileReadCounts);
+                        asset.Status = AssetStatus.ReadingFile;
                         LoadFile(i);
-                        asset.Status= AssetStatus.ReadingFile;
                         break;
                     
                     case AssetStatus.FileReadComplete:
+                        Interlocked.Decrement(ref _fileReadCounts);
                         asset.Status = AssetStatus.CreatingAsset;
                         CreateAsset(i);
                         break;
 
                     case AssetStatus.RequestDependencies:
+                        foreach (var dependency in asset.Dependencies)
+                        {
+                            Load(dependency);
+                        }
+                        asset.Status = AssetStatus.WaitingForDependencies;
                         break;
+
                     case AssetStatus.WaitingForDependencies:
+                        UpdateDependency(ref asset);
                         break;
+
                     case AssetStatus.AssetCreated:
                         asset.FileBytes.Free();
-                        asset.Status = AssetStatus.Loaded;
+                        asset.Status = asset.Dependencies.Length == 0 ? AssetStatus.Loaded : AssetStatus.RequestDependencies;
                         break;
+
                     case AssetStatus.UnloadRequested:
                         // TODO: should this be async?
                         asset.Loader.OnRelease(asset.AssetHandle);
+                        foreach (var dependency in asset.Dependencies)
+                        {
+                            Unload(dependency);
+                        }
                         asset.Status = AssetStatus.Unloaded;
                         break;
+
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
         }
 
+        private void UpdateDependency(ref Asset asset)
+        {
+            foreach (var dependency in asset.Dependencies)
+            {
+                ref readonly var dependencyAsset = ref _assets[IndexOf(dependency)];
+                if (dependencyAsset.Status != AssetStatus.Loaded)
+                {
+                    return;
+                }
+            }
+            asset.Status = AssetStatus.Loaded;
+        }
 
         private void CreateAsset(int index)
         {
