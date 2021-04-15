@@ -18,8 +18,9 @@ namespace Titan.Assets
             _imageLoader = imageLoader;
         }
 
-        public unsafe int OnLoad(in MemoryChunk<byte> buffer)
+        public unsafe int OnLoad(in MemoryChunk<byte>[] buffers)
         {
+            var buffer = buffers[0];
             Logger.Trace<TextureLoader>($"Load from buffer with size {buffer.Size}");
             using var image = _imageLoader.Load(buffer.AsSpan());
             return GraphicsDevice.TextureManager.Create(new TextureCreation

@@ -1,13 +1,11 @@
 using System;
 using Titan.Assets;
-using Titan.Assets.Database;
 using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Threading;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Images;
 using Titan.Graphics.Windows;
 
@@ -64,6 +62,10 @@ namespace Titan
             var assetsManager = new AssetsManager()
                 .Register(new TextureLoader(new WICImageLoader()))
                 .Register(new ModelLoader())
+                .Register(new ShaderLoader())
+                .Register(new VertexShaderLoader())
+                .Register(new PixelShaderLoader())
+                .Register(new MaterialsLoader())
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var count = 1000;

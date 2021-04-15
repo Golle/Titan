@@ -56,7 +56,7 @@ namespace Titan.Assets
                     return;
                 }
                 
-                if (asset.Status is not AssetStatus.UnloadRequested or AssetStatus.Unloaded)
+                if (asset.Status != AssetStatus.UnloadRequested && asset.Status != AssetStatus.Unloaded)
                 {
                     asset.ReferenceCount--;
                     if (asset.ReferenceCount <= 0)
@@ -87,42 +87,57 @@ namespace Titan.Assets
                 {
                     // Ignored by ProcessState
                     case AssetStatus.Unloaded:
-                    case AssetStatus.ReadingFile:
+                    case AssetStatus.ReadingFiles:
                     case AssetStatus.CreatingAsset:
                     case AssetStatus.Loaded:
                         break;
                     case AssetStatus.LoadRequested:
-                        if (_fileReadCounts >= _maxConcurrentFileReads)
+                        // Load dependencies first
+                        if (asset.Dependencies.Length > 0)
                         {
-                            //Logger.Trace<Loader>($"Max file loads reached");
-                            continue;
+                            foreach (var dependency in asset.Dependencies)
+                            {
+                                Load(dependency);
+                            }
+                            asset.Status = AssetStatus.WaitingForDependencies;
                         }
-                        Interlocked.Increment(ref _fileReadCounts);
-                        asset.Status = AssetStatus.ReadingFile;
-                        LoadFile(i);
+                        else
+                        {
+                            asset.Status = AssetStatus.DependenciesLoaded;
+                        }
                         break;
-                    
+
+                    case AssetStatus.WaitingForDependencies:
+                        if (DependenciesLoaded(asset.Dependencies))
+                        {
+                            asset.Status = AssetStatus.DependenciesLoaded;
+                        }
+                        break;
+
+                    case AssetStatus.DependenciesLoaded:
+                        // An asset could just be a set of dependencies, like a shader for example which consists of VertexShader, PixelShader and an InputLayout. 
+                        if (asset.Files?.Length > 0)
+                        {
+                            asset.Status = AssetStatus.ReadingFiles;
+                            LoadFiles(i);
+                        }
+                        else
+                        {
+                            asset.Status = AssetStatus.FileReadComplete;
+                        }
+                        break;
+
                     case AssetStatus.FileReadComplete:
-                        Interlocked.Decrement(ref _fileReadCounts);
                         asset.Status = AssetStatus.CreatingAsset;
                         CreateAsset(i);
                         break;
 
-                    case AssetStatus.RequestDependencies:
-                        foreach (var dependency in asset.Dependencies)
-                        {
-                            Load(dependency);
-                        }
-                        asset.Status = AssetStatus.WaitingForDependencies;
-                        break;
-
-                    case AssetStatus.WaitingForDependencies:
-                        UpdateDependency(ref asset);
-                        break;
-
                     case AssetStatus.AssetCreated:
-                        asset.FileBytes.Free();
-                        asset.Status = asset.Dependencies.Length == 0 ? AssetStatus.Loaded : AssetStatus.RequestDependencies;
+                        for (var fileIndex = 0; fileIndex < asset.FileBytes?.Length; ++fileIndex)
+                        {
+                            asset.FileBytes[fileIndex].Free();
+                        }
+                        asset.Status = asset.Status = AssetStatus.Loaded;
                         break;
 
                     case AssetStatus.UnloadRequested:
@@ -141,17 +156,17 @@ namespace Titan.Assets
             }
         }
 
-        private void UpdateDependency(ref Asset asset)
+        private bool DependenciesLoaded(string[] dependencies)
         {
-            foreach (var dependency in asset.Dependencies)
+            foreach (var dependency in dependencies)
             {
                 ref readonly var dependencyAsset = ref _assets[IndexOf(dependency)];
                 if (dependencyAsset.Status != AssetStatus.Loaded)
                 {
-                    return;
+                    return false;
                 }
             }
-            asset.Status = AssetStatus.Loaded;
+            return true;
         }
 
         private void CreateAsset(int index)
@@ -162,21 +177,28 @@ namespace Titan.Assets
                 ref var asset = ref assets[i];
                 Logger.Trace<Loader>($"Creating asset");
                 asset.AssetHandle = asset.Loader.OnLoad(asset.FileBytes);
-                Logger.Trace<Loader>($"Asset created");
+                Logger.Trace<Loader>($"Asset created {asset.AssetHandle}");
                 asset.Status = AssetStatus.AssetCreated;
             }, (index, _assets));
         }
 
-        private void LoadFile(int index)
+        private void LoadFiles(int index)
         {
             IOWorkerPool.QueueWorkerItem<(int, Asset[])>(static value =>
             {
-                var (i, assets) = value;
-                ref var asset = ref assets[i];
+                var (assetIndex, assets) = value;
+                ref var asset = ref assets[assetIndex];
                 Logger.Trace<Loader>($"File read starting {asset.Identifier}");
-                using var file = FileSystem.OpenRead(asset.File);
-                asset.FileBytes = MemoryUtils.AllocateBlock<byte>((uint) file.Length);
-                file.Read(asset.FileBytes.AsSpan()); // TODO: do we need to handle smaller buffers?
+                asset.FileBytes = new MemoryChunk<byte>[asset.Files.Length];
+                for(var i = 0; i < asset.Files.Length; ++i)
+                {
+                    var path = asset.Files[i];
+                    using var file = FileSystem.OpenRead(path);
+                    var block = MemoryUtils.AllocateBlock<byte>((uint)file.Length);
+                    file.Read(block.AsSpan());
+                    asset.FileBytes[i] = block;
+                }
+                
                 Logger.Trace<Loader>($"File read finished {asset.Identifier}");
                 asset.Status= AssetStatus.FileReadComplete;
             }, (index, _assets));

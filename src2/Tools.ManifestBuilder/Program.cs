@@ -7,6 +7,9 @@ using Titan.Core.Logging;
 Logger.Start();
 
 const string assetsPath = @"F:\Git\Titan\assets";
+const string outputPath = @"F:\Git\Titan\assetsV3";
+
+Directory.CreateDirectory(outputPath);
 
 Logger.Info($"Reading assets from {assetsPath}");
 
@@ -17,7 +20,7 @@ var a = Directory.EnumerateFiles(assetsPath, "*", SearchOption.AllDirectories)
         switch (asset.Extension.ToLowerInvariant())
         {
             case ".mtl":
-                Logger.Trace("Ignoring material");
+                Logger.Trace("Ignoring material (Will be referenced in Obj files)");
                 break;
             case ".png" or ".jpg": 
                 Logger.Trace("Texture found");

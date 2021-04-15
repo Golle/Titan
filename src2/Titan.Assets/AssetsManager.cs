@@ -40,9 +40,10 @@ namespace Titan.Assets
                     assets[i++] = new Asset
                     {
                         Identifier = descriptor.Name,
-                        File = Path.Combine(descriptor.File),
+                        Files = descriptor.Files,
                         Loader = loader,
                         Status = descriptor.Preload ? AssetStatus.LoadRequested : AssetStatus.Unloaded,
+                        ReferenceCount = descriptor.Preload ? 1 : 0,
                         AssetHandle = Handle<Asset>.Null,
                         Static = descriptor.Static,
                         Dependencies = descriptor.Dependencies ?? Array.Empty<string>()
@@ -50,7 +51,7 @@ namespace Titan.Assets
                 }
             }
 
-            _loader = new Loader(assets, config.MaxConcurrentFileReads);
+            _loader = new Loader(assets.AsSpan(0, i).ToArray(), config.MaxConcurrentFileReads);
             return this;
         }
 

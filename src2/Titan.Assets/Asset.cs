@@ -8,9 +8,9 @@ namespace Titan.Assets
         public string Identifier;
         public IAssetLoader Loader;
         public AssetStatus Status;
-        public string File;
+        public string[] Files;
         public int ReferenceCount;
-        public MemoryChunk<byte> FileBytes;
+        public MemoryChunk<byte>[] FileBytes;
         public int AssetHandle;
         public bool Static;
         public string[] Dependencies;

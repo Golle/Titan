@@ -6,7 +6,7 @@ using Titan.Core.Serialization;
 namespace Titan.Assets.Database
 {
 
-    public record AssetDescriptor(string Name, string File, string Type, string[] Dependencies, bool Preload, bool Static);
+    public record AssetDescriptor(string Name, string[] Files, string Type, string[] Dependencies, bool Preload, bool Static);
     
     public record AssetManifest(AssetDescriptor[] Assets)
     {

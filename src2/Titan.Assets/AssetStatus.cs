@@ -3,11 +3,12 @@ namespace Titan.Assets
     public enum AssetStatus
     {
         Unloaded,
+
         LoadRequested,
-        ReadingFile,
-        FileReadComplete,
-        RequestDependencies,
         WaitingForDependencies,
+        DependenciesLoaded,
+        ReadingFiles,
+        FileReadComplete,
         CreatingAsset,
         AssetCreated,
         Loaded,
