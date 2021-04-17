@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Serialization;
@@ -11,7 +13,7 @@ namespace Titan.Assets
     public class VertexShaderLoader : IAssetLoader
     {
         public void Init(AssetsManager assetsManager) { }
-        public int OnLoad(in MemoryChunk<byte>[] buffers)
+        public object OnLoad(in MemoryChunk<byte>[] buffers)
         {
             Debug.Assert(buffers.Length == 2, $"{nameof(VertexShaderLoader)} must have 2 files");
 
@@ -23,9 +25,12 @@ namespace Titan.Assets
             return vertexShader;
         }
 
-        public void OnRelease(int handle)
+        public void OnRelease(object asset)
         {
+            var handle = Unsafe.Unbox<Handle<VertexShader>>(asset);
             Logger.Info<VertexShaderLoader>($"OnRelease {handle}");
+
+            GraphicsDevice.ShaderManager.Release(handle);
         }
 
         public void Dispose()

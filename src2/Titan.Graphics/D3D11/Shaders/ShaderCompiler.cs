@@ -53,36 +53,6 @@ namespace Titan.Graphics.D3D11.Shaders
         }
 
 
-        internal ID3DBlob* Compile(string source, string entrypoint, string shaderVersion)
-        {
-            static byte[] AsBytes(string str) => Encoding.ASCII.GetBytes(str);
-            
-
-            // TODO: can these allocatations be replaces with stackalloc? (if they are less than 1mb it should be fine)
-            ID3DBlob* shader;
-            fixed (byte* pSource = AsBytes(source))
-            fixed (byte* pEntrypoint = AsBytes(entrypoint))
-            fixed (byte* pTarget = AsBytes(shaderVersion))
-            {
-                ID3DBlob* error = null;
-                var result = D3DCompile(pSource, (nuint) source.Length, null, null, null, (sbyte*) pEntrypoint, (sbyte*) pTarget, 0, 0, &shader, &error);
-                if (FAILED(result) && error != null)
-                {
-                    var errorMessage = Encoding.ASCII.GetString((byte*) error->GetBufferPointer(), (int) error->GetBufferSize());
-                    Logger.Error<ShaderCompiler>(errorMessage);
-                }
-
-                if (error != null)
-                {
-                    error->Release();
-                }
-                CheckAndThrow(result, nameof(D3DCompile));
-            }
-
-            return shader;
-        }
-
-
         //internal CompiledShader CompileFromFile(string filename, string entrypoint, string shaderVersion)
         //{
         //    ID3DBlob* shader;

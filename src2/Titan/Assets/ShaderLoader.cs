@@ -7,15 +7,15 @@ namespace Titan.Assets
 {
     public class ShaderLoader : IAssetLoader
     {
-        public int OnLoad(in MemoryChunk<byte>[] buffers)
+        public object OnLoad(in MemoryChunk<byte>[] buffers)
         {
             Logger.Info<ShaderLoader>($"OnLoad {buffers?.FirstOrDefault().Size}");
             return 10;
         }
 
-        public void OnRelease(int handle)
+        public void OnRelease(object asset)
         {
-            Logger.Info<ShaderLoader>($"OnRelease {handle}");
+            Logger.Info<ShaderLoader>($"OnRelease {asset?.GetType().Name}");
         }
 
         public void Dispose()

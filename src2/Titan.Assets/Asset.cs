@@ -12,6 +12,7 @@ namespace Titan.Assets
         public int ReferenceCount;
         public MemoryChunk<byte>[] FileBytes;
         public int AssetHandle;
+        public object AssetReference;
         public bool Static;
         public int[] Dependencies;
     }

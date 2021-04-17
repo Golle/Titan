@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
@@ -148,7 +147,7 @@ namespace Titan.Assets
 
                     case AssetStatus.UnloadRequested:
                         // TODO: should this be async?
-                        asset.Loader.OnRelease(asset.AssetHandle);
+                        asset.Loader.OnRelease(asset.AssetReference);
                         foreach (var dependency in asset.Dependencies)
                         {
                             Unload(dependency);
@@ -182,8 +181,8 @@ namespace Titan.Assets
                 var (i, assets) = value;
                 ref var asset = ref assets[i];
                 Logger.Trace<Loader>($"Creating asset");
-                asset.AssetHandle = asset.Loader.OnLoad(asset.FileBytes);
-                Logger.Trace<Loader>($"Asset created {asset.AssetHandle}");
+                asset.AssetReference = asset.Loader.OnLoad(asset.FileBytes);
+                Logger.Trace<Loader>($"Asset created");
                 asset.Status = AssetStatus.AssetCreated;
             }, (index, _assets));
         }

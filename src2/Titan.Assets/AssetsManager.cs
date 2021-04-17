@@ -41,7 +41,6 @@ namespace Titan.Assets
                     Loader = loader,
                     Status = descriptor.Preload ? AssetStatus.LoadRequested : AssetStatus.Unloaded,
                     ReferenceCount = descriptor.Preload ? 1 : 0,
-                    AssetHandle = Handle<Asset>.Null,
                     Static = descriptor.Static,
                 };
             }).ToArray();
@@ -78,18 +77,18 @@ namespace Titan.Assets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Unload(string identifier) => _loader.Unload(identifier);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Handle<T> GetAssetHandle<T>(in Handle<Asset> handle)
+        public T GetAssetHandle<T>(in Handle<Asset> handle)
         {
 #if DEBUG
             ref readonly var asset = ref _loader.GetAsset(handle);
             if (asset.Status != AssetStatus.Loaded)
             {
                 Logger.Error<Loader>("Getting handle for Asset that is not loaded. Returning 0");
-                return 0;
+                return default;
             }
-            return asset.AssetHandle;
+            return (T)asset.AssetReference;
 #else
-            return _assets[handle.Value].AssetHandle;
+            return (T)_loader.GetAsset(handle).AssetReference;
 #endif
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

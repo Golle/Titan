@@ -7,15 +7,16 @@ namespace Titan.Assets
 {
     public class ModelLoader : IAssetLoader
     {
-        public int OnLoad(in MemoryChunk<byte>[] buffers)
+        public object OnLoad(in MemoryChunk<byte>[] buffers)
         {
             Logger.Info<ModelLoader>($"OnLoad {buffers.FirstOrDefault().Size}");
             return 10;
         }
 
-        public void OnRelease(int handle)
+        public void OnRelease(object asset)
         {
-            Logger.Info<ModelLoader>($"OnRelease {handle}");
+
+            Logger.Info<ModelLoader>($"OnRelease {asset?.GetType().Name}");
         }
 
         public void Dispose()

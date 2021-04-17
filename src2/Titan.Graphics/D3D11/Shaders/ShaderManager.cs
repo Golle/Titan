@@ -32,7 +32,7 @@ namespace Titan.Graphics.D3D11.Shaders
         private readonly List<Handle<PixelShader>> _pixelShaderHandles = new();
         public ShaderManager(ID3D11Device* device)
         {
-            Logger.Trace<Shaders.ShaderManager>($"Init with {MaxShaders} slots");
+            Logger.Trace<ShaderManager>($"Init with {MaxShaders} slots");
             _device = device;
             _vertexShaderPool.Init(MaxShaders);
             _pixelShaderPool.Init(MaxShaders);
