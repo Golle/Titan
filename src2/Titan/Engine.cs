@@ -60,15 +60,15 @@ namespace Titan
             var graphicsSystem = GraphicsSystem.Create();
             
             var assetsManager = new AssetsManager()
-                .Register(new TextureLoader(new WICImageLoader()))
-                .Register(new ModelLoader())
-                .Register(new ShaderLoader())
-                .Register(new VertexShaderLoader())
-                .Register(new PixelShaderLoader())
-                .Register(new MaterialsLoader())
+                .Register("texture", new TextureLoader(new WICImageLoader()))
+                .Register("model", new ModelLoader())
+                .Register("shader", new ShaderLoader())
+                .Register("vertexshader", new VertexShaderLoader())
+                .Register("pixelshader", new PixelShaderLoader())
+                .Register("material", new MaterialsLoader())
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
-            var count = 1000;
+            var count = 300;
 
             Handle<Asset> asset = 0;
             unsafe
@@ -90,7 +90,7 @@ namespace Titan
                     {
                         //Logger.Trace<Engine>("Asset is loaded");
                         //var texture = assetsManager.GetAssetHandle<Texture>(asset);
-                        //Logger.Trace<Engine>($"Texture handle: {texture.Value}");
+                        //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
                         assetsManager.Unload("models/clock");
                     }
                     //t.Update();
@@ -99,8 +99,6 @@ namespace Titan
                     // Do stuff with the engine
                     GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
                     GraphicsDevice.SwapChain.Present();
-
-
                 }
             }
         }

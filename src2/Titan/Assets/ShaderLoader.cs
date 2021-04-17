@@ -5,22 +5,22 @@ using Titan.Core.Memory;
 
 namespace Titan.Assets
 {
-    public class ModelLoader : IAssetLoader
+    public class ShaderLoader : IAssetLoader
     {
         public int OnLoad(in MemoryChunk<byte>[] buffers)
         {
-            Logger.Info<ModelLoader>($"OnLoad {buffers.FirstOrDefault().Size}");
+            Logger.Info<ShaderLoader>($"OnLoad {buffers?.FirstOrDefault().Size}");
             return 10;
         }
 
         public void OnRelease(int handle)
         {
-            Logger.Info<ModelLoader>($"OnRelease {handle}");
+            Logger.Info<ShaderLoader>($"OnRelease {handle}");
         }
 
         public void Dispose()
         {
-            Logger.Info<ModelLoader>("Dispose");
+            Logger.Info<ShaderLoader>("Dispose");
         }
     }
 }

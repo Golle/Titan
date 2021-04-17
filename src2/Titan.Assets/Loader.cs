@@ -32,30 +32,36 @@ namespace Titan.Assets
         // TODO: handle invalid handles (_assets is 0 indexed right now)
         public Handle<Asset> Load(string identifier)
         {
+            var index = IndexOf(identifier);
+            Load(index);
+            return index;
+        }
+
+        private void Load(int index)
+        {
             lock (_map) // TOOD: replace this with an action queue to avoid locks
-            {
-                var index = IndexOf(identifier);
+            { 
                 ref var asset = ref _assets[index];
                 if (asset.Status == AssetStatus.Unloaded)
                 {
                     asset.Status = AssetStatus.LoadRequested;
                 }
                 asset.ReferenceCount++;
-                return index;
             }
         }
 
-        public void Unload(string identifier)
+        public void Unload(string identifier) => Unload(IndexOf(identifier));
+        private void Unload(int index)
         {
             lock (_map)
             {
-                ref var asset = ref _assets[IndexOf(identifier)];
+                ref var asset = ref _assets[index];
                 if (asset.Static)
                 {
                     Logger.Warning<Loader>("Trying to unload a static asset.");
                     return;
                 }
-                
+
                 if (asset.Status != AssetStatus.UnloadRequested && asset.Status != AssetStatus.Unloaded)
                 {
                     asset.ReferenceCount--;
@@ -156,11 +162,11 @@ namespace Titan.Assets
             }
         }
 
-        private bool DependenciesLoaded(string[] dependencies)
+        private bool DependenciesLoaded(int[] dependencies)
         {
             foreach (var dependency in dependencies)
             {
-                ref readonly var dependencyAsset = ref _assets[IndexOf(dependency)];
+                ref readonly var dependencyAsset = ref _assets[dependency];
                 if (dependencyAsset.Status != AssetStatus.Loaded)
                 {
                     return false;

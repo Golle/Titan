@@ -13,6 +13,6 @@ namespace Titan.Assets
         public MemoryChunk<byte>[] FileBytes;
         public int AssetHandle;
         public bool Static;
-        public string[] Dependencies;
+        public int[] Dependencies;
     }
 }
