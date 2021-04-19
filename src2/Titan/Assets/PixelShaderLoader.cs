@@ -12,7 +12,7 @@ namespace Titan.Assets
 {
     public class PixelShaderLoader : IAssetLoader
     {
-        public object OnLoad(in MemoryChunk<byte>[] buffers)
+        public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<AssetDependency> dependencies)
         {
             Debug.Assert(buffers.Length == 1, $"{nameof(PixelShaderLoader)} only supports single files");
 

@@ -6,6 +6,7 @@ namespace Titan.Assets
     public struct Asset
     {
         public string Identifier;
+        public string Type;
         public IAssetLoader Loader;
         public AssetStatus Status;
         public string[] Files;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.IO;
@@ -178,10 +179,17 @@ namespace Titan.Assets
         {
             IOWorkerPool.QueueWorkerItem<(int, Asset[])>(static value =>
             {
-                var (i, assets) = value;
-                ref var asset = ref assets[i];
+                var (assetIndex, assets) = value;
+                ref var asset = ref assets[assetIndex];
                 Logger.Trace<Loader>($"Creating asset");
-                asset.AssetReference = asset.Loader.OnLoad(asset.FileBytes);
+
+                var dependencies = new AssetDependency[asset.Dependencies.Length]; // TODO: heap allocation, maybe its fine. Short lived.
+                for (var i = 0; i < dependencies.Length; ++i)
+                {
+                    ref readonly var dep = ref assets[asset.Dependencies[i]];
+                    dependencies[i] = new AssetDependency(dep.Type, dep.Identifier, dep.AssetReference);
+                }
+                asset.AssetReference = asset.Loader.OnLoad(asset.FileBytes, dependencies);
                 Logger.Trace<Loader>($"Asset created");
                 asset.Status = AssetStatus.AssetCreated;
             }, (index, _assets));

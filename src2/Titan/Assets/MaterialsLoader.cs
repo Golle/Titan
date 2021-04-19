@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Titan.Assets.Database;
 using Titan.Core.Logging;
@@ -7,7 +8,7 @@ namespace Titan.Assets
 {
     public class MaterialsLoader : IAssetLoader
     {
-        public object OnLoad(in MemoryChunk<byte>[] buffers)
+        public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<AssetDependency> dependencies)
         {
             Logger.Info<MaterialsLoader>($"OnLoad {buffers.FirstOrDefault().Size}");
             return 10;

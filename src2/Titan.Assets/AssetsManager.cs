@@ -42,6 +42,7 @@ namespace Titan.Assets
                     Status = descriptor.Preload ? AssetStatus.LoadRequested : AssetStatus.Unloaded,
                     ReferenceCount = descriptor.Preload ? 1 : 0,
                     Static = descriptor.Static,
+                    Type =  descriptor.Type
                 };
             }).ToArray();
 

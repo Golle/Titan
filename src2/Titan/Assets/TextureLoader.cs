@@ -21,7 +21,7 @@ namespace Titan.Assets
             _imageLoader = imageLoader;
         }
 
-        public unsafe object OnLoad(in MemoryChunk<byte>[] buffers)
+        public unsafe object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<AssetDependency> dependencies)
         {
             var buffer = buffers[0];
             Logger.Trace<TextureLoader>($"Load from buffer with size {buffer.Size}");
