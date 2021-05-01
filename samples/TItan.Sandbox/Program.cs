@@ -5,9 +5,7 @@ using Titan.Sandbox;
 
 Console.WriteLine($"Hello World!");
 
-
-using var app = Engine.StartNew<SandboxApplication>();
-
+Engine.StartNew<SandboxApplication>();
 
 namespace Titan.Sandbox
 {

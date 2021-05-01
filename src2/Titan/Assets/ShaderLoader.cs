@@ -1,8 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using Titan.Assets.Database;
 using Titan.Core;
+using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11.Shaders;
 
@@ -23,13 +25,17 @@ namespace Titan.Assets
 
             foreach (var dependency in dependencies)
             {
-                if (dependency.Type == "vertexshader")
+                switch (dependency.Type)
                 {
-                    vertexShaderHandle = Unsafe.Unbox<Handle<VertexShader>>(dependency.Asset);
-                }
-                else if (dependency.Type == "pixelshader")
-                {
-                    pixelShaderHandle = Unsafe.Unbox<Handle<PixelShader>>(dependency.Asset);
+                    case AssetTypes.VertexShader:
+                        vertexShaderHandle = Unsafe.Unbox<Handle<VertexShader>>(dependency.Asset);
+                        break;
+                    case AssetTypes.PixelShader:
+                        pixelShaderHandle = Unsafe.Unbox<Handle<PixelShader>>(dependency.Asset);
+                        break;
+                    default:
+                        Logger.Warning<ShaderLoader>($"Unrecognized dependency type {dependency.Type}");
+                        break;
                 }
             }
 

@@ -13,7 +13,6 @@ namespace Titan.Assets
 {
     public class VertexShaderLoader : IAssetLoader
     {
-        public void Init(AssetsManager assetsManager) { }
         public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<AssetDependency> dependencies)
         {
             Debug.Assert(buffers.Length == 2, $"{nameof(VertexShaderLoader)} must have 2 files");

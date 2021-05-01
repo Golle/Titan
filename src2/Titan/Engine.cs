@@ -11,19 +11,18 @@ using Titan.Graphics.Windows;
 
 namespace Titan
 {
-    public class Engine : IDisposable
+    public class Engine
     {
         private readonly Application _app;
 
         private Window _window;
-        public static Engine StartNew<T>() where T : Application
+        public static void StartNew<T>() where T : Application
         {
-            var engine = new Engine(Activator.CreateInstance<T>());
-            engine.Start();
-            return engine;
+            new Engine(Activator.CreateInstance<T>())
+                .Start();
         }
-        
-        public Engine(Application app)
+
+        private Engine(Application app)
         {
             _app = app;
         }
@@ -58,53 +57,63 @@ namespace Titan
             _app.OnStart();
 
             var graphicsSystem = GraphicsSystem.Create();
-            
+
+            try
+            {
+                Run();
+            }
+            finally
+            {
+                Shutdown();
+            }
+        }
+
+        private unsafe void Run()
+        {
             var assetsManager = new AssetsManager()
-                .Register("texture", new TextureLoader(new WICImageLoader()))
-                .Register("model", new ModelLoader())
-                .Register("shader", new ShaderLoader())
-                .Register("vertexshader", new VertexShaderLoader())
-                .Register("pixelshader", new PixelShaderLoader())
-                .Register("material", new MaterialsLoader())
+                .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
+                .Register(AssetTypes.Model, new ModelLoader())
+                .Register(AssetTypes.Shader, new ShaderLoader())
+                .Register(AssetTypes.VertexShader, new VertexShaderLoader())
+                .Register(AssetTypes.PixelShader, new PixelShaderLoader())
+                .Register(AssetTypes.Material, new MaterialsLoader())
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var count = 300;
 
             Handle<Asset> asset = 0;
-            unsafe
+            var color = stackalloc float[4];
+            color[0] = 1f;
+            color[1] = 0.4f;
+            color[2] = 0f;
+            color[3] = 1f;
+
+            while (_window.Update())
             {
-                var color = stackalloc float[4];
-                color[0] = 1f;
-                color[1] = 0.4f;
-                color[2] = 0f;
-                color[3] = 1f;
-
-                while (_window.Update())
+                if (count-- == 0)
                 {
-                    if (count-- == 0)
-                    {
-                        asset = assetsManager.Load("models/clock");
-                    }
-
-                    if (assetsManager.IsLoaded(asset))
-                    {
-                        //Logger.Trace<Engine>("Asset is loaded");
-                        //var texture = assetsManager.GetAssetHandle<Texture>(asset);
-                        //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
-                        assetsManager.Unload("models/clock");
-                    }
-                    //t.Update();
-                    assetsManager.Update();
-
-                    // Do stuff with the engine
-                    GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
-                    GraphicsDevice.SwapChain.Present();
+                    asset = assetsManager.Load("models/clock");
                 }
+
+                if (assetsManager.IsLoaded(asset))
+                {
+                    //Logger.Trace<Engine>("Asset is loaded");
+                    //var texture = assetsManager.GetAssetHandle<Texture>(asset);
+                    //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
+                    assetsManager.Unload("models/clock");
+                }
+
+                //t.Update();
+                assetsManager.Update();
+
+                // Do stuff with the engine
+                GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
+                GraphicsDevice.SwapChain.Present();
             }
         }
 
-        
-        public void Dispose()
+
+        private void Shutdown()
         {
             Logger.Info<Engine>("Disposing the application");
             _app.OnTerminate();

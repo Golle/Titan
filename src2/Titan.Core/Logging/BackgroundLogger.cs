@@ -45,15 +45,15 @@ namespace Titan.Core.Logging
                     _ => throw new ArgumentOutOfRangeException()
                 };
                 Console.Write("{0} [", DateTimeNow());
-                if (logMessage.Scope != null)
-                {
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    Console.Write(logMessage.Scope);
-                    Console.ResetColor();
-                    Console.Write("][");
-                }
                 Console.ForegroundColor = color;
                 Console.Write(logMessage.Level);
+                if (logMessage.Scope != null)
+                {
+                    Console.ResetColor();
+                    Console.Write("][");
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.Write(logMessage.Scope);
+                }
                 Console.ResetColor();
                 Console.WriteLine("] - {0}", logMessage.Message);
             }

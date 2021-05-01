@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
@@ -13,10 +12,10 @@ namespace Titan.Assets
 
     public class AssetsManager
     {
-        private readonly Dictionary<string, IAssetLoader> _loaders = new();
+        private readonly Dictionary<AssetTypes, IAssetLoader> _loaders = new();
         private Loader _loader;
 
-        public AssetsManager Register(string type, IAssetLoader loader)
+        public AssetsManager Register(AssetTypes type, IAssetLoader loader)
         {
             Logger.Trace<AssetsManager>($"Added loader for asset type {type}");
             _loaders.Add(type, loader);
@@ -29,11 +28,17 @@ namespace Titan.Assets
 
             var assets = manifest.Assets.Select(descriptor =>
             {
-                if (!_loaders.TryGetValue(descriptor.Type, out var loader))
+                if (!Enum.TryParse<AssetTypes>(descriptor.Type, true, out var type))
+                {
+                    Logger.Error<AssetsManager>($"Failed to parse type {descriptor.Type} to the type {nameof(AssetTypes)}");
+                }
+
+                if (!_loaders.TryGetValue(type, out var loader))
                 {
                     Logger.Error<AssetsManager>($"No loader registered for the type {descriptor.Type} that was found in the manifest. Asset will be discarded.");
                     throw new InvalidOperationException("Missing loader");
                 }
+
                 return new Asset
                 {
                     Identifier = descriptor.Name,
@@ -42,7 +47,7 @@ namespace Titan.Assets
                     Status = descriptor.Preload ? AssetStatus.LoadRequested : AssetStatus.Unloaded,
                     ReferenceCount = descriptor.Preload ? 1 : 0,
                     Static = descriptor.Static,
-                    Type =  descriptor.Type
+                    Type =  type
                 };
             }).ToArray();
 
