@@ -1,5 +1,6 @@
 using System;
 using Titan.Assets;
+using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Core;
 using Titan.Core.IO;

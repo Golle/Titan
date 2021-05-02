@@ -17,7 +17,7 @@ namespace Titan.Assets
 
     public class ShaderLoader : IAssetLoader
     {
-        public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<AssetDependency> dependencies)
+        public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
         {
             Handle<VertexShader> vertexShaderHandle = default;
             Handle<PixelShader> pixelShaderHandle = default;

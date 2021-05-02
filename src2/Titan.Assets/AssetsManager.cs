@@ -41,7 +41,7 @@ namespace Titan.Assets
 
                 return new Asset
                 {
-                    Identifier = descriptor.Name,
+                    Identifier = descriptor.Id,
                     Files = descriptor.Files,
                     Loader = loader,
                     Status = descriptor.Preload ? AssetStatus.LoadRequested : AssetStatus.Unloaded,
@@ -68,9 +68,8 @@ namespace Titan.Assets
             {
                 var descriptor = manifest.Assets[i];
                 ref var asset = ref assets[i];
-                asset.Dependencies = descriptor.Dependencies?.Select(IndexOf).ToArray() ?? Array.Empty<int>();
+                asset.Dependencies = descriptor.Dependencies?.Select(d => new AssetDependency(IndexOf(d.Id), d.Name)).ToArray() ?? Array.Empty<AssetDependency>();
             }
-
 
             _loader = new Loader(assets, config.MaxConcurrentFileReads);
             return this;

@@ -103,7 +103,7 @@ namespace Titan.Assets
                         {
                             foreach (var dependency in asset.Dependencies)
                             {
-                                Load(dependency);
+                                Load(dependency.Index);
                             }
                             asset.Status = AssetStatus.WaitingForDependencies;
                         }
@@ -151,7 +151,7 @@ namespace Titan.Assets
                         asset.Loader.OnRelease(asset.AssetReference);
                         foreach (var dependency in asset.Dependencies)
                         {
-                            Unload(dependency);
+                            Unload(dependency.Index);
                         }
                         asset.Status = AssetStatus.Unloaded;
                         break;
@@ -162,11 +162,11 @@ namespace Titan.Assets
             }
         }
 
-        private bool DependenciesLoaded(int[] dependencies)
+        private bool DependenciesLoaded(ReadOnlySpan<AssetDependency> dependencies)
         {
-            foreach (var dependency in dependencies)
+            foreach (ref readonly var dependency in dependencies)
             {
-                ref readonly var dependencyAsset = ref _assets[dependency];
+                ref readonly var dependencyAsset = ref _assets[dependency.Index];
                 if (dependencyAsset.Status != AssetStatus.Loaded)
                 {
                     return false;
@@ -183,11 +183,12 @@ namespace Titan.Assets
                 ref var asset = ref assets[assetIndex];
                 Logger.Trace<Loader>($"Creating asset");
 
-                var dependencies = new AssetDependency[asset.Dependencies.Length]; // TODO: heap allocation, maybe its fine. Short lived.
+                var dependencies = new Dependency[asset.Dependencies.Length]; // TODO: heap allocation, maybe its fine. Short lived.
                 for (var i = 0; i < dependencies.Length; ++i)
                 {
-                    ref readonly var dep = ref assets[asset.Dependencies[i]];
-                    dependencies[i] = new AssetDependency(dep.Type, dep.Identifier, dep.AssetReference);
+                    ref readonly var dependency = ref asset.Dependencies[i];
+                    ref readonly var dep = ref assets[dependency.Index];
+                    dependencies[i] = new Dependency(dep.Type, dep.Identifier, dependency.Name, dep.AssetReference);
                 }
                 asset.AssetReference = asset.Loader.OnLoad(asset.FileBytes, dependencies);
                 Logger.Trace<Loader>($"Asset created");

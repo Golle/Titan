@@ -6,7 +6,7 @@ namespace Titan.Assets.Database
 {
     public interface IAssetLoader : IDisposable
     {
-        public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<AssetDependency> dependencies);
+        public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies);
         public void OnRelease(object asset);
     }
 }

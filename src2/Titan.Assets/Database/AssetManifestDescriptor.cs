@@ -5,9 +5,9 @@ using Titan.Core.Serialization;
 
 namespace Titan.Assets.Database
 {
+    public record AssetDescriptor(string Id, string[] Files, string Type, AssetDependencyDescriptor[] Dependencies, bool Preload, bool Static);
+    public record AssetDependencyDescriptor(string Id, string Name);
 
-    public record AssetDescriptor(string Name, string[] Files, string Type, string[] Dependencies, bool Preload, bool Static);
-    
     public record AssetManifestDescriptor(AssetDescriptor[] Assets)
     {
         public static AssetManifestDescriptor CreateFromFile(string file)

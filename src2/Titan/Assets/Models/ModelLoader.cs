@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
+using Titan.Assets.Materials;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
@@ -42,7 +43,7 @@ namespace Titan.Assets.Models
 
     public class ModelLoader : IAssetLoader
     {
-        public unsafe object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<AssetDependency> dependencies)
+        public unsafe object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
         {
             var buffer = buffers[0].AsPointer();
             var desc = (MeshDescriptor*) buffer;

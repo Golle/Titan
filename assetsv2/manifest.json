@@ -1,14 +1,14 @@
 {
     "Assets": [
         {
-            "Name": "textures/lion",
+            "Id": "textures/lion",
             "Files": [
                 "textures/lion.png"
             ],
             "Type": "texture"
         },
         {
-            "Name": "shaders/lambertian_vertexshader",
+            "Id": "shaders/lambertian_vertexshader",
             "Type": "vertexshader",
             "Files": [
                 "shaders/lambertian_vertexshader.hlsl",
@@ -16,53 +16,73 @@
             ]
         },
         {
-            "Name": "shaders/lambertian_pixelshader",
+            "Id": "shaders/lambertian_pixelshader",
             "Type": "pixelshader",
             "Files": [
                 "shaders/lambertian_pixelshader.hlsl"
             ]
         },
         {
-            "Name": "shaders/default_shader",
+            "Id": "shaders/default_shader",
             "Type": "shader",
             "Dependencies": [
-                "shaders/lambertian_pixelshader",
-                "shaders/lambertian_vertexshader"
+                {
+                    "Id": "shaders/lambertian_pixelshader"
+                },
+                {
+                    "Id": "shaders/lambertian_vertexshader"
+                }
             ],
             "Preload": false,
             "Static": false
         },
         {
-            "Name": "materials/material_01",
+            "Id": "materials/material_01",
             "Files": [
                 "materials/material_01.json"
             ],
             "Type": "material",
             "Dependencies": [
-                "shaders/default_shader"
+                {
+                    "Id": "shaders/default_shader"
+                },
+                {
+                    "Id": "textures/lion",
+                    "Name": "diffuse"
+                },
+                {
+                    "Id": "textures/lion",
+                    "Name": "bumpmap"
+                }
             ]
         },
         {
-            "Name": "models/clock",
+            "Id": "models/clock",
             "Files": [
                 "models/clock/clock.geo"
             ],
             "Type": "model",
             "Dependencies": [
-                "materials/material_01",
-                "textures/lion"
+                {
+                    "Id": "materials/material_01"
+                },
+                {
+                    "Id": "textures/lion"
+                }
             ],
             "Preload": false,
             "Static": false
         },
         {
-            "Name": "models/tree",
+            "Id": "models/tree",
             "Files": [
                 "models/tree.geo"
             ],
             "Type": "model",
             "Dependencies": [
-                "materials/material_01"
+                {
+                    "Id": "materials/material_01"
+                }
             ]
         }
     ]
