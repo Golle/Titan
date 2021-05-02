@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Tools.ManifestBuilder.Parsers.WavefrontObj
+namespace Tools.Core.WavefrontObj
 {
-    internal static class ObjParser
+    public static class ObjParser
     {
         public static async Task<WavefrontObject> ReadFromFile(string filename)
         {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Tools.ManifestBuilder.Parsers.WavefrontObj
+namespace Tools.Core.WavefrontObj
 {
     public class ObjGroup
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Titan.Core.Logging;
 
-namespace Tools.ManifestBuilder.Parsers.WavefrontObj
+namespace Tools.Core.WavefrontObj
 {
     internal class MaterialParser
     {

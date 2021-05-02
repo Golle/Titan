@@ -5,7 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace Tools.ManifestBuilder.Parsers.WavefrontObj
+namespace Tools.Core.WavefrontObj
 {
     internal class ObjBuilder
     {

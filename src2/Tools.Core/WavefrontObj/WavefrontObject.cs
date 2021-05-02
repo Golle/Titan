@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Tools.ManifestBuilder.Parsers.WavefrontObj
+namespace Tools.Core.WavefrontObj
 {
     public class WavefrontObject
     {

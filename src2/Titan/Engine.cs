@@ -1,5 +1,6 @@
 using System;
 using Titan.Assets;
+using Titan.Assets.Models;
 using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
@@ -92,7 +93,7 @@ namespace Titan
             {
                 if (count-- == 0)
                 {
-                    asset = assetsManager.Load("models/clock");
+                    asset = assetsManager.Load("models/tree");
                 }
 
                 if (assetsManager.IsLoaded(asset))
@@ -100,7 +101,7 @@ namespace Titan
                     //Logger.Trace<Engine>("Asset is loaded");
                     //var texture = assetsManager.GetAssetHandle<Texture>(asset);
                     //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
-                    assetsManager.Unload("models/clock");
+                    assetsManager.Unload("models/tree");
                 }
 
                 //t.Update();

@@ -2,60 +2,68 @@
     "Assets": [
         {
             "Name": "textures/lion",
-            "File": "textures/lion.png",
-            "Type": "texture",
-            "Preload": false,
-            "Static": false
+            "Files": [
+                "textures/lion.png"
+            ],
+            "Type": "texture"
         },
         {
-            "Name": "textures/lion1",
-            "File": "textures/lion.png",
-            "Type": "texture",
-            "Preload": false,
-            "Static": false
+            "Name": "shaders/lambertian_vertexshader",
+            "Type": "vertexshader",
+            "Files": [
+                "shaders/lambertian_vertexshader.hlsl",
+                "shaders/lambertian_vertexshader.layout"
+            ]
         },
         {
-            "Name": "textures/lion2",
-            "File": "textures/lion.png",
-            "Type": "texture",
-            "Preload": false,
-            "Static": false
+            "Name": "shaders/lambertian_pixelshader",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/lambertian_pixelshader.hlsl"
+            ]
         },
         {
-            "Name": "textures/lion3",
-            "File": "textures/lion.png",
-            "Type": "texture",
-            "Preload": false,
-            "Static": false
-        },
-        {
-            "Name": "textures/lion4",
-            "File": "textures/lion.png",
-            "Type": "texture",
-            "Preload": false,
-            "Static": false
-        },
-        {
-            "Name": "textures/lion5",
-            "File": "textures/lion.png",
-            "Type": "texture",
-            "Preload": true,
-            "Static": false
-        },
-        {
-            "Name": "models/clock",
-            "File": "models/clock/clock.geo",
-            "Type": "model",
+            "Name": "shaders/default_shader",
+            "Type": "shader",
             "Dependencies": [
-                "textures/lion",
-                "textures/lion1",
-                "textures/lion2",
-                "textures/lion3",
-                "textures/lion4",
-                "textures/lion5"
+                "shaders/lambertian_pixelshader",
+                "shaders/lambertian_vertexshader"
             ],
             "Preload": false,
             "Static": false
+        },
+        {
+            "Name": "materials/material_01",
+            "Files": [
+                "materials/material_01.json"
+            ],
+            "Type": "material",
+            "Dependencies": [
+                "shaders/default_shader"
+            ]
+        },
+        {
+            "Name": "models/clock",
+            "Files": [
+                "models/clock/clock.geo"
+            ],
+            "Type": "model",
+            "Dependencies": [
+                "materials/material_01",
+                "textures/lion"
+            ],
+            "Preload": false,
+            "Static": false
+        },
+        {
+            "Name": "models/tree",
+            "Files": [
+                "models/tree.geo"
+            ],
+            "Type": "model",
+            "Dependencies": [
+                "materials/material_01"
+            ]
         }
     ]
 }

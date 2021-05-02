@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Titan\Titan.csproj" />
     <ProjectReference Include="..\Tools.Core\Tools.Core.csproj" />
   </ItemGroup>
 

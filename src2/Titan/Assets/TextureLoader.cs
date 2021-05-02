@@ -15,7 +15,6 @@ namespace Titan.Assets
     public class TextureLoader : IAssetLoader
     {
         private readonly IImageLoader _imageLoader;
-        public string Type => "texture";
         public TextureLoader(IImageLoader imageLoader)
         {
             _imageLoader = imageLoader;

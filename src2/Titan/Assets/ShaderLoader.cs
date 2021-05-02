@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 using Titan.Assets.Database;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -10,7 +9,7 @@ using Titan.Graphics.D3D11.Shaders;
 
 namespace Titan.Assets
 {
-    internal struct ShaderProgram
+    public struct ShaderProgram
     {
         public Handle<VertexShader> VertexShader;
         public Handle<PixelShader> PixelShader;

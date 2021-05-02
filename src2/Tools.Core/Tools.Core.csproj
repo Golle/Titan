@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
@@ -9,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tools.Core\Tools.Core.csproj" />
+    <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
   </ItemGroup>
 
 </Project>
