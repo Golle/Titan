@@ -19,3 +19,7 @@ x86/
 
 # A lot of temp textures, dont put on git yet.
 /resources/textures/
+
+
+/assetsv2/*
+/assetsV3/*
