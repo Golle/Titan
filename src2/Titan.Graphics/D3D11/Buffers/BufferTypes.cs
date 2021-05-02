@@ -1,6 +1,6 @@
 namespace Titan.Graphics.D3D11.Buffers
 {
-    internal enum BufferTypes
+    public enum BufferTypes
     {
         VertexBuffer,
         IndexBuffer,

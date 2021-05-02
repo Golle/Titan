@@ -22,7 +22,7 @@ namespace Titan.Graphics.D3D11.Buffers
             _device = device;
         }
 
-        internal Handle<Buffer> Create(BufferCreation args)
+        public Handle<Buffer> Create(BufferCreation args)
         {
             Logger.Trace<BufferManager>($"Create {args.Type} with stride {args.Stride} usage {args.Usage}. InitialData: {args.InitialData.HasValue()}");
             var handle = _resourcePool.CreateResource();
@@ -73,9 +73,10 @@ namespace Titan.Graphics.D3D11.Buffers
             _usedHandles.Add(handle);
             return handle;
         }
-        
-        internal void Release(in Handle<Buffer> handle)
+
+        public void Release(in Handle<Buffer> handle)
         {
+            Logger.Trace<BufferManager>($"Releasing buffer with handle {handle}");
             ReleaseInternal(handle);
             _usedHandles.Remove(handle);
             _resourcePool.ReleaseResource(handle);
