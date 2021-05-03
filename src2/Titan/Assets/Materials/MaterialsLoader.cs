@@ -5,31 +5,10 @@ using Titan.Assets.Database;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.Graphics;
 using Titan.Graphics.D3D11.Textures;
 
 namespace Titan.Assets.Materials
 {
-
-    public class Material
-    {
-        private readonly MaterialProperties _properties;
-        public ShaderProgram Shader { get; }
-        public ref readonly MaterialProperties Properties => ref _properties;
-        public Material(in ShaderProgram shader, in MaterialProperties properties)
-        {
-            Shader = shader;
-            _properties = properties;
-        }
-    }
-
-    public struct MaterialProperties
-    {
-        public Color DiffuseColor;
-        public Handle<Texture> DiffuseMap;
-        public Handle<Texture> BumpMap;
-    }
-
     public class MaterialsLoader : IAssetLoader
     {
         public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
@@ -52,12 +31,14 @@ namespace Titan.Assets.Materials
                         case "bumpmap":
                             properties.BumpMap = Unsafe.Unbox<Handle<Texture>>(dependency.Asset);
                             break;
-                            default:
-                                Logger.Error<MaterialsLoader>($"Texture type {dependency.Name} is not recognized.");
-                                break;
+                        default:
+                            Logger.Error<MaterialsLoader>($"Texture type {dependency.Name} is not recognized.");
+                            break;
                     }
                 }
             }
+
+            Logger.Warning<MaterialsLoader>("Materials have not been fully implemented yet.");
 
             Debug.Assert(shader.PixelShader.IsValid(), "The PixelShader handle is not valid");
             Debug.Assert(shader.VertexShader.IsValid(), "The VertexShader handle is not valid");
