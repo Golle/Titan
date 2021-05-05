@@ -7,8 +7,8 @@ namespace Titan.Windows.Win32
     [StructLayout(LayoutKind.Sequential)]
     public struct POINT
     {
-        internal int X;
-        internal int Y;
+        public int X;
+        public int Y;
 
         public POINT(int x, int y)
         {

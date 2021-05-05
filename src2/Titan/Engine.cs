@@ -5,6 +5,7 @@ using Titan.Assets.Models;
 using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
+using Titan.Core.Messaging;
 using Titan.Core.Threading;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -35,6 +36,9 @@ namespace Titan
             static void Trace(string message) => Logger.Trace<Engine>(message);
 
             Logger.Start();
+
+            Trace($"Init {nameof(EventManager)}");
+            EventManager.Init(new EventManagerConfiguration(10_000));
 
             Trace($"Init {nameof(FileSystem)}");
             FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan\assetsv2"));
@@ -92,9 +96,16 @@ namespace Titan
 
             while (_window.Update())
             {
+                EventManager.Update();
+
                 if (count-- == 0)
                 {
                     asset = assetsManager.Load("models/tree");
+
+                    EventManager.Push(new SimpleEvent
+                    {
+                        Count = 100
+                    });
                 }
 
                 if (assetsManager.IsLoaded(asset))
@@ -103,7 +114,18 @@ namespace Titan
                     //var texture = assetsManager.GetAssetHandle<Texture>(asset);
                     //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
                     assetsManager.Unload("models/tree");
+
                 }
+                foreach (ref readonly var @event in EventManager.GetEvents())
+                {
+                    Logger.Warning<Engine>($"Event type: {@event.Type} ({@event})");
+                    if (@event.Type == SimpleEvent.Id)
+                    {
+                        ref readonly var simple = ref @event.As<SimpleEvent>();
+                        Logger.Warning<Engine>($"Simple: {simple.Count}");
+                    }
+                }
+
 
                 //t.Update();
                 assetsManager.Update();
@@ -114,6 +136,11 @@ namespace Titan
             }
         }
 
+        struct SimpleEvent
+        {
+            public static readonly short Id = EventId<SimpleEvent>.Value;
+            public int Count;
+        }
 
         private void Shutdown()
         {
@@ -135,6 +162,10 @@ namespace Titan
             _window.Dispose();
 
             FileSystem.Terminate();
+
+            Logger.Trace<Engine>($"Terminate {nameof(EventManager)}");
+            EventManager.Terminate();
+
 
             Logger.Shutdown();
         }
