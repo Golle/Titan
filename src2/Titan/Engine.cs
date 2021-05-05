@@ -11,6 +11,7 @@ using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Images;
 using Titan.Graphics.Windows;
+using Titan.Input;
 
 namespace Titan
 {
@@ -97,6 +98,7 @@ namespace Titan
             while (_window.Update())
             {
                 EventManager.Update();
+                InputManager.Update();
 
                 if (count-- == 0)
                 {
@@ -126,6 +128,11 @@ namespace Titan
                     }
                 }
 
+
+                if (InputManager.IsKeyDown(KeyCode.Space))
+                {
+                    Logger.Error("SPACE IS DOWN you turd!");
+                }
 
                 //t.Update();
                 assetsManager.Update();
