@@ -60,8 +60,16 @@ namespace Titan.Core.Memory
             get => ref _ptr[index];
         }
 
+        public ref T this[uint index]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => ref _ptr[index];
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T* GetPointer(int index) => &_ptr[index];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T* GetPointer(uint index) => &_ptr[index];
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> AsSpan() => new (_ptr, (int) _size);
     }

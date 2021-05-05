@@ -1,0 +1,66 @@
+using System;
+using System.Runtime.CompilerServices;
+using Titan.ECS.Entities;
+
+namespace Titan.ECS.Worlds
+{
+    public class World : IDisposable
+    {
+        private readonly uint _id;
+        private readonly EntityManager _entityManager;
+
+
+        private static readonly IdContainer WorldIds = new(100);
+        private static readonly World[] Worlds = new World[100];
+        public World(WorldConfiguration config)
+        {
+            _id = WorldIds.Next();
+            _entityManager = new(_id, config);
+            Worlds[_id] = this;
+        }
+
+
+        internal static World GetWorldById(uint worldId)
+        {
+            var world = Worlds[worldId];
+#if DEBUG
+            if (world == null)
+            {
+                throw new InvalidOperationException($"World with id {worldId} does not exist.");
+            }
+#endif
+            return world;
+        }
+
+        public void Dispose()
+        {
+            _entityManager.Dispose();
+            Worlds[_id] = null;
+            WorldIds.Return(_id);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AttachEntity(in Entity parent, in Entity entity) => _entityManager.Attach(parent, entity);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DetachEntity(in Entity entity) => _entityManager.Detach(entity);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DestroyEntity(in Entity entity) => _entityManager.Destroy(entity);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Entity CreateEntity() => _entityManager.Create();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(in Entity entity) where T : unmanaged
+        {
+            throw new NotImplementedException();
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(in Entity entity, in T value) where T : unmanaged
+        {
+            throw new NotImplementedException();
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveComponent<T>(in Entity entity) where T : unmanaged
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
