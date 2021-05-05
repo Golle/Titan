@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Titan.Core.Messaging;
 using Titan.Graphics.Windows.Events;
+using Titan.Windows.Win32;
 
 namespace Titan.Graphics.Windows
 {
@@ -16,7 +17,7 @@ namespace Titan.Graphics.Windows
         public static void OnLeftMouseButtonUp() => EventManager.Push(new MouseButtonEvent(MouseButton.Left, false));
         public static void OnRightMouseButtonDown() => EventManager.Push(new MouseButtonEvent(MouseButton.Right, true));
         public static void OnRightMouseButtonUp() => EventManager.Push(new MouseButtonEvent(MouseButton.Right, false));
-        //public static void OnMouseMove(in POINT position) => EventManager.Push(new MouseMovedEvent(position.X, position.Y));
+        public static void OnMouseMove(in POINT position) => EventManager.Push(new MouseMovedEvent(position.X, position.Y));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void OnKeyDown(nuint wParam, nuint lParam)

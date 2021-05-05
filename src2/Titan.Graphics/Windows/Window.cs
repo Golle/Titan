@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
 using Titan.Windows;
@@ -21,8 +20,12 @@ namespace Titan.Graphics.Windows
         private string _title;
         private readonly string _className;
         private POINT _center;
+        private POINT _mousePosition;
+        private POINT _hideCursorPosition;
 
         private static Window _activeWindow; // TODO: change this if we'll ever support multiple windows
+        private bool _cursorVisible = true;
+
         private Window(HWND handle, string title, string className, uint width, uint height, bool windowed)
         {
             Width =  width;
@@ -113,10 +116,67 @@ namespace Titan.Graphics.Windows
                 TranslateMessage(msg);
                 DispatchMessage(msg);
             }
-            //UpdateMousePosition();
+            UpdateMousePosition();
             return true;
         }
 
+        private void UpdateMousePosition()
+        {
+            POINT point;
+            if (!GetCursorPos(&point))
+            {
+                return;
+            }
+
+            if (_cursorVisible)
+            {
+                if (!ScreenToClient(Handle, &point))
+                {
+                    return;
+                }
+                if (_mousePosition.X != point.X || _mousePosition.Y != point.Y)
+                {
+                    _mousePosition = point;
+                    WindowEventHandler.OnMouseMove(point);
+                }
+            }
+            else
+            {
+                var mouseMoved = false;
+                var center = new POINT((int) (Width / 2), (int) (Height / 2));
+                var delta = point - center;
+                if (delta.X != 0 || delta.Y != 0)
+                {
+                    _mousePosition += delta; // TODO: this will cause integer overflow at some point
+                    mouseMoved = true;
+                }
+                SetCursorPos(center.X, center.Y);
+
+                if (mouseMoved)
+                {
+                    WindowEventHandler.OnMouseMove(_mousePosition);
+                }
+            }
+        }
+
+        public void ToggleMouse()
+        {
+            _cursorVisible = !_cursorVisible;
+            ShowCursor(_cursorVisible);
+            if (_cursorVisible)
+            {
+                SetCursorPos(_hideCursorPosition.X, _hideCursorPosition.Y);
+            }
+            else
+            {
+                POINT pos;
+                if (GetCursorPos(&pos))
+                {
+                    _hideCursorPosition = pos;
+                }
+                SetCursorPos((int) (Width / 2), (int) (Height / 2));
+            }
+        }
 
         [UnmanagedCallersOnly]
         public static nint WndProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
@@ -185,7 +245,6 @@ namespace Titan.Graphics.Windows
             }
             return DefWindowProcA(hWnd, message, wParam, lParam);
         }
-
 
         public void Dispose()
         {

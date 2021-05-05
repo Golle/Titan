@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using Titan.Assets;
 using Titan.Assets.Materials;
 using Titan.Assets.Models;
@@ -103,11 +104,6 @@ namespace Titan
                 if (count-- == 0)
                 {
                     asset = assetsManager.Load("models/tree");
-
-                    EventManager.Push(new SimpleEvent
-                    {
-                        Count = 100
-                    });
                 }
 
                 if (assetsManager.IsLoaded(asset))
@@ -116,37 +112,19 @@ namespace Titan
                     //var texture = assetsManager.GetAssetHandle<Texture>(asset);
                     //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
                     assetsManager.Unload("models/tree");
-
                 }
-                foreach (ref readonly var @event in EventManager.GetEvents())
-                {
-                    Logger.Warning<Engine>($"Event type: {@event.Type} ({@event})");
-                    if (@event.Type == SimpleEvent.Id)
-                    {
-                        ref readonly var simple = ref @event.As<SimpleEvent>();
-                        Logger.Warning<Engine>($"Simple: {simple.Count}");
-                    }
-                }
-
-
-                if (InputManager.IsKeyDown(KeyCode.Space))
+                
+                if (InputManager.IsKeyPressed(KeyCode.Space))
                 {
                     Logger.Error("SPACE IS DOWN you turd!");
                 }
-
-                //t.Update();
+                
                 assetsManager.Update();
 
                 // Do stuff with the engine
                 GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
                 GraphicsDevice.SwapChain.Present();
             }
-        }
-
-        struct SimpleEvent
-        {
-            public static readonly short Id = EventId<SimpleEvent>.Value;
-            public int Count;
         }
 
         private void Shutdown()
