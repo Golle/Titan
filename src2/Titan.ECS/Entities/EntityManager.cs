@@ -4,11 +4,10 @@ using System.Runtime.CompilerServices;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.ECS.Events;
+using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Entities
 {
-    public record WorldConfiguration(uint MaxEntities);
-
     public class EntityManager : IDisposable
     {
         private readonly MemoryChunk<Relationship> _relationship;

@@ -1,24 +1,31 @@
 using System;
 using System.Runtime.CompilerServices;
+using Titan.Core.Logging;
+using Titan.ECS.Components;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.Worlds
 {
+    public record WorldConfiguration(uint MaxEntities, ComponentConfiguration[] Components);
+    public record ComponentConfiguration(Type Type, ComponentPoolTypes PoolType, uint Count = 0);
+
     public class World : IDisposable
     {
         private readonly uint _id;
         private readonly EntityManager _entityManager;
-
+        private readonly ComponentRegistry _componentRegistry;
 
         private static readonly IdContainer WorldIds = new(100);
         private static readonly World[] Worlds = new World[100];
+
         public World(WorldConfiguration config)
         {
             _id = WorldIds.Next();
+            Logger.Trace<World>($"Creating world {_id}");
             _entityManager = new(_id, config);
+            _componentRegistry = new (config);
             Worlds[_id] = this;
         }
-
 
         internal static World GetWorldById(uint worldId)
         {
@@ -34,6 +41,7 @@ namespace Titan.ECS.Worlds
 
         public void Dispose()
         {
+            Logger.Trace<World>($"Disposing world {_id}");
             _entityManager.Dispose();
             Worlds[_id] = null;
             WorldIds.Return(_id);
@@ -48,19 +56,10 @@ namespace Titan.ECS.Worlds
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Entity CreateEntity() => _entityManager.Create();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in Entity entity) where T : unmanaged
-        {
-            throw new NotImplementedException();
-        }
+        public void AddComponent<T>(in Entity entity) where T : unmanaged => _componentRegistry.GetPool<T>().Create(entity);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in Entity entity, in T value) where T : unmanaged
-        {
-            throw new NotImplementedException();
-        }
+        public void AddComponent<T>(in Entity entity, in T value) where T : unmanaged => _componentRegistry.GetPool<T>().Create(entity, value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveComponent<T>(in Entity entity) where T : unmanaged
-        {
-            throw new NotImplementedException();
-        }
+        public void RemoveComponent<T>(in Entity entity) where T : unmanaged => _componentRegistry.GetPool<T>().Destroy(entity);
     }
 }

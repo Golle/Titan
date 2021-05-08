@@ -3,11 +3,14 @@ using System.Numerics;
 using Titan.Assets;
 using Titan.Assets.Materials;
 using Titan.Assets.Models;
+using Titan.Components;
 using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
+using Titan.ECS.Components;
+using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Images;
@@ -66,6 +69,7 @@ namespace Titan
 
             var graphicsSystem = GraphicsSystem.Create();
 
+
             try
             {
                 Run();
@@ -87,6 +91,20 @@ namespace Titan
                 .Register(AssetTypes.Material, new MaterialsLoader())
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
+
+            using var world = new World(new WorldConfiguration(10_000, new[]
+            {
+                new ComponentConfiguration(typeof(Transform3D), ComponentPoolTypes.Packed)
+            }));
+
+            var entity1 = world.CreateEntity();
+            entity1.AddComponent(new Transform3D
+            {
+                Position = Vector3.One,
+                Scale = Vector3.One,
+                Rotation = Quaternion.Identity
+            });
+
             var count = 300;
 
             Handle<Asset> asset = 0;
@@ -101,18 +119,18 @@ namespace Titan
                 EventManager.Update();
                 InputManager.Update();
 
-                if (count-- == 0)
-                {
-                    asset = assetsManager.Load("models/tree");
-                }
+                //if (count-- == 0)
+                //{
+                //    asset = assetsManager.Load("models/tree");
+                //}
 
-                if (assetsManager.IsLoaded(asset))
-                {
-                    //Logger.Trace<Engine>("Asset is loaded");
-                    //var texture = assetsManager.GetAssetHandle<Texture>(asset);
-                    //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
-                    assetsManager.Unload("models/tree");
-                }
+                //if (assetsManager.IsLoaded(asset))
+                //{
+                //    //Logger.Trace<Engine>("Asset is loaded");
+                //    //var texture = assetsManager.GetAssetHandle<Texture>(asset);
+                //    //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
+                //    assetsManager.Unload("models/tree");
+                //}
                 
                 if (InputManager.IsKeyPressed(KeyCode.Space))
                 {
@@ -146,6 +164,7 @@ namespace Titan
             Logger.Trace<Engine>($"Close/Dispose {nameof(Window)}");
             _window.Dispose();
 
+            Logger.Trace<Engine>($"Terminate {nameof(FileSystem)}");
             FileSystem.Terminate();
 
             Logger.Trace<Engine>($"Terminate {nameof(EventManager)}");

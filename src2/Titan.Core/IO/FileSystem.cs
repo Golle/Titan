@@ -41,11 +41,7 @@ namespace Titan.Core.IO
 
         public static void Terminate()
         {
-            Logger.Trace($"Terminate the {nameof(FileSystem)}");
-
-
             _initialized = false;
         }
-
     }
 }

@@ -19,11 +19,11 @@ namespace Titan.ECS.Components
         private readonly uint _maxNumberOfComponents;
         private readonly ConcurrentQueue<nint> _freeComponents = new(); // use type nint because T* cant be stored in the queue
 
-        public PackedComponentPool(uint numberOfComponents, WorldConfiguration config)
+        public PackedComponentPool(uint numberOfComponents, uint maxEntities)
         {
             _maxNumberOfComponents = numberOfComponents;
             var componentsSize = sizeof(T) * numberOfComponents;
-            var entitiesSize = sizeof(T*) * config.MaxEntities;
+            var entitiesSize = sizeof(T*) * maxEntities;
             var totalSize = (uint)(componentsSize + entitiesSize);
             _memoryBlock = MemoryUtils.AllocateBlock(totalSize, true);
             _components = (T*) _memoryBlock.AsPointer();
@@ -66,6 +66,14 @@ namespace Titan.ECS.Components
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref T Get(in Entity entity)
+        {
+            ref var pComponent = ref _indexers[entity.Id];
+            Debug.Assert(pComponent != null, $"Component of type {typeof(T)} has not been added to the entity.");
+            return ref *pComponent;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(in Entity entity) => _indexers[entity.Id] != null;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -82,15 +90,11 @@ namespace Titan.ECS.Components
             pComponent = null;
         }
 
+
         public ref T this[in Entity entity]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                ref var pComponent = ref _indexers[entity.Id];
-                Debug.Assert(pComponent != null, $"Component of type {typeof(T)} has not been added to the entity.");
-                return ref *pComponent;
-            }
+            get => ref Get(entity);
         }
 
         public void Dispose()
