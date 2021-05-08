@@ -101,13 +101,10 @@ namespace Titan.ECS.Worlds
             EventManager.Push(new EntityChangedEvent(entity, info.Components));
         }
 
-
         public void Update()
         {
             _entityManager.Update();
             _componentRegistry.Update();
         }
     }
-
-    
 }

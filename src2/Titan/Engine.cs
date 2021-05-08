@@ -114,6 +114,7 @@ namespace Titan
                 Rotation = Quaternion.Identity
             });
 
+            
             Handle<Asset> asset = 0;
             var color = stackalloc float[4];
             color[0] = 1f;
@@ -142,7 +143,7 @@ namespace Titan
                     timer.Restart();
                     frameCount = 0;
                 }
-
+                
                 //if (count-- == 0)
                 //{
                 //    asset = assetsManager.Load("models/tree");
@@ -159,7 +160,7 @@ namespace Titan
 
                 if (InputManager.IsKeyPressed(KeyCode.Space))
                 {
-                    Logger.Error("SPACE IS DOWN you turd!");
+                    Logger.Error("SPACE IS DOWN you smerk!");
                 }
                 
                 assetsManager.Update();

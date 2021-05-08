@@ -94,7 +94,6 @@ namespace Titan.ECS.Components
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
         void IComponentPool.OnEntityDestroyed(uint entityId)
         {
             // Internal call from ComponentRegistry, no validation
