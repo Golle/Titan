@@ -1,4 +1,5 @@
-﻿using Titan.ECS.Entities;
+using System.ComponentModel;
+using Titan.ECS.Entities;
 
 namespace Titan.ECS.Events
 {

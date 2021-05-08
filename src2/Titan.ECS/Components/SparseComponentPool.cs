@@ -32,7 +32,17 @@ namespace Titan.ECS.Components
             throw new NotImplementedException();
         }
 
+        public void Destroy(uint entityId)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Contains(in Entity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IComponentPool.OnEntityDestroyed(uint entityId)
         {
             throw new NotImplementedException();
         }

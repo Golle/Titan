@@ -104,6 +104,8 @@ namespace Titan.Graphics.Windows
             return new Window(handle, config.Title, className, config.Width, config.Height, config.Windowed);
         }
 
+
+        public void SetTitle(string title) => SetWindowTextA(Handle, title);
         public bool Update()
         {
             while (PeekMessageA(out var msg, 0, 0, 0, 1)) // pass IntPtr.Zero as HWND to detect mouse movement outside of the window

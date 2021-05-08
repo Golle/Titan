@@ -50,7 +50,7 @@ namespace Titan.ECS.Components
             ref var pComponent = ref _indexers[entity.Id];
             if (pComponent != null)
             {
-                throw new InvalidOperationException($"A component of type {typeof(T)} has already been added to this entity.");
+                throw new InvalidOperationException($"A component of type {typeof(T)} has already been added to this entity {entity.Id}");
             }
 
             // TODO: if components are created by multiple threads this section of the code wont work reliable.
@@ -77,19 +77,34 @@ namespace Titan.ECS.Components
         public bool Contains(in Entity entity) => _indexers[entity.Id] != null;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Destroy(in Entity entity)
-        {
-            ref var pComponent = ref _indexers[entity.Id];
-            if (pComponent == null)
-            {
-                throw new InvalidOperationException("Trying to destroy component that has not been created.");
-            }
-            Logger.Trace<PackedComponentPool<T>>($"Removed {typeof(T).Name} from Entity {entity.Id}");
-            _freeComponents.Enqueue((nint)pComponent);
+        public void Destroy(in Entity entity) => Destroy(entity.Id);
 
-            pComponent = null;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Destroy(uint entityId)
+        {
+            ref var pComponent = ref _indexers[entityId];
+            Debug.Assert(pComponent != null, "Trying to destroy a component that has not been created.");
+            Logger.Trace<PackedComponentPool<T>>($"Removed {typeof(T).Name} from Entity {entityId}");
+            if (pComponent != null)
+            {
+                _freeComponents.Enqueue((nint)pComponent);
+                pComponent = null;
+            }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
+        void IComponentPool.OnEntityDestroyed(uint entityId)
+        {
+            // Internal call from ComponentRegistry, no validation
+            ref var pComponent = ref _indexers[entityId];
+            if (pComponent != null)
+            {
+                _freeComponents.Enqueue((nint)pComponent);
+                pComponent = null;
+            }
+        }
 
         public ref T this[in Entity entity]
         {

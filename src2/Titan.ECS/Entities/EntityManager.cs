@@ -15,9 +15,9 @@ namespace Titan.ECS.Entities
         private readonly IdContainer _entityIds;
         private readonly uint _worldId;
 
-        public EntityManager(uint worldId, WorldConfiguration config)
+        public EntityManager(WorldConfiguration config)
         {
-            _worldId = worldId;
+            _worldId = config.Id;
             _entityIds = new IdContainer(config.MaxEntities);
             _relationship = MemoryUtils.AllocateBlock<Relationship>(config.MaxEntities, true);
         }

@@ -5,6 +5,9 @@
     <LangVersion>preview</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants />
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src2\Titan\Titan.csproj" />
   </ItemGroup>

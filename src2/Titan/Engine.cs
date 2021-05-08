@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using Titan.Assets;
 using Titan.Assets.Materials;
@@ -10,6 +11,7 @@ using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
 using Titan.ECS.Components;
+using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -26,8 +28,15 @@ namespace Titan
         private Window _window;
         public static void StartNew<T>() where T : Application
         {
-            new Engine(Activator.CreateInstance<T>())
-                .Start();
+            try
+            {
+                new Engine(Activator.CreateInstance<T>())
+                    .Start();
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         private Engine(Application app)
@@ -105,8 +114,6 @@ namespace Titan
                 Rotation = Quaternion.Identity
             });
 
-            var count = 300;
-
             Handle<Asset> asset = 0;
             var color = stackalloc float[4];
             color[0] = 1f;
@@ -114,10 +121,27 @@ namespace Titan
             color[2] = 0f;
             color[3] = 1f;
 
+
+            var timer = Stopwatch.StartNew();
+            var frameCount = 0;
+            
             while (_window.Update())
             {
                 EventManager.Update();
                 InputManager.Update();
+
+
+                world.Update();
+
+                if (timer.Elapsed.Seconds >= 1f)
+                {
+                    var elapsed = timer.Elapsed;
+                    
+                    _window.SetTitle($"FPS: {(int)(frameCount/elapsed.TotalSeconds)}");
+
+                    timer.Restart();
+                    frameCount = 0;
+                }
 
                 //if (count-- == 0)
                 //{
@@ -131,7 +155,8 @@ namespace Titan
                 //    //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
                 //    assetsManager.Unload("models/tree");
                 //}
-                
+
+
                 if (InputManager.IsKeyPressed(KeyCode.Space))
                 {
                     Logger.Error("SPACE IS DOWN you turd!");
@@ -142,6 +167,7 @@ namespace Titan
                 // Do stuff with the engine
                 GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
                 GraphicsDevice.SwapChain.Present();
+                frameCount++;
             }
         }
 

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
+using Titan.Core.Messaging;
+using Titan.ECS.Events;
 using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Components
@@ -13,9 +15,11 @@ namespace Titan.ECS.Components
 
         private static readonly Type SparseType = typeof(SparseComponentPool<>);
         private static readonly Type PackedType = typeof(PackedComponentPool<>);
+        private readonly uint _worldId;
         public ComponentRegistry(WorldConfiguration config)
         {
             _config = config;
+            _worldId = config.Id;
             Logger.Trace<ComponentRegistry>("Register Components");
             foreach (var (type, poolType, count) in config.Components)
             {
@@ -46,6 +50,24 @@ namespace Titan.ECS.Components
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IComponentPool<T> GetPool<T>() where T : unmanaged => (IComponentPool<T>)_pools[typeof(T)];
+
+        public void Update()
+        {
+            foreach (ref readonly var @event in EventManager.GetEvents())
+            {
+                if (@event.Type == EntityBeingDestroyedEvent.Id)
+                {
+                    ref readonly var entityEvent = ref @event.As<EntityBeingDestroyedEvent>();
+                    if (entityEvent.WorldId == _worldId)
+                    {
+                        foreach (var pool in _pools.Values)
+                        {
+                            pool.OnEntityDestroyed(entityEvent.EntityId);
+                        }
+                    }
+                }
+            }
+        }
 
         public void Dispose()
         {
