@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -21,12 +22,21 @@ namespace Titan.ECS
             }
             _head = max;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public uint Next()
+        {
+            var index = Interlocked.Decrement(ref _head);
+            Debug.Assert(index != 0, "Max number of ids has been reached.");
+            return _availableIds[index];
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public uint Next() => _availableIds[Interlocked.Decrement(ref _head)];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Return(uint id) => _availableIds[Interlocked.Increment(ref _head) - 1] = id;
+        public void Return(uint id)
+        {
+            // TODO: add a check it's a valid id that gets returned, or we might have duplicates
+            _availableIds[Interlocked.Increment(ref _head) - 1] = id;
+        }
     }
 
     // TODO: slower, but easier to understand
