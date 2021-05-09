@@ -5,10 +5,12 @@ using Titan.Core.Messaging;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.Events;
+using Titan.ECS.Systems;
+using Titan.ECS.Systems.Dispatcher;
 
 namespace Titan.ECS.Worlds
 {
-    public record WorldConfiguration(uint MaxEntities, ComponentConfiguration[] Components)
+    public record WorldConfiguration(uint MaxEntities, ComponentConfiguration[] Components, EntitySystem[] Systems)
     {
         public uint Id { get; init; }
     }
@@ -17,23 +19,89 @@ namespace Titan.ECS.Worlds
 
     public class World : IDisposable
     {
-        private readonly uint _id;
-        private readonly EntityManager _entityManager;
-        private readonly EntityInfoManager _entityInfoManager;
-        private readonly ComponentRegistry _componentRegistry;
+        internal uint Id { get; }
+        internal EntityManager Manager { get; }
+        internal EntityInfoManager InfoManager { get; }
+        internal ComponentRegistry Registry { get; }
+        internal WorldConfiguration Config { get; }
+        internal EntityFilterManager FilterManager { get; }
 
         private static readonly IdContainer WorldIds = new(100);
         private static readonly World[] Worlds = new World[100];
+        
+        private SystemsDispatcher _dispatcher;
 
         public World(WorldConfiguration config)
         {
-            _id = WorldIds.Next();
-            Logger.Trace<World>($"Creating world {_id}");
-            config = config with {Id = _id};
-            _entityManager = new(config);
-            _componentRegistry = new (config);
-            _entityInfoManager = new(config);
-            Worlds[_id] = this;
+            Id = WorldIds.Next();
+            Logger.Trace<World>($"Creating world {Id}");
+            Config = config with {Id = Id};
+            Manager = new(Config);
+            Registry = new (Config);
+            InfoManager = new(Config);
+            FilterManager = new(Config);
+            Worlds[Id] = this;
+            
+            _dispatcher = SystemDispatcherFactory.Create(Config.Systems);
+            _dispatcher.Init(this);
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AttachEntity(in Entity parent, in Entity entity) => Manager.Attach(parent, entity);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DetachEntity(in Entity entity) => Manager.Detach(entity);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DestroyEntity(in Entity entity) => Manager.Destroy(entity);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Entity CreateEntity() => Manager.Create();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(in Entity entity) where T : unmanaged
+        {
+            Registry.GetPool<T>().Create(entity);
+            ComponentAdded<T>(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(in Entity entity, in T value) where T : unmanaged
+        {
+            Registry.GetPool<T>().Create(entity, value);
+            ComponentAdded<T>(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ComponentAdded<T>(in Entity entity) where T : unmanaged
+        {
+            ref var info = ref InfoManager.Get(entity);
+            var componentId = ComponentId<T>.Id;
+            info.Components += componentId;
+            EventManager.Push(new ComponentAddedEvent(entity, componentId));
+            EventManager.Push(new EntityChangedEvent(entity, info.Components));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveComponent<T>(in Entity entity) where T : unmanaged
+        {
+            // TODO: should this be done in 2 frames? flag for deletion, and delete in next frame?
+            Registry.GetPool<T>().Destroy(entity);
+            ref var info = ref InfoManager.Get(entity);
+            var componentId = ComponentId<T>.Id;
+            info.Components -= componentId;
+            EventManager.Push(new ComponentRemovedEvent(entity, componentId));
+            EventManager.Push(new EntityChangedEvent(entity, info.Components));
+        }
+
+        public void Update()
+        {
+            Manager.Update();
+            Registry.Update();
+            FilterManager.Update();
+            
+            _dispatcher.Execute();
         }
 
         internal static World GetWorldById(uint worldId)
@@ -50,61 +118,12 @@ namespace Titan.ECS.Worlds
 
         public void Dispose()
         {
-            Logger.Trace<World>($"Disposing world {_id}");
-            _entityManager.Dispose();
-            _entityInfoManager.Dispose();
-            Worlds[_id] = null;
-            WorldIds.Return(_id);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AttachEntity(in Entity parent, in Entity entity) => _entityManager.Attach(parent, entity);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DetachEntity(in Entity entity) => _entityManager.Detach(entity);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DestroyEntity(in Entity entity) => _entityManager.Destroy(entity);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Entity CreateEntity() => _entityManager.Create();
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in Entity entity) where T : unmanaged
-        {
-            _componentRegistry.GetPool<T>().Create(entity);
-            ComponentAdded<T>(entity);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in Entity entity, in T value) where T : unmanaged
-        {
-            _componentRegistry.GetPool<T>().Create(entity, value);
-            ComponentAdded<T>(entity);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ComponentAdded<T>(in Entity entity) where T : unmanaged
-        {
-            ref var info = ref _entityInfoManager.Get(entity);
-            var componentId = ComponentId<T>.Id;
-            info.Components += componentId;
-            EventManager.Push(new ComponentAddedEvent(entity, componentId));
-            EventManager.Push(new EntityChangedEvent(entity, info.Components));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveComponent<T>(in Entity entity) where T : unmanaged
-        {
-            // TODO: should this be done in 2 frames? flag for deletion, and delete in next frame?
-            _componentRegistry.GetPool<T>().Destroy(entity);
-            ref var info = ref _entityInfoManager.Get(entity);
-            var componentId = ComponentId<T>.Id;
-            info.Components -= componentId;
-            EventManager.Push(new ComponentRemovedEvent(entity, componentId));
-            EventManager.Push(new EntityChangedEvent(entity, info.Components));
-        }
-
-        public void Update()
-        {
-            _entityManager.Update();
-            _componentRegistry.Update();
+            Logger.Trace<World>($"Disposing world {Id}");
+            Manager.Dispose();
+            InfoManager.Dispose();
+            FilterManager.Dispose();
+            Worlds[Id] = null;
+            WorldIds.Return(Id);
         }
     }
 }

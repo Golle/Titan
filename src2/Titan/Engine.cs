@@ -11,13 +11,14 @@ using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
 using Titan.ECS.Components;
-using Titan.ECS.Entities;
+using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Images;
 using Titan.Graphics.Windows;
 using Titan.Input;
+using Titan.Systems;
 
 namespace Titan
 {
@@ -102,9 +103,14 @@ namespace Titan
 
 
             using var world = new World(new WorldConfiguration(10_000, new[]
-            {
-                new ComponentConfiguration(typeof(Transform3D), ComponentPoolTypes.Packed)
-            }));
+                {
+                    new ComponentConfiguration(typeof(Transform3D), ComponentPoolTypes.Packed),
+                }, 
+                new EntitySystem[]
+                {
+                    new Transform3DSystem()
+                }
+            ));
 
             var entity1 = world.CreateEntity();
             entity1.AddComponent(new Transform3D
@@ -143,7 +149,7 @@ namespace Titan
                     timer.Restart();
                     frameCount = 0;
                 }
-                
+
                 //if (count-- == 0)
                 //{
                 //    asset = assetsManager.Load("models/tree");
@@ -157,10 +163,17 @@ namespace Titan
                 //    assetsManager.Unload("models/tree");
                 //}
 
-
+                if (InputManager.IsKeyPressed(KeyCode.S))
+                {
+                    entity1.AddComponent(new Transform3D
+                    {
+                        Position = new Vector3(2,43,5)
+                    });
+                } 
                 if (InputManager.IsKeyPressed(KeyCode.Space))
                 {
                     Logger.Error("SPACE IS DOWN you smerk!");
+                    entity1.RemoveComponent<Transform3D>();
                 }
                 
                 assetsManager.Update();
