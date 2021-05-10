@@ -4,6 +4,7 @@ using System.Numerics;
 using Titan.Assets;
 using Titan.Assets.Materials;
 using Titan.Assets.Models;
+using Titan.Assets.Shaders;
 using Titan.Components;
 using Titan.Core;
 using Titan.Core.IO;
@@ -18,6 +19,7 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.Images;
 using Titan.Graphics.Windows;
 using Titan.Input;
+using Titan.Rendering;
 using Titan.Systems;
 
 namespace Titan
@@ -80,6 +82,8 @@ namespace Titan
             var graphicsSystem = GraphicsSystem.Create();
 
 
+
+
             try
             {
                 Run();
@@ -112,6 +116,8 @@ namespace Titan
                 }
             ));
 
+
+
             var entity1 = world.CreateEntity();
             entity1.AddComponent(new Transform3D
             {
@@ -132,6 +138,17 @@ namespace Titan
             var timer = Stopwatch.StartNew();
             var frameCount = 0;
             
+            var builder = new PipelineBuilder(assetsManager);
+            builder.LoadResources();
+            // Preload assets for rendering pipeline
+            while (_window.Update() && !builder.IsReady())
+            {
+                assetsManager.Update();
+            }
+            builder.Create();
+
+
+            // star the main loop
             while (_window.Update())
             {
                 EventManager.Update();

@@ -1,5 +1,4 @@
 using Titan.Components;
-using Titan.Core.Logging;
 using Titan.ECS.Systems;
 
 namespace Titan.Systems
@@ -20,7 +19,7 @@ namespace Titan.Systems
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref readonly var transform = ref _transform.Get(entity);
-                Logger.Warning<Transform3DSystem>("Lol " + transform.Position);
+                //Logger.Warning<Transform3DSystem>("Lol " + transform.Position);
             }
         }
 

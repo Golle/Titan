@@ -2,10 +2,14 @@ using Titan.Windows.D3D11;
 
 namespace Titan.Graphics.D3D11.Textures
 {
+
+
+
+
     public record TextureCreation
     {
         // TODO: create new enums for these
-        public DXGI_FORMAT Format { get; init; }
+        public TextureFormats Format { get; init; }
         public D3D11_USAGE Usage { get; init; }
 
         public TextureBindFlags Binding { get; init; }

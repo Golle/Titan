@@ -25,10 +25,6 @@ namespace Titan.ECS.Systems
             _entities = (Entity*) _memory.AsPointer();
             _indexers = (int*)(_entities + maxEntities);
             Unsafe.InitBlock(_entities, byte.MaxValue, (uint) size);
-            //for (var i = 0; i < maxEntities; ++i) // TODO: replace with Unsafe.Init
-            //{
-            //    _indexers[i] = -1;
-            //}
         }
 
         internal void OnEntityChanged(in Entity entity, in ComponentId components)

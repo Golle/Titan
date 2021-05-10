@@ -8,7 +8,7 @@ using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Shaders;
 
-namespace Titan.Assets
+namespace Titan.Assets.Shaders
 {
     public class PixelShaderLoader : IAssetLoader
     {

@@ -58,7 +58,7 @@ namespace Titan.Graphics.D3D11.Textures
 
             var desc = new D3D11_TEXTURE2D_DESC
             {
-                Format = args.Format,
+                Format = (DXGI_FORMAT)args.Format,
                 ArraySize = 1,
                 MipLevels = 1,
                 BindFlags = bindflags,
@@ -101,7 +101,7 @@ namespace Titan.Graphics.D3D11.Textures
             {
                 var renderTargetDesc = new D3D11_RENDER_TARGET_VIEW_DESC
                 {
-                    Format = args.Format,
+                    Format = (DXGI_FORMAT)args.Format,
                     Texture2D = new D3D11_TEX2D_RTV
                     {
                         MipSlice = 0
@@ -119,7 +119,7 @@ namespace Titan.Graphics.D3D11.Textures
             {
                 var shadedResourceViewDesc = new D3D11_SHADER_RESOURCE_VIEW_DESC
                 {
-                    Format = args.Format,
+                    Format = (DXGI_FORMAT)args.Format,
                     Texture2D = new D3D11_TEX2D_SRV
                     {
                         MipLevels = 1,

@@ -1,0 +1,35 @@
+using static Titan.Windows.D3D11.DXGI_FORMAT;
+
+// ReSharper disable InconsistentNaming
+
+namespace Titan.Graphics.D3D11
+{
+    public enum TextureFormats : uint
+    {
+        None,
+        RG32F = DXGI_FORMAT_R32G32_FLOAT,
+        RGB32F = DXGI_FORMAT_R32G32B32_FLOAT,
+        RGBA32F = DXGI_FORMAT_R32G32B32A32_FLOAT,
+
+        RGBA16F = DXGI_FORMAT_R16G16B16A16_FLOAT,
+        RGBA16U = DXGI_FORMAT_R16G16B16A16_UNORM,
+
+        RGBA8U = DXGI_FORMAT_R8G8B8A8_UNORM,
+
+        // Not sure these are needed.
+        //BGRA8U = DXGI_FORMAT_B8G8R8A8_UNORM, // DXGI 1.1
+        //BGRX8U = DXGI_FORMAT_B8G8R8X8_UNORM, // DXGI 1.1
+
+        //DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM, // DXGI 1.1
+        //DXGI_FORMAT_R10G10B10A2_UNORM,
+        //DXGI_FORMAT_R9G9B9E5_SHAREDEXP,
+        //DXGI_FORMAT_B5G5R5A1_UNORM,
+        //DXGI_FORMAT_B5G6R5_UNORM,
+
+        R32F = DXGI_FORMAT_R32_FLOAT,
+        R16F = DXGI_FORMAT_R16_FLOAT,
+        R16U = DXGI_FORMAT_R16_UNORM,
+        R8U = DXGI_FORMAT_R8_UNORM,
+        A8U = DXGI_FORMAT_A8_UNORM
+    }
+}

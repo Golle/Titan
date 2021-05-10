@@ -8,6 +8,7 @@ namespace Titan.Graphics.D3D11.Textures
         None = 0,
         ShaderResource = 1,
         RenderTarget = 2,
-        DepthBuffer = 4
+        DepthBuffer = 4,
+        FrameBuffer = ShaderResource | RenderTarget
     }
 }

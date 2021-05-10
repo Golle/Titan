@@ -1,3 +1,5 @@
+using Titan.Assets.Shaders;
+
 namespace Titan.Assets.Materials
 {
     public class Material

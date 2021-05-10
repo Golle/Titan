@@ -13,8 +13,10 @@ namespace Titan.Graphics.D3D11.Textures
         internal uint Width;
         internal uint Height;
 
+        internal TextureFormats Format;
+
         internal int Handle; // TODO: internal Handle<Texture> causes a TypeLoadException in the C++ code :O
-        internal DXGI_FORMAT Format;
+        
         internal D3D11_BIND_FLAG BindFlags;
         internal D3D11_USAGE Usage;
     }

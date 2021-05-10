@@ -19,7 +19,7 @@ namespace Titan.ECS.Worlds
 
     public class World : IDisposable
     {
-        internal uint Id { get; }
+        internal uint Id => Config.Id;
         internal EntityManager Manager { get; }
         internal EntityInfoManager InfoManager { get; }
         internal ComponentRegistry Registry { get; }
@@ -29,13 +29,12 @@ namespace Titan.ECS.Worlds
         private static readonly IdContainer WorldIds = new(100);
         private static readonly World[] Worlds = new World[100];
         
-        private SystemsDispatcher _dispatcher;
+        private readonly SystemsDispatcher _dispatcher;
 
         public World(WorldConfiguration config)
         {
-            Id = WorldIds.Next();
+            Config = config with {Id = WorldIds.Next() };
             Logger.Trace<World>($"Creating world {Id}");
-            Config = config with {Id = Id};
             Manager = new(Config);
             Registry = new (Config);
             InfoManager = new(Config);

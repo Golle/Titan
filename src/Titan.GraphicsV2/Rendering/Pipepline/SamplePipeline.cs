@@ -11,6 +11,7 @@ namespace Titan.GraphicsV2.Rendering.Pipepline
     [StructLayout(LayoutKind.Sequential)]
     unsafe struct SampleStage
     {
+        
         internal bool ClearDepthStencil;
         internal bool ClearRenderTargets;
         internal Color ClearColor;

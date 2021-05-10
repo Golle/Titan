@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
+using Titan.Assets.Shaders;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;

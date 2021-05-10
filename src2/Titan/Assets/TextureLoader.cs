@@ -31,7 +31,7 @@ namespace Titan.Assets
                 Height = image.Height,
                 Binding = TextureBindFlags.ShaderResource,
                 DataStride = image.Stride,
-                Format = image.Format,
+                Format = (TextureFormats)image.Format,
                 InitialData = new DataBlob(image.GetBuffer(), image.GetBufferSize()),
                 Usage = D3D11_USAGE.D3D11_USAGE_IMMUTABLE
             });
