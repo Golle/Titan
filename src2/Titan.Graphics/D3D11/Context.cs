@@ -175,7 +175,12 @@ namespace Titan.Graphics.D3D11
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShader(in Handle<PixelShader> handle) => _context->PSSetShader(GraphicsDevice.ShaderManager.Access(handle).Shader, null, 0u);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexShader(in Handle<VertexShader> handle) => _context->VSSetShader(GraphicsDevice.ShaderManager.Access(handle).Shader, null, 0u);
+        public void SetVertexShader(in Handle<VertexShader> handle)
+        {
+            ref readonly var vertexShader = ref GraphicsDevice.ShaderManager.Access(handle);
+            _context->VSSetShader(vertexShader.Shader, null, 0u);
+            _context->IASetInputLayout(vertexShader.InputLayout);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void UnsetPixelShaderResources()
@@ -205,6 +210,41 @@ namespace Titan.Graphics.D3D11
 
             var buffer = GraphicsDevice.BufferManager.Access(handle).Resource;
             _context->VSSetConstantBuffers(slot, 1, &buffer);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetVertexBuffer(in Handle<Buffer> handle)
+        {
+            ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
+            Debug.Assert(buffer.BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_VERTEX_BUFFER));
+            var resource = buffer.Resource;
+            var stride = buffer.Stride;
+            var offset = 0u;
+            _context->IASetVertexBuffers(0, 1, &resource, &stride, &offset);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetIndexBuffer(in Handle<Buffer> handle)
+        {
+            ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
+            Debug.Assert(buffer.BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER));
+            var format = buffer.Stride == 2 ? DXGI_FORMAT.DXGI_FORMAT_R16_UINT : DXGI_FORMAT.DXGI_FORMAT_R32_UINT;
+            _context->IASetIndexBuffer(buffer.Resource, format, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DrawIndexed(uint count, uint startIndex = 0, int vertexIndex = 0) => _context->DrawIndexed(count, startIndex, vertexIndex);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY topology) => _context->IASetPrimitiveTopology(topology);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetViewPort(in ViewPort viewport)
+        {
+            fixed (D3D11_VIEWPORT* pView = &viewport.Resource)
+            {
+                _context->RSSetViewports(1, pView);
+            }
         }
     }
 }

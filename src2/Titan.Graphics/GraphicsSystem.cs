@@ -1,9 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Numerics;
-using System.Threading;
 using Titan.Core;
-using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Pipeline;
@@ -27,7 +24,8 @@ namespace Titan.Graphics
         private readonly Context _immediateContext = GraphicsDevice.ImmediateContext;
         private readonly SwapChain _swapchain = GraphicsDevice.SwapChain;
         private readonly Handle<Buffer> _cameraBufferHandle;
-        
+        private readonly ViewPort _viewport;
+
         public unsafe GraphicsSystem(Pipeline[] pipeline)
         {
             _pipeline = pipeline;
@@ -40,6 +38,8 @@ namespace Titan.Graphics
                 Stride = (uint)sizeof(CameraBuffer),
                 Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
             });
+
+            _viewport = new ViewPort((int)GraphicsDevice.SwapChain.Width, (int)GraphicsDevice.SwapChain.Height);
         }
 
         public void Render()
@@ -47,6 +47,8 @@ namespace Titan.Graphics
             // set up camera
             _immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = Matrix4x4.Identity, ViewProjection = Matrix4x4.Identity});
             _immediateContext.SetVertexShaderConstantBuffer(_cameraBufferHandle, CameraSlot);
+            
+            _immediateContext.SetViewPort(_viewport); // change this if we want to support more than a single viewport
             //execute pipeline
             foreach (ref readonly var pipeline in _pipeline.AsSpan())
             {

@@ -76,13 +76,12 @@ namespace Titan.Rendering
                 AddressAll = TextureAddressMode.Wrap
             });
 
-
             var gBuffer = new Pipeline
             {
                 RenderTargets = new[] {gBufferAlbedo, gBufferNormals, gBufferProperties},
                 PixelShader = gbufferShaders.PixelShader,
                 VertexShader =  gbufferShaders.VertexShader,
-                ClearColor = Color.Black,
+                ClearColor = Color.Magenta,
                 ClearRenderTargets = true,
                 Renderer = _geometryRenderer
             };
