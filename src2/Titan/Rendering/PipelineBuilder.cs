@@ -16,20 +16,22 @@ namespace Titan.Rendering
         private Handle<Asset> _gBufferHandle;
 
         private readonly AssetsManager _assetsManager;
+        private readonly SimpleRenderQueue _simpleRenderQueue;
         private Handle<Asset> _fullscreenHandle;
         private GeometryRenderer _geometryRenderer;
         private BackbufferRenderer _backbufferRenderer;
 
-        public PipelineBuilder(AssetsManager assetsManager)
+        public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue)
         {
             _assetsManager = assetsManager;
+            _simpleRenderQueue = simpleRenderQueue;
         }
         public void LoadResources()
         {
             _gBufferHandle = _assetsManager.Load("shaders/gbuffer");
             _fullscreenHandle = _assetsManager.Load("shaders/fullscreen");
 
-            _geometryRenderer = new GeometryRenderer();
+            _geometryRenderer = new GeometryRenderer(_simpleRenderQueue);
             _backbufferRenderer = new BackbufferRenderer();
         }
 
@@ -46,6 +48,13 @@ namespace Titan.Rendering
             var swapchain = GraphicsDevice.SwapChain;
 
             // Create the framebuffers
+            var gBufferPosition = GraphicsDevice.TextureManager.Create(new TextureCreation
+            {
+                Format = TextureFormats.RGBA32F,
+                Width = swapchain.Width,
+                Height = swapchain.Height,
+                Binding = TextureBindFlags.FrameBuffer
+            });
             var gBufferAlbedo = GraphicsDevice.TextureManager.Create(new TextureCreation
             {
                 Format = TextureFormats.RGBA32F,
@@ -54,13 +63,6 @@ namespace Titan.Rendering
                 Binding = TextureBindFlags.FrameBuffer
             });
             var gBufferNormals = GraphicsDevice.TextureManager.Create(new TextureCreation
-            {
-                Format = TextureFormats.RGBA32F,
-                Width = swapchain.Width,
-                Height = swapchain.Height,
-                Binding = TextureBindFlags.FrameBuffer
-            });
-            var gBufferProperties = GraphicsDevice.TextureManager.Create(new TextureCreation
             {
                 Format = TextureFormats.RGBA32F,
                 Width = swapchain.Width,
@@ -78,10 +80,10 @@ namespace Titan.Rendering
 
             var gBuffer = new Pipeline
             {
-                RenderTargets = new[] {gBufferAlbedo, gBufferNormals, gBufferProperties},
+                RenderTargets = new[] {gBufferPosition, gBufferAlbedo, gBufferNormals},
                 PixelShader = gbufferShaders.PixelShader,
                 VertexShader =  gbufferShaders.VertexShader,
-                ClearColor = Color.Magenta,
+                ClearColor = Color.Black,
                 ClearRenderTargets = true,
                 Renderer = _geometryRenderer
             };
@@ -106,7 +108,7 @@ namespace Titan.Rendering
                 RenderTargets = new[] {backbufferRenderTarget},
                 PixelShader = fullscreenShader.PixelShader,
                 VertexShader = fullscreenShader.VertexShader,
-                PixelShaderResources = new[] {gBufferAlbedo},
+                PixelShaderResources = new[] {gBufferNormals},
                 PixelShaderSamplers = new []{fullscreenSampler},
                 Renderer = _backbufferRenderer
             };

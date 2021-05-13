@@ -9,5 +9,8 @@ namespace Titan.Components
         public Vector3 Position;
         public Vector3 Scale;
         public Quaternion Rotation;
+
+        internal Matrix4x4 ModelMatrix;
+        internal Matrix4x4 WorldMatrix;
     }
 }

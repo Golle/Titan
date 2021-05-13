@@ -39,6 +39,7 @@ namespace Titan.Assets.Models
     {
         public Handle<Buffer> VertexBuffer;
         public Handle<Buffer> IndexBuffer;
+        public uint Indicies;
     }
 
     public class ModelLoader : IAssetLoader
@@ -78,7 +79,9 @@ namespace Titan.Assets.Models
 
             return new Model(new Mesh
             {
-                IndexBuffer = indexBuffer, VertexBuffer = vertexBuffer
+                IndexBuffer = indexBuffer, 
+                VertexBuffer = vertexBuffer,
+                Indicies =  desc->NumberOfIndices
             });
         }
 

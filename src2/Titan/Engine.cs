@@ -102,13 +102,42 @@ namespace Titan
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
 
+            var renderQueue = new SimpleRenderQueue(1000);
+
+            
+            
+            Handle<Asset> asset = 0;
+            var color = stackalloc float[4];
+            color[0] = 1f;
+            color[1] = 0.4f;
+            color[2] = 0f;
+            color[3] = 1f;
+
+            var timer = Stopwatch.StartNew();
+            var frameCount = 0;
+            
+            var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue);
+            pipelineBuilder.LoadResources();
+            // Preload assets for rendering pipeline
+            while (_window.Update() && !pipelineBuilder.IsReady())
+            {
+                assetsManager.Update();
+            }
+            
+            var pipeline = pipelineBuilder.Create();
+            using var graphicsSystem = new GraphicsSystem(pipeline);
+
             using var world = new World(new WorldConfiguration(10_000, new[]
                 {
                     new ComponentConfiguration(typeof(Transform3D), ComponentPoolTypes.Packed),
-                }, 
+                    new ComponentConfiguration(typeof(CameraComponent), ComponentPoolTypes.Packed)
+                },
                 new EntitySystem[]
                 {
-                    new Transform3DSystem()
+                    new Transform3DSystem(),
+                    new Render3DSystem(assetsManager, renderQueue),
+                    new CameraSystem(graphicsSystem),
+                    new FirstPersonCameraSystem()
                 }
             ));
 
@@ -122,31 +151,17 @@ namespace Titan
                 Rotation = Quaternion.Identity
             });
 
-            
-            Handle<Asset> asset = 0;
-            var color = stackalloc float[4];
-            color[0] = 1f;
-            color[1] = 0.4f;
-            color[2] = 0f;
-            color[3] = 1f;
+            var entity2 = world.CreateEntity();
+            entity2.AddComponent(new Transform3D{Position = Vector3.Zero, Rotation = Quaternion.Identity, Scale = Vector3.One});
+            entity2.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
 
 
-            var timer = Stopwatch.StartNew();
-            var frameCount = 0;
-            
-            var pipelineBuilder = new PipelineBuilder(assetsManager);
-            pipelineBuilder.LoadResources();
-            // Preload assets for rendering pipeline
-            while (_window.Update() && !pipelineBuilder.IsReady())
-            {
-                assetsManager.Update();
-            }
-            var pipeline = pipelineBuilder.Create();
-            using var graphicsSystem = new GraphicsSystem(pipeline);
 
             // star the main loop
             while (_window.Update())
             {
+                renderQueue.Update();
+
                 EventManager.Update();
                 InputManager.Update();
 
@@ -176,18 +191,18 @@ namespace Titan
                 //    assetsManager.Unload("models/tree");
                 //}
 
-                if (InputManager.IsKeyPressed(KeyCode.S))
-                {
-                    entity1.AddComponent(new Transform3D
-                    {
-                        Position = new Vector3(2,43,5)
-                    });
-                } 
-                if (InputManager.IsKeyPressed(KeyCode.Space))
-                {
-                    Logger.Error("SPACE IS DOWN you smerk!");
-                    entity1.RemoveComponent<Transform3D>();
-                }
+                //if (InputManager.IsKeyPressed(KeyCode.S))
+                //{
+                //    entity1.AddComponent(new Transform3D
+                //    {
+                //        Position = new Vector3(2,43,5)
+                //    });
+                //} 
+                //if (InputManager.IsKeyPressed(KeyCode.Space))
+                //{
+                //    Logger.Error("SPACE IS DOWN you smerk!");
+                //    entity1.RemoveComponent<Transform3D>();
+                //}
                 
                 assetsManager.Update();
 

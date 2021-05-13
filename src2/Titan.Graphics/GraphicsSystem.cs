@@ -25,6 +25,8 @@ namespace Titan.Graphics
         private readonly SwapChain _swapchain = GraphicsDevice.SwapChain;
         private readonly Handle<Buffer> _cameraBufferHandle;
         private readonly ViewPort _viewport;
+        private Matrix4x4 _view;
+        private Matrix4x4 _viewProject;
 
         public unsafe GraphicsSystem(Pipeline[] pipeline)
         {
@@ -42,10 +44,18 @@ namespace Titan.Graphics
             _viewport = new ViewPort((int)GraphicsDevice.SwapChain.Width, (int)GraphicsDevice.SwapChain.Height);
         }
 
+
+        public void SetCamera(in Matrix4x4 view, in Matrix4x4 viewProjection)
+        {
+            _view = view;
+            _viewProject = viewProjection;
+        }
         public void Render()
         {
             // set up camera
-            _immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = Matrix4x4.Identity, ViewProjection = Matrix4x4.Identity});
+            //Matrix4x4.Transpose(cam.ViewProjection)
+            _immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = _view, ViewProjection = Matrix4x4.Transpose(_viewProject)});
+            
             _immediateContext.SetVertexShaderConstantBuffer(_cameraBufferHandle, CameraSlot);
             
             _immediateContext.SetViewPort(_viewport); // change this if we want to support more than a single viewport
