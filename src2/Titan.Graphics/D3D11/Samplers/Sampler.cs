@@ -4,7 +4,7 @@ using Titan.Windows.D3D11;
 namespace Titan.Graphics.D3D11.Samplers
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal unsafe struct Sampler
+    public unsafe struct Sampler
     {
         internal ID3D11SamplerState* SamplerState;
 

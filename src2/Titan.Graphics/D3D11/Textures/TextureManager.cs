@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -18,8 +17,6 @@ namespace Titan.Graphics.D3D11.Textures
         private readonly SwapChain _swapChain;
         private ResourcePool<Texture> _resourcePool;
 
-        private readonly List<Handle<Texture>> _usedHandles = new();
-
         internal TextureManager(ID3D11Device* device, SwapChain swapChain)
         {
             Logger.Trace<TextureManager>($"Init with {MaxNumberOfTextures} slots");
@@ -27,6 +24,33 @@ namespace Titan.Graphics.D3D11.Textures
             _swapChain = swapChain;
             _resourcePool.Init(MaxNumberOfTextures);
         }
+
+        public Handle<Texture> CreateBackbufferRenderTarget()
+        {
+            var handle = _resourcePool.CreateResource();
+            if (!handle.IsValid())
+            {
+                throw new InvalidOperationException("Failed to Create Texture Handle");
+            }
+
+            var swapchain = GraphicsDevice.SwapChain;
+            var backbuffer = swapchain.Backbuffer;
+            backbuffer->AddRef();
+
+            var texture = _resourcePool.GetResourcePointer(handle);
+            texture->Usage = D3D11_USAGE.D3D11_USAGE_IMMUTABLE;
+            texture->BindFlags = D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET;
+            texture->D3DTarget = backbuffer;
+            texture->D3DResource = null;
+            texture->D3DTexture = null;
+            texture->Format = TextureFormats.RGBA32F;
+            texture->Handle = handle;
+            texture->Height = swapchain.Height;
+            texture->Width = swapchain.Width;
+
+            return handle;
+        }
+
 
         public Handle<Texture> Create(TextureCreation args)
         {
@@ -133,8 +157,6 @@ namespace Titan.Graphics.D3D11.Textures
             {
                 texture->D3DResource = null;
             }
-            
-            _usedHandles.Add(handle);
             return handle;
         }
 
@@ -142,7 +164,6 @@ namespace Titan.Graphics.D3D11.Textures
         {
             Logger.Trace<TextureManager>($"Releasing texture with handle {handle}");
             ReleaseInternal(handle);
-            _usedHandles.Remove(handle);
             _resourcePool.ReleaseResource(handle);
         }
 
@@ -169,13 +190,9 @@ namespace Titan.Graphics.D3D11.Textures
 
         public void Dispose()
         {
-            if (_usedHandles.Count > 0)
+            foreach (var handle in _resourcePool.EnumerateUsedResources())
             {
-                Logger.Warning<TextureManager>($"{_usedHandles.Count} unreleased resources when disposing the manager");
-                Logger.Trace<TextureManager>($"Releasing {_usedHandles.Count} textures");
-            }
-            foreach (var handle in _usedHandles)
-            {
+                Logger.Warning<TextureManager>($"Releasing an unreleased resource with handle {handle.Value}");
                 ReleaseInternal(handle);
             }
             Logger.Trace<TextureManager>("Terminate resource pool");

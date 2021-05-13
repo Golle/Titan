@@ -1,5 +1,4 @@
 using System;
-using System.Net.Mime;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Samplers;

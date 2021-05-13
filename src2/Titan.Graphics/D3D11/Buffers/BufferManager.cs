@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -13,7 +12,6 @@ namespace Titan.Graphics.D3D11.Buffers
     {
         private readonly ID3D11Device* _device;
         private ResourcePool<Buffer> _resourcePool;
-        private readonly List<Handle<Buffer>> _usedHandles = new (); // TODO: maybe this can be handled inside the resource pool?
         private const uint MaxBuffers = 1000u;
         internal BufferManager(ID3D11Device* device)
         {
@@ -70,7 +68,6 @@ namespace Titan.Graphics.D3D11.Buffers
             {
                 Common.CheckAndThrow(_device->CreateBuffer(&desc, null, &buffer->Resource), nameof(ID3D11Device.CreateBuffer));
             }
-            _usedHandles.Add(handle);
             return handle;
         }
 
@@ -78,7 +75,6 @@ namespace Titan.Graphics.D3D11.Buffers
         {
             Logger.Trace<BufferManager>($"Releasing buffer with handle {handle}");
             ReleaseInternal(handle);
-            _usedHandles.Remove(handle);
             _resourcePool.ReleaseResource(handle);
         }
 
@@ -97,13 +93,9 @@ namespace Titan.Graphics.D3D11.Buffers
 
         public void Dispose()
         {
-            if (_usedHandles.Count > 0)
+            foreach (var handle in _resourcePool.EnumerateUsedResources())
             {
-                Logger.Warning<BufferManager>($"{_usedHandles.Count} unreleased resources when disposing the manager");
-                Logger.Trace<BufferManager>($"Releasing {_usedHandles.Count} buffers");
-            }
-            foreach (var handle in _usedHandles)
-            {
+                Logger.Warning<BufferManager>($"Releasing an unreleased Buffer with handle {handle.Value}");
                 ReleaseInternal(handle);
             }
             Logger.Trace<BufferManager>("Terminate resource pool");

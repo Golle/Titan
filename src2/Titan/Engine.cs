@@ -79,10 +79,6 @@ namespace Titan
             Info("Initialize Application.");
             _app.OnStart();
 
-            var graphicsSystem = GraphicsSystem.Create();
-
-
-
 
             try
             {
@@ -138,15 +134,15 @@ namespace Titan
             var timer = Stopwatch.StartNew();
             var frameCount = 0;
             
-            var builder = new PipelineBuilder(assetsManager);
-            builder.LoadResources();
+            var pipelineBuilder = new PipelineBuilder(assetsManager);
+            pipelineBuilder.LoadResources();
             // Preload assets for rendering pipeline
-            while (_window.Update() && !builder.IsReady())
+            while (_window.Update() && !pipelineBuilder.IsReady())
             {
                 assetsManager.Update();
             }
-            builder.Create();
-
+            var pipeline = pipelineBuilder.Create();
+            using var graphicsSystem = new GraphicsSystem(pipeline);
 
             // star the main loop
             while (_window.Update())
@@ -196,8 +192,10 @@ namespace Titan
                 assetsManager.Update();
 
                 // Do stuff with the engine
-                GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
-                GraphicsDevice.SwapChain.Present();
+                //GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
+                //GraphicsDevice.SwapChain.Present();
+                graphicsSystem.Render();
+
                 frameCount++;
             }
         }

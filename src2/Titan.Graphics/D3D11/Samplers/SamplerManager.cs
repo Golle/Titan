@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -13,7 +12,6 @@ namespace Titan.Graphics.D3D11.Samplers
     {
         private readonly ID3D11Device* _device;
         private ResourcePool<Sampler> _resourcePool;
-        private readonly List<Handle<Sampler>> _usedHandles = new();
         private const uint MaxSamplers = 32u;
         internal SamplerManager(ID3D11Device* device)
         {
@@ -51,8 +49,7 @@ namespace Titan.Graphics.D3D11.Samplers
             };
             
             Common.CheckAndThrow(_device->CreateSamplerState(&desc, &sampler->SamplerState), nameof(ID3D11Device.CreateSamplerState));
-
-            _usedHandles.Add(handle);
+            
             return handle;
         }
 
@@ -62,8 +59,6 @@ namespace Titan.Graphics.D3D11.Samplers
         internal void Release(in Handle<Sampler> handle)
         {
             ReleaseInternal(handle);
-            
-            _usedHandles.Remove(handle);
             _resourcePool.ReleaseResource(handle);
         }
 
@@ -78,14 +73,9 @@ namespace Titan.Graphics.D3D11.Samplers
 
         public void Dispose()
         {
-            if (_usedHandles.Count > 0)
+            foreach (var handle in _resourcePool.EnumerateUsedResources())
             {
-                Logger.Warning<SamplerManager>($"{_usedHandles.Count} unreleased resources when disposing the manager");
-                Logger.Trace<SamplerManager>($"Releasing {_usedHandles.Count} samplers");
-            }
-            
-            foreach (var handle in _usedHandles)
-            {
+                Logger.Warning<SamplerManager>($"Releasing an unreleased Aampler with handle {handle.Value}");
                 ReleaseInternal(handle);
             }
             Logger.Trace<SamplerManager>("Terminate resource pool");

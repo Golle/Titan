@@ -1,69 +1,105 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Titan.Core.Logging;
 
 namespace Titan.Core.Memory
 {
+    
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public unsafe struct ResourcePool<T> where T : unmanaged
     {
         private MemoryChunk<T> _data;
-        private MemoryChunk<int> _freeIndices;
+        private MemoryChunk<int> _usedData;
+        private volatile int _nextResource;
 
-        private uint _maxCount;
-        private volatile int _freeIndicesHead;
+        private int _maxCount;
+        private static readonly int Offset = new Random().Next(100, 100000);
 
         public void Init(uint count)
         {
             _data = MemoryUtils.AllocateBlock<T>(count, true);
-            _freeIndices = MemoryUtils.AllocateBlock<int>(count);
-            for (var i = 0; i < count; ++i)
-            {
-                _freeIndices[i] = i;
-            }
-            _freeIndicesHead = 0; // Ignore the first resource, it's used for an invalid handle
-            _maxCount = count;
+            _usedData = MemoryUtils.AllocateBlock<int>(count, true);
+            _maxCount = (int) count;
         }
 
         public void Terminate()
         {
             _data.Free();
-            _freeIndices.Free();
+            _usedData.Free();
             _data = default;
-            _freeIndices = default;
+            _usedData = default;
         }
 
-        public Handle<T> CreateResource()
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Handle<T> CreateResource() => GetFreeIndex() + Offset;
+
+        private int GetFreeIndex()
         {
-            var index = Interlocked.Increment(ref _freeIndicesHead); 
-            if (index >= _maxCount)
+            var maxIterations = _maxCount;
+            while (maxIterations-- > 0)
             {
-                return 0;
+                var current = _nextResource;
+                var index = Interlocked.CompareExchange(ref _nextResource, (current + 1) % _maxCount, current);
+                // Some other thread updated the counter, do another lap
+                if (index != current)
+                {
+                    Logger.Trace("index != current", GetType());
+                    continue;
+                }
+                
+                var previousStatus = Interlocked.CompareExchange(ref _usedData[index], 1, 0);
+                // If the resource is used, loop again and try to find a new spot
+                if (previousStatus != 0)
+                {
+                    Logger.Trace("previousState !=0", GetType());
+                    continue;
+                }
+
+                return index;
             }
-            // If a resource is released at the same time as it's created this will fail
-            return _freeIndices[index];
+            ThrowException();
+            static void ThrowException()
+            {
+                throw new InvalidOperationException("MaxIterations to allocate a resource has been reached, can't continue.");
+            }
+            // Unreachable code
+            return -1;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ReleaseResource(in Handle<T> handle)
         {
-            if (handle.IsValid() && handle.Value <= _maxCount)
+            var index = handle - Offset;
+            if (handle.IsValid() && index <= _maxCount)
             {
-                var index = Interlocked.Decrement(ref _freeIndicesHead) + 1;
-                if (index > 0)
-                {
-                    _freeIndices[index] = handle;
-                }
-                else
-                {
-                    throw new InvalidOperationException("Released more resources than was created.");
-                }
+                _usedData[index] = 0;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref T GetResourceReference(in Handle<T> handle) => ref _data[handle.Value];
+        public ref T GetResourceReference(in Handle<T> handle) => ref _data[handle.Value-Offset];
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T* GetResourcePointer(in Handle<T> handle) => _data.GetPointer(handle.Value);
+        public T* GetResourcePointer(in Handle<T> handle) => _data.GetPointer(handle.Value-Offset);
+
+
+        /// <summary>
+        /// Should only be used to cleanup resources, and never inside a game loop.
+        /// </summary>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<Handle<T>> EnumerateUsedResources()
+        {
+            for (var i = 0; i < _maxCount; ++i)
+            {
+                if (_usedData[i] == 1)
+                {
+                    yield return i + Offset;
+                }
+            }
+        }
     }
 }

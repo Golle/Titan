@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -27,9 +26,6 @@ namespace Titan.Graphics.D3D11.Shaders
         private ResourcePool<VertexShader> _vertexShaderPool;
         private ResourcePool<PixelShader> _pixelShaderPool;
 
-
-        private readonly List<Handle<VertexShader>> _vertexShaderHandles = new();
-        private readonly List<Handle<PixelShader>> _pixelShaderHandles = new();
         public ShaderManager(ID3D11Device* device)
         {
             Logger.Trace<ShaderManager>($"Init with {MaxShaders} slots");
@@ -97,8 +93,7 @@ namespace Titan.Graphics.D3D11.Shaders
             }
 
             CheckAndThrow(_device->CreateVertexShader(vertexShaderBytecode.Get()->GetBufferPointer(), vertexShaderBytecode.Get()->GetBufferSize(), null, &vertexShader->Shader), nameof(ID3D11Device.CreateVertexShader));
-
-            _vertexShaderHandles.Add(handle);
+            
             return handle;
         }
 
@@ -115,7 +110,7 @@ namespace Titan.Graphics.D3D11.Shaders
             
             using var pixelShaderBytecode = new ComPtr<ID3DBlob>(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
             CheckAndThrow(_device->CreatePixelShader(pixelShaderBytecode.Get()->GetBufferPointer(), pixelShaderBytecode.Get()->GetBufferSize(), null, &pixelShader->Shader), nameof(ID3D11Device.CreatePixelShader));
-            _pixelShaderHandles.Add(handle);
+            
             return handle;
         }
 
@@ -129,7 +124,6 @@ namespace Titan.Graphics.D3D11.Shaders
         public void Release(in Handle<PixelShader> handle)
         {
             ReleaseInternal(handle);
-            _pixelShaderHandles.Remove(handle);
             _pixelShaderPool.ReleaseResource(handle);
         }
 
@@ -146,7 +140,6 @@ namespace Titan.Graphics.D3D11.Shaders
         public void Release(in Handle<VertexShader> handle)
         {
             ReleaseInternal(handle);
-            _vertexShaderHandles.Remove(handle);
             _vertexShaderPool.ReleaseResource(handle);
         }
 
@@ -167,27 +160,18 @@ namespace Titan.Graphics.D3D11.Shaders
 
         public void Dispose()
         {
-            if (_vertexShaderHandles.Count > 0)
+            foreach (var handle in _vertexShaderPool.EnumerateUsedResources())
             {
-                Logger.Warning<ShaderManager>($"{_vertexShaderHandles.Count} unreleased vertex shaders when disposing the manager");
-                Logger.Trace<ShaderManager>($"Releasing {_vertexShaderHandles.Count} vertex shaders");
-            }
-            foreach (var handle in _vertexShaderHandles)
-            {
+                Logger.Warning<ShaderManager>($"Releasing a unreleased Vertex Shader with handle {handle.Value}");
                 ReleaseInternal(handle);
             }
 
-            if (_pixelShaderHandles.Count > 0)
+            foreach (var handle in _pixelShaderPool.EnumerateUsedResources())
             {
-                Logger.Warning<ShaderManager>($"{_pixelShaderHandles.Count} unreleased pixel shaders when disposing the manager");
-                Logger.Trace<ShaderManager>($"Releasing {_pixelShaderHandles.Count} pixel shaders");
-            }
-            foreach (var handle in _pixelShaderHandles)
-            {
+                Logger.Warning<ShaderManager>($"Releasing a unreleased Pixel Shader with handle {handle.Value}");
                 ReleaseInternal(handle);
             }
             Logger.Trace<ShaderManager>("Terminate resource pools");
-
             _vertexShaderPool.Terminate();
             _pixelShaderPool.Terminate();
         }
