@@ -22,7 +22,7 @@ namespace Titan.Graphics.D3D11.Samplers
             
         }
 
-        internal Handle<Sampler> Create(SamplerCreation args)
+        public Handle<Sampler> Create(SamplerCreation args)
         {
             var handle = _resourcePool.CreateResource();
             if (!handle.IsValid())

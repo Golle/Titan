@@ -1,9 +1,13 @@
 using System;
+using System.Diagnostics;
 using System.Numerics;
+using System.Threading;
 using Titan.Core;
+using Titan.Core.Logging;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Pipeline;
-using Titan.Graphics.D3D11.Textures;
+using Titan.Windows.D3D11;
 using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Graphics
@@ -17,57 +21,73 @@ namespace Titan.Graphics
 
     public class GraphicsSystem : IDisposable
     {
+        private const uint CameraSlot = 0u;
+
         private readonly Pipeline[] _pipeline;
         private readonly Context _immediateContext = GraphicsDevice.ImmediateContext;
         private readonly SwapChain _swapchain = GraphicsDevice.SwapChain;
-        private readonly TextureManager _textureManager = GraphicsDevice.TextureManager;
         private readonly Handle<Buffer> _cameraBufferHandle;
-
+        
         public unsafe GraphicsSystem(Pipeline[] pipeline)
         {
             _pipeline = pipeline;
 
-            //_cameraBufferHandle = GraphicsDevice.BufferManager.Create(new BufferCreation
-            //{
-            //    Type = BufferTypes.ConstantBuffer,
-            //    Count = 1,
-            //    CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE,
-            //    Stride = (uint) sizeof(CameraBuffer),
-            //    Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
-            //});
+            _cameraBufferHandle = GraphicsDevice.BufferManager.Create(new BufferCreation
+            {
+                Type = BufferTypes.ConstantBuffer,
+                Count = 1,
+                CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE,
+                Stride = (uint)sizeof(CameraBuffer),
+                Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
+            });
         }
 
         public void Render()
         {
             // set up camera
-            //_immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = Matrix4x4.Identity, ViewProjection = Matrix4x4.Identity});
+            _immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = Matrix4x4.Identity, ViewProjection = Matrix4x4.Identity});
+            _immediateContext.SetVertexShaderConstantBuffer(_cameraBufferHandle, CameraSlot);
+            //execute pipeline
+            foreach (ref readonly var pipeline in _pipeline.AsSpan())
+            {
+                if (pipeline.ClearRenderTargets)
+                {
+                    foreach (var handle in pipeline.RenderTargets)
+                    {
+                        _immediateContext.ClearRenderTarget(handle, pipeline.ClearColor);
+                    }
+                }
 
-            // execute pipeline
-            //foreach (ref readonly var pipeline in _pipeline.AsSpan())
-            //{
-            //    if (pipeline.ClearRenderTargets)
-            //    {
-            //        foreach (var handle in pipeline.RenderTargets)
-            //        {
-            //            _immediateContext.ClearRenderTarget(handle, pipeline.ClearColor);
-            //        }
-            //    } 
+                _immediateContext.SetRenderTargets(pipeline.RenderTargets);
+                _immediateContext.SetPixelShaderSamplers(pipeline.PixelShaderSamplers);
+                _immediateContext.SetVertexShaderSamplers(pipeline.VertexShaderSamplers);
+                _immediateContext.SetPixelShaderResources(pipeline.PixelShaderResources);
+                _immediateContext.SetVertexShaderResources(pipeline.VertexShaderResources);
+                if (pipeline.VertexShader.IsValid())
+                {
+                    _immediateContext.SetVertexShader(pipeline.VertexShader);
+                }
+
+                if (pipeline.PixelShader.IsValid())
+                {
+                    _immediateContext.SetPixelShader(pipeline.PixelShader);
+                }
+
+                pipeline.Renderer.Render(_immediateContext);
                 
-
-
-
-            //}
-
+                _immediateContext.UnsetRenderTargets();
+                _immediateContext.UnsetPixelShaderResources();
+                _immediateContext.UnsetVertexShaderResources();
+            }
 
             // swapchain
             _swapchain.Present();
-
+            //Thread.Sleep(100);
         }
-
 
         public void Dispose()
         {
-
+            GraphicsDevice.BufferManager.Release(_cameraBufferHandle);
         }
     }
 }

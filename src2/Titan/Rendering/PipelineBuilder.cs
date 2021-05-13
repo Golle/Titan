@@ -6,6 +6,7 @@ using Titan.Core;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Pipeline;
+using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Textures;
 
 namespace Titan.Rendering
@@ -16,6 +17,8 @@ namespace Titan.Rendering
 
         private readonly AssetsManager _assetsManager;
         private Handle<Asset> _fullscreenHandle;
+        private GeometryRenderer _geometryRenderer;
+        private BackbufferRenderer _backbufferRenderer;
 
         public PipelineBuilder(AssetsManager assetsManager)
         {
@@ -23,20 +26,21 @@ namespace Titan.Rendering
         }
         public void LoadResources()
         {
-            //_gBufferHandle = _assetsManager.Load("shaders/gbuffer");
-            //_fullscreenHandle = _assetsManager.Load("shaders/fullscreen");
-            
+            _gBufferHandle = _assetsManager.Load("shaders/gbuffer");
+            _fullscreenHandle = _assetsManager.Load("shaders/fullscreen");
+
+            _geometryRenderer = new GeometryRenderer();
+            _backbufferRenderer = new BackbufferRenderer();
         }
+
         public bool IsReady()
         {
-            //return _assetsManager.IsLoaded(_gBufferHandle) && 
-            //       _assetsManager.IsLoaded(_fullscreenHandle);
-            return true;
+            return _assetsManager.IsLoaded(_gBufferHandle) &&
+                   _assetsManager.IsLoaded(_fullscreenHandle);
         }
 
         public Pipeline[] Create()
         {
-            return Array.Empty<Pipeline>();
             Debug.Assert(GraphicsDevice.IsInitialized, $"{nameof(GraphicsDevice)} must be initialized before the {nameof(GraphicsSystem)} is created.");
 
             var swapchain = GraphicsDevice.SwapChain;
@@ -66,13 +70,21 @@ namespace Titan.Rendering
 
             var gbufferShaders = _assetsManager.GetAssetHandle<ShaderProgram>(_gBufferHandle);
 
+            var fullscreenSampler = GraphicsDevice.SamplerManager.Create(new SamplerCreation
+            {
+                Filter = TextureFilter.MinMagMipPoint,
+                AddressAll = TextureAddressMode.Wrap
+            });
+
+
             var gBuffer = new Pipeline
             {
                 RenderTargets = new[] {gBufferAlbedo, gBufferNormals, gBufferProperties},
                 PixelShader = gbufferShaders.PixelShader,
                 VertexShader =  gbufferShaders.VertexShader,
                 ClearColor = Color.Black,
-                ClearRenderTargets = true
+                ClearRenderTargets = true,
+                Renderer = _geometryRenderer
             };
 
             var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
@@ -91,11 +103,13 @@ namespace Titan.Rendering
             {
                 ClearDepthStencil = false,
                 ClearRenderTargets = true,
-                ClearColor = Color.Blue,
+                ClearColor = Color.Green,
                 RenderTargets = new[] {backbufferRenderTarget},
                 PixelShader = fullscreenShader.PixelShader,
                 VertexShader = fullscreenShader.VertexShader,
-                PixelShaderResources = new[] {gBufferAlbedo}
+                PixelShaderResources = new[] {gBufferAlbedo},
+                PixelShaderSamplers = new []{fullscreenSampler},
+                Renderer = _backbufferRenderer
             };
 
             return new[] {gBuffer, backbuffer};

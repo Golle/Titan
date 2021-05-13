@@ -1,35 +1,42 @@
-using System.Runtime.CompilerServices;
+using Titan.Graphics;
 using Titan.Graphics.D3D11;
 
 namespace Titan.Rendering
 {
-    internal interface IRenderer
-    {
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void Render(Context context);
-    }
-
     internal class GeometryRenderer : IRenderer
+
     {
         private readonly ViewPort _viewport;
-
         public GeometryRenderer()
         {
             _viewport = new ViewPort((int) GraphicsDevice.SwapChain.Width, (int) GraphicsDevice.SwapChain.Height);
         }
 
+
         public void Render(Context context)
         {
-            throw new System.NotImplementedException();
+            //Logger.Warning<GeometryRenderer>("RENDER");
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 
     internal class BackbufferRenderer : IRenderer
     {
+        public BackbufferRenderer()
+        {
+            
+        }
         public void Render(Context context)
         {
-            throw new System.NotImplementedException();
+            //Logger.Warning<BackbufferRenderer>("RENDER");
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
