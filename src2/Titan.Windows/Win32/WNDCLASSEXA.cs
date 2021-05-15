@@ -14,7 +14,7 @@ namespace Titan.Windows.Win32
         public int CbWndExtra;
         public nint HInstance;
         public nint HIcon;
-        public nint HCursor;
+        public HCURSOR HCursor;
         public nint HbrBackground;
         public string LpszMenuName;
         public string LpszClassName;

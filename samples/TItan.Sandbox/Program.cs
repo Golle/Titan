@@ -16,6 +16,11 @@ namespace Titan.Sandbox
             Logger.Info("Sandbox application starting");
         }
 
+        public override void ConfigureSystems(SystemsCollection collection)
+        {
+            collection.Add(new FirstPersonCameraSystem(Window));
+        }
+
         public override void OnTerminate()
         {
             Logger.Info("Sandbox application shutting down");

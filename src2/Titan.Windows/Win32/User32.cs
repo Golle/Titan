@@ -107,8 +107,20 @@ namespace Titan.Windows.Win32
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern HCURSOR LoadCursorW(
+            [In] nint hInstance,
+            [In] char* lpCursorName
+        );
+
+        [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int ShowCursor(
             [In, MarshalAs(UnmanagedType.Bool)] bool show
+        );
+
+
+        [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern int SetCursor(
+            [In] HCURSOR cursor
         );
 
         [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]

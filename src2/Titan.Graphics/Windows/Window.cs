@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
+using Titan.Core.Messaging;
+using Titan.Graphics.Windows.Events;
 using Titan.Windows;
 using Titan.Windows.Win32;
 using static Titan.Windows.Win32.User32;
@@ -25,6 +27,7 @@ namespace Titan.Graphics.Windows
 
         private static Window _activeWindow; // TODO: change this if we'll ever support multiple windows
         private bool _cursorVisible = true;
+        private static HCURSOR _defaultCursor;
 
         private Window(HWND handle, string title, string className, uint width, uint height, bool windowed)
         {
@@ -43,13 +46,15 @@ namespace Titan.Graphics.Windows
             {
                 throw new NotSupportedException($"Only a single {nameof(Window)} can be created.");
             }
+
+            _defaultCursor = LoadCursorW(0, StandardCursorResources.IDC_HELP);
             var className = "class_" + Guid.NewGuid().ToString().Substring(0, 4);
             // Create the Window Class EX
             var wndClassExA = new  WNDCLASSEXA
             {
                 CbClsExtra = 0,
                 CbSize = (uint)Marshal.SizeOf<WNDCLASSEXA>(),
-                HCursor = 0,
+                HCursor = _defaultCursor,
                 HIcon = 0,
                 LpFnWndProc = &WndProc,
                 CbWndExtra = 0,
@@ -95,6 +100,7 @@ namespace Titan.Graphics.Windows
                 null
             );
 
+            
             if (!handle.IsValid)
             {
                 Logger.Error($"CreateWindowExA failed with Win32Error {Marshal.GetLastWin32Error()}");
@@ -108,6 +114,7 @@ namespace Titan.Graphics.Windows
         public void SetTitle(string title) => SetWindowTextA(Handle, title);
         public bool Update()
         {
+            
             while (PeekMessageA(out var msg, 0, 0, 0, 1)) // pass IntPtr.Zero as HWND to detect mouse movement outside of the window
             {
                 if (msg.Message == WM_QUIT)
@@ -119,6 +126,15 @@ namespace Titan.Graphics.Windows
                 DispatchMessage(msg);
             }
             UpdateMousePosition();
+
+            foreach (ref readonly var @event in EventManager.GetEvents())
+            {
+                if (@event.Type == MouseStateEvent.Id)
+                {
+                    ToggleMouse(@event.As<MouseStateEvent>().Visible);
+                }
+            }
+
             return true;
         }
 
@@ -161,9 +177,15 @@ namespace Titan.Graphics.Windows
             }
         }
 
-        public void ToggleMouse()
+        private void ToggleMouse(bool visible)
         {
-            _cursorVisible = !_cursorVisible;
+            if (visible == _cursorVisible)
+            {
+                // No state change
+                return;
+            }
+
+            _cursorVisible = visible;
             ShowCursor(_cursorVisible);
             if (_cursorVisible)
             {
@@ -176,7 +198,7 @@ namespace Titan.Graphics.Windows
                 {
                     _hideCursorPosition = pos;
                 }
-                SetCursorPos((int) (Width / 2), (int) (Height / 2));
+                SetCursorPos((int)(Width / 2), (int)(Height / 2));
             }
         }
 

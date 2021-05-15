@@ -71,6 +71,7 @@ namespace Titan
             _window = Window.Create(new WindowConfiguration("Titan is a moon ?!", 1920, 1080));
             Trace($"Showing the {nameof(Window)}");
             _window.Show();
+            _app.Window = new GameWindow(_window);
 
             Trace($"Init {typeof(GraphicsDevice).FullName}");
             GraphicsDevice.Init(_window, new DeviceConfiguration(144, true, true));
@@ -78,7 +79,6 @@ namespace Titan
             Info("Engine has been initialized.");
             Info("Initialize Application.");
             _app.OnStart();
-
 
             try
             {
@@ -101,12 +101,8 @@ namespace Titan
                 .Register(AssetTypes.Material, new MaterialsLoader())
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
-
             var renderQueue = new SimpleRenderQueue(1000);
-
             
-            
-            Handle<Asset> asset = 0;
             var color = stackalloc float[4];
             color[0] = 1f;
             color[1] = 0.4f;
@@ -127,18 +123,19 @@ namespace Titan
             var pipeline = pipelineBuilder.Create();
             using var graphicsSystem = new GraphicsSystem(pipeline);
 
+
+            var systemCollection = new SystemsCollection()
+                .Add(new Transform3DSystem())
+                .Add(new Render3DSystem(assetsManager, renderQueue))
+                .Add(new CameraSystem(graphicsSystem));
+            _app.ConfigureSystems(systemCollection);
+
             using var world = new World(new WorldConfiguration(10_000, new[]
                 {
                     new ComponentConfiguration(typeof(Transform3D), ComponentPoolTypes.Packed),
                     new ComponentConfiguration(typeof(CameraComponent), ComponentPoolTypes.Packed)
                 },
-                new EntitySystem[]
-                {
-                    new Transform3DSystem(),
-                    new Render3DSystem(assetsManager, renderQueue),
-                    new CameraSystem(graphicsSystem),
-                    new FirstPersonCameraSystem()
-                }
+                systemCollection.Systems.ToArray()
             ));
 
 
@@ -153,8 +150,15 @@ namespace Titan
 
             var entity2 = world.CreateEntity();
             entity2.AddComponent(new Transform3D{Position = Vector3.Zero, Rotation = Quaternion.Identity, Scale = Vector3.One});
-            entity2.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
+            var cameraComponent = CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f);
+            cameraComponent.Active = true;
+            entity2.AddComponent(cameraComponent);
 
+            var entity3 = world.CreateEntity();
+            entity3.AddComponent(new Transform3D { Position = Vector3.Zero, Rotation = Quaternion.Identity, Scale = Vector3.One });
+            var cameraComponent1 = CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f);
+            //cameraComponent1.SetActive();
+            entity3.AddComponent(cameraComponent1);
 
 
             // star the main loop
@@ -164,7 +168,6 @@ namespace Titan
 
                 EventManager.Update();
                 InputManager.Update();
-
 
                 world.Update();
 
