@@ -44,7 +44,6 @@ namespace Titan.Graphics
             _viewport = new ViewPort((int)GraphicsDevice.SwapChain.Width, (int)GraphicsDevice.SwapChain.Height);
         }
 
-
         public void SetCamera(in Matrix4x4 view, in Matrix4x4 viewProjection)
         {
             _view = view;
@@ -70,7 +69,12 @@ namespace Titan.Graphics
                     }
                 }
 
-                _immediateContext.SetRenderTargets(pipeline.RenderTargets);
+                if (pipeline.ClearDepthBuffer)
+                {
+                    _immediateContext.ClearDepthBuffer(pipeline.DepthBuffer, pipeline.DepthBufferClearValue);
+                }
+                
+                _immediateContext.SetRenderTargets(pipeline.RenderTargets, pipeline.DepthBuffer);
                 _immediateContext.SetPixelShaderSamplers(pipeline.PixelShaderSamplers);
                 _immediateContext.SetVertexShaderSamplers(pipeline.VertexShaderSamplers);
                 _immediateContext.SetPixelShaderResources(pipeline.PixelShaderResources);

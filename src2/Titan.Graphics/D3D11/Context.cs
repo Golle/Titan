@@ -111,13 +111,15 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRenderTargets(in Handle<Texture>[] handles)
+        public void SetRenderTargets(in Handle<Texture>[] handles, in Handle<Texture> depthBufferHandle)
         {
+            var depthBuffer = depthBufferHandle.IsValid() ? GraphicsDevice.TextureManager.Access(depthBufferHandle).D3DDepthStencil : null;
+            
             var numberOfViews = handles.Length;
             if (numberOfViews == 1)
             {
                 var renderTarget = GraphicsDevice.TextureManager.Access(handles[0]).D3DTarget;
-                _context->OMSetRenderTargets(1, &renderTarget, null);
+                _context->OMSetRenderTargets(1, &renderTarget, depthBuffer);
             }
             else
             {
@@ -126,7 +128,7 @@ namespace Titan.Graphics.D3D11
                 {
                     renderTargets[i] = GraphicsDevice.TextureManager.Access(handles[i]).D3DTarget;
                 }
-                _context->OMSetRenderTargets((uint) numberOfViews, renderTargets, null);
+                _context->OMSetRenderTargets((uint) numberOfViews, renderTargets, depthBuffer);
             }
         }
 
@@ -145,7 +147,6 @@ namespace Titan.Graphics.D3D11
                 resources[i] = GraphicsDevice.TextureManager.Access(handles[i]).D3DResource;
             }
             _context->PSSetShaderResources(startSlot, (uint)numberOfViews, resources);
-
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -246,5 +247,8 @@ namespace Titan.Graphics.D3D11
                 _context->RSSetViewports(1, pView);
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ClearDepthBuffer(in Handle<Texture> handle, float value) => _context->ClearDepthStencilView(GraphicsDevice.TextureManager.Access(handle).D3DDepthStencil, D3D11_CLEAR_FLAG.D3D11_CLEAR_DEPTH | D3D11_CLEAR_FLAG.D3D11_CLEAR_STENCIL, value, 0);
     }
 }

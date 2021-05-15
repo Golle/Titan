@@ -43,6 +43,7 @@ namespace Titan.Graphics.D3D11.Textures
             texture->D3DTarget = backbuffer;
             texture->D3DResource = null;
             texture->D3DTexture = null;
+            texture->D3DDepthStencil = null;
             texture->Format = TextureFormats.RGBA32F;
             texture->Handle = handle;
             texture->Height = swapchain.Height;
@@ -69,6 +70,11 @@ namespace Titan.Graphics.D3D11.Textures
             if (args.Binding.HasFlag(TextureBindFlags.ShaderResource))
             {
                 bindflags |= D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE;
+            }
+
+            if (args.Binding.HasFlag(TextureBindFlags.DepthBuffer))
+            {
+                bindflags |= D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL;
             }
 
             if (bindflags == 0)
@@ -105,6 +111,10 @@ namespace Titan.Graphics.D3D11.Textures
             texture->Height = height;
             texture->Width = width;
             texture->Usage = args.Usage;
+            texture->D3DTarget = null;
+            texture->D3DResource = null;
+            texture->D3DDepthStencil = null;
+            texture->D3DTexture = null;
 
 
             if (args.InitialData.HasValue() && args.DataStride > 0)
@@ -134,10 +144,7 @@ namespace Titan.Graphics.D3D11.Textures
                 };
                 CheckAndThrow(_device->CreateRenderTargetView((ID3D11Resource*)texture->D3DTexture, &renderTargetDesc, &texture->D3DTarget), nameof(ID3D11Device.CreateRenderTargetView));
             }
-            else
-            {
-                texture->D3DTarget = null;
-            }
+            
 
             if ((bindflags & D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE) != 0)
             {
@@ -153,9 +160,17 @@ namespace Titan.Graphics.D3D11.Textures
                 };
                 CheckAndThrow(_device->CreateShaderResourceView((ID3D11Resource*)texture->D3DTexture, &shadedResourceViewDesc, &texture->D3DResource), nameof(ID3D11Device.CreateShaderResourceView));
             }
-            else
+
+            if ((bindflags & D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL) != 0)
             {
-                texture->D3DResource = null;
+                var depthStencilViewDesc = new D3D11_DEPTH_STENCIL_VIEW_DESC
+                {
+                    Flags = 0,
+                    Format = (DXGI_FORMAT) args.DepthStencilFormat,
+                    Texture2D = new D3D11_TEX2D_DSV {MipSlice = 0},
+                    ViewDimension = D3D11_DSV_DIMENSION.D3D11_DSV_DIMENSION_TEXTURE2D
+                };
+                CheckAndThrow(_device->CreateDepthStencilView((ID3D11Resource*)texture->D3DTexture, &depthStencilViewDesc, &texture->D3DDepthStencil), nameof(ID3D11Device.CreateDepthStencilView));
             }
             return handle;
         }
@@ -181,6 +196,10 @@ namespace Titan.Graphics.D3D11.Textures
             if (texture->D3DTexture != null)
             {
                 texture->D3DTexture->Release();
+            }
+            if (texture->D3DDepthStencil != null)
+            {
+                texture->D3DDepthStencil->Release();
             }
             *texture = default; // TODO: is not really needed, but we can do it to "clean" up the pointers so they can't be used.
         }

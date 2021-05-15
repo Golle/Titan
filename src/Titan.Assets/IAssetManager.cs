@@ -51,13 +51,13 @@ namespace Titan.Assets
             
             _fileLoader.Load(path, task =>
             {
-                IOWorkerPool.QueueWorkerItem(item =>
-                {
-                    LOGGER.Debug("Loading resource");
+                //IOWorkerPool.QueueWorkerItem(item =>
+                //{
+                //    LOGGER.Debug("Loading resource");
 
-                    handle.OnComplete();
-                    task.Dispose();
-                }, handle);
+                //    handle.OnComplete();
+                //    task.Dispose();
+                //}, handle);
             });
 
             return handle;

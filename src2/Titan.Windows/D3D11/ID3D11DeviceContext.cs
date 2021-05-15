@@ -298,7 +298,7 @@ namespace Titan.Windows.D3D11
         //    _In_  const FLOAT Values[4]);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ClearDepthStencilView(ID3D11DepthStencilView* pDepthStencilView, uint clearFlags, float depth, byte stencil) => ((delegate* unmanaged[Stdcall]<void*, ID3D11DepthStencilView*, uint, float, byte, void>)_vtbl[53])(Unsafe.AsPointer(ref this), pDepthStencilView, clearFlags, depth, stencil);
+        public void ClearDepthStencilView(ID3D11DepthStencilView* pDepthStencilView, D3D11_CLEAR_FLAG clearFlags, float depth, byte stencil) => ((delegate* unmanaged[Stdcall]<void*, ID3D11DepthStencilView*, D3D11_CLEAR_FLAG, float, byte, void>)_vtbl[53])(Unsafe.AsPointer(ref this), pDepthStencilView, clearFlags, depth, stencil);
 
         //void (STDMETHODCALLTYPE* GenerateMips ) (
         //    ID3D11DeviceContext* This,

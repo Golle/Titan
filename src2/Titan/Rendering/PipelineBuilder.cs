@@ -69,6 +69,14 @@ namespace Titan.Rendering
                 Height = swapchain.Height,
                 Binding = TextureBindFlags.FrameBuffer
             });
+            var depthBuffer = GraphicsDevice.TextureManager.Create(new TextureCreation
+            {
+                Binding = TextureBindFlags.DepthBuffer,
+                //DepthStencilFormat = DepthStencilFormats.D24S8,
+                //Format = TextureFormats.R24G8TL
+                DepthStencilFormat = DepthStencilFormats.D32,
+                Format = TextureFormats.R32TL
+            });
 
             var gbufferShaders = _assetsManager.GetAssetHandle<ShaderProgram>(_gBufferHandle);
 
@@ -81,6 +89,9 @@ namespace Titan.Rendering
             var gBuffer = new Pipeline
             {
                 RenderTargets = new[] {gBufferPosition, gBufferAlbedo, gBufferNormals},
+                ClearDepthBuffer = true,
+                DepthBufferClearValue = 1f,
+                DepthBuffer = depthBuffer,
                 PixelShader = gbufferShaders.PixelShader,
                 VertexShader =  gbufferShaders.VertexShader,
                 ClearColor = Color.Black,
@@ -102,7 +113,7 @@ namespace Titan.Rendering
             var fullscreenShader = _assetsManager.GetAssetHandle<ShaderProgram>(_fullscreenHandle);
             var backbuffer = new Pipeline
             {
-                ClearDepthStencil = false,
+                ClearDepthBuffer = false,
                 ClearRenderTargets = true,
                 ClearColor = Color.Green,
                 RenderTargets = new[] {backbufferRenderTarget},

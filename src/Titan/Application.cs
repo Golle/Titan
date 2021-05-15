@@ -108,7 +108,7 @@ namespace Titan
 
             _startup.OnStart(_world);
 
-            new TestClassForASsets().Run(_container);
+            //new TestClassForASsets().Run(_container);
 
             StartMainLoop();
             
@@ -129,7 +129,7 @@ namespace Titan
                     _world.Update();
                     foreach (var assetManagers in _managers)
                     {
-                        assetManagers.Update();
+                        //assetManagers.Update();
                     }
                     _dispatcher.Execute(_workerPool);
                 }

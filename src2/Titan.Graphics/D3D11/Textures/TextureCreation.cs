@@ -10,6 +10,7 @@ namespace Titan.Graphics.D3D11.Textures
     {
         // TODO: create new enums for these
         public TextureFormats Format { get; init; }
+        public DepthStencilFormats DepthStencilFormat { get; init; }
         public D3D11_USAGE Usage { get; init; }
 
         public TextureBindFlags Binding { get; init; }

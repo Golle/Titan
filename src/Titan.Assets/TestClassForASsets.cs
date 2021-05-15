@@ -16,7 +16,7 @@ namespace Titan.Assets
         {
             
             
-            IOWorkerPool.Initialize();
+            //IOWorkerPool.Initialize();
 
             var manager = new AssetManager(container.GetInstance<FileSystem>());
 
