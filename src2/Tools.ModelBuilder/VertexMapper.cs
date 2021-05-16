@@ -13,7 +13,7 @@ namespace Tools.ModelBuilder
         {
             _model = model;
         }
-        public Mesh<TexturedVertex> Map(ReadOnlySpan<ObjVertex> objVertices, ReadOnlyMemory<int> indices, ReadOnlyMemory<SubMesh> submeshes)
+        public Mesh<TexturedVertex> Map(ReadOnlySpan<ObjVertex> objVertices, ReadOnlyMemory<int> indices, ReadOnlyMemory<SubmeshDescriptor> submeshes)
         {
             var vertices = new TexturedVertex[objVertices.Length];
             for (var i = 0; i < objVertices.Length; ++i)

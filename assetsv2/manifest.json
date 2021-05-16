@@ -32,9 +32,7 @@
                 {
                     "Id": "shaders/lambertian_vertexshader"
                 }
-            ],
-            "Preload": false,
-            "Static": false
+            ]
         },
         {
             "Id": "materials/material_01",
@@ -69,9 +67,31 @@
                 {
                     "Id": "textures/lion"
                 }
+            ]
+        },
+        {
+            "Id": "materials/tree_00",
+            "Files": [
+                "materials/tree_00.json"
             ],
-            "Preload": false,
-            "Static": false
+            "Type": "material",
+            "Dependencies": [
+                {
+                    "Id": "shaders/default_shader"
+                }
+            ]
+        },
+        {
+            "Id": "materials/tree_01",
+            "Files": [
+                "materials/tree_01.json"
+            ],
+            "Type": "material",
+            "Dependencies": [
+                {
+                    "Id": "shaders/default_shader"
+                }
+            ]
         },
         {
             "Id": "models/tree",
@@ -81,7 +101,10 @@
             "Type": "model",
             "Dependencies": [
                 {
-                    "Id": "materials/material_01"
+                    "Id": "materials/tree_00"
+                },
+                {
+                    "Id": "materials/tree_01"
                 }
             ]
         },

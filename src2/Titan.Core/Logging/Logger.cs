@@ -31,7 +31,8 @@ namespace Titan.Core.Logging
         public static void Trace(string message, Type type) => Log(LogLevel.Trace, message, type.Name);
 
 
-        public static void Info<T>(string message) => Log(LogLevel.Info, message, typeof(T).Name);
+        public static void Info<T>(string message) => Info(message, typeof(T));
+        public static void Info(string message, Type type) => Log(LogLevel.Info, message, type.Name);
         public static void Info(string message) => Log(LogLevel.Info, message);
 
         public static void Error<T>(string message) => Error(message, typeof(T));

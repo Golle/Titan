@@ -4,6 +4,13 @@ using Titan.Graphics.D3D11.Textures;
 
 namespace Titan.Assets.Materials
 {
+    public struct MatTest
+    {
+        public string Name;
+        public Color DiffuseColor;
+    }
+
+
     public struct MaterialProperties
     {
         public Color DiffuseColor;

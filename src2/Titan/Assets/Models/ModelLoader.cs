@@ -1,32 +1,14 @@
 using System;
-using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
 using Titan.Assets.Materials;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Windows.D3D11;
-using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Assets.Models
 {
-
-    public class Model
-    {
-        private readonly Mesh _mesh;
-        public ref readonly Mesh Mesh
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ref _mesh;
-        }
-
-        public Model(in Mesh mesh)
-        {
-            _mesh = mesh;
-        }
-    }
 
     public struct Submesh
     {
@@ -34,14 +16,6 @@ namespace Titan.Assets.Models
         public uint Count;
         public Material Material;
     }
-    
-    public struct Mesh
-    {
-        public Handle<Buffer> VertexBuffer;
-        public Handle<Buffer> IndexBuffer;
-        public uint Indicies;
-    }
-
     public class ModelLoader : IAssetLoader
     {
         public unsafe object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
@@ -52,9 +26,7 @@ namespace Titan.Assets.Models
             var verticesSize = desc->NumberOfVertices * desc->VertexSize;
             var pIndices = pVertices + verticesSize;
             var indicesSize = desc->NumberOfIndices * sizeof(int);
-
-            Logger.Warning($"{(((int*)pIndices)[10])}");
-            
+            var submeshDescriptors = new ReadOnlySpan<SubmeshDescriptor>(pIndices + indicesSize, desc->NumberOfSubmeshes);
             var vertexBuffer = GraphicsDevice.BufferManager.Create(new BufferCreation
             {
                 CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED,
@@ -77,11 +49,24 @@ namespace Titan.Assets.Models
                 Usage = D3D11_USAGE.D3D11_USAGE_IMMUTABLE
             });
 
+            
+            var submeshes = new Submesh[submeshDescriptors.Length];
+            for (var i = 0; i < submeshDescriptors.Length; ++i)
+            {
+                ref readonly var submesh = ref submeshDescriptors[i];
+                submeshes[i] = new Submesh
+                {
+                    Count = submesh.Count,
+                    Material = (Material) dependencies[submesh.MaterialIndex].Asset, // TODO: this will fail if a model depends on anything else than a material
+                    StartIndex = submesh.StartIndex
+                };
+            }
+            
             return new Model(new Mesh
             {
                 IndexBuffer = indexBuffer, 
                 VertexBuffer = vertexBuffer,
-                Indicies =  desc->NumberOfIndices
+                Submeshes = submeshes
             });
         }
 

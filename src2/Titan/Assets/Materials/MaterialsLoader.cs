@@ -6,6 +6,7 @@ using Titan.Assets.Shaders;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
+using Titan.Core.Serialization;
 using Titan.Graphics.D3D11.Textures;
 
 namespace Titan.Assets.Materials
@@ -14,6 +15,7 @@ namespace Titan.Assets.Materials
     {
         public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
         {
+            Debug.Assert(buffers.Length == 1, "Only a single file can be used for materials");
             ShaderProgram shader = default;
             MaterialProperties properties = default;
             foreach (ref readonly var dependency in dependencies)
@@ -38,6 +40,9 @@ namespace Titan.Assets.Materials
                     }
                 }
             }
+
+            var material = Json.Deserialize<MatTest>(buffers[0].AsSpan());
+            properties.DiffuseColor = material.DiffuseColor;
 
             Logger.Warning<MaterialsLoader>("Materials have not been fully implemented yet.");
 

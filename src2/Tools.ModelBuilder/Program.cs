@@ -1,8 +1,13 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Numerics;
+using System.Text.Json;
+using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Core.Logging;
+using Titan.Core.Serialization;
+using Titan.Graphics;
 using Tools.Core.WavefrontObj;
 using Tools.ModelBuilder;
 
@@ -21,7 +26,7 @@ Directory.CreateDirectory(materialDestinationPath);
 foreach (var file in Directory.EnumerateFiles(assetsPath, "*.obj", SearchOption.AllDirectories))
 {
     var model = await ObjParser.ReadFromFile(file);
-    var name = Path.GetFileNameWithoutExtension(file);
+    var name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
 
     var builder = new MeshBuilder();
     foreach (var group in model.Groups)
@@ -102,23 +107,29 @@ foreach (var file in Directory.EnumerateFiles(assetsPath, "*.obj", SearchOption.
             modelOutput.Write(new ReadOnlySpan<byte>(pIndicies, sizeof(int) * mesh.Indices.Length));
         }
 
-        fixed (SubMesh* pSubmeshes = mesh.SubMeshes.Span)
+        fixed (SubmeshDescriptor* pSubmeshes = mesh.SubMeshes.Span)
         {
-            modelOutput.Write(new ReadOnlySpan<byte>(&pSubmeshes, sizeof(SubMesh) * mesh.SubMeshes.Length));
+            modelOutput.Write(new ReadOnlySpan<byte>(pSubmeshes, sizeof(SubmeshDescriptor) * mesh.SubMeshes.Length));
         }
     }
 
 
-    await using var materialOutput = File.Open(Path.Combine(materialDestinationPath, $"{name}.mat"), FileMode.OpenOrCreate, FileAccess.Write);
-    materialOutput.SetLength(0);
-    materialOutput.Seek(0, SeekOrigin.Begin);
+    
 
-    unsafe
     {
-        
-        foreach (var material in model.Materials)
+
+        for (var i = 0; i < model.Materials.Length; ++i)
         {
-            
+            var material = model.Materials[i];
+
+            await using var materialOutput = File.Open(Path.Combine(materialDestinationPath, $"{name}_{i:D2}.json"), FileMode.OpenOrCreate, FileAccess.Write);
+            materialOutput.SetLength(0);
+            materialOutput.Seek(0, SeekOrigin.Begin);
+            materialOutput.Write(Json.SerializeUtf8(new MatTest
+            {
+                Name = material.Name,
+                DiffuseColor = Color.ParseF(material.DiffuseColor.Original)
+            }));
         }
     }
 

@@ -28,7 +28,6 @@ namespace Titan.Rendering
         }
 
 
-
         public void Push(in Matrix4x4 transform, Model model) => _renderables[Interlocked.Increment(ref _count) - 1] = new Renderable {Model = model, Transform = transform};
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -72,11 +71,13 @@ namespace Titan.Rendering
                 
                 context.SetVertexBuffer(mesh.VertexBuffer);    
                 context.SetIndexBuffer(mesh.IndexBuffer);
-                
-                context.DrawIndexed(mesh.Indicies);
-            }
 
-            //Logger.Warning<GeometryRenderer>("RENDER");
+                for (var i = 0; i < mesh.Submeshes.Length; ++i)
+                {
+                    ref readonly var submesh = ref mesh.Submeshes[i];
+                    context.DrawIndexed(submesh.Count, submesh.StartIndex);
+                }
+            }
         }
 
         public void Dispose()

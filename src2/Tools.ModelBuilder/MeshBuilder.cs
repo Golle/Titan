@@ -5,12 +5,12 @@ using Tools.Core.WavefrontObj;
 namespace Tools.ModelBuilder
 {
 
-    public record Mesh<T>(ReadOnlyMemory<T> Vertices, ReadOnlyMemory<int> Indices, ReadOnlyMemory<SubMesh> SubMeshes);
+    public record Mesh<T>(ReadOnlyMemory<T> Vertices, ReadOnlyMemory<int> Indices, ReadOnlyMemory<SubmeshDescriptor> SubMeshes);
     internal class MeshBuilder
     {
         private readonly ObjVertex[] _vertices = new ObjVertex[200_000];
         private readonly int[] _indices = new int[800_000];
-        private readonly SubMesh[] _meshes = new SubMesh[10000];
+        private readonly SubmeshDescriptor[] _meshes = new SubmeshDescriptor[10000];
 
         private int _indexCount;
         private int _vertexCount;
@@ -63,10 +63,10 @@ namespace Tools.ModelBuilder
             }
         }
 
-        public Mesh<T> Build<T>(Func<ReadOnlyMemory<ObjVertex>, ReadOnlyMemory<int>, ReadOnlyMemory<SubMesh>, Mesh<T>> mapper) where T : unmanaged
+        public Mesh<T> Build<T>(Func<ReadOnlyMemory<ObjVertex>, ReadOnlyMemory<int>, ReadOnlyMemory<SubmeshDescriptor>, Mesh<T>> mapper) where T : unmanaged
         {
             SetCountForCurrentMesh();
-            return mapper(new ReadOnlyMemory<ObjVertex>(_vertices, 0, _vertexCount), new ReadOnlyMemory<int>(_indices, 0, _indexCount), new ReadOnlyMemory<SubMesh>(_meshes, 0, _submeshCount));
+            return mapper(new ReadOnlyMemory<ObjVertex>(_vertices, 0, _vertexCount), new ReadOnlyMemory<int>(_indices, 0, _indexCount), new ReadOnlyMemory<SubmeshDescriptor>(_meshes, 0, _submeshCount));
         }
     }
 }

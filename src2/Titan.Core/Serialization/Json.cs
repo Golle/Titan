@@ -16,6 +16,8 @@ namespace Titan.Core.Serialization
 
         public static T Deserialize<T>(ReadOnlySpan<byte> json) => JsonSerializer.Deserialize<T>(json, Options);
         public static T Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, Options);
-        public static string Serialize<T>(in T value) => JsonSerializer.Serialize(value);
+        public static string Serialize<T>(in T value) => JsonSerializer.Serialize(value, Options);
+        public static Span<byte> SerializeUtf8<T>(in T value) => JsonSerializer.SerializeToUtf8Bytes(value, Options);
+
     }
 }
