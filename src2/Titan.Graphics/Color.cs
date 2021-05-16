@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Graphics
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
     [DebuggerDisplay("R:{R} G:{G} B:{B} A:{A} ")]
     public struct Color
     {

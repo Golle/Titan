@@ -14,12 +14,14 @@ namespace Titan.Rendering
     internal class PipelineBuilder
     {
         private Handle<Asset> _gBufferHandle;
+        private Handle<Asset> _fullscreenHandle;
+        private Handle<Asset> _lambertianHandle;
 
         private readonly AssetsManager _assetsManager;
         private readonly SimpleRenderQueue _simpleRenderQueue;
-        private Handle<Asset> _fullscreenHandle;
         private GeometryRenderer _geometryRenderer;
         private BackbufferRenderer _backbufferRenderer;
+        private IRenderer _deferredShadingRenderer;
 
         public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue)
         {
@@ -29,16 +31,20 @@ namespace Titan.Rendering
         public void LoadResources()
         {
             _gBufferHandle = _assetsManager.Load("shaders/gbuffer");
+            _lambertianHandle = _assetsManager.Load("shaders/default_shader");
             _fullscreenHandle = _assetsManager.Load("shaders/fullscreen");
 
             _geometryRenderer = new GeometryRenderer(_simpleRenderQueue);
             _backbufferRenderer = new BackbufferRenderer();
+            _deferredShadingRenderer = new DeferredShadingRenderer();
         }
 
         public bool IsReady()
         {
             return _assetsManager.IsLoaded(_gBufferHandle) &&
-                   _assetsManager.IsLoaded(_fullscreenHandle);
+                   _assetsManager.IsLoaded(_fullscreenHandle) &&
+                   _assetsManager.IsLoaded(_lambertianHandle)
+                   ;
         }
 
         public Pipeline[] Create()
@@ -99,17 +105,32 @@ namespace Titan.Rendering
                 Renderer = _geometryRenderer
             };
 
+
+            var lambertianShaders = _assetsManager.GetAssetHandle<ShaderProgram>(_lambertianHandle);
+
+            var deferredShadingTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
+            {
+                Format = TextureFormats.RGBA32F,
+                Width = swapchain.Width,
+                Height = swapchain.Height,
+                Binding = TextureBindFlags.FrameBuffer
+            });
+
+
+            var deferredShading = new Pipeline
+            {
+                ClearRenderTargets = true,
+                ClearColor = Color.Black,
+                PixelShader = lambertianShaders.PixelShader,
+                VertexShader = lambertianShaders.VertexShader,
+                RenderTargets = new []{deferredShadingTarget},
+                PixelShaderResources = new []{gBufferPosition, gBufferAlbedo, gBufferNormals},
+                PixelShaderSamplers = new []{fullscreenSampler},
+                Renderer = _deferredShadingRenderer
+            };
+            
+            
             var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
-
-            //var backbufferColor = GraphicsDevice.TextureManager.Create(new TextureCreation
-            //{
-            //    Format = TextureFormats.RGBA32F,
-            //    Width = swapchain.Width,
-            //    Height = swapchain.Height,
-            //    Binding = TextureBindFlags.FrameBuffer
-            //});
-
-
             var fullscreenShader = _assetsManager.GetAssetHandle<ShaderProgram>(_fullscreenHandle);
             var backbuffer = new Pipeline
             {
@@ -119,12 +140,12 @@ namespace Titan.Rendering
                 RenderTargets = new[] {backbufferRenderTarget},
                 PixelShader = fullscreenShader.PixelShader,
                 VertexShader = fullscreenShader.VertexShader,
-                PixelShaderResources = new[] { gBufferAlbedo },
+                PixelShaderResources = new[] { deferredShadingTarget },
                 PixelShaderSamplers = new []{fullscreenSampler},
                 Renderer = _backbufferRenderer
             };
 
-            return new[] {gBuffer, backbuffer};
+            return new[] {gBuffer, deferredShading, backbuffer};
         }
     }
 }

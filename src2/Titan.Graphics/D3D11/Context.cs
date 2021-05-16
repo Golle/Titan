@@ -210,7 +210,7 @@ namespace Titan.Graphics.D3D11
             Debug.Assert(GraphicsDevice.BufferManager.Access(handle).BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER));
 
             var buffer = GraphicsDevice.BufferManager.Access(handle).Resource;
-            _context->VSSetConstantBuffers(slot, 1, &buffer);
+            _context->PSSetConstantBuffers(slot, 1, &buffer);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

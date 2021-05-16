@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Core;
 using Titan.Graphics;
@@ -27,7 +28,6 @@ namespace Titan.Rendering
             _renderables = new Renderable[max];
         }
 
-
         public void Push(in Matrix4x4 transform, Model model) => _renderables[Interlocked.Increment(ref _count) - 1] = new Renderable {Model = model, Transform = transform};
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -44,6 +44,7 @@ namespace Titan.Rendering
     {
         private readonly SimpleRenderQueue _queue;
         private readonly Handle<Buffer> _transformBuffer;
+        private readonly Handle<Buffer> _materialBuffer;
 
         public unsafe GeometryRenderer(SimpleRenderQueue queue)
         {
@@ -56,13 +57,25 @@ namespace Titan.Rendering
                 Type = BufferTypes.ConstantBuffer,
                 Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
             });
+
+            _materialBuffer = GraphicsDevice.BufferManager.Create(new BufferCreation
+            {
+                Count = 1,
+                CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE,
+                Stride = (uint) sizeof(MaterialBuffer),
+                Type = BufferTypes.ConstantBuffer,
+                Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
+            });
         }
 
 
         public void Render(Context context)
         {
+            Unsafe.SkipInit(out MaterialBuffer material);
+
             context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             context.SetVertexShaderConstantBuffer(_transformBuffer, 1);
+            context.SetPixelShaderConstantBuffer(_materialBuffer, 1);
             foreach (ref readonly var renderable in _queue.GetRenderables())
             {
                 ref readonly var mesh = ref renderable.Model.Mesh;
@@ -75,6 +88,9 @@ namespace Titan.Rendering
                 for (var i = 0; i < mesh.Submeshes.Length; ++i)
                 {
                     ref readonly var submesh = ref mesh.Submeshes[i];
+                    material.DiffuseColor = submesh.Material.Properties.DiffuseColor;
+                    context.Map(_materialBuffer, material);
+
                     context.DrawIndexed(submesh.Count, submesh.StartIndex);
                 }
             }
@@ -83,6 +99,12 @@ namespace Titan.Rendering
         public void Dispose()
         {
             GraphicsDevice.BufferManager.Release(_transformBuffer);
+            GraphicsDevice.BufferManager.Release(_materialBuffer);
         }
+    }
+
+    internal struct MaterialBuffer
+    {
+        public Color DiffuseColor;
     }
 }
