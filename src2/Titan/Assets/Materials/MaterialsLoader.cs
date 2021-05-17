@@ -17,7 +17,10 @@ namespace Titan.Assets.Materials
         {
             Debug.Assert(buffers.Length == 1, "Only a single file can be used for materials");
             ShaderProgram shader = default;
-            MaterialProperties properties = default;
+
+            var diffuseMap = Handle<Texture>.Null;
+            var ambientMap = Handle<Texture>.Null;
+            
             foreach (ref readonly var dependency in dependencies)
             {
                 if (dependency.Type == AssetTypes.Shader)
@@ -29,10 +32,10 @@ namespace Titan.Assets.Materials
                     switch (dependency.Name)
                     {
                         case "diffuse":
-                            properties.DiffuseMap = Unsafe.Unbox<Handle<Texture>>(dependency.Asset);
+                            diffuseMap = Unsafe.Unbox<Handle<Texture>>(dependency.Asset);
                             break;
-                        case "bumpmap":
-                            properties.BumpMap = Unsafe.Unbox<Handle<Texture>>(dependency.Asset);
+                        case "ambient":
+                            ambientMap = Unsafe.Unbox<Handle<Texture>>(dependency.Asset);
                             break;
                         default:
                             Logger.Error<MaterialsLoader>($"Texture type {dependency.Name} is not recognized.");
@@ -41,24 +44,35 @@ namespace Titan.Assets.Materials
                 }
             }
 
-            var material = Json.Deserialize<MatTest>(buffers[0].AsSpan());
-            properties.DiffuseColor = material.DiffuseColor;
-
-            Logger.Warning<MaterialsLoader>("Materials have not been fully implemented yet.");
-
             Debug.Assert(shader.PixelShader.IsValid(), "The PixelShader handle is not valid");
             Debug.Assert(shader.VertexShader.IsValid(), "The VertexShader handle is not valid");
 
-            return new Material(shader, properties);
+            var material = Json.Deserialize<MaterialDescriptor>(buffers[0].AsSpan());
+            var args = new MaterialCreation
+            {
+                Shader = shader,
+                DiffuseColor = material.DiffuseColor,
+                AmbientColor = material.AmbientColor,
+                EmissiveColor =  material.EmissiveColor,
+                SpecularColor = material.SpecularColor,
+                DiffuseMap = diffuseMap,
+                AmbientMap = ambientMap
+            };
+
+            
+            Logger.Warning<MaterialsLoader>("Materials have not been fully implemented yet.");
+            return Resources.Material.Create(args);
         }
 
         public void OnRelease(object asset)
         {
-            // No resources allocated
+            var handle = Unsafe.Unbox<Handle<Material>>(asset);
+            Resources.Material.Release(handle);
         }
 
         public void Dispose()
         {
+            //_manager.Dispose(); TODO: who owns the manager?
             // Nothing to dispose
         }
     }

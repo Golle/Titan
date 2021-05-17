@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Titan.Assets;
+using Titan.Assets.Materials;
 using Titan.Assets.Shaders;
 using Titan.Core;
 using Titan.Graphics;

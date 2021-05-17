@@ -50,7 +50,7 @@
                 },
                 {
                     "Id": "textures/lion",
-                    "Name": "bumpmap"
+                    "Name": "ambient"
                 }
             ]
         },

@@ -7,7 +7,6 @@ using Titan.Core.Logging;
 
 namespace Titan.Core.Memory
 {
-    
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public unsafe struct ResourcePool<T> where T : unmanaged
     {
@@ -32,7 +31,6 @@ namespace Titan.Core.Memory
             _data = default;
             _usedData = default;
         }
-
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Handle<T> CreateResource() => GetFreeIndex() + Offset;

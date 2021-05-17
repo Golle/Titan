@@ -167,7 +167,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsetRenderTargets()
+        public void UnbindRenderTargets()
         {
             ID3D11RenderTargetView* renderTarget = null;
             _context->OMSetRenderTargets(1, &renderTarget, null);
@@ -184,16 +184,29 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsetPixelShaderResources()
+        public void UnbindPixelShaderResources(in Handle<Texture>[] handles)
         {
-            ID3D11ShaderResourceView* resource = null;
-            _context->PSSetShaderResources(0, 1, &resource);
+            if (handles == null)
+            {
+                return;
+            }
+
+            var numberOfResources = handles.Length;
+            var resources = stackalloc ID3D11ShaderResourceView*[numberOfResources];
+            Unsafe.InitBlock(resources, 0, (uint) (sizeof(ID3D11ShaderResourceView*)*numberOfResources));
+            _context->PSSetShaderResources(0, (uint)numberOfResources, resources);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsetVertexShaderResources()
+        public void UnbindVertexShaderResources(in Handle<Texture>[] handles)
         {
-            ID3D11ShaderResourceView* resource = null;
-            _context->VSSetShaderResources(0, 1, &resource);
+            if (handles == null)
+            {
+                return;
+            }
+            var numberOfResources = handles.Length;
+            var resources = stackalloc ID3D11ShaderResourceView*[numberOfResources];
+            Unsafe.InitBlock(resources, 0, (uint)(sizeof(ID3D11ShaderResourceView*) * numberOfResources));
+            _context->VSSetShaderResources(0, (uint)numberOfResources, resources);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

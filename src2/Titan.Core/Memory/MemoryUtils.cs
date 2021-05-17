@@ -39,5 +39,7 @@ namespace Titan.Core.Memory
             }
             return new MemoryChunk(ptr);
         }
+
+        public static PinnedMemoryChunk<T> AllocateArray<T>(int size, bool zeroMemory = false) => zeroMemory ? new(GC.AllocateArray<T>(size, false)) :  new (GC.AllocateUninitializedArray<T>(size, false));
     }
 }

@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Text.Json;
 using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Core.Logging;
@@ -114,8 +112,6 @@ foreach (var file in Directory.EnumerateFiles(assetsPath, "*.obj", SearchOption.
     }
 
 
-    
-
     {
 
         for (var i = 0; i < model.Materials.Length; ++i)
@@ -125,16 +121,20 @@ foreach (var file in Directory.EnumerateFiles(assetsPath, "*.obj", SearchOption.
             await using var materialOutput = File.Open(Path.Combine(materialDestinationPath, $"{name}_{i:D2}.json"), FileMode.OpenOrCreate, FileAccess.Write);
             materialOutput.SetLength(0);
             materialOutput.Seek(0, SeekOrigin.Begin);
-            materialOutput.Write(Json.SerializeUtf8(new MatTest
+            materialOutput.Write(Json.SerializeUtf8(new MaterialDescriptor
             {
                 Name = material.Name,
-                DiffuseColor = Color.ParseF(material.DiffuseColor.Original)
+                DiffuseColor = Color.ParseF(material.DiffuseColor.Original, Color.White),
+                AmbientColor = Color.ParseF(material.AmbientColor.Original, Color.White),
+                EmissiveColor = Color.ParseF(material.EmissiveColor.Original, Color.Zero),
+                SpecularColor = Color.ParseF(material.SpecularColor.Original, Color.Zero)
             }));
         }
     }
 
 }
 Logger.Warning("Done");
+Logger.Shutdown();
 
 
 

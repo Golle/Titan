@@ -91,9 +91,9 @@ namespace Titan.Graphics
 
                 pipeline.Renderer.Render(_immediateContext);
                 
-                _immediateContext.UnsetRenderTargets();
-                _immediateContext.UnsetPixelShaderResources();
-                _immediateContext.UnsetVertexShaderResources();
+                _immediateContext.UnbindRenderTargets();
+                _immediateContext.UnbindPixelShaderResources(pipeline.PixelShaderResources);
+                _immediateContext.UnbindVertexShaderResources(pipeline.VertexShaderResources);
             }
 
             // swapchain

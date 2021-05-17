@@ -1,6 +1,8 @@
 using System;
+using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
 using Titan.Assets.Materials;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
@@ -14,7 +16,7 @@ namespace Titan.Assets.Models
     {
         public uint StartIndex;
         public uint Count;
-        public Material Material;
+        public Handle<Material> Material;
     }
     public class ModelLoader : IAssetLoader
     {
@@ -49,7 +51,6 @@ namespace Titan.Assets.Models
                 Usage = D3D11_USAGE.D3D11_USAGE_IMMUTABLE
             });
 
-            
             var submeshes = new Submesh[submeshDescriptors.Length];
             for (var i = 0; i < submeshDescriptors.Length; ++i)
             {
@@ -57,7 +58,7 @@ namespace Titan.Assets.Models
                 submeshes[i] = new Submesh
                 {
                     Count = submesh.Count,
-                    Material = (Material) dependencies[submesh.MaterialIndex].Asset, // TODO: this will fail if a model depends on anything else than a material
+                    Material = Unsafe.Unbox<Handle<Material>>(dependencies[submesh.MaterialIndex].Asset) , // TODO: this will fail if a model depends on anything else than a material
                     StartIndex = submesh.StartIndex
                 };
             }

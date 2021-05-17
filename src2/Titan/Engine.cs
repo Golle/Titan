@@ -6,13 +6,11 @@ using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Assets.Shaders;
 using Titan.Components;
-using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
 using Titan.ECS.Components;
-using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -76,6 +74,10 @@ namespace Titan
             Trace($"Init {typeof(GraphicsDevice).FullName}");
             GraphicsDevice.Init(_window, new DeviceConfiguration(144, true, true));
 
+            Trace($"Init {nameof(Resources)}");
+            Resources.Init();
+            
+
             Info("Engine has been initialized.");
             Info("Initialize Application.");
             _app.OnStart();
@@ -123,22 +125,22 @@ namespace Titan
             var pipeline = pipelineBuilder.Create();
             using var graphicsSystem = new GraphicsSystem(pipeline);
 
-
             var systemCollection = new SystemsCollection()
                 .Add(new Transform3DSystem())
                 .Add(new Render3DSystem(assetsManager, renderQueue))
-                .Add(new CameraSystem(graphicsSystem));
+                .Add(new CameraSystem(graphicsSystem))
+                .Add(new ModelLoaderSystem(assetsManager))
+                ;
             _app.ConfigureSystems(systemCollection);
 
             using var world = new World(new WorldConfiguration(10_000, new[]
                 {
                     new ComponentConfiguration(typeof(Transform3D), ComponentPoolTypes.Packed),
-                    new ComponentConfiguration(typeof(CameraComponent), ComponentPoolTypes.Packed)
+                    new ComponentConfiguration(typeof(CameraComponent), ComponentPoolTypes.Packed),
+                    new ComponentConfiguration(typeof(AssetComponent<Model>), ComponentPoolTypes.Packed)
                 },
                 systemCollection.Systems.ToArray()
             ));
-
-
 
             var entity1 = world.CreateEntity();
             entity1.AddComponent(new Transform3D
@@ -149,17 +151,12 @@ namespace Titan
             });
 
             var entity2 = world.CreateEntity();
-            entity2.AddComponent(new Transform3D{Position = Vector3.Zero, Rotation = Quaternion.Identity, Scale = Vector3.One});
+            entity2.AddComponent(new Transform3D{Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One});
             var cameraComponent = CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f);
             cameraComponent.Active = true;
             entity2.AddComponent(cameraComponent);
-
-            var entity3 = world.CreateEntity();
-            entity3.AddComponent(new Transform3D { Position = Vector3.Zero, Rotation = Quaternion.Identity, Scale = Vector3.One });
-            var cameraComponent1 = CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f);
-            //cameraComponent1.SetActive();
-            entity3.AddComponent(cameraComponent1);
-
+            entity2.AddComponent(new AssetComponent<Model>("models/tree"));
+            
 
             // star the main loop
             while (_window.Update())
@@ -233,6 +230,9 @@ namespace Titan
             
             Logger.Trace<Engine>($"Terminate {nameof(GraphicsDevice)}");
             GraphicsDevice.Terminate();
+
+            Logger.Trace<Engine>($"Terminate {nameof(Resources)}");
+            Resources.Terminate();
 
             Logger.Trace<Engine>($"Close/Dispose {nameof(Window)}");
             _window.Dispose();

@@ -1,10 +1,13 @@
-using System.Runtime.InteropServices;
+using Titan.Graphics;
 
 namespace Titan.Assets.Materials
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct MaterialDescriptor
     {
-        public uint Count;
+        public string Name;
+        public Color AmbientColor;
+        public Color DiffuseColor;
+        public Color SpecularColor;
+        public Color EmissiveColor;
     }
 }

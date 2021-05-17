@@ -1,0 +1,18 @@
+﻿using Titan.Assets.Shaders;
+using Titan.Core;
+using Titan.Graphics;
+using Titan.Graphics.D3D11.Textures;
+
+namespace Titan.Assets.Materials
+{
+    public record MaterialCreation
+    {
+        public Color AmbientColor { get; init; }
+        public Color DiffuseColor { get; init; }
+        public Color SpecularColor { get; init; }
+        public Color EmissiveColor { get; init; }
+        public Handle<Texture> DiffuseMap { get; init; }
+        public Handle<Texture> AmbientMap { get; init; }
+        public ShaderProgram Shader { get; init; }
+    }
+}

@@ -31,8 +31,13 @@ namespace Titan.Graphics
         public static readonly Color Zero = new(0f, 0, 0, 0);
         public static readonly Color Magenta = new(1f, 0, 1f);
 
-        public static Color ParseF(string value)
+        public static Color ParseF(string value, in Color defaultValue)
         {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return defaultValue;
+            }
+
             var values = value.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(v => float.Parse(v, CultureInfo.InvariantCulture))
                 .ToArray();

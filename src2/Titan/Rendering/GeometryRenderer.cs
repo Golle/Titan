@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Titan.Assets;
 using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Core;
@@ -16,7 +17,12 @@ namespace Titan.Rendering
     internal struct Renderable
     {
         public Matrix4x4 Transform;
-        public Model Model;
+
+        public Handle<Buffer> VertexBuffer;
+        public Handle<Buffer> IndexBuffer;
+        public Handle<Material> Material;
+        public uint StartIndex;
+        public uint Count;
     }
     
     internal class SimpleRenderQueue
@@ -28,7 +34,22 @@ namespace Titan.Rendering
             _renderables = new Renderable[max];
         }
 
-        public void Push(in Matrix4x4 transform, Model model) => _renderables[Interlocked.Increment(ref _count) - 1] = new Renderable {Model = model, Transform = transform};
+        public void Push(in Matrix4x4 transform, Model model)
+        {
+            for(var i = 0; i < model.Mesh.Submeshes.Length; ++i)
+            {
+                ref readonly var submesh = ref model.Mesh.Submeshes[i];
+                _renderables[Interlocked.Increment(ref _count) - 1] = new Renderable
+                {
+                    Transform = transform,
+                    Count = submesh.Count,
+                    StartIndex = submesh.StartIndex,
+                    Material = submesh.Material,
+                    IndexBuffer = model.Mesh.IndexBuffer,
+                    VertexBuffer = model.Mesh.VertexBuffer
+                };
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<Renderable> GetRenderables() => new(_renderables, 0, _count);
@@ -71,28 +92,23 @@ namespace Titan.Rendering
 
         public void Render(Context context)
         {
-            Unsafe.SkipInit(out MaterialBuffer material);
+            Unsafe.SkipInit(out MaterialBuffer materialBuffer);
 
             context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             context.SetVertexShaderConstantBuffer(_transformBuffer, 1);
             context.SetPixelShaderConstantBuffer(_materialBuffer, 1);
             foreach (ref readonly var renderable in _queue.GetRenderables())
             {
-                ref readonly var mesh = ref renderable.Model.Mesh;
-
                 context.Map(_transformBuffer, renderable.Transform);
                 
-                context.SetVertexBuffer(mesh.VertexBuffer);    
-                context.SetIndexBuffer(mesh.IndexBuffer);
+                context.SetVertexBuffer(renderable.VertexBuffer);    
+                context.SetIndexBuffer(renderable.IndexBuffer);
 
-                for (var i = 0; i < mesh.Submeshes.Length; ++i)
-                {
-                    ref readonly var submesh = ref mesh.Submeshes[i];
-                    material.DiffuseColor = submesh.Material.Properties.DiffuseColor;
-                    context.Map(_materialBuffer, material);
+                ref readonly var material = ref Resources.Material.Access(renderable.Material);
+                materialBuffer.DiffuseColor = material.Properties.DiffuseColor;
+                context.Map(_materialBuffer, materialBuffer);
 
-                    context.DrawIndexed(submesh.Count, submesh.StartIndex);
-                }
+                context.DrawIndexed(renderable.Count, renderable.StartIndex);
             }
         }
 

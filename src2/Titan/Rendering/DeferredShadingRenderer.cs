@@ -9,7 +9,6 @@ using Titan.Windows.D3D11;
 
 namespace Titan.Rendering
 {
-
     [StructLayout(LayoutKind.Explicit, Size = 1024)]
     internal unsafe struct LightBuffer
     {

@@ -20,7 +20,7 @@ namespace Titan.Graphics.D3D11
             Height = height;
             Backbuffer = backbuffer;
             _swapChain = swapChain;
-            _syncInterval = vsync ? 1u : 0u;
+            _syncInterval = !vsync ? 1u : 0u;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
