@@ -14,7 +14,6 @@ namespace Titan.Rendering
 {
     internal class PipelineBuilder
     {
-        private Handle<Asset> _gBufferHandle;
         private Handle<Asset> _fullscreenHandle;
         private Handle<Asset> _lambertianHandle;
 
@@ -31,7 +30,6 @@ namespace Titan.Rendering
         }
         public void LoadResources()
         {
-            _gBufferHandle = _assetsManager.Load("shaders/gbuffer");
             _lambertianHandle = _assetsManager.Load("shaders/default_shader");
             _fullscreenHandle = _assetsManager.Load("shaders/fullscreen");
 
@@ -42,8 +40,7 @@ namespace Titan.Rendering
 
         public bool IsReady()
         {
-            return _assetsManager.IsLoaded(_gBufferHandle) &&
-                   _assetsManager.IsLoaded(_fullscreenHandle) &&
+            return _assetsManager.IsLoaded(_fullscreenHandle) &&
                    _assetsManager.IsLoaded(_lambertianHandle)
                    ;
         }
@@ -83,8 +80,6 @@ namespace Titan.Rendering
                 Format = TextureFormats.R24G8TL
             });
 
-            var gbufferShaders = _assetsManager.GetAssetHandle<ShaderProgram>(_gBufferHandle);
-
             var fullscreenSampler = GraphicsDevice.SamplerManager.Create(new SamplerCreation
             {
                 Filter = TextureFilter.MinMagMipPoint,
@@ -97,13 +92,10 @@ namespace Titan.Rendering
                 ClearDepthBuffer = true,
                 DepthBufferClearValue = 1f,
                 DepthBuffer = depthBuffer,
-                PixelShader = gbufferShaders.PixelShader,
-                VertexShader =  gbufferShaders.VertexShader,
                 ClearColor = Color.White,
                 ClearRenderTargets = true,
                 Renderer = _geometryRenderer
             };
-
 
             var lambertianShaders = _assetsManager.GetAssetHandle<ShaderProgram>(_lambertianHandle);
 
@@ -126,7 +118,6 @@ namespace Titan.Rendering
                 PixelShaderSamplers = new []{fullscreenSampler},
                 Renderer = _deferredShadingRenderer
             };
-            
             
             var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
             var fullscreenShader = _assetsManager.GetAssetHandle<ShaderProgram>(_fullscreenHandle);

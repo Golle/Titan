@@ -77,7 +77,7 @@
             "Type": "material",
             "Dependencies": [
                 {
-                    "Id": "shaders/default_shader"
+                    "Id": "shaders/gbuffer01"
                 }
             ]
         },
@@ -89,7 +89,7 @@
             "Type": "material",
             "Dependencies": [
                 {
-                    "Id": "shaders/default_shader"
+                    "Id": "shaders/gbuffer"
                 }
             ]
         },
@@ -124,6 +124,13 @@
             ]
         },
         {
+            "Id": "shaders/gbuffer01_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/gbuffer01_ps.hlsl"
+            ]
+        },
+        {
             "Id": "shaders/gbuffer",
             "Type": "shader",
             "Dependencies": [
@@ -133,9 +140,19 @@
                 {
                     "Id": "shaders/gbuffer_ps"
                 }
-            ],
-            "Preload": true,
-            "Static": true
+            ]
+        },
+        {
+            "Id": "shaders/gbuffer01",
+            "Type": "shader",
+            "Dependencies": [
+                {
+                    "Id": "shaders/gbuffer_vs"
+                },
+                {
+                    "Id": "shaders/gbuffer01_ps"
+                }
+            ]
         },
         {
             "Id": "shaders/fullscreen_vs",
