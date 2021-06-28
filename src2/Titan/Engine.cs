@@ -152,9 +152,7 @@ namespace Titan
 
             var entity2 = world.CreateEntity();
             entity2.AddComponent(new Transform3D{Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One});
-            var cameraComponent = CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f);
-            cameraComponent.Active = true;
-            entity2.AddComponent(cameraComponent);
+            entity2.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
             entity2.AddComponent(new AssetComponent<Model>("models/tree"));
             
 
