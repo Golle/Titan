@@ -38,7 +38,7 @@ namespace Titan.Assets
                     Logger.Error<AssetsManager>($"No loader registered for the type {descriptor.Type} that was found in the manifest. Asset will be discarded.");
                     throw new InvalidOperationException("Missing loader");
                 }
-
+                
                 return new Asset
                 {
                     Identifier = descriptor.Id,
@@ -82,7 +82,7 @@ namespace Titan.Assets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Unload(string identifier) => _loader.Unload(identifier);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T GetAssetHandle<T>(in Handle<Asset> handle)
+        public Handle<T> GetAssetHandle<T>(in Handle<Asset> handle)
         {
 #if DEBUG
             ref readonly var asset = ref _loader.GetAsset(handle);
@@ -91,9 +91,9 @@ namespace Titan.Assets
                 Logger.Error<Loader>("Getting handle for Asset that is not loaded. Returning 0");
                 return default;
             }
-            return (T)asset.AssetReference;
+            return asset.AssetHandle;
 #else
-            return (T)_loader.GetAsset(handle).AssetReference;
+            return _loader.GetAsset(handle).AssetHandle;
 #endif
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

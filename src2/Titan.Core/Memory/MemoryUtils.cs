@@ -20,7 +20,7 @@ namespace Titan.Core.Memory
             {
                 OutOfMemoryException();
             }
-            return new MemoryChunk<T>(ptr, size);
+            return new MemoryChunk<T>(ptr, size, count);
         }
 
         public static MemoryChunk AllocateBlock(uint size, bool zeroMemory = false)

@@ -38,11 +38,11 @@ namespace Titan.Systems
 
                 if (_assetsManager.IsLoaded(asset.AssetHandle))
                 {
-                    //entity.AddComponent(new ModelComponent
-                    //{
-                    //    Handle = _assetsManager.GetAssetHandle<Handle<Model>>(asset.AssetHandle)
-                    //});
-
+                    var assetHandle = _assetsManager.GetAssetHandle<Model>(asset.AssetHandle);
+                    entity.AddComponent(new ModelComponent
+                    {
+                        Handle = assetHandle
+                    });
                 }
             }
         }

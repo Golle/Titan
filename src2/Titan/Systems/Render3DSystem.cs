@@ -13,9 +13,7 @@ namespace Titan.Systems
         private readonly SimpleRenderQueue _queue;
         private EntityFilter _filter;
         private ReadOnlyStorage<Transform3D> _transform;
-        private Handle<Asset> _treeHandle;
-        private bool _loaded;
-        private Model _tree;
+        private ReadOnlyStorage<ModelComponent> _model;
 
         public Render3DSystem(AssetsManager assetsManager, SimpleRenderQueue queue)
         {
@@ -26,28 +24,20 @@ namespace Titan.Systems
         protected override void Init()
         {
             _transform = GetReadOnly<Transform3D>();
-            _treeHandle = _assetsManager.Load("models/tree");
-            _filter = CreateFilter(new EntityFilterConfiguration().With<Transform3D>());
+            _model = GetReadOnly<ModelComponent>();
+            _filter = CreateFilter(new EntityFilterConfiguration().With<Transform3D>().With<ModelComponent>());
 
         }
 
         protected override void OnUpdate(in Timestep timestep)
         {
-            if (_loaded)
+            var entities = _filter.GetEntities();
+            foreach (ref readonly var entity in entities)
             {
-                foreach (ref readonly var entity in _filter.GetEntities())
-                {
-                    ref readonly var transform = ref _transform.Get(entity);
+                ref readonly var transform = ref _transform.Get(entity);
+                ref readonly var model = ref _model.Get(entity);
 
-                    _queue.Push(transform.WorldMatrix, _tree);
-                }
-            }
-            else
-            {
-                if (_loaded = _assetsManager.IsLoaded(_treeHandle))
-                {
-                    _tree = _assetsManager.GetAssetHandle<Model>(_treeHandle);
-                }
+                _queue.Push(transform.WorldMatrix, model.Handle);
             }
         }
     }

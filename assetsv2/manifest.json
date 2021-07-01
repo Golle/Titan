@@ -8,7 +8,7 @@
             "Type": "texture"
         },
         {
-            "Id": "shaders/lambertian_vertexshader",
+            "Id": "shaders/default_vs",
             "Type": "vertexshader",
             "Files": [
                 "shaders/lambertian_vertexshader.hlsl",
@@ -16,22 +16,10 @@
             ]
         },
         {
-            "Id": "shaders/lambertian_pixelshader",
+            "Id": "shaders/default_ps",
             "Type": "pixelshader",
             "Files": [
                 "shaders/lambertian_pixelshader.hlsl"
-            ]
-        },
-        {
-            "Id": "shaders/default_shader",
-            "Type": "shader",
-            "Dependencies": [
-                {
-                    "Id": "shaders/lambertian_pixelshader"
-                },
-                {
-                    "Id": "shaders/lambertian_vertexshader"
-                }
             ]
         },
         {
@@ -42,7 +30,10 @@
             "Type": "material",
             "Dependencies": [
                 {
-                    "Id": "shaders/default_shader"
+                    "Id": "shaders/default_vs"
+                },
+                {
+                    "Id": "shaders/default_ps"
                 },
                 {
                     "Id": "textures/lion",
@@ -77,7 +68,10 @@
             "Type": "material",
             "Dependencies": [
                 {
-                    "Id": "shaders/gbuffer01"
+                    "Id": "shaders/gbuffer01_ps"
+                },
+                {
+                    "Id": "shaders/gbuffer_vs"
                 }
             ]
         },
@@ -89,7 +83,10 @@
             "Type": "material",
             "Dependencies": [
                 {
-                    "Id": "shaders/gbuffer"
+                    "Id": "shaders/gbuffer_ps"
+                },
+                {
+                    "Id": "shaders/gbuffer_vs"
                 }
             ]
         },
@@ -131,54 +128,20 @@
             ]
         },
         {
-            "Id": "shaders/gbuffer",
-            "Type": "shader",
-            "Dependencies": [
-                {
-                    "Id": "shaders/gbuffer_vs"
-                },
-                {
-                    "Id": "shaders/gbuffer_ps"
-                }
-            ]
-        },
-        {
-            "Id": "shaders/gbuffer01",
-            "Type": "shader",
-            "Dependencies": [
-                {
-                    "Id": "shaders/gbuffer_vs"
-                },
-                {
-                    "Id": "shaders/gbuffer01_ps"
-                }
-            ]
-        },
-        {
             "Id": "shaders/fullscreen_vs",
             "Type": "vertexshader",
             "Files": [
                 "shaders/fullscreen_vs.hlsl",
                 "shaders/fullscreen.layout"
-            ]
+            ],
+            "Preload": true,
+            "Static": true
         },
         {
             "Id": "shaders/fullscreen_ps",
             "Type": "pixelshader",
             "Files": [
                 "shaders/fullscreen_ps.hlsl"
-            ]
-        },
-        {
-            "Id": "shaders/fullscreen",
-            "Type": "shader",
-            "Dependencies": [
-                {
-                    "Id": "shaders/fullscreen_vs"
-                },
-                {
-                    "Id": "shaders/fullscreen_ps"
-                }
             ],
             "Preload": true,
             "Static": true

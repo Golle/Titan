@@ -148,7 +148,8 @@ namespace Titan.Assets
 
                     case AssetStatus.UnloadRequested:
                         // TODO: should this be async?
-                        asset.Loader.OnRelease(asset.AssetReference);
+
+                        asset.Loader.OnRelease(asset.AssetHandle);
                         foreach (var dependency in asset.Dependencies)
                         {
                             Unload(dependency.Index);
@@ -188,9 +189,9 @@ namespace Titan.Assets
                 {
                     ref readonly var dependency = ref asset.Dependencies[i];
                     ref readonly var dep = ref assets[dependency.Index];
-                    dependencies[i] = new Dependency(dep.Type, dep.Identifier, dependency.Name, dep.AssetReference);
+                    dependencies[i] = new Dependency(dep.Type, dep.Identifier, dependency.Name, dep.AssetHandle);
                 }
-                asset.AssetReference = asset.Loader.OnLoad(asset.FileBytes, dependencies);
+                asset.AssetHandle = asset.Loader.OnLoad(asset.FileBytes, dependencies);
                 Logger.Trace<Loader>($"Asset created");
                 asset.Status = AssetStatus.AssetCreated;
             }, (index, _assets));

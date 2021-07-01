@@ -5,6 +5,7 @@ using Titan.Assets;
 using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Assets.Shaders;
+using Titan.Assets.Storage;
 using Titan.Components;
 using Titan.Core.IO;
 using Titan.Core.Logging;
@@ -96,8 +97,7 @@ namespace Titan
         {
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
-                .Register(AssetTypes.Model, new ModelLoader())
-                .Register(AssetTypes.Shader, new ShaderLoader())
+                .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
                 .Register(AssetTypes.VertexShader, new VertexShaderLoader())
                 .Register(AssetTypes.PixelShader, new PixelShaderLoader())
                 .Register(AssetTypes.Material, new MaterialsLoader())
@@ -137,23 +137,35 @@ namespace Titan
                 {
                     new ComponentConfiguration(typeof(Transform3D), ComponentPoolTypes.Packed),
                     new ComponentConfiguration(typeof(CameraComponent), ComponentPoolTypes.Packed),
-                    new ComponentConfiguration(typeof(AssetComponent<Model>), ComponentPoolTypes.Packed)
+                    new ComponentConfiguration(typeof(AssetComponent<Model>), ComponentPoolTypes.Packed),
+                    new ComponentConfiguration(typeof(ModelComponent), ComponentPoolTypes.Packed)
                 },
                 systemCollection.Systems.ToArray()
             ));
 
-            var entity1 = world.CreateEntity();
-            entity1.AddComponent(new Transform3D
+            //{
+            //    var tree = world.CreateEntity();
+            //    tree.AddComponent(Transform3D.Default);
+            //    tree.AddComponent(new AssetComponent<Model>("models/tree"));
+            //}
+            for (var i = 0; i < 10; ++i)
             {
-                Position = Vector3.One,
-                Scale = Vector3.One,
-                Rotation = Quaternion.Identity
-            });
+                for (var j = 0; j < 10; ++j)
+                {
+                    {
+                        var tree = world.CreateEntity();
+                        tree.AddComponent(new Transform3D { Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(i*20, 0, j*20) });
+                        tree.AddComponent(new AssetComponent<Model>("models/tree"));
+                    }
+                }
+            }
+            
+            
+
 
             var entity2 = world.CreateEntity();
             entity2.AddComponent(new Transform3D{Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One});
             entity2.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
-            entity2.AddComponent(new AssetComponent<Model>("models/tree"));
             
 
             // star the main loop

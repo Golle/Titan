@@ -5,13 +5,13 @@ namespace Titan.Assets
         public readonly AssetTypes Type;
         public readonly string Id;
         public readonly string Name;
-        public readonly object Asset;
-        public Dependency(AssetTypes type, string id, string name, object asset)
+        public readonly int AssetHandle;
+        public Dependency(AssetTypes type, string id, string name, int assetHandle)
         {
             Type = type;
             Id = id;
             Name = name;
-            Asset = asset;
+            AssetHandle = assetHandle;
         }
     }
 }

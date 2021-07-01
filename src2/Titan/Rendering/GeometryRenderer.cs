@@ -55,8 +55,8 @@ namespace Titan.Rendering
                 context.SetIndexBuffer(renderable.IndexBuffer);
 
                 ref readonly var material = ref Resources.Material.Access(renderable.Material);
-                context.SetPixelShader(material.Shader.PixelShader);
-                context.SetVertexShader(material.Shader.VertexShader);
+                context.SetPixelShader(material.PixelShader);
+                context.SetVertexShader(material.VertexShader);
 
                 ref readonly var properties = ref material.Properties;
                 materialBuffer.DiffuseColor = properties.DiffuseColor;

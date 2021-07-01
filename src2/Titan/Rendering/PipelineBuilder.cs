@@ -1,21 +1,21 @@
-using System;
 using System.Diagnostics;
 using Titan.Assets;
-using Titan.Assets.Materials;
-using Titan.Assets.Shaders;
 using Titan.Core;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.D3D11.Samplers;
+using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
 
 namespace Titan.Rendering
 {
     internal class PipelineBuilder
     {
-        private Handle<Asset> _fullscreenHandle;
-        private Handle<Asset> _lambertianHandle;
+        private Handle<Asset> _fullscreenPixelShaderHandle;
+        private Handle<Asset> _lambertianPixelShaderHandle;
+        private Handle<Asset> _fullscreenVertexShaderHandle;
+        private Handle<Asset> _lambertianVertexShaderHandle;
 
         private readonly AssetsManager _assetsManager;
         private readonly SimpleRenderQueue _simpleRenderQueue;
@@ -30,8 +30,10 @@ namespace Titan.Rendering
         }
         public void LoadResources()
         {
-            _lambertianHandle = _assetsManager.Load("shaders/default_shader");
-            _fullscreenHandle = _assetsManager.Load("shaders/fullscreen");
+            _lambertianVertexShaderHandle = _assetsManager.Load("shaders/default_vs");
+            _fullscreenVertexShaderHandle = _assetsManager.Load("shaders/fullscreen_vs");
+            _lambertianPixelShaderHandle = _assetsManager.Load("shaders/default_ps");
+            _fullscreenPixelShaderHandle = _assetsManager.Load("shaders/fullscreen_ps");
 
             _geometryRenderer = new GeometryRenderer(_simpleRenderQueue);
             _backbufferRenderer = new BackbufferRenderer();
@@ -40,8 +42,10 @@ namespace Titan.Rendering
 
         public bool IsReady()
         {
-            return _assetsManager.IsLoaded(_fullscreenHandle) &&
-                   _assetsManager.IsLoaded(_lambertianHandle)
+            return _assetsManager.IsLoaded(_fullscreenVertexShaderHandle) &&
+                   _assetsManager.IsLoaded(_lambertianVertexShaderHandle) &&
+                   _assetsManager.IsLoaded(_fullscreenPixelShaderHandle) &&
+                   _assetsManager.IsLoaded(_lambertianPixelShaderHandle)
                    ;
         }
 
@@ -97,8 +101,6 @@ namespace Titan.Rendering
                 Renderer = _geometryRenderer
             };
 
-            var lambertianShaders = _assetsManager.GetAssetHandle<ShaderProgram>(_lambertianHandle);
-
             var deferredShadingTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
             {
                 Format = TextureFormats.RGBA32F,
@@ -111,8 +113,8 @@ namespace Titan.Rendering
             {
                 ClearRenderTargets = true,
                 ClearColor = Color.Black,
-                PixelShader = lambertianShaders.PixelShader,
-                VertexShader = lambertianShaders.VertexShader,
+                PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_lambertianPixelShaderHandle),
+                VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_lambertianVertexShaderHandle),
                 RenderTargets = new []{deferredShadingTarget},
                 PixelShaderResources = new []{gBufferPosition, gBufferAlbedo, gBufferNormals},
                 PixelShaderSamplers = new []{fullscreenSampler},
@@ -120,15 +122,14 @@ namespace Titan.Rendering
             };
             
             var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
-            var fullscreenShader = _assetsManager.GetAssetHandle<ShaderProgram>(_fullscreenHandle);
             var backbuffer = new Pipeline
             {
                 ClearDepthBuffer = false,
                 ClearRenderTargets = true,
                 ClearColor = Color.Green,
                 RenderTargets = new[] {backbufferRenderTarget},
-                PixelShader = fullscreenShader.PixelShader,
-                VertexShader = fullscreenShader.VertexShader,
+                PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_fullscreenPixelShaderHandle),
+                VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
                 PixelShaderResources = new[] { deferredShadingTarget },
                 PixelShaderSamplers = new []{fullscreenSampler},
                 Renderer = _backbufferRenderer

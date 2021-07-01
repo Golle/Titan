@@ -11,16 +11,15 @@ using Titan.Windows.D3D11;
 
 namespace Titan.Assets.Models
 {
-
-    public struct Submesh
-    {
-        public uint StartIndex;
-        public uint Count;
-        public Handle<Material> Material;
-    }
     public class ModelLoader : IAssetLoader
     {
-        public unsafe object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
+        private readonly ModelManager _modelManager;
+        public ModelLoader(ModelManager modelManager)
+        {
+            _modelManager = modelManager;
+        }
+
+        public unsafe int OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
         {
             var buffer = buffers[0].AsPointer();
             var desc = (MeshDescriptor*) buffer;
@@ -51,31 +50,32 @@ namespace Titan.Assets.Models
                 Usage = D3D11_USAGE.D3D11_USAGE_IMMUTABLE
             });
 
-            var submeshes = new Submesh[submeshDescriptors.Length];
+            Span<Submesh> submeshes = stackalloc Submesh[submeshDescriptors.Length];
             for (var i = 0; i < submeshDescriptors.Length; ++i)
             {
                 ref readonly var submesh = ref submeshDescriptors[i];
                 submeshes[i] = new Submesh
                 {
                     Count = submesh.Count,
-                    Material = Unsafe.Unbox<Handle<Material>>(dependencies[submesh.MaterialIndex].Asset) , // TODO: this will fail if a model depends on anything else than a material
+                    Material = dependencies[submesh.MaterialIndex].AssetHandle , // TODO: this will fail if a model depends on anything else than a material
                     StartIndex = submesh.StartIndex
                 };
             }
-            
-            return new Model(new Mesh
+            return _modelManager.Create(new ModelCreation
             {
+                Submeshes = submeshes,
                 IndexBuffer = indexBuffer, 
-                VertexBuffer = vertexBuffer,
-                Submeshes = submeshes
+                VertexBuffer = vertexBuffer
             });
         }
 
-        public void OnRelease(object asset)
+        public void OnRelease(int handle)
         {
-            var model = (Model) asset;
+            ref readonly var model = ref _modelManager.Access(handle);
             GraphicsDevice.BufferManager.Release(model.Mesh.VertexBuffer);
             GraphicsDevice.BufferManager.Release(model.Mesh.IndexBuffer);
+            
+            _modelManager.Release(handle);
         }
 
         public void Dispose()

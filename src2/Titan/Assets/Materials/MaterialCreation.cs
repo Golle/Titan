@@ -1,6 +1,6 @@
-﻿using Titan.Assets.Shaders;
 using Titan.Core;
 using Titan.Graphics;
+using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
 
 namespace Titan.Assets.Materials
@@ -13,6 +13,7 @@ namespace Titan.Assets.Materials
         public Color EmissiveColor { get; init; }
         public Handle<Texture> DiffuseMap { get; init; }
         public Handle<Texture> AmbientMap { get; init; }
-        public ShaderProgram Shader { get; init; }
+        public Handle<VertexShader> VertexShader { get; init; }
+        public Handle<PixelShader> PixelShader { get; init; }
     }
 }

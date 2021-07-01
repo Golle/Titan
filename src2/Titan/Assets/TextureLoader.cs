@@ -1,7 +1,5 @@
 using System;
-using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
@@ -20,7 +18,7 @@ namespace Titan.Assets
             _imageLoader = imageLoader;
         }
 
-        public unsafe object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
+        public unsafe int OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
         {
             var buffer = buffers[0];
             Logger.Trace<TextureLoader>($"Load from buffer with size {buffer.Size}");
@@ -39,9 +37,8 @@ namespace Titan.Assets
             return handle;
         }
 
-        public void OnRelease(object asset)
+        public void OnRelease(int handle)
         {
-            var handle = Unsafe.Unbox<Handle<Texture>>(asset);
             Logger.Trace<TextureLoader>($"Release handle {handle}");
             GraphicsDevice.TextureManager.Release(handle);
         }

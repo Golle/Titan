@@ -23,7 +23,8 @@ namespace Titan.Assets.Materials
             }
 
             var material = _resources.GetResourcePointer(handle);
-            material->Shader = args.Shader;
+            material->PixelShader = args.PixelShader;
+            material->VertexShader = args.VertexShader;
             ref var properties = ref material->Properties;
             properties.AmbientColor = args.AmbientColor;
             properties.DiffuseColor = args.DiffuseColor;

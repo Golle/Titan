@@ -2,27 +2,31 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Titan.Assets;
 using Titan.Assets.Models;
+using Titan.Core;
 
 namespace Titan.Rendering
 {
     internal class SimpleRenderQueue
     {
-        public Renderable[] _renderables;
-        public int _count;
+        private readonly Renderable[] _renderables;
+        private int _count;
         public SimpleRenderQueue(uint max)
         {
             _renderables = new Renderable[max];
         }
 
-        public void Push(in Matrix4x4 transform, Model model)
+        public void Push(in Matrix4x4 transform, Handle<Model> handle)
         {
-            for(var i = 0; i < model.Mesh.Submeshes.Length; ++i)
+            ref readonly var model = ref Resources.Models.Access(handle);
+
+            for(var i = 0; i < model.Mesh.Submeshes.Count; ++i)
             {
                 ref readonly var submesh = ref model.Mesh.Submeshes[i];
                 _renderables[Interlocked.Increment(ref _count) - 1] = new Renderable
                 {
-                    Transform = transform,
+                    Transform = Matrix4x4.Transpose(transform),
                     Count = submesh.Count,
                     StartIndex = submesh.StartIndex,
                     Material = submesh.Material,

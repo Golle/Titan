@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -12,18 +11,17 @@ namespace Titan.Assets.Shaders
 {
     public class PixelShaderLoader : IAssetLoader
     {
-        public object OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
+        public int OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
         {
             Debug.Assert(buffers.Length == 1, $"{nameof(PixelShaderLoader)} only supports single files");
 
             return GraphicsDevice.ShaderManager.CreatePixelShader(new PixelShaderCreation(buffers[0], "main", "ps_5_0"));
         }
 
-        public void OnRelease(object asset)
+        public void OnRelease(int handle)
         {
-            var handle = Unsafe.Unbox<Handle<PixelShader>>(asset);
             Logger.Info<PixelShaderLoader>($"OnRelease {handle}");
-            GraphicsDevice.ShaderManager.Release(new Handle<PixelShader>(handle));
+            GraphicsDevice.ShaderManager.Release((Handle<PixelShader>)handle);
         }
 
         public void Dispose()

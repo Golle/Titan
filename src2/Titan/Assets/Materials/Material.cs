@@ -1,10 +1,12 @@
-using Titan.Assets.Shaders;
+using Titan.Core;
+using Titan.Graphics.D3D11.Shaders;
 
 namespace Titan.Assets.Materials
 {
     public struct Material
     {
         public MaterialProperties Properties;
-        public ShaderProgram Shader;
+        public Handle<VertexShader> VertexShader;
+        public Handle<PixelShader> PixelShader;
     }
 }

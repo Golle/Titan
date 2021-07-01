@@ -27,11 +27,21 @@ namespace Titan.Core.Memory
     {
         private readonly T* _ptr;
         private readonly uint _size;
+        private readonly uint _count;
+        /// <summary>
+        /// The number of elements in this memory chunk. This can be 0 in cases where the chunk has been created from a pointer
+        /// </summary>
+        public uint Count => _count;
+        
+        /// <summary>
+        /// The size in bytes of the memory chunk
+        /// </summary>
         public uint Size => _size;
-        internal MemoryChunk(T* ptr, uint size)
+        internal MemoryChunk(T* ptr, uint size, uint count)
         {
             _ptr = ptr;
             _size = size;
+            _count = count;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -52,7 +62,7 @@ namespace Titan.Core.Memory
         public static implicit operator void*(in MemoryChunk<T> memory) => memory._ptr;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator MemoryChunk<T>(T* ptr) => new(ptr, 0u);
+        public static explicit operator MemoryChunk<T>(T* ptr) => new(ptr, 0u, 0u);
 
         public ref T this[int index]
         {
