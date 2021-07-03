@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Titan.Sandbox": {
-      "commandName": "Project",
-      "nativeDebugging": true
-    }
-  }
-}
