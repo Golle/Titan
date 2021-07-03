@@ -1,87 +1,109 @@
 using System;
-using System.Runtime.CompilerServices;
-using Titan.Core.Logging;
-using Titan.Graphics.Pipeline;
-using Titan.Graphics.Resources;
-using Titan.Graphics.Shaders;
-using Titan.Graphics.States;
+using System.Numerics;
+using Titan.Core;
+using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.D3D11.Pipeline;
+using Titan.Windows.D3D11;
+using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Graphics
 {
-    internal class GraphicsSystem : IDisposable
+
+    internal struct CameraBuffer
     {
-        private readonly IGraphicsDevice _device;
-        private readonly IGraphicsPipeline _graphicsPipeline;
-        private readonly ITexture2DManager _texture2DManager;
-        private readonly IShaderResourceViewManager _shaderResourceViewManager;
-        private readonly IVertexBufferManager _vertexBufferManager;
-        private readonly IIndexBufferManager _indexBufferManager;
-        private readonly IConstantBufferManager _constantBufferManager;
-        private readonly IRenderTargetViewManager _renderTargetViewManager;
-        private readonly IDepthStencilViewManager _depthStencilViewManager;
-        private readonly ISamplerStateManager _samplerStateManager;
-        private readonly IDepthStencilStateManager _depthStencilStateManager;
-        private readonly IShaderManager _shaderManager;
+        public Matrix4x4 View;
+        public Matrix4x4 ViewProjection;
+    }
 
-        public GraphicsSystem(IGraphicsDevice device, IGraphicsPipeline graphicsPipeline, ITexture2DManager texture2DManager, IShaderResourceViewManager shaderResourceViewManager, IVertexBufferManager vertexBufferManager, IIndexBufferManager indexBufferManager, IConstantBufferManager constantBufferManager, IRenderTargetViewManager renderTargetViewManager, IDepthStencilViewManager depthStencilViewManager, ISamplerStateManager samplerStateManager, IDepthStencilStateManager depthStencilStateManager, IShaderManager shaderManager)
+    public class GraphicsSystem : IDisposable
+    {
+        private const uint CameraSlot = 0u;
+
+        private readonly Pipeline[] _pipeline;
+        private readonly Context _immediateContext = GraphicsDevice.ImmediateContext;
+        private readonly SwapChain _swapchain = GraphicsDevice.SwapChain;
+        private readonly Handle<Buffer> _cameraBufferHandle;
+        private readonly ViewPort _viewport;
+        private Matrix4x4 _view;
+        private Matrix4x4 _viewProject;
+
+        public unsafe GraphicsSystem(Pipeline[] pipeline)
         {
-            _device = device;
-            _graphicsPipeline = graphicsPipeline;
-            _texture2DManager = texture2DManager;
-            _shaderResourceViewManager = shaderResourceViewManager;
-            _vertexBufferManager = vertexBufferManager;
-            _indexBufferManager = indexBufferManager;
-            _constantBufferManager = constantBufferManager;
-            _renderTargetViewManager = renderTargetViewManager;
-            _depthStencilViewManager = depthStencilViewManager;
-            _samplerStateManager = samplerStateManager;
-            _depthStencilStateManager = depthStencilStateManager;
-            _shaderManager = shaderManager;
+            _pipeline = pipeline;
+
+            _cameraBufferHandle = GraphicsDevice.BufferManager.Create(new BufferCreation
+            {
+                Type = BufferTypes.ConstantBuffer,
+                Count = 1,
+                CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE,
+                Stride = (uint)sizeof(CameraBuffer),
+                Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
+            });
+
+            _viewport = new ViewPort((int)GraphicsDevice.SwapChain.Width, (int)GraphicsDevice.SwapChain.Height);
         }
 
-        public void Initialize(string assetsDirectory, uint refreshRate, PipelineConfiguration pipelineConfiguration, bool debug)
+        public void SetCamera(in Matrix4x4 view, in Matrix4x4 viewProjection)
         {
-            LOGGER.Debug("Initialize graphics device {0}", debug ? "(debug)" : "");
-            _device.Initialize(refreshRate, debug);
-
-            LOGGER.Debug("Initialize GraphicManagers");
-            _texture2DManager.Initialize(_device);
-            _shaderResourceViewManager.Initialize(_device);
-            _vertexBufferManager.Initialize(_device);
-            _indexBufferManager.Initialize(_device);
-            _constantBufferManager.Initialize(_device);
-            _renderTargetViewManager.Initialize(_device);
-            _depthStencilViewManager.Initialize(_device);
-            _samplerStateManager.Initialize(_device);
-            _depthStencilStateManager.Initialize(_device);
+            _view = view;
+            _viewProject = viewProjection;
+        }
+        public void Render()
+        {
+            // set up camera
+            //Matrix4x4.Transpose(cam.ViewProjection)
+            _immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = _view, ViewProjection = Matrix4x4.Transpose(_viewProject)});
             
-            _shaderManager.Initialize(_device, assetsDirectory);
-            LOGGER.Debug("Finished initializing GraphicManagers");
+            _immediateContext.SetVertexShaderConstantBuffer(_cameraBufferHandle, CameraSlot);
+            
+            _immediateContext.SetViewPort(_viewport); // change this if we want to support more than a single viewport
+            //execute pipeline
+            foreach (ref readonly var pipeline in _pipeline.AsSpan())
+            {
+                if (pipeline.ClearRenderTargets)
+                {
+                    foreach (var handle in pipeline.RenderTargets)
+                    {
+                        _immediateContext.ClearRenderTarget(handle, pipeline.ClearColor);
+                    }
+                }
 
-            LOGGER.Debug("Initialize graphics pipeline");
-            _graphicsPipeline.Initialize(pipelineConfiguration);
+                if (pipeline.ClearDepthBuffer)
+                {
+                    _immediateContext.ClearDepthBuffer(pipeline.DepthBuffer, pipeline.DepthBufferClearValue);
+                }
+                
+                _immediateContext.SetRenderTargets(pipeline.RenderTargets, pipeline.DepthBuffer);
+                _immediateContext.SetPixelShaderSamplers(pipeline.PixelShaderSamplers);
+                _immediateContext.SetVertexShaderSamplers(pipeline.VertexShaderSamplers);
+                _immediateContext.SetPixelShaderResources(pipeline.PixelShaderResources);
+                _immediateContext.SetVertexShaderResources(pipeline.VertexShaderResources);
+                if (pipeline.VertexShader.IsValid())
+                {
+                    _immediateContext.SetVertexShader(pipeline.VertexShader);
+                }
+
+                if (pipeline.PixelShader.IsValid())
+                {
+                    _immediateContext.SetPixelShader(pipeline.PixelShader);
+                }
+
+                pipeline.Renderer.Render(_immediateContext);
+                
+                _immediateContext.UnbindRenderTargets();
+                _immediateContext.UnbindPixelShaderResources(pipeline.PixelShaderResources);
+                _immediateContext.UnbindVertexShaderResources(pipeline.VertexShaderResources);
+            }
+
+            // swapchain
+            _swapchain.Present();
+            //Thread.Sleep(100);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RenderFrame() => _graphicsPipeline.Execute();
         public void Dispose()
         {
-            // Dispose in reverse order of creation
-            _graphicsPipeline.Dispose();
-
-            _shaderManager.Dispose();
-            
-            _texture2DManager.Dispose();
-            _shaderResourceViewManager.Dispose();
-            _vertexBufferManager.Dispose();
-            _indexBufferManager.Dispose();
-            _constantBufferManager.Dispose();
-            _renderTargetViewManager.Dispose();
-            _depthStencilViewManager.Dispose();
-            _samplerStateManager.Dispose();
-            _depthStencilStateManager.Dispose();
-
-            _device.Dispose();
+            GraphicsDevice.BufferManager.Release(_cameraBufferHandle);
         }
     }
 }

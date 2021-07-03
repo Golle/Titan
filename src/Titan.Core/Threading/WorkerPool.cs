@@ -3,26 +3,25 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Titan.Core.Common;
 using Titan.Core.Logging;
 
 namespace Titan.Core.Threading
 {
     public record WorkerPoolConfiguration(uint MaxQueuedJobs, uint NumberOfWorkers);
 
-    public sealed class WorkerPool : IDisposable
+    public sealed class WorkerPool
     {
-        private WorkerInfo[] _workers;
-        private Job[] _jobs;
-        private Semaphore _notifier; // TODO: Replace with a custom Semaphore/Notifier later. But for now a Semaphore is enough
-        private ConcurrentQueue<int> _jobQueue;
-        private volatile int _nextJob;
-        private int _maxJobs;
-        public void Initialize(WorkerPoolConfiguration configuration)
+        private static WorkerInfo[] _workers;
+        private static Job[] _jobs;
+        private static Semaphore _notifier; // TODO: Replace with a custom Semaphore/Notifier later. But for now a Semaphore is enough
+        private static ConcurrentQueue<int> _jobQueue;
+        private static volatile int _nextJob;
+        private static int _maxJobs;
+        public static void Init(WorkerPoolConfiguration configuration)
         {
             if (configuration.NumberOfWorkers >= Environment.ProcessorCount)
             {
-                LOGGER.Warning("Number of Threads are greater or equal to the number of logical processors in the machine. {0} >= {1}", configuration.NumberOfWorkers, Environment.ProcessorCount);
+                Logger.Warning<WorkerPool>($"Number of Threads are greater or equal to the number of logical processors in the machine. {configuration.NumberOfWorkers} >= {Environment.ProcessorCount}");
             }
 
             if (_workers != null)
@@ -30,8 +29,8 @@ namespace Titan.Core.Threading
                 throw new InvalidOperationException($"{nameof(WorkerPool)} has already been initialized.");
             }
 
-            LOGGER.Debug("Creating {0} worker threads.", configuration.NumberOfWorkers);
-            LOGGER.Debug("Creating job queue with size {0}", configuration.MaxQueuedJobs);
+            Logger.Debug<WorkerPool>($"Creating {configuration.NumberOfWorkers} worker threads.");
+            Logger.Debug<WorkerPool>($"Creating job queue with size {configuration.MaxQueuedJobs}");
 
             _maxJobs = (int) configuration.MaxQueuedJobs;
             _jobs = new Job[configuration.MaxQueuedJobs + 1]; // Index 0 will be invalid, so we create the array with one more element
@@ -58,7 +57,7 @@ namespace Titan.Core.Threading
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCompleted(in Handle<WorkerPool> handle)
+        public static bool IsCompleted(in Handle<WorkerPool> handle)
         {
             Debug.Assert(handle.IsValid(), "Invalid handle");
             ref var job = ref _jobs[handle.Value];
@@ -71,7 +70,7 @@ namespace Titan.Core.Threading
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset(ref Handle<WorkerPool> handle)
+        public static void Reset(ref Handle<WorkerPool> handle)
         {
             ref var job = ref _jobs[handle.Value];
             if (job.AutoReset || job.State != JobState.Completed)
@@ -87,8 +86,8 @@ namespace Titan.Core.Threading
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Handle<WorkerPool> Enqueue(in JobDescription description) => Enqueue(description, null);
-        public Handle<WorkerPool> Enqueue(in JobDescription description, JobProgress progress)
+        public static Handle<WorkerPool> Enqueue(in JobDescription description) => Enqueue(description, null);
+        public static Handle<WorkerPool> Enqueue(in JobDescription description, JobProgress progress)
         {
             var jobIndex = GetNextJob();
 
@@ -105,7 +104,7 @@ namespace Titan.Core.Threading
             return jobIndex;
         }
 
-        private void RunWorker(object obj)
+        private static void RunWorker(object obj)
         {
             var index = (int) obj;
             ref var worker = ref _workers[index];
@@ -137,7 +136,7 @@ namespace Titan.Core.Threading
             }
         }
 
-        private int GetNextJob()
+        private static int GetNextJob()
         {
             // TODO: if the queue is "full" for some reason (maybe AutoReset = false), this method will never return. How should it be handled?
             var maxIterations = _maxJobs;
@@ -168,12 +167,10 @@ namespace Titan.Core.Threading
             return -1;
         }
 
-        ~WorkerPool() => Dispose();
-        public void Dispose()
+        public static void Terminate()
         {
             if (_workers != null)
             {
-                GC.SuppressFinalize(this);
                 // Set the worker Active = false
                 for (var i = 0; i < _workers.Length; ++i)
                 {

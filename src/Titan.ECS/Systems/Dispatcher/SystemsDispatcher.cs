@@ -1,18 +1,19 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Titan.Core.Common;
+using Titan.Core;
 using Titan.Core.Threading;
+using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Systems.Dispatcher
 {
     public sealed class SystemsDispatcher
     {
         private readonly SystemNode[] _nodes;
-
         private readonly JobProgress _progress;
         private readonly NodeStatus[] _status;
         private readonly Handle<WorkerPool>[] _handles;
+
         public SystemsDispatcher(SystemNode[] nodes)
         {
             _nodes = nodes;
@@ -21,7 +22,15 @@ namespace Titan.ECS.Systems.Dispatcher
             _handles = new Handle<WorkerPool>[nodes.Length];
         }
 
-        public void Execute(WorkerPool pool)
+        public void Init(World world)
+        {
+            foreach (var systemNode in _nodes)
+            {
+                systemNode.InitFunc(world);
+            }
+        }
+
+        public void Execute()
         {
             _progress.Reset();
             Array.Fill(_status, NodeStatus.Waiting);
@@ -47,26 +56,26 @@ namespace Titan.ECS.Systems.Dispatcher
                     if (isReady)
                     {
                         _status[i] = NodeStatus.Running;
-                        _handles[i] = pool.Enqueue(new JobDescription(node.ExecuteFunc, autoReset: false), _progress);
+                        _handles[i] = WorkerPool.Enqueue(new JobDescription(node.ExecuteFunc, autoReset: false), _progress);
                     }
                 }
                 Thread.Yield();
 
-                ResetHandles(pool);
+                ResetHandles();
             }
             // Make sure all handles have been reset
-            ResetHandles(pool);
+            ResetHandles();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ResetHandles(WorkerPool pool)
+        private void ResetHandles()
         {
             for (var i = 0; i < _handles.Length; ++i)
             {
                 ref var handle = ref _handles[i];
-                if (handle.IsValid() && pool.IsCompleted(handle))
+                if (handle.IsValid() && WorkerPool.IsCompleted(handle))
                 {
-                    pool.Reset(ref handle);
+                    WorkerPool.Reset(ref handle);
                     _status[i] = NodeStatus.Completed;
                 }
             }

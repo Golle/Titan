@@ -1,0 +1,150 @@
+{
+    "Assets": [
+        {
+            "Id": "textures/lion",
+            "Files": [
+                "textures/lion.png"
+            ],
+            "Type": "texture"
+        },
+        {
+            "Id": "shaders/default_vs",
+            "Type": "vertexshader",
+            "Files": [
+                "shaders/lambertian_vertexshader.hlsl",
+                "shaders/lambertian_vertexshader.layout"
+            ]
+        },
+        {
+            "Id": "shaders/default_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/lambertian_pixelshader.hlsl"
+            ]
+        },
+        {
+            "Id": "materials/material_01",
+            "Files": [
+                "materials/material_01.json"
+            ],
+            "Type": "material",
+            "Dependencies": [
+                {
+                    "Id": "shaders/default_vs"
+                },
+                {
+                    "Id": "shaders/default_ps"
+                },
+                {
+                    "Id": "textures/lion",
+                    "Name": "diffuse"
+                },
+                {
+                    "Id": "textures/lion",
+                    "Name": "ambient"
+                }
+            ]
+        },
+        {
+            "Id": "models/clock",
+            "Files": [
+                "models/clock/clock.geo"
+            ],
+            "Type": "model",
+            "Dependencies": [
+                {
+                    "Id": "materials/material_01"
+                },
+                {
+                    "Id": "textures/lion"
+                }
+            ]
+        },
+        {
+            "Id": "materials/tree_00",
+            "Files": [
+                "materials/tree_00.json"
+            ],
+            "Type": "material",
+            "Dependencies": [
+                {
+                    "Id": "shaders/gbuffer01_ps"
+                },
+                {
+                    "Id": "shaders/gbuffer_vs"
+                }
+            ]
+        },
+        {
+            "Id": "materials/tree_01",
+            "Files": [
+                "materials/tree_01.json"
+            ],
+            "Type": "material",
+            "Dependencies": [
+                {
+                    "Id": "shaders/gbuffer_ps"
+                },
+                {
+                    "Id": "shaders/gbuffer_vs"
+                }
+            ]
+        },
+        {
+            "Id": "models/tree",
+            "Files": [
+                "models/tree.geo"
+            ],
+            "Type": "model",
+            "Dependencies": [
+                {
+                    "Id": "materials/tree_00"
+                },
+                {
+                    "Id": "materials/tree_01"
+                }
+            ]
+        },
+        {
+            "Id": "shaders/gbuffer_vs",
+            "Type": "vertexshader",
+            "Files": [
+                "shaders/gbuffer_vs.hlsl",
+                "shaders/gbuffer.layout"
+            ]
+        },
+        {
+            "Id": "shaders/gbuffer_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/gbuffer_ps.hlsl"
+            ]
+        },
+        {
+            "Id": "shaders/gbuffer01_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/gbuffer01_ps.hlsl"
+            ]
+        },
+        {
+            "Id": "shaders/fullscreen_vs",
+            "Type": "vertexshader",
+            "Files": [
+                "shaders/fullscreen_vs.hlsl",
+                "shaders/fullscreen.layout"
+            ],
+            "Preload": true,
+            "Static": true
+        },
+        {
+            "Id": "shaders/fullscreen_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/fullscreen_ps.hlsl"
+            ],
+            "Preload": true,
+            "Static": true
+        }
+    ]
+}

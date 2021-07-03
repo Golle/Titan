@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Entities
 {
@@ -23,32 +23,27 @@ namespace Titan.ECS.Entities
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Attach(in Entity entity) => WorldContainer.AttachEntity(this, entity);
+        public void Attach(in Entity entity) => World.GetWorldById(WorldId).AttachEntity(this, entity);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Detach() => WorldContainer.DetachEntity(this);
+        public void Detach() => World.GetWorldById(WorldId).DetachEntity(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsNull() => Id == 0u;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Destroy() => WorldContainer.DestroyEntity(this);
-        
+        public void Destroy() => World.GetWorldById(WorldId).DestroyEntity(this);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Entity CreateChildEntity()
         {
-            var entity = WorldContainer.CreateEntity(WorldId);
+            var entity = World.GetWorldById(WorldId).CreateEntity();
             Attach(entity);
             return entity;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>() where T : unmanaged => WorldContainer.AddComponent<T>(this);
+        public void AddComponent<T>() where T : unmanaged => World.GetWorldById(WorldId).AddComponent<T>(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in T initialValue) where T : unmanaged => WorldContainer.AddComponent(this, initialValue);
+        public void AddComponent<T>(in T initialValue) where T : unmanaged => World.GetWorldById(WorldId).AddComponent(this, initialValue);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveComponent<T>() where T : unmanaged => WorldContainer.RemoveComponent<T>(this);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveManagedComponent<T>() where T : struct => WorldContainer.RemoveManagedComponent<T>(this);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddManagedComponent<T>(in T initialValue) where T : struct => WorldContainer.AddManagedComponent(this, initialValue);
+        public void RemoveComponent<T>() where T : unmanaged => World.GetWorldById(WorldId).RemoveComponent<T>(this);
     }
 }

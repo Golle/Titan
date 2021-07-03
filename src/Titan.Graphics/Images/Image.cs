@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
-using Titan.Windows.Win32.D3D11;
+using Titan.Windows.D3D11;
 
 namespace Titan.Graphics.Images
 {

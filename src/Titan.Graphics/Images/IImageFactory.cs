@@ -1,7 +1,11 @@
+using System;
+
 namespace Titan.Graphics.Images
 {
-    public interface IImageFactory
+    public interface IImageLoader : IDisposable
     {
-        Image LoadImageFromFile(string filename);
+        Image Load(string identifier);
+        unsafe Image Load(byte* buffer, uint size);
+        Image Load(ReadOnlySpan<byte> buffer);
     }
 }

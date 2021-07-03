@@ -5,9 +5,9 @@ using Titan.Core.Logging;
 
 namespace Titan.ECS.Systems.Dispatcher
 {
-    internal class SystemDispatcherFactory
+    internal static class SystemDispatcherFactory
     {
-        public SystemsDispatcher Create(in SystemBase[] systems)
+        public static SystemsDispatcher Create(in EntitySystem[] systems)
         {
             var count = systems.Length;
             var sortedSystems = systems.OrderByDescending(s => s.Priority).ToArray();
@@ -35,20 +35,19 @@ namespace Titan.ECS.Systems.Dispatcher
                 nodes[i] = new SystemNode(system, dependencies.ToArray());
             }
 
-
             LogDependencies(nodes);
             return new SystemsDispatcher(nodes);
         }
 
-        [Conditional("DEBUG")]
+        [Conditional("TRACE")]
         private static void LogDependencies(SystemNode[] nodes)
         {
             foreach (var node in nodes)
             {
                 var dependencies = string.Join(", ", node.Dependencies.Select(d => nodes[d].System.GetType().Name));
-                LOGGER.Debug(string.IsNullOrWhiteSpace(dependencies) ? 
+                Logger.Trace(string.IsNullOrWhiteSpace(dependencies) ? 
                     $"{node.System.GetType().Name} has no dependencies" : 
-                    $"{node.System.GetType().Name} depends on {dependencies}");
+                    $"{node.System.GetType().Name} depends on {dependencies}", typeof(SystemDispatcherFactory));
             }
         }
     }

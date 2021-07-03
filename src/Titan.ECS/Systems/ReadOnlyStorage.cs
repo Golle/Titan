@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
+using Titan.ECS.Components;
 using Titan.ECS.Entities;
-using Titan.ECS.Registry;
 
 namespace Titan.ECS.Systems
 {
