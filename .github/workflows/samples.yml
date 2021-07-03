@@ -1,4 +1,4 @@
-name: Titan
+name: Titan Samples
 
 on: workflow_dispatch
 
