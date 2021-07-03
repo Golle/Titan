@@ -13,13 +13,27 @@ Logger.Start();
 
 Logger.Info("Hello world!");
 
-const string assetsPath = @"F:\Git\Titan\assets";
-const string modelDestinationPath = @"F:\Git\Titan\assetsV2\models";
-const string materialDestinationPath = @"F:\Git\Titan\assetsV2\materials";  
+
+Console.WriteLine(Directory.GetCurrentDirectory());
+
+
+var assetsPath = @"F:\Git\Titan\assets";
+var modelDestinationPath = @"F:\Git\Titan\assetsV2\models";
+var materialDestinationPath = @"F:\Git\Titan\assetsV2\materials";
+
+if (args.Length == 3)
+{
+    assetsPath = Path.Combine(Directory.GetCurrentDirectory(), args[0]);
+    modelDestinationPath = Path.Combine(Directory.GetCurrentDirectory(), args[1]);
+    materialDestinationPath = Path.Combine(Directory.GetCurrentDirectory(), args[2]);
+}
+else
+{
+    Logger.Warning("No arguments specified, using default.");
+}
 
 Directory.CreateDirectory(modelDestinationPath);
 Directory.CreateDirectory(materialDestinationPath);
-
 
 foreach (var file in Directory.EnumerateFiles(assetsPath, "*.obj", SearchOption.AllDirectories))
 {
@@ -133,7 +147,7 @@ foreach (var file in Directory.EnumerateFiles(assetsPath, "*.obj", SearchOption.
     }
 
 }
-Logger.Warning("Done");
+Logger.Info("Done");
 Logger.Shutdown();
 
 

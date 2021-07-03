@@ -5,7 +5,7 @@ using Titan.Components;
 using Titan.ECS.Systems;
 using Titan.Input;
 
-namespace TItan.Sandbox
+namespace Breakout
 {
    
 

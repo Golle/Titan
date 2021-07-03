@@ -1,13 +1,13 @@
 using System;
+using Breakout;
 using Titan;
 using Titan.Core.Logging;
-using TItan.Sandbox;
 
 Console.WriteLine($"Hello World!");
 
 Engine.StartNew<SandboxApplication>();
 
-namespace TItan.Sandbox
+namespace Breakout
 {
     internal class SandboxApplication : Application
     {
