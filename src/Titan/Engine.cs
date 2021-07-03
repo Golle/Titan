@@ -57,7 +57,7 @@ namespace Titan
             EventManager.Init(new EventManagerConfiguration(10_000));
 
             Trace($"Init {nameof(FileSystem)}");
-            FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan\assetsv2"));
+            FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan\samples\breakout\assets"));
 
             Trace($"Init {nameof(WorkerPool)}");
             WorkerPool.Init(new WorkerPoolConfiguration(100, (uint) ((Environment.ProcessorCount/2) - 1)));
@@ -154,8 +154,8 @@ namespace Titan
                 {
                     {
                         var tree = world.CreateEntity();
-                        tree.AddComponent(new Transform3D { Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(i*20, 0, j*20) });
-                        tree.AddComponent(new AssetComponent<Model>("models/tree"));
+                        tree.AddComponent(new Transform3D { Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(i * 4.15f, 0, j * 2.2f) });
+                        tree.AddComponent(new AssetComponent<Model>("models/block"));
                     }
                 }
             }
