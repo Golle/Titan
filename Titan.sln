@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31025.218
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan", "src2\Titan\Titan.csproj", "{025925E7-2C0E-45D7-864D-021620636B18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan", "src\Titan\Titan.csproj", "{025925E7-2C0E-45D7-864D-021620636B18}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{74127627-7DB8-4DB4-B491-454C750DB930}"
 EndProject
@@ -11,25 +11,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{3196
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Sandbox", "samples\Titan.Sandbox\Titan.Sandbox.csproj", "{D3624F7E-8F6B-4994-AA86-CB1C084652F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Core", "src2\Titan.Core\Titan.Core.csproj", "{387D90C1-A3E5-4D61-AD3B-422CD6A42283}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Core", "src\Titan.Core\Titan.Core.csproj", "{387D90C1-A3E5-4D61-AD3B-422CD6A42283}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Windows", "src2\Titan.Windows\Titan.Windows.csproj", "{DEADA75B-515F-4A03-8178-ACB4E2913738}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Windows", "src\Titan.Windows\Titan.Windows.csproj", "{DEADA75B-515F-4A03-8178-ACB4E2913738}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Graphics", "src2\Titan.Graphics\Titan.Graphics.csproj", "{088C5B7B-115D-49C9-963C-EBBE9D995648}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Graphics", "src\Titan.Graphics\Titan.Graphics.csproj", "{088C5B7B-115D-49C9-963C-EBBE9D995648}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Assets", "src2\Titan.Assets\Titan.Assets.csproj", "{09AE8312-C593-4D53-9895-8556CACCFB11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Assets", "src\Titan.Assets\Titan.Assets.csproj", "{09AE8312-C593-4D53-9895-8556CACCFB11}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{D078C8E6-5D88-4DF0-9425-84E84CB7A6CD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.ManifestBuilder", "src2\Tools.ManifestBuilder\Tools.ManifestBuilder.csproj", "{9BC7D8D9-F6F4-4931-A3C5-7FF40ED98471}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.ManifestBuilder", "src\Tools.ManifestBuilder\Tools.ManifestBuilder.csproj", "{9BC7D8D9-F6F4-4931-A3C5-7FF40ED98471}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.CodeGeneration", "src2\Titan.CodeGeneration\Titan.CodeGeneration.csproj", "{458692E9-0A02-48D2-9DD5-D326478313A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.CodeGeneration", "src\Titan.CodeGeneration\Titan.CodeGeneration.csproj", "{458692E9-0A02-48D2-9DD5-D326478313A2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.Core", "src2\Tools.Core\Tools.Core.csproj", "{0C0ABB2C-BD95-406F-A6BB-82370E3820F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.Core", "src\Tools.Core\Tools.Core.csproj", "{0C0ABB2C-BD95-406F-A6BB-82370E3820F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.ModelBuilder", "src2\Tools.ModelBuilder\Tools.ModelBuilder.csproj", "{BB5CE964-F58E-496F-A833-B9DD29802E8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.ModelBuilder", "src\Tools.ModelBuilder\Tools.ModelBuilder.csproj", "{BB5CE964-F58E-496F-A833-B9DD29802E8C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.ECS", "src2\Titan.ECS\Titan.ECS.csproj", "{972296BE-2FC7-4AB7-8242-8B88E3CA970C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.ECS", "src\Titan.ECS\Titan.ECS.csproj", "{972296BE-2FC7-4AB7-8242-8B88E3CA970C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2E5F74ED-A362-46AD-81EF-3D06CC61DF7C}"
 EndProject
