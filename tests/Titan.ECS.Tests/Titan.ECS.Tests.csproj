@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src2\Titan.ECS\Titan.ECS.csproj" />
+    <ProjectReference Include="..\..\src\Titan.ECS\Titan.ECS.csproj" />
   </ItemGroup>
 
 </Project>

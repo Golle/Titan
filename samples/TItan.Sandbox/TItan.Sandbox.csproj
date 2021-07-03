@@ -10,6 +10,6 @@
     <DefineConstants />
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src2\Titan\Titan.csproj" />
+    <ProjectReference Include="..\..\src\Titan\Titan.csproj" />
   </ItemGroup>
 </Project>

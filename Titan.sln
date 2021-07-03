@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.ECS", "src\Titan.ECS\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2E5F74ED-A362-46AD-81EF-3D06CC61DF7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.ECS.Tests", "tests2\Titan.ECS.Tests\Titan.ECS.Tests.csproj", "{60783C89-5057-4D0C-A1FE-642D761AED75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.ECS.Tests", "tests\Titan.ECS.Tests\Titan.ECS.Tests.csproj", "{60783C89-5057-4D0C-A1FE-642D761AED75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
