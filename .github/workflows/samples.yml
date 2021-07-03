@@ -1,0 +1,26 @@
+name: Titan
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install .NET 6.0.x
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+        include-prerelease: true
+
+    - name: Build Breakout
+      run: ./publish.ps1
+      shell: pwsh
+      working-directory: samples/Breakout
+  
+    - uses: actions/upload-artifact@v2
+      with:
+        name: breakout
+        path: samples/Breakout/release
