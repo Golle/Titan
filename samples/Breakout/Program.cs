@@ -1,26 +1,35 @@
 using System;
+using System.Numerics;
 using Breakout;
 using Titan;
+using Titan.Assets.Models;
+using Titan.Components;
 using Titan.Core.Logging;
+using Titan.ECS.Worlds;
 using Titan.Graphics.Windows;
 
 Console.WriteLine($"Hello World!");
 
-Engine.StartNew<SandboxApplication>();
+Engine.StartNew<BreakoutApplication>();
 
 namespace Breakout
 {
-    internal class SandboxApplication : Application
+    internal class BreakoutApplication : Application
     {
-        public override void OnStart()
+        public override void OnStart(World world)
         {
-            Logger.Info("Sandbox application starting");
+            var block = world.CreateEntity();
+            block.AddComponent(Transform3D.Default);
+            block.AddComponent(new AssetComponent<Model>("models/block"));
+
+            var camera = world.CreateEntity();
+            camera.AddComponent(new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
+            camera.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
         }
 
-        public override void ConfigureSystems(SystemsCollection collection)
-        {
-            collection.Add(new FirstPersonCameraSystem(Window));
-        }
+        public override void ConfigureWorld(WorldBuilder builder) => 
+            builder
+                .WithSystem(new FirstPersonCameraSystem(Window));
 
         public override EngineConfiguration ConfigureEngine(EngineConfiguration config) =>
             config with

@@ -105,8 +105,7 @@ namespace Titan
             Resources.Init();
             
             Info("Engine has been initialized.");
-            Info("Initialize Application.");
-            _app.OnStart();
+
             try
             {
                 Run();
@@ -149,45 +148,22 @@ namespace Titan
             var pipeline = pipelineBuilder.Create();
             using var graphicsSystem = new GraphicsSystem(pipeline);
 
-            var systemCollection = new SystemsCollection()
-                .Add(new Transform3DSystem())
-                .Add(new Render3DSystem(assetsManager, renderQueue))
-                .Add(new CameraSystem(graphicsSystem))
-                .Add(new ModelLoaderSystem(assetsManager))
-                ;
-            _app.ConfigureSystems(systemCollection);
+            var worldBuilder = new WorldBuilder(defaultMaxEntities: 10_000)
+                .WithComponent<Transform3D>()
+                .WithComponent<CameraComponent>()
+                .WithComponent<AssetComponent<Model>>()
+                .WithComponent<ModelComponent>()
 
-            using var world = new World(new WorldConfiguration(10_000, new[]
-                {
-                    new ComponentConfiguration(typeof(Transform3D), ComponentPoolTypes.Packed),
-                    new ComponentConfiguration(typeof(CameraComponent), ComponentPoolTypes.Packed),
-                    new ComponentConfiguration(typeof(AssetComponent<Model>), ComponentPoolTypes.Packed),
-                    new ComponentConfiguration(typeof(ModelComponent), ComponentPoolTypes.Packed)
-                },
-                systemCollection.Systems.ToArray()
-            ));
+                .WithSystem(new Transform3DSystem())
+                .WithSystem(new Render3DSystem(assetsManager, renderQueue))
+                .WithSystem(new CameraSystem(graphicsSystem))
+                .WithSystem(new ModelLoaderSystem(assetsManager));
 
-            var r = new Random();
-            for (var i = 0; i < 10; ++i)
-            {
-                for (var j = 0; j < 10; ++j)
-                {
-                    {
-                        var tree = world.CreateEntity();
-                        var q = Quaternion.CreateFromAxisAngle(Vector3.UnitY, r.Next(0, 360));
-                        var s = r.NextSingle()*5;
-                        var x = r.NextSingle() * 10 + 5;
-                        var y = r.NextSingle() * 10 + 5;
-                        tree.AddComponent(new Transform3D { Scale = Vector3.One * s, Rotation = q, Position = new Vector3(i * x, 0, j * y) });
-                        tree.AddComponent(new AssetComponent<Model>("models/pillar"));
-                    }
-                }
-            }
-            
-            var entity2 = world.CreateEntity();
-            entity2.AddComponent(new Transform3D{Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One});
-            entity2.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
-            
+            _app.ConfigureWorld(worldBuilder);
+
+            Logger.Info<Engine>("Initialize starter world");
+            using var starterWorld = new World(worldBuilder.Build());
+            _app.OnStart(starterWorld);
 
             // star the main loop
             while (_window.Update())
@@ -197,7 +173,7 @@ namespace Titan
                 EventManager.Update();
                 InputManager.Update();
 
-                world.Update();
+                starterWorld.Update();
 
                 if (timer.Elapsed.Seconds >= 1f)
                 {
