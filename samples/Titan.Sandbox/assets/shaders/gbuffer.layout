@@ -1,0 +1,14 @@
+[
+    {
+        "Name": "Position",
+        "Format": "RGB32F"
+    },
+    {
+        "Name": "Normal",
+        "Format": "RGB32F"
+    },
+    {
+        "Name": "Texture",
+        "Format": "RG32F"
+    }
+]

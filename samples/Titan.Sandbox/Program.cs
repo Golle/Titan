@@ -28,6 +28,12 @@ namespace Titan.Sandbox
             collection.Add(new FirstPersonCameraSystem(Window));
         }
 
+        public override EngineConfiguration ConfigureEngine(EngineConfiguration config) =>
+            config with
+            {
+                AssetsPath = "assets"
+            };
+
         public override WindowConfiguration ConfigureWindow(WindowConfiguration config) =>
             config with
             {
@@ -40,9 +46,9 @@ namespace Titan.Sandbox
         public override DeviceConfiguration ConfigureDevice(DeviceConfiguration config) =>
             config with
             {
-                Debug = false,
+                Debug = true,
                 RefreshRate = 144,
-                Vsync = false
+                Vsync = true
             };
     }
 }

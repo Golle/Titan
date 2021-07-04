@@ -167,14 +167,19 @@ namespace Titan
                 systemCollection.Systems.ToArray()
             ));
 
+            var r = new Random();
             for (var i = 0; i < 10; ++i)
             {
                 for (var j = 0; j < 10; ++j)
                 {
                     {
                         var tree = world.CreateEntity();
-                        tree.AddComponent(new Transform3D { Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(i * 4.15f, 0, j * 2.2f) });
-                        tree.AddComponent(new AssetComponent<Model>("models/tree"));
+                        var q = Quaternion.CreateFromAxisAngle(Vector3.UnitY, r.Next(0, 360));
+                        var s = r.NextSingle()*5;
+                        var x = r.NextSingle() * 10 + 5;
+                        var y = r.NextSingle() * 10 + 5;
+                        tree.AddComponent(new Transform3D { Scale = Vector3.One * s, Rotation = q, Position = new Vector3(i * x, 0, j * y) });
+                        tree.AddComponent(new AssetComponent<Model>("models/pillar"));
                     }
                 }
             }
