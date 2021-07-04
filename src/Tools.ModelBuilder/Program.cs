@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using Titan.Assets.Materials;
@@ -37,8 +38,10 @@ Directory.CreateDirectory(materialDestinationPath);
 
 foreach (var file in Directory.EnumerateFiles(assetsPath, "*.obj", SearchOption.AllDirectories))
 {
+    var timer = Stopwatch.StartNew();
     var model = await ObjParser.ReadFromFile(file);
     var name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
+    Logger.Info($"Found '{name}'");
 
     var builder = new MeshBuilder();
     foreach (var group in model.Groups)
@@ -146,6 +149,7 @@ foreach (var file in Directory.EnumerateFiles(assetsPath, "*.obj", SearchOption.
         }
     }
 
+    Logger.Info($"Converted '{name}' in {timer.Elapsed.TotalMilliseconds} ms.");
 }
 Logger.Info("Done");
 Logger.Shutdown();
