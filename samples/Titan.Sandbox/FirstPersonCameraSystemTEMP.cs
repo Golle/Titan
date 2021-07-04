@@ -1,11 +1,10 @@
 using System;
 using System.Numerics;
-using Titan;
 using Titan.Components;
 using Titan.ECS.Systems;
 using Titan.Input;
 
-namespace TItan.Sandbox
+namespace Titan.Sandbox
 {
    
 

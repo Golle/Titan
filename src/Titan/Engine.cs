@@ -5,7 +5,6 @@ using Titan.Assets;
 using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Assets.Shaders;
-using Titan.Assets.Storage;
 using Titan.Components;
 using Titan.Core.IO;
 using Titan.Core.Logging;
@@ -28,11 +27,11 @@ namespace Titan
         private readonly Application _app;
 
         private Window _window;
-        public static void StartNew<T>() where T : Application
+        public static void StartNew<T>() where T : Application, new()
         {
             try
             {
-                new Engine(Activator.CreateInstance<T>())
+                new Engine(new T())
                     .Start();
             }
             catch
@@ -57,7 +56,7 @@ namespace Titan
             EventManager.Init(new EventManagerConfiguration(10_000));
 
             Trace($"Init {nameof(FileSystem)}");
-            FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan\samples\breakout\assets"));
+            FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan\assetsV2"));
 
             Trace($"Init {nameof(WorkerPool)}");
             WorkerPool.Init(new WorkerPoolConfiguration(100, (uint) ((Environment.ProcessorCount/2) - 1)));
@@ -66,14 +65,18 @@ namespace Titan
             IOWorkerPool.Init(2, 100);
             
 
+            Trace($"Configure the {nameof(Window)}");
+            var windowConfig = _app.ConfigureWindow(new WindowConfiguration(_app.GetType().Name, 800, 600, true));
             Trace($"Creating the {nameof(Window)}");
-            _window = Window.Create(new WindowConfiguration("Titan is a moon ?!", 1920, 1080));
+            _window = Window.Create(windowConfig);
             Trace($"Showing the {nameof(Window)}");
             _window.Show();
             _app.Window = new GameWindow(_window);
 
+            Trace($"Configure {nameof(GraphicsDevice)}");
+            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(60, true, true));
             Trace($"Init {typeof(GraphicsDevice).FullName}");
-            GraphicsDevice.Init(_window, new DeviceConfiguration(144, true, true));
+            GraphicsDevice.Init(_window, deviceConfig);
 
             Trace($"Init {nameof(Resources)}");
             Resources.Init();
@@ -155,7 +158,7 @@ namespace Titan
                     {
                         var tree = world.CreateEntity();
                         tree.AddComponent(new Transform3D { Scale = Vector3.One, Rotation = Quaternion.Identity, Position = new Vector3(i * 4.15f, 0, j * 2.2f) });
-                        tree.AddComponent(new AssetComponent<Model>("models/block"));
+                        tree.AddComponent(new AssetComponent<Model>("models/tree"));
                     }
                 }
             }
