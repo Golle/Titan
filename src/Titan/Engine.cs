@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Numerics;
 using Titan.Assets;
 using Titan.Assets.Materials;
@@ -22,6 +23,12 @@ using Titan.Systems;
 
 namespace Titan
 {
+    public record EngineConfiguration
+    {
+        public string AssetsPath { get; init; }
+        public uint MaxEvents { get; init; }
+    }
+
     public class Engine
     {
         private readonly Application _app;
@@ -38,6 +45,10 @@ namespace Titan
             {
                 // ignored
             }
+            finally
+            {
+                Logger.Shutdown();
+            }
         }
 
         private Engine(Application app)
@@ -52,11 +63,24 @@ namespace Titan
 
             Logger.Start();
 
+            var engineConfig = _app.ConfigureEngine(new EngineConfiguration { MaxEvents = 10_000 });
+            if (string.IsNullOrWhiteSpace(engineConfig.AssetsPath))
+            {
+                Logger.Error<Engine>($"{nameof(EngineConfiguration.AssetsPath)} is not set. Must be a valid relative path.");
+                return;
+            }
+
+            if (engineConfig.MaxEvents == 0)
+            {
+                Logger.Error<Engine>($"{nameof(EngineConfiguration.MaxEvents)} is set to 0. Must be a valid positive number.");
+                return;
+            }
+
             Trace($"Init {nameof(EventManager)}");
-            EventManager.Init(new EventManagerConfiguration(10_000));
+            EventManager.Init(new EventManagerConfiguration(engineConfig.MaxEvents));
 
             Trace($"Init {nameof(FileSystem)}");
-            FileSystem.Init(new FileSystemConfiguration(@"f:\git\titan\assetsV2"));
+            FileSystem.Init(new FileSystemConfiguration(engineConfig.AssetsPath));
 
             Trace($"Init {nameof(WorkerPool)}");
             WorkerPool.Init(new WorkerPoolConfiguration(100, (uint) ((Environment.ProcessorCount/2) - 1)));
@@ -64,7 +88,6 @@ namespace Titan
             Trace($"Init {nameof(IOWorkerPool)}");
             IOWorkerPool.Init(2, 100);
             
-
             Trace($"Configure the {nameof(Window)}");
             var windowConfig = _app.ConfigureWindow(new WindowConfiguration(_app.GetType().Name, 800, 600, true));
             Trace($"Creating the {nameof(Window)}");
@@ -81,11 +104,9 @@ namespace Titan
             Trace($"Init {nameof(Resources)}");
             Resources.Init();
             
-
             Info("Engine has been initialized.");
             Info("Initialize Application.");
             _app.OnStart();
-
             try
             {
                 Run();
@@ -95,7 +116,7 @@ namespace Titan
                 Shutdown();
             }
         }
-
+        
         private unsafe void Run()
         {
             var assetsManager = new AssetsManager()
@@ -146,11 +167,6 @@ namespace Titan
                 systemCollection.Systems.ToArray()
             ));
 
-            //{
-            //    var tree = world.CreateEntity();
-            //    tree.AddComponent(Transform3D.Default);
-            //    tree.AddComponent(new AssetComponent<Model>("models/tree"));
-            //}
             for (var i = 0; i < 10; ++i)
             {
                 for (var j = 0; j < 10; ++j)
@@ -163,9 +179,6 @@ namespace Titan
                 }
             }
             
-            
-
-
             var entity2 = world.CreateEntity();
             entity2.AddComponent(new Transform3D{Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One});
             entity2.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
@@ -190,38 +203,7 @@ namespace Titan
                     timer.Restart();
                     frameCount = 0;
                 }
-
-                //if (count-- == 0)
-                //{
-                //    asset = assetsManager.Load("models/tree");
-                //}
-
-                //if (assetsManager.IsLoaded(asset))
-                //{
-                //    //Logger.Trace<Engine>("Asset is loaded");
-                //    //var texture = assetsManager.GetAssetHandle<Texture>(asset);
-                //    //Logger.Trace<Engine>($"Texture handle: {texture.Value}"); 
-                //    assetsManager.Unload("models/tree");
-                //}
-
-                //if (InputManager.IsKeyPressed(KeyCode.S))
-                //{
-                //    entity1.AddComponent(new Transform3D
-                //    {
-                //        Position = new Vector3(2,43,5)
-                //    });
-                //} 
-                //if (InputManager.IsKeyPressed(KeyCode.Space))
-                //{
-                //    Logger.Error("SPACE IS DOWN you smerk!");
-                //    entity1.RemoveComponent<Transform3D>();
-                //}
-                
                 assetsManager.Update();
-
-                // Do stuff with the engine
-                //GraphicsDevice.ImmediateContext.ClearRenderTarget(GraphicsDevice.SwapChain.Backbuffer, color);
-                //GraphicsDevice.SwapChain.Present();
                 graphicsSystem.Render();
 
                 frameCount++;
@@ -255,10 +237,6 @@ namespace Titan
 
             Logger.Trace<Engine>($"Terminate {nameof(EventManager)}");
             EventManager.Terminate();
-
-
-            Logger.Shutdown();
         }
     }
-
 }

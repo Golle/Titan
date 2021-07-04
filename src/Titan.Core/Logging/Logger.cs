@@ -39,7 +39,9 @@ namespace Titan.Core.Logging
         public static void Error(string message, Type type) => Log(LogLevel.Error, message, type.Name);
         public static void Error(string message) => Log(LogLevel.Error, message);
 
-        public static void Warning<T>(string message) => Log(LogLevel.Warning, message, typeof(T).Name);
+        public static void Warning<T>(string message) => Warning(message, typeof(T));
+        public static void Warning(string message, Type type) => Log(LogLevel.Warning, message, type.Name);
+
         public static void Warning(string message) => Log(LogLevel.Warning, message);
 
 
