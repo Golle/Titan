@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Channels;
 
@@ -33,7 +34,7 @@ namespace Titan.Core.Logging
 
         private static void Run()
         {
-            static string DateTimeNow() => DateTime.Now.ToString("HH:mm:ss.fff");
+            static string DateTimeNow() => DateTime.Now.ToString("HH:mm:ss.fff", new DateTimeFormatInfo());
             static void WriteLine(in LogMessage logMessage)
             {
                 var color = logMessage.Level switch
