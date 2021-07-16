@@ -1,12 +1,12 @@
 using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core;
 using Titan.Core.Threading;
 using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Systems.Dispatcher
 {
+    // TODO: can this be optimized? can we use spans for nodes? build a better structure for the execution tree
     public sealed class SystemsDispatcher
     {
         private readonly SystemNode[] _nodes;
@@ -34,20 +34,26 @@ namespace Titan.ECS.Systems.Dispatcher
         {
             _progress.Reset();
             Array.Fill(_status, NodeStatus.Waiting);
+            
+            // Put it in a local variable to avoid bounds checking
+            var status = _status; 
+            var nodes = _nodes;
+            var handles = _handles;
 
             while (!_progress.IsComplete())
             {
                 for (var i = 0; i < _nodes.Length; ++i)
                 {
-                    if (_status[i] != NodeStatus.Waiting)
+                    if (status[i] != NodeStatus.Waiting)
                     {
                         continue;
                     }
-                    ref readonly var node = ref _nodes[i];
+                    
+                    ref readonly var node = ref nodes[i];
                     var isReady = true;
                     foreach (var dependencyIndex in node.Dependencies)
                     {
-                        if (_status[dependencyIndex] != NodeStatus.Completed)
+                        if (status[dependencyIndex] != NodeStatus.Completed)
                         {
                             isReady = false;
                             break;
@@ -55,12 +61,11 @@ namespace Titan.ECS.Systems.Dispatcher
                     }
                     if (isReady)
                     {
-                        _status[i] = NodeStatus.Running;
-                        _handles[i] = WorkerPool.Enqueue(new JobDescription(node.ExecuteFunc, autoReset: false), _progress);
+                        status[i] = NodeStatus.Running;
+                        handles[i] = WorkerPool.Enqueue(new JobDescription(node.ExecuteFunc, autoReset: false), _progress);
                     }
                 }
-                Thread.Yield();
-
+                //Thread.Yield(); // TODO: should this be used?
                 ResetHandles();
             }
             // Make sure all handles have been reset
@@ -70,9 +75,10 @@ namespace Titan.ECS.Systems.Dispatcher
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetHandles()
         {
-            for (var i = 0; i < _handles.Length; ++i)
+            var handles = _handles;
+            for (var i = 0; i < handles.Length; ++i)
             {
-                ref var handle = ref _handles[i];
+                ref var handle = ref handles[i];
                 if (handle.IsValid() && WorkerPool.IsCompleted(handle))
                 {
                     WorkerPool.Reset(ref handle);
