@@ -51,7 +51,7 @@ namespace Titan.Core.Logging
                 {
                     Console.ResetColor();
                     Console.Write("][");
-                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
                     Console.Write(logMessage.Scope);
                 }
                 Console.ResetColor();
