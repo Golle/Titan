@@ -24,9 +24,11 @@ var materialDestinationPath = @"F:\Git\Titan\assetsV2\materials";
 
 if (args.Length == 3)
 {
-    assetsPath = Path.Combine(Directory.GetCurrentDirectory(), args[0]);
-    modelDestinationPath = Path.Combine(Directory.GetCurrentDirectory(), args[1]);
-    materialDestinationPath = Path.Combine(Directory.GetCurrentDirectory(), args[2]);
+    static string GetPath(string path) => Path.IsPathRooted(path) ? path : Path.Combine(Directory.GetCurrentDirectory(), path);
+
+    assetsPath = GetPath(args[0]);
+    modelDestinationPath = GetPath(args[1]);
+    materialDestinationPath = GetPath(args[2]);
 }
 else
 {
