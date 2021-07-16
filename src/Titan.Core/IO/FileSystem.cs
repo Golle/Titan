@@ -5,7 +5,7 @@ using Titan.Core.Logging;
 
 namespace Titan.Core.IO
 {
-    public record FileSystemConfiguration(string BasePath);
+    public record FileSystemConfiguration(string BasePath, string BasePathIdentifierPattern = "*.csproj");
     
     // TODO: add different types of file systems, right now we just use a path
     public static class FileSystem
@@ -32,7 +32,7 @@ namespace Titan.Core.IO
                 do
                 {
                     path = Directory.GetParent(path)?.FullName;
-                } while (--maxDepth > 0 && path != null && Directory.GetFiles(path, "*.csproj", SearchOption.TopDirectoryOnly).Length == 0);
+                } while (--maxDepth > 0 && path != null && Directory.GetFiles(path, config.BasePathIdentifierPattern, SearchOption.TopDirectoryOnly).Length == 0);
 
                 if (path == null)
                 {
