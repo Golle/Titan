@@ -1,6 +1,7 @@
 using System;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
@@ -36,6 +37,7 @@ namespace Titan.Graphics.D3D11
         public static TextureManager TextureManager { get; private set; }
         public static SamplerManager SamplerManager { get; private set; }
         public static ShaderManager ShaderManager { get; private set; }
+        public static RasterizerManager RasterizerManager { get; private set; }
 
         public static void Init(Window window, DeviceConfiguration config)
         {
@@ -101,6 +103,7 @@ namespace Titan.Graphics.D3D11
                 TextureManager = new TextureManager(_device.Get(), SwapChain);
                 SamplerManager = new SamplerManager(_device.Get());
                 ShaderManager = new ShaderManager(_device.Get());
+                RasterizerManager = new RasterizerManager(_device.Get());
             }
 
             IsInitialized = true;
@@ -120,6 +123,8 @@ namespace Titan.Graphics.D3D11
                 SamplerManager = null;
                 ShaderManager.Dispose();
                 ShaderManager = null;
+                RasterizerManager.Dispose();
+                RasterizerManager = null;
 
                 Logger.Trace<ID3D11Device>("Disposing resources");
                 _backbuffer.Dispose();

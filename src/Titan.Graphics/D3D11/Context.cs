@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
@@ -263,5 +264,9 @@ namespace Titan.Graphics.D3D11
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ClearDepthBuffer(in Handle<Texture> handle, float value) => _context->ClearDepthStencilView(GraphicsDevice.TextureManager.Access(handle).D3DDepthStencil, D3D11_CLEAR_FLAG.D3D11_CLEAR_DEPTH | D3D11_CLEAR_FLAG.D3D11_CLEAR_STENCIL, value, 0);
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetRasterizerState(in Handle<RasterizerState> handle) => _context->RSSetState(GraphicsDevice.RasterizerManager.Access(handle).State);
     }
 }
