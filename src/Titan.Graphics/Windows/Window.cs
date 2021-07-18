@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
@@ -28,7 +29,10 @@ namespace Titan.Graphics.Windows
         private static Window _activeWindow; // TODO: change this if we'll ever support multiple windows
         private bool _cursorVisible = true;
         private static HCURSOR _defaultCursor;
+        public bool ShowFps { get; set; }
 
+        private Stopwatch _timer;
+        private int _frames;
         private Window(HWND handle, string title, string className, uint width, uint height, bool windowed)
         {
             Width =  width;
@@ -38,6 +42,7 @@ namespace Titan.Graphics.Windows
             _title = title;
             _className = className;
             _activeWindow = this;
+            _timer = Stopwatch.StartNew();
         }
 
         public static Window Create(WindowConfiguration config)
@@ -114,6 +119,14 @@ namespace Titan.Graphics.Windows
         public void SetTitle(string title) => SetWindowTextA(Handle, title);
         public bool Update()
         {
+            _frames++;
+            if (_timer.Elapsed.TotalSeconds >= 1.0f)
+            {
+                var fps = _frames / _timer.Elapsed.TotalSeconds;
+                SetTitle($"{_title}. FPS: {(int)fps}");
+                _timer.Restart();
+                _frames = 1;
+            }
             while (PeekMessageA(out var msg, 0, 0, 0, 1)) // pass IntPtr.Zero as HWND to detect mouse movement outside of the window
             {
                 if (msg.Message == WM_QUIT)
@@ -133,7 +146,6 @@ namespace Titan.Graphics.Windows
                     ToggleMouse(@event.As<MouseStateEvent>().Visible);
                 }
             }
-
             return true;
         }
 
