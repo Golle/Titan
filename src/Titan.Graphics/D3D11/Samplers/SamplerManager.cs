@@ -19,7 +19,6 @@ namespace Titan.Graphics.D3D11.Samplers
             _device = device;
             
             _resourcePool.Init(MaxSamplers);
-            
         }
 
         public Handle<Sampler> Create(SamplerCreation args)
@@ -75,7 +74,7 @@ namespace Titan.Graphics.D3D11.Samplers
         {
             foreach (var handle in _resourcePool.EnumerateUsedResources())
             {
-                Logger.Warning<SamplerManager>($"Releasing an unreleased Aampler with handle {handle.Value}");
+                Logger.Warning<SamplerManager>($"Releasing an unreleased Sampler with handle {handle.Value}");
                 ReleaseInternal(handle);
             }
             Logger.Trace<SamplerManager>("Terminate resource pool");
