@@ -97,7 +97,7 @@ namespace Titan
             _app.Window = new GameWindow(_window);
 
             Trace($"Configure {nameof(GraphicsDevice)}");
-            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(60, true, true));
+            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(144, true, true));
             Trace($"Init {typeof(GraphicsDevice).FullName}");
             GraphicsDevice.Init(_window, deviceConfig);
 
@@ -134,9 +134,6 @@ namespace Titan
             color[2] = 0f;
             color[3] = 1f;
 
-            var timer = Stopwatch.StartNew();
-            var frameCount = 0;
-            
             var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue);
             pipelineBuilder.LoadResources();
             // Preload assets for rendering pipeline
@@ -175,19 +172,8 @@ namespace Titan
 
                 starterWorld.Update();
 
-                if (timer.Elapsed.Seconds >= 1f)
-                {
-                    var elapsed = timer.Elapsed;
-                    
-                    _window.SetTitle($"FPS: {(int)(frameCount/elapsed.TotalSeconds)}");
-
-                    timer.Restart();
-                    frameCount = 0;
-                }
                 assetsManager.Update();
                 graphicsSystem.Render();
-
-                frameCount++;
             }
         }
 

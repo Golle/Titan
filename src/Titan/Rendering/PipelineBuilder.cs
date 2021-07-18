@@ -21,7 +21,8 @@ namespace Titan.Rendering
         private readonly SimpleRenderQueue _simpleRenderQueue;
         private GeometryRenderer _geometryRenderer;
         private BackbufferRenderer _backbufferRenderer;
-        private IRenderer _deferredShadingRenderer;
+        private UIRenderer _uiRenderer;
+        private DeferredShadingRenderer _deferredShadingRenderer;
 
         public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue)
         {
@@ -38,6 +39,7 @@ namespace Titan.Rendering
             _geometryRenderer = new GeometryRenderer(_simpleRenderQueue);
             _backbufferRenderer = new BackbufferRenderer();
             _deferredShadingRenderer = new DeferredShadingRenderer();
+            _uiRenderer = new UIRenderer();
         }
 
         public bool IsReady()
@@ -120,6 +122,22 @@ namespace Titan.Rendering
                 PixelShaderSamplers = new []{fullscreenSampler},
                 Renderer = _deferredShadingRenderer
             };
+
+            var uiRenderTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
+            {
+                Format = TextureFormats.RGBA32F,
+                Width = swapchain.Width,
+                Height = swapchain.Height,
+                Binding = TextureBindFlags.FrameBuffer
+            });
+
+            var ui = new Pipeline
+            {
+                ClearRenderTargets = true,
+                ClearColor = new Color(0.1f, 0, 0, 0.1f),
+                RenderTargets = new[] { uiRenderTarget },
+                Renderer = _uiRenderer
+            };
             
             var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
             var backbuffer = new Pipeline
@@ -130,12 +148,12 @@ namespace Titan.Rendering
                 RenderTargets = new[] {backbufferRenderTarget},
                 PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_fullscreenPixelShaderHandle),
                 VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
-                PixelShaderResources = new[] { deferredShadingTarget },
+                PixelShaderResources = new[] { deferredShadingTarget, uiRenderTarget },
                 PixelShaderSamplers = new []{fullscreenSampler},
                 Renderer = _backbufferRenderer
             };
 
-            return new[] {gBuffer, deferredShading, backbuffer};
+            return new[] {gBuffer, deferredShading, ui, backbuffer};
         }
     }
 }
