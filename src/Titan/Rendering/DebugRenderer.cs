@@ -62,21 +62,20 @@ namespace Titan.Rendering
 
             var obj = GDI32.SelectObject(hdc, _font);
 
-            const string str = "Sample format: {0}";
+            const string str = "Sample Data collection: {0}";
 
             Span<byte> strBytes = stackalloc byte[256];
-            var formattedString = string.Format(str, 1000);
-            var length = Encoding.UTF8.GetBytes(formattedString, strBytes);
-            fixed (byte* pStr = strBytes)
+            var r = new Random(123123);
+            for (var i = 0; i < 10; ++i)
             {
-                GDI32.TextOutA(hdc, 10, 10, pStr, length);
+                var formattedString1 = string.Format(str, r.Next(1000, 1000000));
+                var length = Encoding.UTF8.GetBytes(formattedString1, strBytes);
+                fixed (byte* pStr = strBytes)
+                {
+                    GDI32.TextOutA(hdc, 10, 10 + i*20, pStr, length);
+                }
             }
-
-            fixed (char* pStr = formattedString)
-            {
-                GDI32.TextOutW(hdc, 10, 30, pStr, length);
-            }
-
+            
             GDI32.SelectObject(hdc, obj);
             _surface.Get()->ReleaseDC(null);
         }
