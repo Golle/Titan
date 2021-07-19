@@ -115,7 +115,6 @@ namespace Titan.Graphics.D3D11
         public void SetRenderTargets(in Handle<Texture>[] handles, in Handle<Texture> depthBufferHandle)
         {
             var depthBuffer = depthBufferHandle.IsValid() ? GraphicsDevice.TextureManager.Access(depthBufferHandle).D3DDepthStencil : null;
-            
             var numberOfViews = handles.Length;
             if (numberOfViews == 1)
             {

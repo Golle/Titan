@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using Titan.Assets;
 using Titan.Core;
@@ -7,6 +8,8 @@ using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
+using Titan.Windows;
+using Titan.Windows.D3D11;
 
 namespace Titan.Rendering
 {
@@ -139,6 +142,7 @@ namespace Titan.Rendering
                 Renderer = _uiRenderer
             };
             
+
             var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
             var backbuffer = new Pipeline
             {
@@ -153,7 +157,48 @@ namespace Titan.Rendering
                 Renderer = _backbufferRenderer
             };
 
-            return new[] {gBuffer, deferredShading, ui, backbuffer};
+            /***** DEBUG Stuff *****/
+            var debugTextureHandle = GraphicsDevice.TextureManager.Create(new TextureCreation
+            {
+                Width = swapchain.Width,
+                Height = swapchain.Height,
+                Binding = TextureBindFlags.FrameBuffer,
+                Format = TextureFormats.BGRA8U,
+                Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT,
+                MiscFlags = D3D11_RESOURCE_MISC_FLAG.D3D11_RESOURCE_MISC_GDI_COMPATIBLE
+            });
+
+            using ComPtr<IDXGISurface1> surface = default;
+            unsafe
+            {
+                fixed (Guid* uuid = &D3D11Common.DXGISurface1)
+                {
+                    Common.CheckAndThrow(GraphicsDevice.TextureManager.Access(debugTextureHandle).D3DTexture->QueryInterface(uuid, (void**)surface.GetAddressOf()), nameof(ID3D11Texture2D.QueryInterface));
+                }
+            }
+
+            var debugPipeline = new Pipeline
+            {
+                ClearColor = Color.Zero,
+                ClearRenderTargets = true,
+                RenderTargets = new[] { debugTextureHandle },
+                Renderer = new DebugRenderer(surface)
+            };
+
+            var debugBackbufferPipeline = new Pipeline
+            {
+                ClearRenderTargets = false,
+                RenderTargets = new[] { backbufferRenderTarget },
+                PixelShaderResources = new[] { deferredShadingTarget, debugTextureHandle },
+                Renderer = _backbufferRenderer,
+                PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_fullscreenPixelShaderHandle),
+                VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
+                PixelShaderSamplers = new[] { fullscreenSampler },
+            };
+            
+
+
+            return new[] {gBuffer, deferredShading, ui, backbuffer, debugPipeline, debugBackbufferPipeline };
         }
     }
 }
