@@ -22,7 +22,7 @@ namespace Titan.Graphics.D3D11
             _swapChain = swapChain;
             _syncInterval = vsync ? 1u : 0u;
         }
-
+     
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Present() => _swapChain->Present(_syncInterval, 0);
     }

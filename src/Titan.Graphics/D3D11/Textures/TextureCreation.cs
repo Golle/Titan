@@ -19,5 +19,6 @@ namespace Titan.Graphics.D3D11.Textures
 
         public DataBlob InitialData { get; init; }
         public  uint DataStride { get; init; }
+        public D3D11_RESOURCE_MISC_FLAG MiscFlags { get; init; }
     }
 }

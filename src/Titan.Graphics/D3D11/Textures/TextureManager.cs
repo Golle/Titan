@@ -96,7 +96,7 @@ namespace Titan.Graphics.D3D11.Textures
                 Height = height,
                 Width = width,
                 Usage = args.Usage,
-                MiscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFIED,
+                MiscFlags = args.MiscFlags,
                 SampleDesc = new DXGI_SAMPLE_DESC
                 {
                     Count = 1,
@@ -205,7 +205,7 @@ namespace Titan.Graphics.D3D11.Textures
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ref readonly Texture Access(in Handle<Texture> handle) => ref _resourcePool.GetResourceReference(handle);
+        public ref readonly Texture Access(in Handle<Texture> handle) => ref _resourcePool.GetResourceReference(handle);
 
         public void Dispose()
         {

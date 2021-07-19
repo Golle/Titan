@@ -7,10 +7,11 @@ namespace Titan.Windows.D3D11
     public static unsafe class D3D11Common
     {
         public const int D3D11_SDK_VERSION = (7);
-        public static readonly Guid D3D11Texture2D = new Guid("6f15aaf2-d208-4e89-9ab4-489535d34f9c");
-        public static readonly Guid D3D11Resource = new Guid("dc8e63f3-d12b-4952-b47b-5e45026a862d");
-        public static readonly Guid D3D11InfoQueue = new Guid("6543dbb6-1b48-42f5-ab82-e97ec74326f6");
-        public static readonly Guid D3D11Debug = new Guid("79cf2233-7536-4948-9d36-1e4692dc5760");
+        public static readonly Guid D3D11Texture2D = new("6f15aaf2-d208-4e89-9ab4-489535d34f9c");
+        public static readonly Guid D3D11Resource = new("dc8e63f3-d12b-4952-b47b-5e45026a862d");
+        public static readonly Guid D3D11InfoQueue = new("6543dbb6-1b48-42f5-ab82-e97ec74326f6");
+        public static readonly Guid D3D11Debug = new("79cf2233-7536-4948-9d36-1e4692dc5760");
+        public static readonly Guid DXGISurface1 = new("4AE63092-6327-4c1b-80AE-BFE12EA32B86");
 
         [DllImport("d3d11", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern HRESULT D3D11CreateDevice(
@@ -41,7 +42,7 @@ namespace Titan.Windows.D3D11
             [In] IDXGIAdapter* pAdapter,
             [In] D3D_DRIVER_TYPE driverType,
             [In] HMODULE software,
-            [In] uint flags,
+            [In] D3D11_CREATE_DEVICE_FLAG flags,
             [In] D3D_FEATURE_LEVEL* pFeatureLevels,
             [In] uint featureLevels,
             [In] uint sdkVersion,
