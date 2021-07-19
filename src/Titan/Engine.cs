@@ -15,11 +15,14 @@ using Titan.ECS.Components;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Images;
 using Titan.Graphics.Windows;
 using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
+using Titan.Windows;
+using Titan.Windows.D3D11;
 
 namespace Titan
 {
@@ -97,7 +100,7 @@ namespace Titan
             _app.Window = new GameWindow(_window);
 
             Trace($"Configure {nameof(GraphicsDevice)}");
-            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(144, true, true));
+            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(144, true, true, true));
             Trace($"Init {typeof(GraphicsDevice).FullName}");
             GraphicsDevice.Init(_window, deviceConfig);
 

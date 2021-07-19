@@ -19,7 +19,7 @@ using static Titan.Windows.D3D11.DXGI_USAGE;
 
 namespace Titan.Graphics.D3D11
 {
-    public record DeviceConfiguration(uint RefreshRate, bool Vsync, bool Debug);
+    public record DeviceConfiguration(uint RefreshRate, bool Vsync, bool Debug, bool Stats);
 
     public static class GraphicsDevice
     {
@@ -46,7 +46,17 @@ namespace Titan.Graphics.D3D11
                 throw new InvalidOperationException($"{nameof(GraphicsDevice)} has already been initialized.");
             }
 
-            var flags = config.Debug ? 2u : 0u;
+            var deviceCreationFlags = D3D11_CREATE_DEVICE_FLAG.UNSPECIFIED;
+            if (config.Debug)
+            {
+                deviceCreationFlags |= D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_DEBUG;
+            }
+
+            if (config.Stats)
+            {
+                deviceCreationFlags |= D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+            }
+
             var featureLevel = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1;
             var desc = new DXGI_SWAP_CHAIN_DESC
             {
@@ -58,7 +68,7 @@ namespace Titan.Graphics.D3D11
                     RefreshRate = new DXGI_RATIONAL { Denominator = config.RefreshRate },
                     Scaling = DXGI_MODE_SCALING_UNSPECIFIED,
                     ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED,
-                    Format = DXGI_FORMAT_R8G8B8A8_UNORM
+                    Format = DXGI_FORMAT_B8G8R8A8_UNORM
                 },
                 SampleDesc = new DXGI_SAMPLE_DESC
                 {
@@ -76,7 +86,7 @@ namespace Titan.Graphics.D3D11
             Logger.Trace<ID3D11Device>("Creating device");
             unsafe
             {
-                CheckAndThrow(D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, flags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _context.GetAddressOf()), nameof(D3D11CreateDeviceAndSwapChain));
+                CheckAndThrow(D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, deviceCreationFlags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _context.GetAddressOf()), nameof(D3D11CreateDeviceAndSwapChain));
             }
             Logger.Trace<ID3D11Device>("Device created");
 
