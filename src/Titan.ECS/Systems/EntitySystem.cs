@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Titan.ECS.Components;
+using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Systems
@@ -12,6 +13,7 @@ namespace Titan.ECS.Systems
         private World _world;
         internal ref readonly ComponentId Read => ref _read;
         internal ref readonly ComponentId Mutable => ref _mutable;
+        protected EntityManager EntityManager { get; private set; }
         internal int Priority { get; }
 
         protected EntitySystem(int priority = 0)
@@ -21,11 +23,15 @@ namespace Titan.ECS.Systems
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void OnPreUpdate(){}
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract void OnUpdate(in Timestep timestep);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void OnPostUpdate() { }
+
         protected abstract void Init();
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Update()
@@ -38,6 +44,7 @@ namespace Titan.ECS.Systems
         internal void InitSystem(World world)
         {
             _world = world;
+            EntityManager = world.Manager;
             Init();
             _world = null;
         }
