@@ -1,13 +1,14 @@
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
 using Titan.Windows;
 using Titan.Windows.D3D11;
+using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Graphics.D3D11
 {
@@ -29,6 +30,20 @@ namespace Titan.Graphics.D3D11
             {
                 _context->ClearRenderTargetView(texture.D3DTarget, (float*)pColor);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Map(in Handle<Buffer> handle, void * data, uint size)
+        {
+            D3D11_MAPPED_SUBRESOURCE subresource;
+            ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
+            var resource = (ID3D11Resource*)buffer.Resource;
+            var result = _context->Map(resource, 0, D3D11_MAP.D3D11_MAP_WRITE_DISCARD, 0, &subresource);
+#if DEBUG
+            Common.CheckAndThrow(result, nameof(ID3D11DeviceContext.Map));
+#endif
+            System.Buffer.MemoryCopy(data, subresource.pData, size, size);
+            _context->Unmap(resource, 0);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -133,7 +148,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderResources(in Handle<Texture>[] handles, uint startSlot = 0u)
+        public void SetPixelShaderResources(in ReadOnlySpan<Handle<Texture>> handles, uint startSlot = 0u)
         {
             if (handles == null)
             {
@@ -184,7 +199,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnbindPixelShaderResources(in Handle<Texture>[] handles)
+        public void UnbindPixelShaderResources(ReadOnlySpan<Handle<Texture>> handles)
         {
             if (handles == null)
             {
