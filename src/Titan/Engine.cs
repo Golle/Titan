@@ -21,6 +21,8 @@ using Titan.Graphics.Windows;
 using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
+using Titan.UI;
+using Titan.UI.Rendering;
 using Titan.Windows;
 using Titan.Windows.D3D11;
 
@@ -130,14 +132,15 @@ namespace Titan
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var renderQueue = new SimpleRenderQueue(1000);
-            
+            var uiRenderQueue = new UIRenderQueue2(1000);
+
             var color = stackalloc float[4];
             color[0] = 1f;
             color[1] = 0.4f;
             color[2] = 0f;
             color[3] = 1f;
 
-            var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue);
+            var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue, uiRenderQueue);
             pipelineBuilder.LoadResources();
             // Preload assets for rendering pipeline
             while (_window.Update() && !pipelineBuilder.IsReady())
@@ -153,11 +156,21 @@ namespace Titan
                 .WithComponent<CameraComponent>()
                 .WithComponent<AssetComponent<Model>>()
                 .WithComponent<ModelComponent>()
+                .WithComponent<AssetComponent<Sprite>>(count:100)
+                .WithComponent<Sprite>()
+                .WithComponent<RectTransform>()
+
+
 
                 .WithSystem(new Transform3DSystem())
                 .WithSystem(new Render3DSystem(assetsManager, renderQueue))
                 .WithSystem(new CameraSystem(graphicsSystem))
-                .WithSystem(new ModelLoaderSystem(assetsManager));
+                .WithSystem(new ModelLoaderSystem(assetsManager))
+                .WithSystem(new SpriteLoaderSystem(assetsManager))
+                .WithSystem(new UIRenderSystem(uiRenderQueue))
+                .WithSystem(new RectTransformSystem())
+                ;
+
 
             _app.ConfigureWorld(worldBuilder);
 
@@ -169,7 +182,7 @@ namespace Titan
             while (_window.Update())
             {
                 renderQueue.Update();
-
+                
                 EventManager.Update();
                 InputManager.Update();
 

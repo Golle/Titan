@@ -146,6 +146,18 @@ namespace Titan.Graphics.D3D11
                 _context->OMSetRenderTargets((uint) numberOfViews, renderTargets, depthBuffer);
             }
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPixelShaderResource(in Handle<Texture> handle, uint startSlot = 0u)
+        {
+            if (!handle.IsValid())
+            {
+                return;
+            }
+            var resource = GraphicsDevice.TextureManager.Access(handle).D3DResource;
+            _context->PSSetShaderResources(startSlot, 1, &resource);
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShaderResources(in ReadOnlySpan<Handle<Texture>> handles, uint startSlot = 0u)
@@ -223,7 +235,7 @@ namespace Titan.Graphics.D3D11
             Unsafe.InitBlock(resources, 0, (uint)(sizeof(ID3D11ShaderResourceView*) * numberOfResources));
             _context->VSSetShaderResources(0, (uint)numberOfResources, resources);
         }
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetVertexShaderConstantBuffer(in Handle<Buffer> handle, uint slot = 0u)
         {

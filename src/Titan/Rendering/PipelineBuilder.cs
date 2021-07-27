@@ -8,6 +8,8 @@ using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
+using Titan.UI;
+using Titan.UI.Rendering;
 using Titan.Windows;
 using Titan.Windows.D3D11;
 
@@ -19,30 +21,39 @@ namespace Titan.Rendering
         private Handle<Asset> _lambertianPixelShaderHandle;
         private Handle<Asset> _fullscreenVertexShaderHandle;
         private Handle<Asset> _lambertianVertexShaderHandle;
+        private Handle<Asset> _uiPixelShaderHandle;
+        private Handle<Asset> _uiVertexShaderHandle;
 
         private readonly AssetsManager _assetsManager;
         private readonly SimpleRenderQueue _simpleRenderQueue;
+        private readonly UIRenderQueue2 _uiRenderQueue;
         private GeometryRenderer _geometryRenderer;
         private BackbufferRenderer _backbufferRenderer;
-        private UIRenderer _uiRenderer;
+        private UIRenderer2 _uiRenderer;
         private DeferredShadingRenderer _deferredShadingRenderer;
 
-        public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue)
+        public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue, UIRenderQueue2 uiRenderQueue)
         {
             _assetsManager = assetsManager;
             _simpleRenderQueue = simpleRenderQueue;
+            _uiRenderQueue = uiRenderQueue;
         }
         public void LoadResources()
         {
             _lambertianVertexShaderHandle = _assetsManager.Load("shaders/default_vs");
-            _fullscreenVertexShaderHandle = _assetsManager.Load("shaders/fullscreen_vs");
             _lambertianPixelShaderHandle = _assetsManager.Load("shaders/default_ps");
-            _fullscreenPixelShaderHandle = _assetsManager.Load("shaders/fullscreen_ps");
+            
+            _fullscreenVertexShaderHandle = _assetsManager.Load("shaders/fullscreen_vs");
+            //_fullscreenPixelShaderHandle = _assetsManager.Load("shaders/fullscreen_ps");
+            _fullscreenPixelShaderHandle = _assetsManager.Load("shaders/fullscreen_debug_ps");
+
+            _uiPixelShaderHandle = _assetsManager.Load("shaders/ui_ps");
+            _uiVertexShaderHandle = _assetsManager.Load("shaders/ui_vs");
 
             _geometryRenderer = new GeometryRenderer(_simpleRenderQueue);
             _backbufferRenderer = new BackbufferRenderer();
             _deferredShadingRenderer = new DeferredShadingRenderer();
-            _uiRenderer = new UIRenderer();
+            _uiRenderer = new UIRenderer2(_uiRenderQueue);
         }
 
         public bool IsReady()
@@ -50,7 +61,9 @@ namespace Titan.Rendering
             return _assetsManager.IsLoaded(_fullscreenVertexShaderHandle) &&
                    _assetsManager.IsLoaded(_lambertianVertexShaderHandle) &&
                    _assetsManager.IsLoaded(_fullscreenPixelShaderHandle) &&
-                   _assetsManager.IsLoaded(_lambertianPixelShaderHandle)
+                   _assetsManager.IsLoaded(_lambertianPixelShaderHandle) &&
+                   _assetsManager.IsLoaded(_uiPixelShaderHandle) &&
+                   _assetsManager.IsLoaded(_uiVertexShaderHandle)
                    ;
         }
 
@@ -126,37 +139,9 @@ namespace Titan.Rendering
                 Renderer = _deferredShadingRenderer
             };
 
-            var uiRenderTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
-            {
-                Format = TextureFormats.RGBA32F,
-                Width = swapchain.Width,
-                Height = swapchain.Height,
-                Binding = TextureBindFlags.FrameBuffer
-            });
-
-            var ui = new Pipeline
-            {
-                ClearRenderTargets = true,
-                ClearColor = new Color(0.1f, 0, 0, 0.1f),
-                RenderTargets = new[] { uiRenderTarget },
-                Renderer = _uiRenderer
-            };
             
-
-            var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
-            var backbuffer = new Pipeline
-            {
-                ClearDepthBuffer = false,
-                ClearRenderTargets = true,
-                ClearColor = Color.Green,
-                RenderTargets = new[] {backbufferRenderTarget},
-                PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_fullscreenPixelShaderHandle),
-                VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
-                PixelShaderResources = new[] { deferredShadingTarget, uiRenderTarget },
-                PixelShaderSamplers = new []{fullscreenSampler},
-                Renderer = _backbufferRenderer
-            };
-
+            
+            
             /***** DEBUG Stuff *****/
             var debugTextureHandle = GraphicsDevice.TextureManager.Create(new TextureCreation
             {
@@ -184,21 +169,52 @@ namespace Titan.Rendering
                 RenderTargets = new[] { debugTextureHandle },
                 Renderer = new DebugRenderer(surface)
             };
+            /***** DEBUG Stuff *****/
 
-            var debugBackbufferPipeline = new Pipeline
+
+            var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
+            var backbuffer = new Pipeline
             {
-                ClearRenderTargets = false,
+                ClearDepthBuffer = false,
+                ClearRenderTargets = true,
+                ClearColor = Color.Black,
                 RenderTargets = new[] { backbufferRenderTarget },
-                PixelShaderResources = new[] { deferredShadingTarget, debugTextureHandle },
-                Renderer = _backbufferRenderer,
                 PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_fullscreenPixelShaderHandle),
                 VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
+                PixelShaderResources = new[] { deferredShadingTarget, debugTextureHandle },
                 PixelShaderSamplers = new[] { fullscreenSampler },
+                Renderer = _backbufferRenderer
             };
-            
 
+            //var uiRenderTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
+            //{
+            //    Format = TextureFormats.RGBA32F,
+            //    Width = swapchain.Width,
+            //    Height = swapchain.Height,
+            //    Binding = TextureBindFlags.FrameBuffer
+            //});
 
-            return new[] {gBuffer, deferredShading, ui, backbuffer, debugPipeline, debugBackbufferPipeline };
+            var uiDepthBuffer = GraphicsDevice.TextureManager.Create(new TextureCreation
+            {
+                Binding = TextureBindFlags.DepthBuffer,
+                DepthStencilFormat = DepthStencilFormats.D24S8,
+                Format = TextureFormats.R24G8TL
+            });
+
+            // TODO: should we render it to an offscreen buffer to support multi-threaded rendering or directly to the backbuffer?
+            var ui = new Pipeline
+            {
+                RenderTargets = new[] { backbufferRenderTarget },
+                //DepthBuffer = uiDepthBuffer,
+                //ClearDepthBuffer = true,
+                //DepthBufferClearValue = 1f,
+                Renderer = _uiRenderer,
+                PixelShaderSamplers = new []{ fullscreenSampler },
+                VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_uiVertexShaderHandle),
+                PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_uiPixelShaderHandle)
+            };
+
+            return new[] {gBuffer, deferredShading, debugPipeline, backbuffer, ui };
         }
     }
 }

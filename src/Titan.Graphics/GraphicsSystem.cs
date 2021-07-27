@@ -19,14 +19,17 @@ namespace Titan.Graphics
     public class GraphicsSystem : IDisposable
     {
         private const uint CameraSlot = 0u;
+        private const uint OrthographicCameraSlot = 1u;
 
         private readonly Pipeline[] _pipeline;
         private readonly Context _immediateContext = GraphicsDevice.ImmediateContext;
         private readonly SwapChain _swapchain = GraphicsDevice.SwapChain;
         private readonly Handle<Buffer> _cameraBufferHandle;
+        private readonly Handle<Buffer> _orthographicCameraHandle;
         private readonly ViewPort _viewport;
         private Matrix4x4 _view;
         private Matrix4x4 _viewProject;
+        private readonly Matrix4x4 _orthographicCamera;
 
         public unsafe GraphicsSystem(Pipeline[] pipeline)
         {
@@ -41,21 +44,39 @@ namespace Titan.Graphics
                 Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
             });
 
-            _viewport = new ViewPort((int)GraphicsDevice.SwapChain.Width, (int)GraphicsDevice.SwapChain.Height);
+            _orthographicCameraHandle = GraphicsDevice.BufferManager.Create(new BufferCreation
+            {
+                Type = BufferTypes.ConstantBuffer,
+                Count = 1,
+                CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE,
+                Stride = (uint)sizeof(Matrix4x4),
+                Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
+            });
+
+            var width = (int)GraphicsDevice.SwapChain.Width;
+            var height = (int)GraphicsDevice.SwapChain.Height;
+            _viewport = new ViewPort(width, height);
+
+            var halfWidth = width / 2f;
+            var halfHeight = height / 2f;
+            _orthographicCamera = Matrix4x4.Transpose(Matrix4x4.CreateOrthographicOffCenter(0, width, 0, height, -1, 1));
         }
 
         public void SetCamera(in Matrix4x4 view, in Matrix4x4 viewProjection)
         {
             _view = view;
-            _viewProject = viewProjection;
+            _viewProject = Matrix4x4.Transpose(viewProjection);
         }
+
         public void Render()
         {
             // set up camera
             //Matrix4x4.Transpose(cam.ViewProjection)
-            _immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = _view, ViewProjection = Matrix4x4.Transpose(_viewProject)});
-            
+            _immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = _view, ViewProjection = _viewProject});
+            _immediateContext.Map(_orthographicCameraHandle, _orthographicCamera);
+
             _immediateContext.SetVertexShaderConstantBuffer(_cameraBufferHandle, CameraSlot);
+            _immediateContext.SetVertexShaderConstantBuffer(_orthographicCameraHandle, OrthographicCameraSlot);
             
             _immediateContext.SetViewPort(_viewport); // change this if we want to support more than a single viewport
             //execute pipeline
@@ -104,6 +125,7 @@ namespace Titan.Graphics
         public void Dispose()
         {
             GraphicsDevice.BufferManager.Release(_cameraBufferHandle);
+            GraphicsDevice.BufferManager.Release(_orthographicCameraHandle);
         }
     }
 }

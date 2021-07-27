@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Titan.Core;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
@@ -11,6 +13,7 @@ namespace Titan.ECS.Systems
         private ComponentId _read;
         private ComponentId _mutable;
         private World _world;
+        private readonly string _name;
         internal ref readonly ComponentId Read => ref _read;
         internal ref readonly ComponentId Mutable => ref _mutable;
         protected EntityManager EntityManager { get; private set; }
@@ -19,6 +22,8 @@ namespace Titan.ECS.Systems
         protected EntitySystem(int priority = 0)
         {
             Priority = priority;
+            
+            _name = GetType().Name;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -33,6 +38,19 @@ namespace Titan.ECS.Systems
         protected abstract void Init();
 
 
+#if DEBUG
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void Update()
+        {
+            var s = Stopwatch.StartNew();
+            OnPreUpdate();
+            OnUpdate(new Timestep(1f));
+            OnPostUpdate();
+            s.Stop();
+            EngineStats.SetStats(_name, s.Elapsed.TotalMilliseconds);
+        }
+
+#else
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Update()
         {
@@ -40,7 +58,7 @@ namespace Titan.ECS.Systems
             OnUpdate(new Timestep(1f));
             OnPostUpdate();
         }
-
+#endif
         internal void InitSystem(World world)
         {
             _world = world;

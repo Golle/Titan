@@ -92,6 +92,20 @@
             ]
         },
         {
+            "Id": "textures/sample_texture_01",
+            "Type" : "texture",
+            "Files": [
+                "textures/test_texture_02.png"
+            ]
+        },
+        {
+            "Id": "textures/sample_texture_02",
+            "Type" : "texture",
+            "Files": [
+                "textures/test_texture_03.png"
+            ]
+        },
+        {
             "Id": "shaders/ui_ps",
             "Type": "pixelshader",
             "Files": [

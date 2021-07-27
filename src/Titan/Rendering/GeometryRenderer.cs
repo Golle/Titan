@@ -17,6 +17,8 @@ namespace Titan.Rendering
         private readonly Handle<Buffer> _transformBuffer;
         private readonly Handle<Buffer> _materialBuffer;
 
+        private const uint TransformSlot = 5u;
+
         public unsafe GeometryRenderer(SimpleRenderQueue queue)
         {
             _queue = queue;
@@ -45,7 +47,7 @@ namespace Titan.Rendering
             Unsafe.SkipInit(out MaterialBuffer materialBuffer);
 
             context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            context.SetVertexShaderConstantBuffer(_transformBuffer, 1);
+            context.SetVertexShaderConstantBuffer(_transformBuffer, TransformSlot);
             context.SetPixelShaderConstantBuffer(_materialBuffer, 1);
             foreach (ref readonly var renderable in _queue.GetRenderables())
             {

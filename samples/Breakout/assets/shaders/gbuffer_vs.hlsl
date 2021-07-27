@@ -4,7 +4,7 @@ cbuffer PerFrameBuffer : register(b0)
     matrix ViewProjection;
 };
 
-cbuffer PerObjectBuffer : register(b1)
+cbuffer PerObjectBuffer : register(b5)
 {
     matrix World;
 };
