@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup>
+    <!-- STATS is used for timers and stats about the engine -->
+        <DefineConstants>STATS</DefineConstants>
+    </PropertyGroup>
+</Project>
