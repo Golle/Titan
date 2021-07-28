@@ -37,8 +37,7 @@ namespace Titan.ECS.Systems
 
         protected abstract void Init();
 
-
-#if DEBUG
+#if STATS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Update()
         {

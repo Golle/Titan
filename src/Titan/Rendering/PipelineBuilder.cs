@@ -214,6 +214,18 @@ namespace Titan.Rendering
                 PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_uiPixelShaderHandle)
             };
 
+            // TODO: this does not work at the moment, need to implement blend modes
+            var debugOverlay = new Pipeline
+            {
+                ClearRenderTargets =  false,
+                RenderTargets = new[] { backbufferRenderTarget },
+                Renderer = _backbufferRenderer,
+                PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_fullscreenPixelShaderHandle),
+                VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
+                PixelShaderResources = new[] { debugTextureHandle },
+                PixelShaderSamplers = new[] { fullscreenSampler }
+            };
+
             return new[] {gBuffer, deferredShading, debugPipeline, backbuffer, ui };
         }
     }
