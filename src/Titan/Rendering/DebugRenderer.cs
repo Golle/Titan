@@ -1,6 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
-using System.Text;
 using Titan.Core;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -11,7 +8,7 @@ using Titan.Windows.Win32;
 
 namespace Titan.Rendering
 {
-    internal unsafe class DebugRenderer : IRenderer
+    internal sealed unsafe class DebugRenderer : Renderer
     {
         private readonly ComPtr<IDXGISurface1> _surface;
         private HFONT _font;
@@ -31,7 +28,7 @@ namespace Titan.Rendering
             _brush = GDI32.CreateSolidBrush(new COLORREF(50, 50, 50));
         }
 
-        public void Render(Context context)
+        public override void Render(Context context)
         {
             if (InputManager.IsKeyPressed(KeyCode.Q))
             {
@@ -93,9 +90,8 @@ namespace Titan.Rendering
             _surface.Get()->ReleaseDC(null);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-            
             _surface.Get()->Release();
         }
     }

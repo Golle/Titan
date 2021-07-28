@@ -11,7 +11,7 @@ using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Rendering
 {
-    internal class GeometryRenderer : IRenderer
+    internal sealed class GeometryRenderer : Renderer
     {
         private readonly SimpleRenderQueue _queue;
         private readonly Handle<Buffer> _transformBuffer;
@@ -42,7 +42,7 @@ namespace Titan.Rendering
         }
 
 
-        public void Render(Context context)
+        public override void Render(Context context)
         {
             Unsafe.SkipInit(out MaterialBuffer materialBuffer);
 
@@ -69,7 +69,7 @@ namespace Titan.Rendering
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             GraphicsDevice.BufferManager.Release(_transformBuffer);
             GraphicsDevice.BufferManager.Release(_materialBuffer);

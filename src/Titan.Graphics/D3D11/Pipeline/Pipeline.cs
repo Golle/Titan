@@ -25,7 +25,7 @@ namespace Titan.Graphics.D3D11.Pipeline
         public Handle<Sampler>[] VertexShaderSamplers;
         public Handle<Texture> DepthBuffer;
 
-        public IRenderer Renderer;
+        public Renderer Renderer;
 
 
         

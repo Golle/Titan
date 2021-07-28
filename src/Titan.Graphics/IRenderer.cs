@@ -4,10 +4,11 @@ using Titan.Graphics.D3D11;
 
 namespace Titan.Graphics
 {
-    public interface IRenderer : IDisposable
+    public abstract class Renderer : IDisposable
     {
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void Render(Context context);
+        public abstract void Render(Context context);
+
+        public virtual void Dispose() { }
     }
 }

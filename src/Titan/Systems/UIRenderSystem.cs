@@ -6,12 +6,12 @@ namespace Titan.Systems
 {
     internal class UIRenderSystem : EntitySystem
     {
-        private readonly UIRenderQueue2 _renderQueue;
+        private readonly UIRenderQueue _renderQueue;
         private EntityFilter _filter;
         private ReadOnlyStorage<RectTransform> _transform;
         private ReadOnlyStorage<Sprite> _sprite;
 
-        public UIRenderSystem(UIRenderQueue2 renderQueue)
+        public UIRenderSystem(UIRenderQueue renderQueue)
         {
             _renderQueue = renderQueue;
         }

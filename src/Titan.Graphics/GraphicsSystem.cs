@@ -56,9 +56,6 @@ namespace Titan.Graphics
             var width = (int)GraphicsDevice.SwapChain.Width;
             var height = (int)GraphicsDevice.SwapChain.Height;
             _viewport = new ViewPort(width, height);
-
-            var halfWidth = width / 2f;
-            var halfHeight = height / 2f;
             _orthographicCamera = Matrix4x4.Transpose(Matrix4x4.CreateOrthographicOffCenter(0, width, 0, height, -1, 1));
         }
 

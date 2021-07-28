@@ -13,7 +13,7 @@ using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.UI.Rendering
 {
-    public unsafe class UIRenderQueue2 : IDisposable
+    public unsafe class UIRenderQueue : IDisposable
     {
         private static readonly IComparer<SortableRenderable> Comparer = new UIComparer();
         private Handle<Buffer> _vertexBuffer;
@@ -26,7 +26,7 @@ namespace Titan.UI.Rendering
 
         private int _elementCount;
 
-        public UIRenderQueue2(uint maxSprites)
+        public UIRenderQueue(uint maxSprites)
         {
             var maxVertices = maxSprites * 4;
             _renderableQueue = MemoryUtils.AllocateBlock<QueuedRenderable>(maxSprites);

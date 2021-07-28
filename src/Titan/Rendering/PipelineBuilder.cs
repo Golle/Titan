@@ -26,13 +26,13 @@ namespace Titan.Rendering
 
         private readonly AssetsManager _assetsManager;
         private readonly SimpleRenderQueue _simpleRenderQueue;
-        private readonly UIRenderQueue2 _uiRenderQueue;
+        private readonly UIRenderQueue _uiRenderQueue;
         private GeometryRenderer _geometryRenderer;
         private BackbufferRenderer _backbufferRenderer;
-        private UIRenderer2 _uiRenderer;
+        private UIRenderer _uiRenderer;
         private DeferredShadingRenderer _deferredShadingRenderer;
 
-        public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue, UIRenderQueue2 uiRenderQueue)
+        public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue, UIRenderQueue uiRenderQueue)
         {
             _assetsManager = assetsManager;
             _simpleRenderQueue = simpleRenderQueue;
@@ -53,7 +53,7 @@ namespace Titan.Rendering
             _geometryRenderer = new GeometryRenderer(_simpleRenderQueue);
             _backbufferRenderer = new BackbufferRenderer();
             _deferredShadingRenderer = new DeferredShadingRenderer();
-            _uiRenderer = new UIRenderer2(_uiRenderQueue);
+            _uiRenderer = new UIRenderer(_uiRenderQueue);
         }
 
         public bool IsReady()
