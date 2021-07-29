@@ -92,7 +92,7 @@ namespace Titan.Graphics.D3D11.Textures
                 ArraySize = 1,
                 MipLevels = 1,
                 BindFlags = bindflags,
-                CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED,
+                CpuAccessFlags = args.CpuAccessFlag,
                 Height = height,
                 Width = width,
                 Usage = args.Usage,
@@ -111,6 +111,7 @@ namespace Titan.Graphics.D3D11.Textures
             texture->Height = height;
             texture->Width = width;
             texture->Usage = args.Usage;
+            texture->CpuAccess = args.CpuAccessFlag;
             texture->D3DTarget = null;
             texture->D3DResource = null;
             texture->D3DDepthStencil = null;

@@ -21,5 +21,6 @@ namespace Titan.Graphics.D3D11.Textures
 
         public D3D11_BIND_FLAG BindFlags;
         public D3D11_USAGE Usage;
+        public D3D11_CPU_ACCESS_FLAG CpuAccess;
     }
 }

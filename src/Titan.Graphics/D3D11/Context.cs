@@ -15,6 +15,8 @@ namespace Titan.Graphics.D3D11
     public unsafe class Context
     {
         private readonly ID3D11DeviceContext* _context;
+
+        public ID3D11DeviceContext* D3dContext => _context;
         public Context(ID3D11DeviceContext* context)
         {
             _context = context;
@@ -244,6 +246,7 @@ namespace Titan.Graphics.D3D11
             var buffer = GraphicsDevice.BufferManager.Access(handle).Resource;
             _context->VSSetConstantBuffers(slot, 1, &buffer);
         }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPixelShaderConstantBuffer(in Handle<Buffer> handle, uint slot = 0u)
         {

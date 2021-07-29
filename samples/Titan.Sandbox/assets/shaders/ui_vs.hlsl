@@ -3,7 +3,6 @@ cbuffer OrthographicCamera : register(b1)
     matrix ViewProjection;
 };
 
-
 struct VS_OUTPUT {
     float2 Texture: Texture;
     float4 Position: SV_Position;

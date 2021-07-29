@@ -201,6 +201,7 @@ namespace Titan.Rendering
                 Format = TextureFormats.R24G8TL
             });
 
+         
             // TODO: should we render it to an offscreen buffer to support multi-threaded rendering or directly to the backbuffer?
             var ui = new Pipeline
             {

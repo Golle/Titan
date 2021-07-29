@@ -79,6 +79,8 @@ namespace Titan.Graphics
             //execute pipeline
             foreach (ref readonly var pipeline in _pipeline.AsSpan())
             {
+                var renderer = pipeline.Renderer;
+
                 if (pipeline.ClearRenderTargets)
                 {
                     foreach (var handle in pipeline.RenderTargets)
@@ -107,7 +109,7 @@ namespace Titan.Graphics
                     _immediateContext.SetPixelShader(pipeline.PixelShader);
                 }
 
-                pipeline.Renderer.Render(_immediateContext);
+                renderer.Render(_immediateContext);
                 
                 _immediateContext.UnbindRenderTargets();
                 _immediateContext.UnbindPixelShaderResources(pipeline.PixelShaderResources);
