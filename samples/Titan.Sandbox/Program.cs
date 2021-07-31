@@ -76,6 +76,10 @@ namespace Titan.Sandbox
                     ZIndex = 0
                 });
             }
+            
+            AddUiElement(200, "textures/transparent_01", new Size(200, 200), new Vector2(0, 0));
+
+            
 
 
             Entity AddUiElement(int zIndex, string texture, Size size, Vector2 offset)

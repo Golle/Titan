@@ -106,6 +106,13 @@
             ]
         },
         {
+            "Id": "textures/transparent_01",
+            "Type" : "texture",
+            "Files": [
+                "textures/transparent_texture_01.png"
+            ]
+        },
+        {
             "Id": "shaders/ui_ps",
             "Type": "pixelshader",
             "Files": [
