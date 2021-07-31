@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
+using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
@@ -297,5 +298,22 @@ namespace Titan.Graphics.D3D11
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRasterizerState(in Handle<RasterizerState> handle) => _context->RSSetState(GraphicsDevice.RasterizerManager.Access(handle).State);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetBlendState(in Handle<BlendState> handle)
+        {
+            if (handle.IsValid())
+            {
+                ref readonly var blendState = ref GraphicsDevice.BlendStateManager.Access(handle);
+                fixed (float* pBlendFactor = blendState.BlendFactor)
+                {
+                    _context->OMSetBlendState(blendState.State, pBlendFactor, blendState.SampleMask);
+                }
+            }
+            else
+            {
+                _context->OMSetBlendState(null, null, 0xffffffff);
+            }
+        }
     }
 }

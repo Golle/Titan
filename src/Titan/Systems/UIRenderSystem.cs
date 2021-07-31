@@ -37,7 +37,7 @@ namespace Titan.Systems
                 ref readonly var transform = ref _transform.Get(entity);
                 ref readonly var sprite = ref _sprite.Get(entity);
                 
-                _renderQueue.Add(transform.Position, transform.Size, sprite.Texture);
+                _renderQueue.Add(transform.Position, transform.AbsoluteZIndex, transform.Size, sprite.Texture);
             }
         }
 

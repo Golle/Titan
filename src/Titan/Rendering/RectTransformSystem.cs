@@ -25,11 +25,13 @@ namespace Titan.Rendering
                 {
                     ref readonly var parentTransform = ref _transform.Get(parent);
                     // Increase z-index with 0.5 per parent so it gets rendered in the correct order
-                    transform.Position = parentTransform.Position + new Vector3(transform.Offset, transform.ZIndex + 0.5f);
+                    transform.Position = parentTransform.Position + transform.Offset;
+                    transform.AbsoluteZIndex = parentTransform.AbsoluteZIndex + 1;
                 }
                 else
                 {
-                    transform.Position = new Vector3(transform.Offset, transform.ZIndex);
+                    transform.Position = transform.Offset;
+                    transform.AbsoluteZIndex = transform.ZIndex;
                 }
             }
         }

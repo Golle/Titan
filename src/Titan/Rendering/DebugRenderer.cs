@@ -13,7 +13,7 @@ namespace Titan.Rendering
         private readonly ComPtr<IDXGISurface1> _surface;
         private HFONT _font;
         private HBRUSH _brush;
-        private bool _enabled;
+        private bool _enabled = true;
 
         public DebugRenderer(ComPtr<IDXGISurface1> surface)
         {
@@ -25,7 +25,7 @@ namespace Titan.Rendering
                 _font = GDI32.CreateFontW(20, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, pFont);
             }
 
-            _brush = GDI32.CreateSolidBrush(new COLORREF(50, 50, 50));
+            _brush = GDI32.CreateSolidBrush(new COLORREF(50, 150, 50));
         }
 
         public override void Render(Context context)
@@ -43,7 +43,7 @@ namespace Titan.Rendering
             Common.CheckAndThrow(_surface.Get()->GetDC(0, &hdc), nameof(IDXGISurface1.GetDC));
 
             GDI32.SetTextColor(hdc, new COLORREF(0, 200, 200));
-            GDI32.SetBkColor(hdc, new COLORREF(40, 40, 0));
+            GDI32.SetBkColor(hdc, new COLORREF(0, 0, 0));
             GDI32.SetBkMode(hdc, BackgroundMode.Transparent);
 
             //var oldBrush = GDI32.SelectObject(hdc, _brush);

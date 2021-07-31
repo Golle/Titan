@@ -1,5 +1,6 @@
 using System;
 using Titan.Core.Logging;
+using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
@@ -38,6 +39,7 @@ namespace Titan.Graphics.D3D11
         public static SamplerManager SamplerManager { get; private set; }
         public static ShaderManager ShaderManager { get; private set; }
         public static RasterizerManager RasterizerManager { get; private set; }
+        public static BlendStateManager BlendStateManager { get; private set; }
 
         public static void Init(Window window, DeviceConfiguration config)
         {
@@ -114,6 +116,7 @@ namespace Titan.Graphics.D3D11
                 SamplerManager = new SamplerManager(_device.Get());
                 ShaderManager = new ShaderManager(_device.Get());
                 RasterizerManager = new RasterizerManager(_device.Get());
+                BlendStateManager = new BlendStateManager(_device.Get());
             }
 
             IsInitialized = true;

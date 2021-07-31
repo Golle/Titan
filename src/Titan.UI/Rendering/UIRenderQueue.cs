@@ -74,14 +74,14 @@ namespace Titan.UI.Rendering
             }
         }
 
-        public void Add(in Vector3 position, in Size size, in Handle<Texture> texture)
+        public void Add(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture)
         {
             var index = _count++;
             var renderable = _renderableQueue.GetPointer(index);
-            renderable->Position = new Vector2(position.X, position.Y);
+            renderable->Position = position;
             renderable->Texture = texture;
             renderable->Size = size;
-            _sortable[index] = new SortableRenderable((int)(position.Z + 0.5f), texture.Value, renderable); // Add 0.5f to Z to prevent floating position errors before casting it to an int. for example 5 could be 4.999998, and casting it to an int would return 4 instead of 5.
+            _sortable[index] = new SortableRenderable(zIndex, texture.Value, renderable); // Add 0.5f to Z to prevent floating position errors before casting it to an int. for example 5 could be 4.999998, and casting it to an int would return 4 instead of 5.
         }
 
         public void Begin()

@@ -109,7 +109,10 @@ namespace Titan.Graphics
                     _immediateContext.SetPixelShader(pipeline.PixelShader);
                 }
 
+                _immediateContext.SetBlendState(pipeline.BlendState);
+
                 renderer.Render(_immediateContext);
+                
                 
                 _immediateContext.UnbindRenderTargets();
                 _immediateContext.UnbindPixelShaderResources(pipeline.PixelShaderResources);

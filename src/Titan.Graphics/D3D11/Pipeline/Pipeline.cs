@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Titan.Core;
+using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
@@ -24,11 +25,9 @@ namespace Titan.Graphics.D3D11.Pipeline
         public Handle<Sampler>[] PixelShaderSamplers;
         public Handle<Sampler>[] VertexShaderSamplers;
         public Handle<Texture> DepthBuffer;
+        public Handle<BlendState> BlendState;
 
         public Renderer Renderer;
-
-
-        
 
         // TODO: this can be used to microoptimize the binding of render targets
 
@@ -44,6 +43,7 @@ namespace Titan.Graphics.D3D11.Pipeline
         //    }
         //    NumberOfRenderTargets = (uint) RenderTargets.Length;
         //}
+        
     }
 
     [StructLayout(LayoutKind.Sequential, Size = sizeof(long)*4)]

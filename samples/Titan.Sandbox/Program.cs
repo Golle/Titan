@@ -1,17 +1,14 @@
 using System;
-using System.Diagnostics;
 using System.Numerics;
 using Titan;
 using Titan.Assets.Models;
 using Titan.Components;
 using Titan.Core.Logging;
-using Titan.Core.Messaging;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Windows;
 using Titan.Sandbox;
-using Titan.UI;
 using Titan.UI.Common;
 
 Console.WriteLine($"Hello World!");
@@ -70,14 +67,14 @@ namespace Titan.Sandbox
                 e5.AddComponent(new AssetComponent<Sprite>("textures/sample_texture_01"));
                 e5.AddComponent(new RectTransform
                 {
-                    Size = new Size(100, 100),
+                    Size = new Size(100, 150),
                     AnchorPoint = AnchorPoint.TopLeft,
                     Offset = new Vector2(0, 0),
                     ZIndex = 0
                 });
             }
             
-            AddUiElement(200, "textures/transparent_01", new Size(200, 200), new Vector2(0, 0));
+            AddUiElement(200, "textures/transparent_01", new Size(1200, 1200), new Vector2(0, 0));
 
             
 

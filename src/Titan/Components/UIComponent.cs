@@ -16,7 +16,8 @@ namespace Titan.Components
         public int ZIndex;
         public AnchorPoint AnchorPoint;
 
-        internal Vector3 Position;
+        internal Vector2 Position;
+        internal int AbsoluteZIndex;
     }
 
 

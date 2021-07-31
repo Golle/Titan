@@ -14,6 +14,6 @@ namespace Titan.Windows.D3D11
         public D3D11_BLEND SrcBlendAlpha;
         public D3D11_BLEND DestBlendAlpha;
         public D3D11_BLEND_OP BlendOpAlpha;
-        public byte RenderTargetWriteMask;
+        public D3D11_COLOR_WRITE_ENABLE RenderTargetWriteMask;
     }
 }
