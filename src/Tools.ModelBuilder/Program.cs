@@ -2,11 +2,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using Titan.Assets.Materials;
-using Titan.Assets.Models;
 using Titan.Core.Logging;
 using Titan.Core.Serialization;
 using Titan.Graphics;
+using Titan.Graphics.Loaders.Materials;
+using Titan.Graphics.Loaders.Models;
 using Tools.Core.WavefrontObj;
 using Tools.ModelBuilder;
 

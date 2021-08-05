@@ -1,7 +1,7 @@
-using Titan.Assets.Materials;
-using Titan.Assets.Models;
+using Titan.Graphics.Loaders.Materials;
+using Titan.Graphics.Loaders.Models;
 
-namespace Titan.Assets
+namespace Titan.Graphics.Loaders
 {
     public static class Resources
     {

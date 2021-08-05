@@ -7,6 +7,8 @@ using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Textures;
+using Titan.Graphics.Loaders;
+using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Common;
 using Titan.Windows.D3D11;
 using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
@@ -74,14 +76,15 @@ namespace Titan.UI.Rendering
             }
         }
 
-        public void Add(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture)
+        public void Add(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture, in TextureCoordinates coordinates)
         {
             var index = _count++;
             var renderable = _renderableQueue.GetPointer(index);
             renderable->Position = position;
             renderable->Texture = texture;
+            renderable->Coordinates = coordinates;
             renderable->Size = size;
-            _sortable[index] = new SortableRenderable(zIndex, texture.Value, renderable); // Add 0.5f to Z to prevent floating position errors before casting it to an int. for example 5 could be 4.999998, and casting it to an int would return 4 instead of 5.
+            _sortable[index] = new SortableRenderable(zIndex, texture, renderable); // Add 0.5f to Z to prevent floating position errors before casting it to an int. for example 5 could be 4.999998, and casting it to an int would return 4 instead of 5.
         }
 
         public void Begin()
@@ -130,19 +133,19 @@ namespace Titan.UI.Rendering
 
 
                 vertex->Position = position;
-                vertex->Texture = new Vector2(0, 1);
+                vertex->Texture = renderable->Coordinates[0];
 
                 vertex++;
                 vertex->Position = new Vector2(position.X, offsetY);
-                vertex->Texture = new Vector2(0, 0);
+                vertex->Texture = renderable->Coordinates[1];
 
                 vertex++;
                 vertex->Position = new Vector2(offsetX, offsetY);
-                vertex->Texture = new Vector2(1, 0);
+                vertex->Texture = renderable->Coordinates[2];
 
                 vertex++;
                 vertex->Position = new Vector2(offsetX, position.Y);
-                vertex->Texture = new Vector2(1, 1);
+                vertex->Texture = renderable->Coordinates[3];
                 vertexIndex += 4;
 
                 indexCount += 6;

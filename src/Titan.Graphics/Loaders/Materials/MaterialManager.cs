@@ -4,7 +4,7 @@ using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 
-namespace Titan.Assets.Materials
+namespace Titan.Graphics.Loaders.Materials
 {
     public unsafe class MaterialManager : IDisposable
     {

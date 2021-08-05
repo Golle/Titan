@@ -2,40 +2,23 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.Win32.SafeHandles;
+using Titan.Assets;
 using Titan.Assets.Database;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.Textures;
 
-namespace Titan.Assets.Atlas
+namespace Titan.Graphics.Loaders.Atlas
 {
-
-    [StructLayout(LayoutKind.Sequential, Size = sizeof(float) * 8)]
-    public unsafe struct TextureCoordinates
-    {
-        public ref readonly Vector2 this[int index]
-        {
-            get
-            {
-                Debug.Assert(index < 4, "Index must be between 0 and 4");
-                return ref *((Vector2*)Unsafe.AsPointer(ref this) + index);
-            }
-        }
-    }
-    public struct TextureAtlas
-    {
-        public Handle<Texture> Texture;
-        public MemoryChunk<TextureCoordinates> Coordinates;
-    }
-
     public unsafe class AtlasLoader : IAssetLoader
     {
+        private readonly AtlasManager _manager;
+
+        public AtlasLoader(AtlasManager manager)
+        {
+            _manager = manager;
+        }
 
         public int OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
         {
@@ -57,17 +40,13 @@ namespace Titan.Assets.Atlas
             var textureWidth = texture.Width;
             var textureHeight = texture.Height;
 
-            // Create a manager for this, and return a handle for the atlas
-            var atlas = new TextureAtlas
-            {
-                Texture = textureHandle,
-                Coordinates = MemoryUtils.AllocateBlock<TextureCoordinates>(count)
-            };
-
+            var handle = _manager.Create(new AtlasCreation(count));
+            ref var atlas = ref _manager.Access(handle);
+            atlas.Texture = textureHandle;
+            
             var coordinates = stackalloc Vector2[4];
             for (var i = 0; i < count; ++i)
             {
-                
                 var values = stream.ReadLine().Split(';');
                 if (values.Length < 4)
                 {
@@ -87,17 +66,20 @@ namespace Titan.Assets.Atlas
                 atlas.Coordinates[i] = *(TextureCoordinates*)coordinates;
             }
 
+            Logger.Trace<AtlasLoader>($"Loaded Atlas with {count} texture coordinates.");
 
-            return 0;
+            return handle;
         }
 
         public void OnRelease(int handle)
         {
-
+            Logger.Trace<AtlasLoader>($"Releasing Atlas with handle {handle}");
+            _manager.Release(handle);
         }
 
         public void Dispose()
         {
+            _manager.Dispose();
         }
     }
     

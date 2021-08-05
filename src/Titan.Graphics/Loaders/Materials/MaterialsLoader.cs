@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Titan.Assets;
 using Titan.Assets.Database;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -8,7 +9,7 @@ using Titan.Core.Serialization;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
 
-namespace Titan.Assets.Materials
+namespace Titan.Graphics.Loaders.Materials
 {
     public class MaterialsLoader : IAssetLoader
     {

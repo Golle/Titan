@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Titan.Assets;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
-using Titan.Graphics.D3D11.Textures;
 using Titan.UI.Common;
 using Titan.UI.Components;
 
@@ -13,6 +11,7 @@ namespace Titan.UI
     public class Sprite
     {
         public string Identifier { get; set; }
+        public int Index { get; set; }
     }
 
 
@@ -20,13 +19,12 @@ namespace Titan.UI
     {
         public Sprite Sprite { get; set; }
         public Sprite OnHover { get; set; }
-
         internal override void OnCreate(in Entity entity)
         {
             base.OnCreate(entity);
             if (Sprite != null)
             {
-                entity.AddComponent(new AssetComponent<SpriteComponent>(Sprite.Identifier));
+                entity.AddComponent(new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent { TextureIndex = Sprite.Index }));
             }
         }
     }
@@ -94,7 +92,7 @@ namespace Titan.UI
             {
                 foreach (var child in container.Children)
                 {
-                    RecursiveCreate(component.Entity,child);
+                    RecursiveCreate(component.Entity, child);
                 }
             }
         }

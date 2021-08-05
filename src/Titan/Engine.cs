@@ -1,35 +1,28 @@
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Numerics;
 using Titan.Assets;
-using Titan.Assets.Atlas;
-using Titan.Assets.Materials;
-using Titan.Assets.Models;
-using Titan.Assets.Shaders;
 using Titan.Components;
 using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
-using Titan.ECS.Components;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Images;
+using Titan.Graphics.Loaders;
+using Titan.Graphics.Loaders.Atlas;
+using Titan.Graphics.Loaders.Materials;
+using Titan.Graphics.Loaders.Models;
+using Titan.Graphics.Loaders.Shaders;
 using Titan.Graphics.Windows;
 using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
-using Titan.UI;
-using Titan.UI.Common;
 using Titan.UI.Components;
 using Titan.UI.Rendering;
 using Titan.UI.Systems;
-using Titan.Windows;
-using Titan.Windows.D3D11;
 
 namespace Titan
 {
@@ -134,13 +127,14 @@ namespace Titan
         
         private unsafe void Run()
         {
+            var atlasManager = new AtlasManager(100);
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
                 .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
                 .Register(AssetTypes.VertexShader, new VertexShaderLoader())
                 .Register(AssetTypes.PixelShader, new PixelShaderLoader())
                 .Register(AssetTypes.Material, new MaterialsLoader())
-                .Register(AssetTypes.Atlas, new AtlasLoader())
+                .Register(AssetTypes.Atlas, new AtlasLoader(atlasManager))
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var renderQueue = new SimpleRenderQueue(1000);
@@ -179,7 +173,7 @@ namespace Titan
                 .WithSystem(new CameraSystem(graphicsSystem))
                 .WithSystem(new ModelLoaderSystem(assetsManager))
                 .WithSystem(new SpriteLoaderSystem(assetsManager))
-                .WithSystem(new UIRenderSystem(uiRenderQueue))
+                .WithSystem(new UIRenderSystem(uiRenderQueue, atlasManager))
                 .WithSystem(new RectTransformSystem())
                 ;
 

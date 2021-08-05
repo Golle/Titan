@@ -1,9 +1,9 @@
-using Titan.Assets.Materials;
 using Titan.Core;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.Loaders.Materials;
 
-namespace Titan.Assets.Models
+namespace Titan.Graphics.Loaders.Models
 {
     public struct Mesh
     {

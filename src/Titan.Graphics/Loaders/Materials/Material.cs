@@ -1,7 +1,7 @@
 using Titan.Core;
 using Titan.Graphics.D3D11.Shaders;
 
-namespace Titan.Assets.Materials
+namespace Titan.Graphics.Loaders.Materials
 {
     public struct Material
     {

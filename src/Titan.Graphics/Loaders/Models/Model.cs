@@ -1,4 +1,4 @@
-namespace Titan.Assets.Models
+namespace Titan.Graphics.Loaders.Models
 {
     public struct Model
     {

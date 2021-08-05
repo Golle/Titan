@@ -1,9 +1,8 @@
 using Titan.Core;
-using Titan.Graphics;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
 
-namespace Titan.Assets.Materials
+namespace Titan.Graphics.Loaders.Materials
 {
     public record MaterialCreation
     {

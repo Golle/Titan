@@ -1,6 +1,4 @@
-using Titan.Graphics;
-
-namespace Titan.Assets.Materials
+namespace Titan.Graphics.Loaders.Materials
 {
     public struct MaterialDescriptor
     {

@@ -1,15 +1,13 @@
 using System;
-using System.Runtime.CompilerServices;
+using Titan.Assets;
 using Titan.Assets.Database;
-using Titan.Assets.Materials;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Windows.D3D11;
 
-namespace Titan.Assets.Models
+namespace Titan.Graphics.Loaders.Models
 {
     public class ModelLoader : IAssetLoader
     {

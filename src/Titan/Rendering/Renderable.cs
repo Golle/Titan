@@ -1,8 +1,8 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Titan.Assets.Materials;
 using Titan.Core;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.Loaders.Materials;
 
 namespace Titan.Rendering
 {

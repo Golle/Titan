@@ -8,7 +8,8 @@ namespace Titan.Assets
         public fixed char Id[128];
         public Handle<Asset> AssetHandle;
         public Handle<T> Handle;
-        public AssetComponent(string id)
+        public T DefaultValue;
+        public AssetComponent(string id, in T defaultValue = default)
         {
             fixed (char* destination = Id)
             fixed (char* source = id)
@@ -17,6 +18,7 @@ namespace Titan.Assets
             }
             AssetHandle = default;
             Handle = default;
+            DefaultValue = defaultValue;
         }
 
         public override string ToString()

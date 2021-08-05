@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Graphics.D3D11.Textures;
+using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Common;
 
 namespace Titan.UI.Rendering
@@ -12,5 +13,6 @@ namespace Titan.UI.Rendering
         public Vector2 Position;
         public Size Size;
         public Handle<Texture> Texture;
+        public TextureCoordinates Coordinates;
     }
 }

@@ -4,7 +4,7 @@ using Titan.Core;
 using Titan.Core.Memory;
 using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
-namespace Titan.Assets.Models
+namespace Titan.Graphics.Loaders.Models
 {
     public ref struct ModelCreation
     {

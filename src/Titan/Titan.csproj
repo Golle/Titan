@@ -12,7 +12,4 @@
     <ProjectReference Include="..\Titan.Graphics\Titan.Graphics.csproj" />
     <ProjectReference Include="..\Titan.UI\Titan.UI.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\Atlas\" />
-  </ItemGroup>
 </Project>

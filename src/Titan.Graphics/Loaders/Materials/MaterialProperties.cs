@@ -1,9 +1,8 @@
 using System.Runtime.InteropServices;
 using Titan.Core;
-using Titan.Graphics;
 using Titan.Graphics.D3D11.Textures;
 
-namespace Titan.Assets.Materials
+namespace Titan.Graphics.Loaders.Materials
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct MaterialProperties

@@ -1,5 +1,4 @@
 using Titan.Assets;
-using Titan.Assets.Models;
 using Titan.Components;
 using Titan.Core;
 using Titan.ECS.Systems;

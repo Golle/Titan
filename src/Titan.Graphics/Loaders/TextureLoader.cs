@@ -1,4 +1,5 @@
 using System;
+using Titan.Assets;
 using Titan.Assets.Database;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
@@ -7,8 +8,7 @@ using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Images;
 using Titan.Windows.D3D11;
 
-
-namespace Titan.Assets
+namespace Titan.Graphics.Loaders
 {
     public class TextureLoader : IAssetLoader
     {

@@ -33,6 +33,7 @@ namespace Titan.ECS.Systems.Dispatcher
         public void Execute()
         {
             _progress.Reset();
+
             Array.Fill(_status, NodeStatus.Waiting);
             
             // Put it in a local variable to avoid bounds checking
@@ -42,7 +43,7 @@ namespace Titan.ECS.Systems.Dispatcher
 
             while (!_progress.IsComplete())
             {
-                for (var i = 0; i < _nodes.Length; ++i)
+                for (var i = 0; i < nodes.Length; ++i)
                 {
                     if (status[i] != NodeStatus.Waiting)
                     {
@@ -76,13 +77,14 @@ namespace Titan.ECS.Systems.Dispatcher
         private void ResetHandles()
         {
             var handles = _handles;
+            var status = _status;
             for (var i = 0; i < handles.Length; ++i)
             {
                 ref var handle = ref handles[i];
                 if (handle.IsValid() && WorkerPool.IsCompleted(handle))
                 {
                     WorkerPool.Reset(ref handle);
-                    _status[i] = NodeStatus.Completed;
+                    status[i] = NodeStatus.Completed;
                 }
             }
         }

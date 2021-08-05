@@ -1,6 +1,6 @@
 using Titan.Assets;
 using Titan.ECS.Systems;
-using Titan.Graphics.D3D11.Textures;
+using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Components;
 
 namespace Titan.UI.Systems
@@ -36,10 +36,9 @@ namespace Titan.UI.Systems
 
                 if (_assetsManager.IsLoaded(sprite.AssetHandle))
                 {
-                    entity.AddComponent(new SpriteComponent
-                    {
-                        Texture = _assetsManager.GetAssetHandle<Texture>(sprite.AssetHandle)
-                    });
+                    var component = sprite.DefaultValue;
+                    component.TextureAtlas = _assetsManager.GetAssetHandle<TextureAtlas>(sprite.AssetHandle);
+                    entity.AddComponent(component);
                 }
             }
         }
