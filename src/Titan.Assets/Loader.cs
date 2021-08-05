@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
@@ -208,12 +209,15 @@ namespace Titan.Assets
                 for(var i = 0; i < asset.Files.Length; ++i)
                 {
                     var path = asset.Files[i];
-                    using var file = FileSystem.OpenRead(path);
-                    var block = MemoryUtils.AllocateBlock<byte>((uint)file.Length);
-                    file.Read(block.AsSpan());
+                    using var fileHandle = FileSystem.OpenReadHandle(path);
+                    var length = fileHandle.Length;
+                    var block = MemoryUtils.AllocateBlock<byte>((uint)length);
+
+                    var bytesRead = fileHandle.Read(block.AsSpan());
+
+                    Logger.Trace<Loader>($"Read {bytesRead} bytes, file size {length} bytes. {asset.Identifier}");
                     asset.FileBytes[i] = block;
                 }
-                
                 Logger.Trace<Loader>($"File read finished {asset.Identifier}");
                 asset.Status= AssetStatus.FileReadComplete;
             }, (index, _assets));

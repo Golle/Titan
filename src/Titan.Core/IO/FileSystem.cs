@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Microsoft.Win32.SafeHandles;
 using Titan.Core.Logging;
 
 namespace Titan.Core.IO
@@ -59,6 +60,9 @@ namespace Titan.Core.IO
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FileStream OpenRead(string identifer) => File.OpenRead(GetFullPath(identifer));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static FileHandle OpenReadHandle(string identifier) => new(File.OpenHandle(GetFullPath(identifier)));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<byte> ReadAllBytes(string identifier) => File.ReadAllBytes(GetFullPath(identifier));
