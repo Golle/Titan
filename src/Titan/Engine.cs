@@ -3,10 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using Titan.Assets;
+using Titan.Assets.Atlas;
 using Titan.Assets.Materials;
 using Titan.Assets.Models;
 using Titan.Assets.Shaders;
 using Titan.Components;
+using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
@@ -22,7 +24,10 @@ using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
 using Titan.UI;
+using Titan.UI.Common;
+using Titan.UI.Components;
 using Titan.UI.Rendering;
+using Titan.UI.Systems;
 using Titan.Windows;
 using Titan.Windows.D3D11;
 
@@ -115,6 +120,12 @@ namespace Titan
             {
                 Run();
             }
+            catch (Exception e)
+            {
+                Logger.Error("Exception was thrown at startup.");
+                Logger.Error(e.Message);
+                Logger.Error(e.StackTrace);
+            }
             finally
             {
                 Shutdown();
@@ -129,6 +140,7 @@ namespace Titan
                 .Register(AssetTypes.VertexShader, new VertexShaderLoader())
                 .Register(AssetTypes.PixelShader, new PixelShaderLoader())
                 .Register(AssetTypes.Material, new MaterialsLoader())
+                .Register(AssetTypes.Atlas, new AtlasLoader())
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var renderQueue = new SimpleRenderQueue(1000);
@@ -156,8 +168,8 @@ namespace Titan
                 .WithComponent<CameraComponent>()
                 .WithComponent<AssetComponent<Model>>()
                 .WithComponent<ModelComponent>()
-                .WithComponent<AssetComponent<Sprite>>(count:100)
-                .WithComponent<Sprite>()
+                .WithComponent<AssetComponent<SpriteComponent>>(count:100)
+                .WithComponent<SpriteComponent>()
                 .WithComponent<RectTransform>()
 
 
@@ -178,18 +190,34 @@ namespace Titan
             using var starterWorld = new World(worldBuilder.Build());
             _app.OnStart(starterWorld);
 
+
+
+            
+
+            var timer = Stopwatch.StartNew();
             // star the main loop
             while (_window.Update())
             {
+
                 renderQueue.Update();
-                
+            
+                timer.Restart();
                 EventManager.Update();
+                EngineStats.SetStats(nameof(EventManager), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
                 InputManager.Update();
+                EngineStats.SetStats(nameof(InputManager), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
 
                 starterWorld.Update();
-
+                EngineStats.SetStats(nameof(World), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
                 assetsManager.Update();
+                EngineStats.SetStats(nameof(AssetsManager), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
                 graphicsSystem.Render();
+                EngineStats.SetStats(nameof(GraphicsSystem), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
             }
         }
 

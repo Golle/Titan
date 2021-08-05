@@ -1,8 +1,7 @@
-using System.Numerics;
-using Titan.Components;
 using Titan.ECS.Systems;
+using Titan.UI.Components;
 
-namespace Titan.Rendering
+namespace Titan.UI.Systems
 {
     public class RectTransformSystem : EntitySystem
     {

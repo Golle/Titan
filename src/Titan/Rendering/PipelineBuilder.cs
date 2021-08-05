@@ -9,7 +9,6 @@ using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
-using Titan.UI;
 using Titan.UI.Rendering;
 using Titan.Windows;
 using Titan.Windows.D3D11;

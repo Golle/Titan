@@ -25,7 +25,7 @@ namespace Titan.Rendering
                 _font = GDI32.CreateFontW(20, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, pFont);
             }
 
-            _brush = GDI32.CreateSolidBrush(new COLORREF(50, 150, 50));
+            _brush = GDI32.CreateSolidBrush(new COLORREF(50, 50, 50));
         }
 
         public override void Render(Context context)
@@ -52,7 +52,7 @@ namespace Titan.Rendering
                 Top = 0,
                 Left = 0,
                 Right = 400,
-                Bottom = 250
+                Bottom = 450
             };
             GDI32.FillRect(hdc, &rect, _brush);
 
@@ -61,7 +61,7 @@ namespace Titan.Rendering
 
             //const string str = "Sample Data collection: {0}";
 
-
+            
             const string template = "{0}: {1:N6}ms";
             var i = 1;
             foreach (var (name, value) in EngineStats.GetStats())

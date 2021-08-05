@@ -1,13 +1,9 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Titan.Core;
-using Titan.Graphics.D3D11.Textures;
 using Titan.UI.Common;
 
-namespace Titan.Components
+namespace Titan.UI.Components
 {
-
-
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct RectTransform
     {
@@ -19,12 +15,4 @@ namespace Titan.Components
         internal Vector2 Position;
         internal int AbsoluteZIndex;
     }
-
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public struct Sprite
-    {
-        public Handle<Texture> Texture;
-    }
-    
 }

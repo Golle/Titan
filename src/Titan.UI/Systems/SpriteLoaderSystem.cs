@@ -1,15 +1,15 @@
 using Titan.Assets;
-using Titan.Components;
 using Titan.ECS.Systems;
 using Titan.Graphics.D3D11.Textures;
+using Titan.UI.Components;
 
-namespace Titan.Systems
+namespace Titan.UI.Systems
 {
-    internal class SpriteLoaderSystem : EntitySystem
+    public class SpriteLoaderSystem : EntitySystem
     {
         private readonly AssetsManager _assetsManager;
         private EntityFilter _filter;
-        private MutableStorage<AssetComponent<Sprite>> _sprite;
+        private MutableStorage<AssetComponent<SpriteComponent>> _sprite;
 
         public SpriteLoaderSystem(AssetsManager assetsManager)
         {
@@ -18,9 +18,9 @@ namespace Titan.Systems
 
         protected override void Init()
         {
-            _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<Sprite>>().Not<Sprite>());
+            _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<SpriteComponent>>().Not<SpriteComponent>());
             
-            _sprite = GetMutable<AssetComponent<Sprite>>();
+            _sprite = GetMutable<AssetComponent<SpriteComponent>>();
         }
 
         protected override void OnUpdate(in Timestep timestep)
@@ -36,7 +36,7 @@ namespace Titan.Systems
 
                 if (_assetsManager.IsLoaded(sprite.AssetHandle))
                 {
-                    entity.AddComponent(new Sprite
+                    entity.AddComponent(new SpriteComponent
                     {
                         Texture = _assetsManager.GetAssetHandle<Texture>(sprite.AssetHandle)
                     });

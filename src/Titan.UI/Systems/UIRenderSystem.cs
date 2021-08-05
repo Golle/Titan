@@ -1,15 +1,15 @@
-using Titan.Components;
 using Titan.ECS.Systems;
+using Titan.UI.Components;
 using Titan.UI.Rendering;
 
-namespace Titan.Systems
+namespace Titan.UI.Systems
 {
-    internal class UIRenderSystem : EntitySystem
+    public class UIRenderSystem : EntitySystem
     {
         private readonly UIRenderQueue _renderQueue;
         private EntityFilter _filter;
         private ReadOnlyStorage<RectTransform> _transform;
-        private ReadOnlyStorage<Sprite> _sprite;
+        private ReadOnlyStorage<SpriteComponent> _sprite;
 
         public UIRenderSystem(UIRenderQueue renderQueue)
         {
@@ -18,10 +18,10 @@ namespace Titan.Systems
 
         protected override void Init()
         {
-            _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<Sprite>());
+            _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<SpriteComponent>());
 
             _transform = GetReadOnly<RectTransform>();
-            _sprite = GetReadOnly<Sprite>();
+            _sprite = GetReadOnly<SpriteComponent>();
         }
 
 

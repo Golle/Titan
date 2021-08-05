@@ -94,31 +94,51 @@
         },
         {
             "Id": "textures/sample_texture",
-            "Type" : "texture",
+            "Type": "texture",
             "Files": [
                 "textures/test_texture.png"
             ]
         },
         {
             "Id": "textures/sample_texture_01",
-            "Type" : "texture",
+            "Type": "texture",
             "Files": [
                 "textures/test_texture_02.png"
             ]
         },
         {
             "Id": "textures/sample_texture_02",
-            "Type" : "texture",
+            "Type": "texture",
             "Files": [
                 "textures/test_texture_03.png"
             ]
         },
         {
             "Id": "textures/transparent_01",
-            "Type" : "texture",
+            "Type": "texture",
             "Files": [
                 "textures/transparent_texture_01.png"
             ]
+        },
+        {
+            "Id": "textures/ui_01",
+            "Type": "texture",
+            "Files": [
+                "textures/ui_01.png"
+            ]
+        },
+        {
+            "Id": "atlas/ui_01",
+            "Type": "atlas",
+            "Files": [
+                "textures/ui_01.atlas"
+            ],
+            "Dependencies": [
+                {
+                    "Id": "textures/ui_01"
+                }
+            ],
+            "Preload":true
         },
         {
             "Id": "shaders/ui_ps",

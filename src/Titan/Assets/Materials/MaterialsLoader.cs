@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using Titan.Assets.Database;
 using Titan.Core;
 using Titan.Core.Logging;

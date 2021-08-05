@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using Breakout;
 using Titan;
+using Titan.Assets;
 using Titan.Assets.Models;
 using Titan.Components;
 using Titan.Core.Logging;
