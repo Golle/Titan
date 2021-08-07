@@ -7,6 +7,7 @@ using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
+using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -20,6 +21,7 @@ using Titan.Graphics.Windows;
 using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
+using Titan.UI;
 using Titan.UI.Components;
 using Titan.UI.Rendering;
 using Titan.UI.Systems;
@@ -162,19 +164,14 @@ namespace Titan
                 .WithComponent<CameraComponent>()
                 .WithComponent<AssetComponent<Model>>()
                 .WithComponent<ModelComponent>()
-                .WithComponent<AssetComponent<SpriteComponent>>(count:100)
-                .WithComponent<SpriteComponent>()
-                .WithComponent<RectTransform>()
-
-
 
                 .WithSystem(new Transform3DSystem())
                 .WithSystem(new Render3DSystem(assetsManager, renderQueue))
                 .WithSystem(new CameraSystem(graphicsSystem))
                 .WithSystem(new ModelLoaderSystem(assetsManager))
-                .WithSystem(new SpriteLoaderSystem(assetsManager))
-                .WithSystem(new UIRenderSystem(uiRenderQueue, atlasManager))
-                .WithSystem(new RectTransformSystem())
+
+                
+                .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager)
                 ;
 
 

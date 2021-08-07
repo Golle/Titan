@@ -4,15 +4,13 @@ using Titan;
 using Titan.Assets;
 using Titan.Components;
 using Titan.Core.Logging;
-using Titan.ECS.Entities;
+using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
 using Titan.Sandbox;
 using Titan.UI;
-using Titan.UI.Common;
-using Titan.UI.Components;
 
 Console.WriteLine($"Hello World!");
 
@@ -50,17 +48,7 @@ namespace Titan.Sandbox
             var camera = world.CreateEntity();
             camera.AddComponent(new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
             camera.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
-
-
-
-
-
-
-
-
-
-
-
+            
             _uiManager = new UIManager(world);
 
             var container = new UIContainer
@@ -90,10 +78,8 @@ namespace Titan.Sandbox
                 ZIndex = 1,
                 Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 2 }
             });
-
             
             _uiManager.Add(container);
-
         }
 
         public override void OnTerminate()
@@ -116,10 +102,10 @@ namespace Titan.Sandbox
         public override WindowConfiguration ConfigureWindow(WindowConfiguration config) =>
             config with
             {
-                //Height = 1080,
-                //Width = 1920,
-                Height = 768,
-                Width = 1024,
+                Height = 1080,
+                Width = 1920,
+                //Height = 768,
+                //Width = 1024,
                 Title = "Sandbox",
                 Windowed = true
             };

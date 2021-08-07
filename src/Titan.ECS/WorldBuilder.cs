@@ -3,7 +3,7 @@ using Titan.ECS.Components;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 
-namespace Titan
+namespace Titan.ECS
 {
     public class WorldBuilder
     {
@@ -11,7 +11,7 @@ namespace Titan
 
         private readonly List<ComponentConfiguration> _components = new();
         private readonly List<EntitySystem> _systems = new();
-        internal WorldBuilder(uint defaultMaxEntities) => _maxEntities = defaultMaxEntities;
+        public WorldBuilder(uint defaultMaxEntities) => _maxEntities = defaultMaxEntities;
         public WorldBuilder MaxEntities(uint maxEntities)
         {
             _maxEntities = maxEntities;
@@ -27,6 +27,7 @@ namespace Titan
             _systems.Add(system);
             return this;
         }
-        internal WorldConfiguration Build() => new(_maxEntities, _components.ToArray(), _systems.ToArray());
+
+        public WorldConfiguration Build() => new(_maxEntities, _components.ToArray(), _systems.ToArray());
     }
 }
