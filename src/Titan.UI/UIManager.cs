@@ -25,6 +25,7 @@ namespace Titan.UI
             if (Sprite != null)
             {
                 entity.AddComponent(new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent { TextureIndex = Sprite.Index }));
+                entity.AddComponent(new InteractableComponent());
             }
         }
     }

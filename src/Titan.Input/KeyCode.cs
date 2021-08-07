@@ -1,4 +1,4 @@
-﻿namespace Titan.Input
+namespace Titan.Input
 {
     public enum KeyCode
     {

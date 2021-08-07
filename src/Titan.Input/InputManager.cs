@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Messaging;
@@ -29,8 +28,8 @@ namespace Titan.Input
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> GetCharacters() => _characterCount > 0 ? new (_characters, 0, _characterCount) : default;
-        
-        internal static void Update()
+
+        public static void Update()
         {
             Array.Clear(_previousKeyState, 0, _previousKeyState.Length);
             _characterCount = 0;
@@ -39,6 +38,7 @@ namespace Titan.Input
             var resetKeys = false;
             foreach (ref readonly var @event in EventManager.GetEvents())
             {
+                // TODO: look at using a mask to detect events instead of a compare like this. This will be very slow for each frame (depending on the amount of events)
                 if (@event.Type == MouseMovedEvent.Id)
                 {
                     ref readonly var movedEvent = ref @event.As<MouseMovedEvent>();

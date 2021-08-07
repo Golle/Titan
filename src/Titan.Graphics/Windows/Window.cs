@@ -241,15 +241,16 @@ namespace Titan.Graphics.Windows
                         var window = _activeWindow;
                         var width = (uint)(lParam & 0xffff);
                         var height = (uint)((lParam >> 16) & 0xffff);
-                        
+
                         window.Height = height;
                         window.Width = width;
-                        window._center = new POINT((int) (window.Width / 2), (int) (window.Height / 2));
+                        window._center = new POINT((int)(window.Width / 2), (int)(window.Height / 2));
                     }
                     else
                     {
                         Logger.Warning<Window>("No active window, changing window size will be ignored.");
                     }
+
                     break;
                 case WM_EXITSIZEMOVE:
                     WindowEventHandler.OnWindowResize(_activeWindow.Width, _activeWindow.Height);
@@ -271,13 +272,19 @@ namespace Titan.Graphics.Windows
                 case WM_MOUSEWHEEL:
                     break;
                 case WM_CREATE:
-                    WindowEventHandler.OnCreate();
+                {
+                    var createStruct = (CREATESTRUCTA*)lParam;
+                    RECT rect = default;
+                    AdjustWindowRect(ref rect, createStruct->dwExStyle, false);
+                    WindowEventHandler.OnCreate((uint)createStruct->cx, (uint)createStruct->cy);
+                }
                     break;
                 case WM_CLOSE:
                     WindowEventHandler.OnClose();
                     PostQuitMessage(0);
                     return 0;
             }
+
             return DefWindowProcA(hWnd, message, wParam, lParam);
         }
 

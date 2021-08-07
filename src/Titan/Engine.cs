@@ -12,6 +12,7 @@ using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Images;
+
 using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Loaders.Materials;
@@ -22,9 +23,7 @@ using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
 using Titan.UI;
-using Titan.UI.Components;
 using Titan.UI.Rendering;
-using Titan.UI.Systems;
 
 namespace Titan
 {

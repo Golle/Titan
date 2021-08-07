@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Titan.Graphics;
 
 namespace Titan.UI.Rendering
 {
@@ -8,5 +9,6 @@ namespace Titan.UI.Rendering
     {
         public Vector2 Position;
         public Vector2 Texture;
+        public Color Color;
     }
 }

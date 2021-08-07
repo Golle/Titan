@@ -26,6 +26,8 @@ namespace Titan.ECS.Systems
             _name = GetType().Name;
         }
 
+        protected abstract void Init();
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void OnPreUpdate(){}
 
@@ -34,8 +36,6 @@ namespace Titan.ECS.Systems
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void OnPostUpdate() { }
-
-        protected abstract void Init();
 
 #if STATS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

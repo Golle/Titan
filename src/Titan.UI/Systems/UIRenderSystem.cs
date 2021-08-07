@@ -1,4 +1,6 @@
+using System;
 using Titan.ECS.Systems;
+using Titan.Graphics;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Components;
 using Titan.UI.Rendering;
@@ -12,6 +14,7 @@ namespace Titan.UI.Systems
         private EntityFilter _filter;
         private ReadOnlyStorage<RectTransform> _transform;
         private ReadOnlyStorage<SpriteComponent> _sprite;
+        private MutableStorage<InteractableComponent> _interactable;
 
         public UIRenderSystem(UIRenderQueue renderQueue, AtlasManager atlasManager)
         {
@@ -25,6 +28,7 @@ namespace Titan.UI.Systems
 
             _transform = GetReadOnly<RectTransform>();
             _sprite = GetReadOnly<SpriteComponent>();
+            _interactable = GetMutable<InteractableComponent>();
         }
 
 
@@ -41,7 +45,11 @@ namespace Titan.UI.Systems
                 ref readonly var sprite = ref _sprite.Get(entity);
                 ref readonly var atlas = ref _atlasManager.Access(sprite.TextureAtlas);
                 ref readonly var coordinates = ref atlas.Get(sprite.TextureIndex);
-                _renderQueue.Add(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates);
+
+                var color = _interactable.Contains(entity) ? _interactable.Get(entity).MouseState == MouseState.Hover ? Color.Black : Color.White : Color.White;
+
+
+                _renderQueue.Add(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color);
             }
         }
 

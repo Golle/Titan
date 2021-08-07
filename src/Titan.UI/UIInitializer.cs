@@ -17,11 +17,13 @@ namespace Titan.UI
                     .WithComponent<AssetComponent<SpriteComponent>>(count: config.MaxSprites)
                     .WithComponent<SpriteComponent>(count: config.MaxComponents)
                     .WithComponent<RectTransform>(count: config.MaxComponents)
+                    .WithComponent<InteractableComponent>(count: config.MaxComponents)
 
 
                     .WithSystem(new SpriteLoaderSystem(assetsManager))
                     .WithSystem(new UIRenderSystem(renderQueue, atlasManager))
                     .WithSystem(new RectTransformSystem())
+                    .WithSystem(new InteractableSystem())
 
                 ;
 

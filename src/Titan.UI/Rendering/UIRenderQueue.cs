@@ -4,10 +4,10 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Memory;
+using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Textures;
-using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Common;
 using Titan.Windows.D3D11;
@@ -76,7 +76,7 @@ namespace Titan.UI.Rendering
             }
         }
 
-        public void Add(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture, in TextureCoordinates coordinates)
+        public void Add(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture, in TextureCoordinates coordinates, in Color color)
         {
             var index = _count++;
             var renderable = _renderableQueue.GetPointer(index);
@@ -84,6 +84,7 @@ namespace Titan.UI.Rendering
             renderable->Texture = texture;
             renderable->Coordinates = coordinates;
             renderable->Size = size;
+            renderable->Color = color;
             _sortable[index] = new SortableRenderable(zIndex, texture, renderable); // Add 0.5f to Z to prevent floating position errors before casting it to an int. for example 5 could be 4.999998, and casting it to an int would return 4 instead of 5.
         }
 
@@ -134,18 +135,22 @@ namespace Titan.UI.Rendering
 
                 vertex->Position = position;
                 vertex->Texture = renderable->Coordinates[0];
+                vertex->Color = renderable->Color;
 
                 vertex++;
                 vertex->Position = new Vector2(position.X, offsetY);
                 vertex->Texture = renderable->Coordinates[1];
+                vertex->Color = renderable->Color;
 
                 vertex++;
                 vertex->Position = new Vector2(offsetX, offsetY);
                 vertex->Texture = renderable->Coordinates[2];
+                vertex->Color = renderable->Color;
 
                 vertex++;
                 vertex->Position = new Vector2(offsetX, position.Y);
                 vertex->Texture = renderable->Coordinates[3];
+                vertex->Color = renderable->Color;
                 vertexIndex += 4;
 
                 indexCount += 6;
