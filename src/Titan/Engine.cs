@@ -12,7 +12,6 @@ using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Images;
-
 using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Loaders.Materials;
@@ -37,7 +36,6 @@ namespace Titan
     {
         private readonly Application _app;
 
-        private Window _window;
         public static void StartNew<T>() where T : Application, new()
         {
             try
@@ -95,15 +93,19 @@ namespace Titan
             Trace($"Configure the {nameof(Window)}");
             var windowConfig = _app.ConfigureWindow(new WindowConfiguration(_app.GetType().Name, 800, 600, true));
             Trace($"Creating the {nameof(Window)}");
-            _window = Window.Create(windowConfig);
+            if (!Window.Init(windowConfig))
+            {
+                Logger.Error("Failed to init the window.", typeof(Engine));
+            }
+
             Trace($"Showing the {nameof(Window)}");
-            _window.Show();
-            _app.Window = new GameWindow(_window);
+            Window.Show();
+            _app.Window = new GameWindow();
 
             Trace($"Configure {nameof(GraphicsDevice)}");
-            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(144, true, true, true));
+            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(windowConfig.Width, windowConfig.Height, 144, windowConfig.Windowed, true, true, true));
             Trace($"Init {typeof(GraphicsDevice).FullName}");
-            GraphicsDevice.Init(_window, deviceConfig);
+            GraphicsDevice.Init(deviceConfig, Window.Handle);
 
             Trace($"Init {nameof(Resources)}");
             Resources.Init();
@@ -150,7 +152,7 @@ namespace Titan
             var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue, uiRenderQueue);
             pipelineBuilder.LoadResources();
             // Preload assets for rendering pipeline
-            while (_window.Update() && !pipelineBuilder.IsReady())
+            while (Window.Update() && !pipelineBuilder.IsReady())
             {
                 assetsManager.Update();
             }
@@ -179,14 +181,11 @@ namespace Titan
             Logger.Info<Engine>("Initialize starter world");
             using var starterWorld = new World(worldBuilder.Build());
             _app.OnStart(starterWorld);
-
-
-
             
 
             var timer = Stopwatch.StartNew();
             // star the main loop
-            while (_window.Update())
+            while (Window.Update())
             {
 
                 renderQueue.Update();
@@ -208,6 +207,8 @@ namespace Titan
                 graphicsSystem.Render();
                 EngineStats.SetStats(nameof(GraphicsSystem), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
+
+                System.Threading.Thread.Sleep(160);
             }
         }
 
@@ -231,7 +232,7 @@ namespace Titan
             Resources.Terminate();
 
             Logger.Trace<Engine>($"Close/Dispose {nameof(Window)}");
-            _window.Dispose();
+            Window.Destroy();
 
             Logger.Trace<Engine>($"Terminate {nameof(FileSystem)}");
             FileSystem.Terminate();

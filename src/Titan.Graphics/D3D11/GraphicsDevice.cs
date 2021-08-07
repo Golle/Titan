@@ -6,7 +6,6 @@ using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
-using Titan.Graphics.Windows;
 using Titan.Windows;
 using Titan.Windows.D3D11;
 using static Titan.Windows.Common;
@@ -20,7 +19,7 @@ using static Titan.Windows.D3D11.DXGI_USAGE;
 
 namespace Titan.Graphics.D3D11
 {
-    public record DeviceConfiguration(uint RefreshRate, bool Vsync, bool Debug, bool Stats);
+    public record DeviceConfiguration(uint Width, uint Height, uint RefreshRate, bool Windowed, bool Vsync, bool Debug, bool Stats);
 
     public static class GraphicsDevice
     {
@@ -28,7 +27,6 @@ namespace Titan.Graphics.D3D11
         private static ComPtr<ID3D11DeviceContext> _context;
         private static ComPtr<IDXGISwapChain> _swapChain;
         private static ComPtr<ID3D11RenderTargetView> _backbuffer;
-
 
         public static SwapChain SwapChain { get; private set; }
         public static Context ImmediateContext { get; private set; }
@@ -41,7 +39,7 @@ namespace Titan.Graphics.D3D11
         public static RasterizerManager RasterizerManager { get; private set; }
         public static BlendStateManager BlendStateManager { get; private set; }
 
-        public static void Init(Window window, DeviceConfiguration config)
+        public static void Init(DeviceConfiguration config, HWND windowHandle)
         {
             if (IsInitialized)
             {
@@ -65,8 +63,8 @@ namespace Titan.Graphics.D3D11
                 BufferCount = 2,
                 BufferDesc = new DXGI_MODE_DESC
                 {
-                    Width = window.Width,
-                    Height = window.Height,
+                    Width = config.Width,
+                    Height = config.Height,
                     RefreshRate = new DXGI_RATIONAL { Denominator = config.RefreshRate },
                     Scaling = DXGI_MODE_SCALING_UNSPECIFIED,
                     ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED,
@@ -79,10 +77,10 @@ namespace Titan.Graphics.D3D11
                 },
 
                 BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
-                OutputWindow = window.Handle,
+                OutputWindow = windowHandle,
                 SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
                 Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH,
-                Windowed = window.Windowed
+                Windowed = config.Windowed
             };
 
             Logger.Trace<ID3D11Device>("Creating device");
@@ -109,7 +107,7 @@ namespace Titan.Graphics.D3D11
             unsafe
             {
                 ImmediateContext = new Context(_context.Get());
-                SwapChain = new SwapChain(_swapChain.Get(), _backbuffer.Get(), config.Vsync, window.Width, window.Height);
+                SwapChain = new SwapChain(_swapChain.Get(), _backbuffer.Get(), config.Vsync, config.Width, config.Height);
 
                 BufferManager = new BufferManager(_device);
                 TextureManager = new TextureManager(_device.Get(), SwapChain);

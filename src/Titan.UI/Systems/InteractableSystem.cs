@@ -15,8 +15,6 @@ namespace Titan.UI.Systems
         private MutableStorage<InteractableComponent> _interactable;
         private ReadOnlyStorage<RectTransform> _transform;
         
-        private uint _windowHeight;
-
         protected override void Init()
         {
             // TOOD: this must be sorted by Z-Index
@@ -24,21 +22,6 @@ namespace Titan.UI.Systems
 
             _interactable = GetMutable<InteractableComponent>();
             _transform = GetReadOnly<RectTransform>();
-        }
-
-        protected override void OnPreUpdate()
-        {
-            foreach (ref readonly var @event in EventManager.GetEvents())
-            {
-                if (@event.Type == WindowResizedEvent.Id)
-                {
-                    _windowHeight = @event.As<WindowResizedEvent>().Height;
-                }
-                else if (@event.Type == WindowCreatedEvent.Id)
-                {
-                    _windowHeight = @event.As<WindowCreatedEvent>().Height;
-                }
-            }
         }
 
         protected override void OnUpdate(in Timestep timestep)
@@ -51,7 +34,6 @@ namespace Titan.UI.Systems
                   interactable.BottomRight.Y < position.Y);
             
             var mousePosition = InputManager.MousePosition;
-            mousePosition.Y = _windowHeight - mousePosition.Y;
             var buttonDown = InputManager.LeftMouseButtonDown;
             
 
@@ -63,12 +45,24 @@ namespace Titan.UI.Systems
                 // TODO: implement IsDirty
                 ref readonly var rectPosition = ref transform.Position;
                 ref readonly var size = ref transform.Size;
-                interactable.BottomRight = new Vector2(rectPosition.X+size.Width);
-                interactable.TopLeft= rectPosition;
+                interactable.BottomRight = new Vector2(rectPosition.X + size.Width, rectPosition.Y + size.Height);
+                interactable.TopLeft = rectPosition;
 
                 if (IsWithin(interactable, mousePosition))
                 {
-                    interactable.MouseState = MouseState.Hover;
+                    var previousMouseButtonDown = (interactable.MouseState & MouseState.Down) > 0;
+                    if (buttonDown)
+                    {
+                        interactable.MouseState = MouseState.Down | MouseState.Hover;
+                    }
+                    else if(previousMouseButtonDown)
+                    {
+                        interactable.MouseState = MouseState.Up | MouseState.Hover;
+                    }
+                    else
+                    {
+                        interactable.MouseState = MouseState.Hover;
+                    }
                 }
                 else
                 {

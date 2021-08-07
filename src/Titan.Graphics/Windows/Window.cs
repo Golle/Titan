@@ -12,118 +12,30 @@ using static Titan.Windows.Win32.WindowsMessage;
 namespace Titan.Graphics.Windows
 {
     public record WindowConfiguration(string Title, uint Width, uint Height, bool Windowed = true);
-
-    public unsafe class Window : IDisposable
+    public static unsafe class Window
     {
-        public uint Width { get; private set; }
-        public uint Height { get; private set; }
-        public bool Windowed { get; }
-        internal HWND Handle { get; }
-
-        private string _title;
-        private readonly string _className;
-        private POINT _center;
-        private POINT _mousePosition;
-        private POINT _hideCursorPosition;
-
-        private static Window _activeWindow; // TODO: change this if we'll ever support multiple windows
-        private bool _cursorVisible = true;
+        private const string ClassName = "titan_game_engine";
         private static HCURSOR _defaultCursor;
-        public bool ShowFps { get; set; }
+        private static POINT _center;
+        private static POINT _mousePosition;
+        private static POINT _hideCursorPosition;
+        private static bool _cursorVisible = true;
+        private static Stopwatch _timer;
+        private static int _frames;
+        public static uint Width { get; private set; }
+        public static uint Height { get; private set; }
+        public static string Title { get; private set; }
 
-        private Stopwatch _timer;
-        private int _frames;
-        private Window(HWND handle, string title, string className, uint width, uint height, bool windowed)
-        {
-            Width =  width;
-            Height = height;
-            Windowed = windowed;
-            Handle = handle;
-            _title = title;
-            _className = className;
-            _activeWindow = this;
-            _timer = Stopwatch.StartNew();
-        }
+        public static bool Windowed { get; }
+        public static HWND Handle { get; private set; }
 
-        public static Window Create(WindowConfiguration config)
-        {
-            if (_activeWindow != null)
-            {
-                throw new NotSupportedException($"Only a single {nameof(Window)} can be created.");
-            }
-
-            _defaultCursor = LoadCursorW(0, StandardCursorResources.IDC_HELP);
-            var className = "class_" + Guid.NewGuid().ToString().Substring(0, 4);
-            // Create the Window Class EX
-            var wndClassExA = new  WNDCLASSEXA
-            {
-                CbClsExtra = 0,
-                CbSize = (uint)Marshal.SizeOf<WNDCLASSEXA>(),
-                HCursor = _defaultCursor,
-                HIcon = 0,
-                LpFnWndProc = &WndProc,
-                CbWndExtra = 0,
-                HIconSm = 0,
-                HInstance = Marshal.GetHINSTANCE(typeof(Window).Module),
-                HbrBackground = 0,
-                LpszClassName = className,
-                Style = 0
-            };
-            Logger.Trace<Window>($"RegisterClass {className}");
-            if (RegisterClassExA(wndClassExA) == 0)
-            {
-                Logger.Error<Window>($"RegisterClassExA failed with Win32Error {Marshal.GetLastWin32Error()}");
-                return null;
-            }
-
-            // Adjust the window size to take into account for the menu etc
-            const WindowStyles wsStyle = WindowStyles.OverlappedWindow | WindowStyles.Visible;
-            const int windowOffset = 100;
-            var windowRect = new RECT
-            {
-                Left = windowOffset,
-                Top = windowOffset,
-                Right = (int) (config.Width + windowOffset),
-                Bottom = (int) (config.Height + windowOffset)
-            };
-            AdjustWindowRect(ref windowRect, wsStyle, false);
-
-            Logger.Trace<Window>($"Create window with size Width: {config.Width} Height: {config.Height}");
-            // Create the Window
-            var handle = CreateWindowExA(
-                0,
-                className,
-                config.Title,
-                wsStyle,
-                -1,
-                -1,
-                windowRect.Right - windowRect.Left,
-                windowRect.Bottom - windowRect.Top,
-                0,
-                0,
-                wndClassExA.HInstance,
-                null
-            );
-
-            
-            if (!handle.IsValid)
-            {
-                Logger.Error($"CreateWindowExA failed with Win32Error {Marshal.GetLastWin32Error()}");
-                return null;
-            }
-
-            return new Window(handle, config.Title, className, config.Width, config.Height, config.Windowed);
-        }
-
-
-        public void SetTitle(string title) => SetWindowTextA(Handle, title);
-        public bool Update()
+        public static bool Update()
         {
             _frames++;
             if (_timer.Elapsed.TotalSeconds >= 1.0f)
             {
                 var fps = _frames / _timer.Elapsed.TotalSeconds;
-                SetTitle($"{_title}. FPS: {(int)fps}");
+                SetTitle($"{Title}. FPS: {(int)fps}");
                 _timer.Restart();
                 _frames = 1;
             }
@@ -147,9 +59,9 @@ namespace Titan.Graphics.Windows
                 }
             }
             return true;
-        }
 
-        private void UpdateMousePosition()
+        }
+        private static void UpdateMousePosition()
         {
             POINT point;
             if (!GetCursorPos(&point))
@@ -172,7 +84,7 @@ namespace Titan.Graphics.Windows
             else
             {
                 var mouseMoved = false;
-                var center = new POINT((int) (Width / 2), (int) (Height / 2));
+                var center = new POINT((int)(Width / 2), (int)(Height / 2));
                 var delta = point - center;
                 if (delta.X != 0 || delta.Y != 0)
                 {
@@ -188,7 +100,7 @@ namespace Titan.Graphics.Windows
             }
         }
 
-        private void ToggleMouse(bool visible)
+        private static void ToggleMouse(bool visible)
         {
             if (visible == _cursorVisible)
             {
@@ -213,8 +125,92 @@ namespace Titan.Graphics.Windows
             }
         }
 
+        public static bool Init(WindowConfiguration config)
+        {
+            if (Handle.IsValid)
+            {
+                throw new InvalidOperationException("The window has already be initialized.");
+            }
+            _defaultCursor = LoadCursorW(0, StandardCursorResources.IDC_HELP);
+            _timer = Stopwatch.StartNew();
+            // Create the Window Class EX
+            var wndClassExA = new WNDCLASSEXA
+            {
+                CbClsExtra = 0,
+                CbSize = (uint)Marshal.SizeOf<WNDCLASSEXA>(),
+                HCursor = _defaultCursor,
+                HIcon = 0,
+                LpFnWndProc = &WndProc,
+                CbWndExtra = 0,
+                HIconSm = 0,
+                HInstance = Marshal.GetHINSTANCE(typeof(Window).Module),
+                HbrBackground = 0,
+                LpszClassName = ClassName,
+                Style = 0
+            };
+            Logger.Trace($"RegisterClass {ClassName}", typeof(Window));
+            if (RegisterClassExA(wndClassExA) == 0)
+            {
+                Logger.Error($"RegisterClassExA failed with Win32Error {Marshal.GetLastWin32Error()}", typeof(Window));
+                return false;
+            }
+
+            // Adjust the window size to take into account for the menu etc
+            const WindowStyles wsStyle = WindowStyles.OverlappedWindow | WindowStyles.Visible;
+            const int windowOffset = 100;
+            var windowRect = new RECT
+            {
+                Left = windowOffset,
+                Top = windowOffset,
+                Right = (int)(config.Width + windowOffset),
+                Bottom = (int)(config.Height + windowOffset)
+            };
+            AdjustWindowRect(ref windowRect, wsStyle, false);
+
+            Logger.Trace($"Create window with size Width: {config.Width} Height: {config.Height}", typeof(Window));
+
+            // Set properties before the window is created so they are available in WM_CREATE
+            Height = config.Height;
+            Width = config.Width;
+            Title = config.Title;
+
+            // Create the Window
+            Handle = CreateWindowExA(
+                0,
+                ClassName,
+                config.Title,
+                wsStyle,
+                -1,
+                -1,
+                windowRect.Right - windowRect.Left,
+                windowRect.Bottom - windowRect.Top,
+                0,
+                0,
+                wndClassExA.HInstance,
+                null
+            );
+
+            if (!Handle.IsValid)
+            {
+                Logger.Error($"CreateWindowExA failed with Win32Error {Marshal.GetLastWin32Error()}");
+                return false;
+            }
+            return true;
+        }
+
+        public static void SetTitle(string title) => SetWindowTextA(Handle, title);
+        public static void Show() => ShowWindow(Handle, ShowWindowCommand.Show);
+
+        public static void Destroy()
+        {
+            DestroyWindow(Handle);
+            UnregisterClassA(ClassName, Marshal.GetHINSTANCE(typeof(Window).Module));
+
+            Handle = default;
+        }
+
         [UnmanagedCallersOnly]
-        public static nint WndProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
+        private static nint WndProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
         {
             switch (message)
             {
@@ -236,24 +232,17 @@ namespace Titan.Graphics.Windows
                     WindowEventHandler.OnCharTyped(wParam);
                     break;
                 case WM_SIZE:
-                    if (_activeWindow != null)
-                    {
-                        var window = _activeWindow;
-                        var width = (uint)(lParam & 0xffff);
-                        var height = (uint)((lParam >> 16) & 0xffff);
+                {
+                    var width = (uint)(lParam & 0xffff);
+                    var height = (uint)((lParam >> 16) & 0xffff);
 
-                        window.Height = height;
-                        window.Width = width;
-                        window._center = new POINT((int)(window.Width / 2), (int)(window.Height / 2));
-                    }
-                    else
-                    {
-                        Logger.Warning<Window>("No active window, changing window size will be ignored.");
-                    }
-
+                    Height = height;
+                    Width = width;
+                    _center = new POINT((int)(Width / 2), (int)(Height / 2));
+                }
                     break;
                 case WM_EXITSIZEMOVE:
-                    WindowEventHandler.OnWindowResize(_activeWindow.Width, _activeWindow.Height);
+                    WindowEventHandler.OnWindowResize(Width, Height);
                     break;
                 case WM_LBUTTONDOWN:
                     WindowEventHandler.OnLeftMouseButtonDown();
@@ -272,12 +261,7 @@ namespace Titan.Graphics.Windows
                 case WM_MOUSEWHEEL:
                     break;
                 case WM_CREATE:
-                {
-                    var createStruct = (CREATESTRUCTA*)lParam;
-                    RECT rect = default;
-                    AdjustWindowRect(ref rect, createStruct->dwExStyle, false);
-                    WindowEventHandler.OnCreate((uint)createStruct->cx, (uint)createStruct->cy);
-                }
+                    WindowEventHandler.OnCreate(Width, Height);
                     break;
                 case WM_CLOSE:
                     WindowEventHandler.OnClose();
@@ -286,19 +270,6 @@ namespace Titan.Graphics.Windows
             }
 
             return DefWindowProcA(hWnd, message, wParam, lParam);
-        }
-
-        public void Dispose()
-        {
-            DestroyWindow(Handle);
-            UnregisterClassA(_className, Marshal.GetHINSTANCE(typeof(Window).Module));
-            
-            _activeWindow = null; // TODO: move this to a windows event?
-        }
-
-        public void Show()
-        {
-            ShowWindow(Handle, ShowWindowCommand.Show);
         }
     }
 }

@@ -46,8 +46,23 @@ namespace Titan.UI.Systems
                 ref readonly var atlas = ref _atlasManager.Access(sprite.TextureAtlas);
                 ref readonly var coordinates = ref atlas.Get(sprite.TextureIndex);
 
-                var color = _interactable.Contains(entity) ? _interactable.Get(entity).MouseState == MouseState.Hover ? Color.Black : Color.White : Color.White;
-
+                var color = Color.White;
+                if (_interactable.Contains(entity))
+                {
+                    var state = _interactable.Get(entity).MouseState;
+                    if ((state & MouseState.Down) > 0)
+                    {
+                        color = Color.Red;
+                    }
+                    else if ((state & MouseState.Up) > 0)
+                    {
+                        color = Color.Black;
+                    }
+                    else if ((state & MouseState.Hover) > 0)
+                    {
+                        color = Color.Blue;
+                    }
+                }
 
                 _renderQueue.Add(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color);
             }

@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Messaging;
+using Titan.Graphics.Windows;
 using Titan.Graphics.Windows.Events;
 
 namespace Titan.Input
@@ -42,7 +43,8 @@ namespace Titan.Input
                 if (@event.Type == MouseMovedEvent.Id)
                 {
                     ref readonly var movedEvent = ref @event.As<MouseMovedEvent>();
-                    _position = new Vector3(movedEvent.X, movedEvent.Y, 0);
+                    var windowHeight = (int)Window.Height;
+                    _position = new Vector3(movedEvent.X,  windowHeight - movedEvent.Y, 0);
                 }
                 else if (@event.Type == MouseButtonEvent.Id)
                 {
@@ -64,7 +66,6 @@ namespace Titan.Input
                 {
                     resetKeys = true;
                 }
-                
             }
             _deltaPosition = _lastPosition - _position;
             if (resetKeys)
