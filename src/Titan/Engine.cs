@@ -174,20 +174,16 @@ namespace Titan
                 
                 .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager)
                 ;
-
-
             _app.ConfigureWorld(worldBuilder);
 
             Logger.Info<Engine>("Initialize starter world");
             using var starterWorld = new World(worldBuilder.Build());
             _app.OnStart(starterWorld);
-            
 
             var timer = Stopwatch.StartNew();
             // star the main loop
             while (Window.Update())
             {
-
                 renderQueue.Update();
             
                 timer.Restart();
@@ -207,8 +203,6 @@ namespace Titan
                 graphicsSystem.Render();
                 EngineStats.SetStats(nameof(GraphicsSystem), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
-
-                System.Threading.Thread.Sleep(160);
             }
         }
 

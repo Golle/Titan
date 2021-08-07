@@ -66,7 +66,7 @@ namespace Titan.Sandbox
                 {
                     const float constant = 0.003f;
                     _rotation.X -= delta.X * constant;
-                    _rotation.Y = Math.Clamp(_rotation.Y + delta.Y * constant, -maxRotation, maxRotation);
+                    _rotation.Y = Math.Clamp(_rotation.Y + -delta.Y * constant, -maxRotation, maxRotation);
                     transform.Rotation = Quaternion.CreateFromYawPitchRoll(_rotation.X, _rotation.Y, 0f);
                     //camera.Rotate(new Vector3(rotation, 0)); // not required?
                 }
