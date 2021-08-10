@@ -40,9 +40,12 @@ namespace Titan.ECS.Worlds
             InfoManager = new(Config);
             FilterManager = new(Config);
             Worlds[Id] = this;
-            
-            _dispatcher = SystemDispatcherFactory.Create(Config.Systems);
-            _dispatcher.Init(this);
+
+            foreach (var system in config.Systems)
+            {
+                system.InitSystem(this);
+            }
+            _dispatcher = new SystemsDispatcher(SystemNodeFactory.Create(config.Systems));
         }
 
 

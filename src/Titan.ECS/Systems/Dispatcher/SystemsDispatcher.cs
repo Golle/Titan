@@ -17,19 +17,10 @@ namespace Titan.ECS.Systems.Dispatcher
         public SystemsDispatcher(SystemNode[] nodes)
         {
             _nodes = nodes;
-            _progress = new JobProgress((uint) nodes.Length);
+            _progress = new JobProgress((uint)nodes.Length);
             _status = new NodeStatus[nodes.Length];
             _handles = new Handle<WorkerPool>[nodes.Length];
         }
-
-        public void Init(World world)
-        {
-            foreach (var systemNode in _nodes)
-            {
-                systemNode.InitFunc(world);
-            }
-        }
-
         public void Execute()
         {
             _progress.Reset();

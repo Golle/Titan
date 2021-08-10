@@ -5,9 +5,10 @@ using Titan.Core.Logging;
 
 namespace Titan.ECS.Systems.Dispatcher
 {
-    internal static class SystemDispatcherFactory
+    // TODO: this priority list needs to be re-worked in to a better system
+    internal static class SystemNodeFactory
     {
-        public static SystemsDispatcher Create(in EntitySystem[] systems)
+        public static SystemNode[] Create(in EntitySystem[] systems)
         {
             var count = systems.Length;
             var sortedSystems = systems.OrderByDescending(s => s.Priority).ToArray();
@@ -29,14 +30,22 @@ namespace Titan.ECS.Systems.Dispatcher
 
                     if (hasReadOnlyDependency || hasMutableDependency)
                     {
-                        dependencies.Add(j);
+                        var circularDependency = nodes[j].Dependencies?.Contains(i) ?? false;
+                        if (circularDependency)
+                        {
+                            Logger.Warning($"Circular dependency {system.GetType().Name} => {nodes[j].System.GetType().Name}. Not adding it as a dependency", typeof(SystemNodeFactory));
+                        }
+                        else
+                        {
+                            dependencies.Add(j);
+                        }
                     }
                 }
                 nodes[i] = new SystemNode(system, dependencies.ToArray());
             }
 
             LogDependencies(nodes);
-            return new SystemsDispatcher(nodes);
+            return nodes;
         }
 
         [Conditional("TRACE")]
@@ -47,7 +56,7 @@ namespace Titan.ECS.Systems.Dispatcher
                 var dependencies = string.Join(", ", node.Dependencies.Select(d => nodes[d].System.GetType().Name));
                 Logger.Trace(string.IsNullOrWhiteSpace(dependencies) ? 
                     $"{node.System.GetType().Name} has no dependencies" : 
-                    $"{node.System.GetType().Name} depends on {dependencies}", typeof(SystemDispatcherFactory));
+                    $"{node.System.GetType().Name} depends on {dependencies}", typeof(SystemNodeFactory));
             }
         }
     }
