@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Graphics.Loaders.Atlas
 {
-    [StructLayout(LayoutKind.Sequential, Size = sizeof(float) * 8)]
+    [StructLayout(LayoutKind.Sequential, Size = sizeof(float) * 2 * 16)]
     public unsafe struct TextureCoordinates
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -14,7 +14,7 @@ namespace Titan.Graphics.Loaders.Atlas
         {
             get
             {
-                Debug.Assert(index < 4, "Index must be between 0 and 4");
+                Debug.Assert(index < 16, "Index must be between 0 and 16");
                 return ref *((Vector2*)Unsafe.AsPointer(ref this) + index);
             }
         }

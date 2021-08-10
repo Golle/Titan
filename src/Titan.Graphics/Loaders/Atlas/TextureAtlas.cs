@@ -1,5 +1,6 @@
-using System.Diagnostics;
+using System;
 using System.Diagnostics.Contracts;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core;
@@ -8,18 +9,19 @@ using Titan.Graphics.D3D11.Textures;
 
 namespace Titan.Graphics.Loaders.Atlas
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct TextureAtlas
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public unsafe struct TextureAtlas
     {
         public Handle<Texture> Texture;
-        public MemoryChunk<TextureCoordinates> Coordinates;
+        public MemoryChunk<AtlasDescriptor> Descriptors;
+        public MemoryChunk<Vector2> Coordinates;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [Pure]
-        public ref readonly TextureCoordinates Get(int index)
+        public ReadOnlySpan<Vector2> Get(int index)
         {
-            Debug.Assert(index >= 0 && index < Coordinates.Count, "Index it out of range.");
-            return ref Coordinates[index];
+            ref readonly var descriptor = ref Descriptors[index];
+            return new ReadOnlySpan<Vector2>(Coordinates.AsPointer() + descriptor.Start, descriptor.Length);
         }
     }
 }

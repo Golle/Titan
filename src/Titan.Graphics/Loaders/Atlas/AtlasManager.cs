@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -6,12 +7,11 @@ using Titan.Core.Memory;
 
 namespace Titan.Graphics.Loaders.Atlas
 {
-    public record AtlasCreation(uint TextureCount);
+    public record AtlasCreation(uint TextureCount, uint NineSliceCount);
 
     public class AtlasManager
     {
         private ResourcePool<TextureAtlas> _resources;
-
         public AtlasManager(uint maxAtlases)
         {
             _resources.Init(maxAtlases);
@@ -26,9 +26,11 @@ namespace Titan.Graphics.Loaders.Atlas
             }
 
             var atlas = _resources.GetResourcePointer(handle);
+
+            var totalCoordinates = args.NineSliceCount * 16 + args.TextureCount * 4;
+            atlas->Coordinates = MemoryUtils.AllocateBlock<Vector2>(totalCoordinates);
+            atlas->Descriptors = MemoryUtils.AllocateBlock<AtlasDescriptor>(args.NineSliceCount + args.TextureCount);
             
-            atlas->Coordinates = MemoryUtils.AllocateBlock<TextureCoordinates>(args.TextureCount);
-         
             return handle;
         }
 
@@ -41,6 +43,7 @@ namespace Titan.Graphics.Loaders.Atlas
             Logger.Trace<AtlasManager>($"Releasing atlas with handle {handle}");
             ref var atlas = ref _resources.GetResourceReference(handle.Value);
             atlas.Coordinates.Free();
+            atlas.Descriptors.Free();
             _resources.ReleaseResource(handle);
         }
 
