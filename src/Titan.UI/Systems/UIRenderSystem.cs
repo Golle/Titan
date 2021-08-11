@@ -1,4 +1,3 @@
-using System;
 using Titan.ECS.Systems;
 using Titan.Graphics;
 using Titan.Graphics.Loaders.Atlas;
@@ -14,7 +13,7 @@ namespace Titan.UI.Systems
         private EntityFilter _filter;
         private ReadOnlyStorage<RectTransform> _transform;
         private ReadOnlyStorage<SpriteComponent> _sprite;
-        private MutableStorage<InteractableComponent> _interactable;
+        private ReadOnlyStorage<InteractableComponent> _interactable;
 
         public UIRenderSystem(UIRenderQueue renderQueue, AtlasManager atlasManager)
         {
@@ -28,7 +27,7 @@ namespace Titan.UI.Systems
 
             _transform = GetReadOnly<RectTransform>();
             _sprite = GetReadOnly<SpriteComponent>();
-            _interactable = GetMutable<InteractableComponent>();
+            _interactable = GetReadOnly<InteractableComponent>();
         }
 
 
@@ -44,7 +43,7 @@ namespace Titan.UI.Systems
                 ref readonly var transform = ref _transform.Get(entity);
                 ref readonly var sprite = ref _sprite.Get(entity);
                 ref readonly var atlas = ref _atlasManager.Access(sprite.TextureAtlas);
-                ref readonly var coordinates = ref atlas.Get(sprite.TextureIndex);
+                var coordinates = atlas.Get(sprite.TextureIndex);
 
                 var color = Color.White;
                 if (_interactable.Contains(entity))
@@ -64,7 +63,15 @@ namespace Titan.UI.Systems
                     }
                 }
 
-                _renderQueue.Add(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color);
+                switch (sprite.Type)
+                {
+                    case SpriteType.Normal:
+                        _renderQueue.Add(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color);
+                        break;
+                    case SpriteType.Slice:
+                        _renderQueue.AddNineSlice(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color, sprite.Margins);
+                        break;
+                }
             }
         }
 

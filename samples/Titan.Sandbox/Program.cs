@@ -7,6 +7,7 @@ using Titan.Core.Logging;
 using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
 using Titan.Sandbox;
@@ -57,36 +58,36 @@ namespace Titan.Sandbox
                 Size = (400, 400),
                 ZIndex = 0
             };
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = Vector2.Zero,
+            //    Size = (100, 100),
+            //    ZIndex = 10,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
+            //});
             container.AddButton(new UIButton
             {
-                Offset = Vector2.Zero,
-                Size = (100, 100),
-                ZIndex = 10,
-                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
-            });
-            container.AddButton(new UIButton
-            {
-                Offset = Vector2.One*20,
+                Offset = new Vector2(400, 200),
                 Size = (100, 100),
                 ZIndex = 1,
-                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 1 }
+                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Type = SpriteType.Slice, Margins = 40}
             });
 
-            container.AddButton(new UIButton
-            {
-                Offset = Vector2.One* 120,
-                Size = (100, 150),
-                ZIndex = 1,
-                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 2 }
-            });
-            container.AddButton(new UIButton
-            {
-                Offset = Vector2.One * 240,
-                Size = (100, 125),
-                ZIndex = 1,
-                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 3 },
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = Vector2.One* 120,
+            //    Size = (100, 150),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 2 }
+            //});
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = Vector2.One * 240,
+            //    Size = (100, 125),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 3 },
                 
-            });
+            //});
             
             _uiManager.Add(container);
         }

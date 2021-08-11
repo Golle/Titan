@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core;
 using Titan.Graphics.Loaders.Atlas;
@@ -8,8 +9,10 @@ namespace Titan.UI.Components
     public struct SpriteComponent
     {
         public Handle<TextureAtlas> TextureAtlas;
-        public int TextureIndex;
+        public byte TextureIndex;
+        internal SpriteType Type;
+        public Margins Margins;
     }
+
+    
 }
-
-

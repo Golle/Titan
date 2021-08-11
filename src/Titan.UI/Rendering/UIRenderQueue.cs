@@ -76,16 +76,36 @@ namespace Titan.UI.Rendering
             }
         }
 
-        public void Add(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture, in TextureCoordinates coordinates, in Color color)
+        public void AddNineSlice(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture, ReadOnlySpan<Vector2> coordinates, in Color color, in Margins margins)
         {
             var index = _count++;
             var renderable = _renderableQueue.GetPointer(index);
+            fixed (Vector2* pCoordinates = coordinates)
+            {
+                System.Buffer.MemoryCopy(pCoordinates, &renderable->Coordinates, 128, 128);
+            }
             renderable->Position = position;
             renderable->Texture = texture;
-            renderable->Coordinates = coordinates;
             renderable->Size = size;
             renderable->Color = color;
-            _sortable[index] = new SortableRenderable(zIndex, texture, renderable); // Add 0.5f to Z to prevent floating position errors before casting it to an int. for example 5 could be 4.999998, and casting it to an int would return 4 instead of 5.
+            renderable->Margins = margins;
+            renderable->Slice = true; 
+            _sortable[index] = new SortableRenderable(zIndex, texture, renderable);
+        }
+
+        public void Add(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture, ReadOnlySpan<Vector2> coordinates, in Color color)
+        {
+            var index = _count++;
+            var renderable = _renderableQueue.GetPointer(index);
+            fixed (Vector2* pCoordinates = coordinates)
+            {
+                System.Buffer.MemoryCopy(pCoordinates, &renderable->Coordinates, 128, 4 * sizeof(Vector2));
+            }
+            renderable->Position = position;
+            renderable->Texture = texture;
+            renderable->Size = size;
+            renderable->Color = color;
+            _sortable[index] = new SortableRenderable(zIndex, texture, renderable);
         }
 
         public void Begin()
@@ -126,34 +146,18 @@ namespace Titan.UI.Rendering
 
                 var vertex = _vertices.GetPointer(vertexIndex);
                 
-                var size = renderable->Size;
-                var position = renderable->Position;
-
-                var offsetY = position.Y + size.Height;
-                var offsetX = position.X + size.Width;
-
-
-                vertex->Position = position;
-                vertex->Texture = renderable->Coordinates[0];
-                vertex->Color = renderable->Color;
-
-                vertex++;
-                vertex->Position = new Vector2(position.X, offsetY);
-                vertex->Texture = renderable->Coordinates[1];
-                vertex->Color = renderable->Color;
-
-                vertex++;
-                vertex->Position = new Vector2(offsetX, offsetY);
-                vertex->Texture = renderable->Coordinates[2];
-                vertex->Color = renderable->Color;
-
-                vertex++;
-                vertex->Position = new Vector2(offsetX, position.Y);
-                vertex->Texture = renderable->Coordinates[3];
-                vertex->Color = renderable->Color;
-                vertexIndex += 4;
-
-                indexCount += 6;
+                if (renderable->Slice)
+                {
+                    RenderSlice(vertex, renderable);
+                    vertexIndex += 4*9;
+                    indexCount += 6*9;
+                }
+                else
+                {
+                    RenderNormal(vertex, renderable);
+                    vertexIndex += 4;
+                    indexCount += 6;
+                }
             }
 
             _elements[_elementCount++] = new UIElement
@@ -163,7 +167,80 @@ namespace Titan.UI.Rendering
                 Texture = texture
             };
             GraphicsDevice.ImmediateContext.Map(_vertexBuffer, _vertices.GetPointer(0), (uint)(vertexIndex * sizeof(UIVertex)));
+            
         }
+
+        private void RenderSlice(UIVertex* vertex, QueuedRenderable* renderable)
+        {
+            var size = renderable->Size;
+            var position = renderable->Position;
+            var margins = renderable->Margins;
+            var color = renderable->Color;
+
+            var positions = stackalloc Vector2[4];
+            positions[0] = position;
+            positions[1] = new Vector2(positions->X + margins.Left, positions->Y + margins.Bottom);
+            positions[2] = new Vector2(positions->X + size.Width - margins.Right, positions->Y + size.Height - margins.Right);
+            positions[3] = new Vector2(positions->X + size.Width, positions->Y + size.Height);
+
+            // TODO: compare this with updating and uploading Indices. This creates 36 vertices, but only 16 are required. But if we use 16 we need to update the indices on each loop.
+            for (var row = 0; row < 3; ++row)
+            {
+                for (var col = 0; col < 3; ++col)
+                {
+                    var textureOffset = row * 4 + col;
+                    
+                    vertex->Position = new Vector2(positions[col].X, positions[row].Y);
+                    vertex->Texture = renderable->Coordinates[textureOffset];
+                    vertex->Color = color;
+
+                    vertex++;
+                    vertex->Position = new Vector2(positions[col].X, positions[row + 1].Y);
+                    vertex->Texture = renderable->Coordinates[textureOffset + 4];
+                    vertex->Color = color;
+
+                    vertex++;
+                    vertex->Position = new Vector2(positions[col + 1].X, positions[row + 1].Y);
+                    vertex->Texture = renderable->Coordinates[textureOffset + 5];
+                    vertex->Color = color;
+
+                    vertex++;
+                    vertex->Position = new Vector2(positions[col + 1].X, positions[row].Y);
+                    vertex->Texture = renderable->Coordinates[textureOffset + 1];
+                    vertex->Color = color;
+                    vertex++;
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining|MethodImplOptions.AggressiveOptimization)]
+        private static void RenderNormal(UIVertex* vertex, QueuedRenderable* renderable)
+        {
+            var size = renderable->Size;
+            var position = renderable->Position;
+            var top = position.Y + size.Height;
+            var right = position.X + size.Width;
+
+            vertex->Position = position;
+            vertex->Texture = renderable->Coordinates[0];
+            vertex->Color = renderable->Color;
+
+            vertex++;
+            vertex->Position = new Vector2(position.X, top);
+            vertex->Texture = renderable->Coordinates[4];
+            vertex->Color = renderable->Color;
+
+            vertex++;
+            vertex->Position = new Vector2(right, top);
+            vertex->Texture = renderable->Coordinates[5];
+            vertex->Color = renderable->Color;
+
+            vertex++;
+            vertex->Position = new Vector2(right, position.Y);
+            vertex->Texture = renderable->Coordinates[1];
+            vertex->Color = renderable->Color;
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public UIRenderables GetRenderables() => new(_vertexBuffer, _indexBuffer, new ReadOnlySpan<UIElement>(_elements, 0, _elementCount));

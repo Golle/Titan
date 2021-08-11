@@ -16,5 +16,7 @@ namespace Titan.UI.Rendering
         public Handle<Texture> Texture;
         public TextureCoordinates Coordinates;
         public Color Color;
+        public Margins Margins;
+        public bool Slice;
     }
 }

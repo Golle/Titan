@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Titan.Assets;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
+using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Common;
 using Titan.UI.Components;
 
@@ -12,6 +15,8 @@ namespace Titan.UI
     {
         public string Identifier { get; set; }
         public int Index { get; set; }
+        public SpriteType Type { get; set; }
+        public Margins Margins { get; set; }
     }
 
 
@@ -19,12 +24,17 @@ namespace Titan.UI
     {
         public Sprite Sprite { get; set; }
         public Sprite OnHover { get; set; }
-        internal override void OnCreate(in Entity entity)
+        internal override unsafe void OnCreate(in Entity entity)
         {
             base.OnCreate(entity);
             if (Sprite != null)
             {
-                entity.AddComponent(new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent { TextureIndex = Sprite.Index }));
+                entity.AddComponent(new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
+                {
+                    TextureIndex = (byte)Sprite.Index,
+                    Type = Sprite.Type,
+                    Margins = Sprite.Margins
+                }));
                 entity.AddComponent(new InteractableComponent());
             }
         }

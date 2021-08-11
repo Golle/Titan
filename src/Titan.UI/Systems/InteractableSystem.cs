@@ -1,9 +1,7 @@
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Titan.Core.Logging;
-using Titan.Core.Messaging;
 using Titan.ECS.Systems;
-using Titan.Graphics.Windows.Events;
 using Titan.Input;
 using Titan.UI.Components;
 
@@ -14,9 +12,13 @@ namespace Titan.UI.Systems
         private EntityFilter _filter;
         private MutableStorage<InteractableComponent> _interactable;
         private ReadOnlyStorage<RectTransform> _transform;
-        
+
+        public InteractableSystem() : base(-1000)
+        {
+        }
         protected override void Init()
         {
+            
             // TOOD: this must be sorted by Z-Index
             _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<InteractableComponent>());
 
