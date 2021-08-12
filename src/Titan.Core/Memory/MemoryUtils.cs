@@ -10,32 +10,23 @@ namespace Titan.Core.Memory
         {
             static void OutOfMemoryException() => throw new OutOfMemoryException("Failed to allocate unmanaged memory.");
             var size = (uint)sizeof(T) * count;
-            var ptr = (T*) Marshal.AllocHGlobal((int) size);
-            if (zeroMemory)
-            {
-                Unsafe.InitBlock(ptr, 0, size);
-            }
-            
+
+            var ptr = zeroMemory ? NativeMemory.AllocZeroed(count, (nuint)sizeof(T)) : NativeMemory.Alloc(count, (nuint)sizeof(T));
             if (ptr == null)
             {
                 OutOfMemoryException();
             }
-            return new MemoryChunk<T>(ptr, size, count);
+            return new MemoryChunk<T>((T*)ptr, size, count);
         }
 
         public static MemoryChunk AllocateBlock(uint size, bool zeroMemory = false)
         {
             static void OutOfMemoryException() => throw new OutOfMemoryException("Failed to allocate unmanaged memory.");
+            var ptr = zeroMemory ? NativeMemory.AllocZeroed(size) : NativeMemory.Alloc(size);
 
-            var ptr = (void*) Marshal.AllocHGlobal((int) size);
             if (ptr == null)
             {
                 OutOfMemoryException();
-            }
-
-            if (zeroMemory)
-            {
-                Unsafe.InitBlock(ptr, 0, size);
             }
             return new MemoryChunk(ptr);
         }
