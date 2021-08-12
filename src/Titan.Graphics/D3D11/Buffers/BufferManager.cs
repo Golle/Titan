@@ -11,7 +11,7 @@ namespace Titan.Graphics.D3D11.Buffers
     public unsafe class BufferManager : IDisposable
     {
         private readonly ID3D11Device* _device;
-        private ResourcePool<Buffer> _resourcePool;
+        private ResourcePool<ResourceBuffer> _resourcePool;
         private const uint MaxBuffers = 1000u;
         internal BufferManager(ID3D11Device* device)
         {
@@ -20,7 +20,7 @@ namespace Titan.Graphics.D3D11.Buffers
             _device = device;
         }
 
-        public Handle<Buffer> Create(BufferCreation args)
+        public Handle<ResourceBuffer> Create(BufferCreation args)
         {
             Logger.Trace<BufferManager>($"Create {args.Type} with stride {args.Stride} usage {args.Usage}. InitialData: {args.InitialData.HasValue()}");
             var handle = _resourcePool.CreateResource();
@@ -71,14 +71,14 @@ namespace Titan.Graphics.D3D11.Buffers
             return handle;
         }
 
-        public void Release(in Handle<Buffer> handle)
+        public void Release(in Handle<ResourceBuffer> handle)
         {
             Logger.Trace<BufferManager>($"Releasing buffer with handle {handle}");
             ReleaseInternal(handle);
             _resourcePool.ReleaseResource(handle);
         }
 
-        private void ReleaseInternal(Handle<Buffer> handle)
+        private void ReleaseInternal(Handle<ResourceBuffer> handle)
         {
             var buffer = _resourcePool.GetResourcePointer(handle);
             if (buffer->Resource != null)
@@ -89,7 +89,7 @@ namespace Titan.Graphics.D3D11.Buffers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ref readonly Buffer Access(in Handle<Buffer> handle) => ref _resourcePool.GetResourceReference(handle);
+        internal ref readonly ResourceBuffer Access(in Handle<ResourceBuffer> handle) => ref _resourcePool.GetResourceReference(handle);
 
         public void Dispose()
         {

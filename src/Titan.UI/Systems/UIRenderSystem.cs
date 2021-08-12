@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Titan.ECS.Systems;
 using Titan.Graphics;
 using Titan.Graphics.Loaders.Atlas;
@@ -44,6 +45,7 @@ namespace Titan.UI.Systems
                 ref readonly var sprite = ref _sprite.Get(entity);
                 ref readonly var atlas = ref _atlasManager.Access(sprite.TextureAtlas);
                 var coordinates = atlas.Get(sprite.TextureIndex);
+                var type = atlas.Type(sprite.TextureIndex);
 
                 var color = Color.White;
                 if (_interactable.Contains(entity))
@@ -63,7 +65,7 @@ namespace Titan.UI.Systems
                     }
                 }
 
-                switch (sprite.Type)
+                switch (type)
                 {
                     case SpriteType.Normal:
                         _renderQueue.Add(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color);

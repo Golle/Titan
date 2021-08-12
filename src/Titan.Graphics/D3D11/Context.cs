@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Graphics.D3D11.BlendStates;
+using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
 using Titan.Windows;
 using Titan.Windows.D3D11;
-using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Graphics.D3D11
 {
@@ -36,7 +36,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Map(in Handle<Buffer> handle, void * data, uint size)
+        public void Map(in Handle<ResourceBuffer> handle, void * data, uint size)
         {
             D3D11_MAPPED_SUBRESOURCE subresource;
             ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
@@ -50,7 +50,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Map<T>(in Handle<Buffer> handle, in T value) where T : unmanaged
+        public void Map<T>(in Handle<ResourceBuffer> handle, in T value) where T : unmanaged
         {
             D3D11_MAPPED_SUBRESOURCE subresource;
             ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
@@ -240,7 +240,7 @@ namespace Titan.Graphics.D3D11
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexShaderConstantBuffer(in Handle<Buffer> handle, uint slot = 0u)
+        public void SetVertexShaderConstantBuffer(in Handle<ResourceBuffer> handle, uint slot = 0u)
         {
             Debug.Assert(GraphicsDevice.BufferManager.Access(handle).BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER));
 
@@ -249,7 +249,7 @@ namespace Titan.Graphics.D3D11
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderConstantBuffer(in Handle<Buffer> handle, uint slot = 0u)
+        public void SetPixelShaderConstantBuffer(in Handle<ResourceBuffer> handle, uint slot = 0u)
         {
             Debug.Assert(GraphicsDevice.BufferManager.Access(handle).BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER));
 
@@ -258,7 +258,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexBuffer(in Handle<Buffer> handle)
+        public void SetVertexBuffer(in Handle<ResourceBuffer> handle)
         {
             ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
             Debug.Assert(buffer.BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_VERTEX_BUFFER));
@@ -269,7 +269,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetIndexBuffer(in Handle<Buffer> handle)
+        public void SetIndexBuffer(in Handle<ResourceBuffer> handle)
         {
             ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
             Debug.Assert(buffer.BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER));

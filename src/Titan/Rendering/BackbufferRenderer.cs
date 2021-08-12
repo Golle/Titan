@@ -9,8 +9,8 @@ namespace Titan.Rendering
 {
     internal sealed class BackbufferRenderer : Renderer
     {
-        private readonly Handle<Buffer> _vertexBuffer;
-        private readonly Handle<Buffer> _indexBuffer;
+        private readonly Handle<ResourceBuffer> _vertexBuffer;
+        private readonly Handle<ResourceBuffer> _indexBuffer;
         public BackbufferRenderer()
         {
             _vertexBuffer = GraphicsDevice.BufferManager.CreateFullscreenVertexBuffer();

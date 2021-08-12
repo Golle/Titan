@@ -23,5 +23,9 @@ namespace Titan.Graphics.Loaders.Atlas
             ref readonly var descriptor = ref Descriptors[index];
             return new ReadOnlySpan<Vector2>(Coordinates.AsPointer() + descriptor.Start, descriptor.Length);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [Pure] 
+        public SpriteType Type(int index) => Descriptors[index].Type;
     }
 }

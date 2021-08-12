@@ -11,7 +11,7 @@ namespace Titan.Graphics.D3D11.BlendStates
 {
     public record BlendStateCreation(byte RenderTargetIndex = 0)
     {
-        public float[] BlendFactor { get; init; }
+        public float[] BlendFactor { get; init; } = null;
         public uint SampleMask { get; init; } = 0xffffffff;
         public D3D11_BLEND SourceBlend { get; init; } = D3D11_BLEND.D3D11_BLEND_SRC_ALPHA;
         public D3D11_BLEND DestinationBlend { get; init; } = D3D11_BLEND.D3D11_BLEND_INV_SRC_ALPHA;
@@ -35,7 +35,7 @@ namespace Titan.Graphics.D3D11.BlendStates
             _device = device;
         }
 
-        public Handle<BlendState> Create(BlendStateCreation args)
+        public Handle<BlendState> Create(in BlendStateCreation args)
         {
             Logger.Trace<BlendState>($"Create BlendState with DATA");
             var handle = _resourcePool.CreateResource();
@@ -75,7 +75,7 @@ namespace Titan.Graphics.D3D11.BlendStates
                 fixed (float* pBlendFactor = args.BlendFactor)
                 {
                     const int size = sizeof(float)*4;
-                    System.Buffer.MemoryCopy(pBlendFactor, blendState->BlendFactor, size, size);
+                    Buffer.MemoryCopy(pBlendFactor, blendState->BlendFactor, size, size);
                 }
             }
             else

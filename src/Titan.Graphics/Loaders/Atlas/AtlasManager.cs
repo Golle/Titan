@@ -7,7 +7,7 @@ using Titan.Core.Memory;
 
 namespace Titan.Graphics.Loaders.Atlas
 {
-    public record AtlasCreation(uint TextureCount, uint NineSliceCount);
+    public readonly record struct AtlasCreation(uint TextureCount, uint NineSliceCount);
 
     public class AtlasManager
     {
@@ -17,7 +17,7 @@ namespace Titan.Graphics.Loaders.Atlas
             _resources.Init(maxAtlases);
         }
 
-        public unsafe Handle<TextureAtlas> Create(AtlasCreation args)
+        public unsafe Handle<TextureAtlas> Create(in AtlasCreation args)
         {
             var handle = _resources.CreateResource();
             if (!handle.IsValid())

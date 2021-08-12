@@ -1,18 +1,18 @@
 using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
+using Titan.Graphics.D3D11.Buffers;
 
 namespace Titan.UI.Rendering
 {
     [SkipLocalsInit]
     public readonly ref struct UIRenderables
     {
-        public readonly Handle<Buffer> VertexBuffer;
-        public readonly Handle<Buffer> IndexBuffer;
+        public readonly Handle<ResourceBuffer> VertexBuffer;
+        public readonly Handle<ResourceBuffer> IndexBuffer;
         public readonly ReadOnlySpan<UIElement> Elements;
 
-        public UIRenderables(Handle<Buffer> vertexBuffer, Handle<Buffer> indexBuffer, ReadOnlySpan<UIElement> elements)
+        public UIRenderables(Handle<ResourceBuffer> vertexBuffer, Handle<ResourceBuffer> indexBuffer, ReadOnlySpan<UIElement> elements)
         {
             VertexBuffer = vertexBuffer;
             IndexBuffer = indexBuffer;

@@ -2,14 +2,14 @@ using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Memory;
-using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
+using Titan.Graphics.D3D11.Buffers;
 
 namespace Titan.Graphics.Loaders.Models
 {
     public ref struct ModelCreation
     {
-        public Handle<Buffer> VertexBuffer;
-        public Handle<Buffer> IndexBuffer;
+        public Handle<ResourceBuffer> VertexBuffer;
+        public Handle<ResourceBuffer> IndexBuffer;
         public ReadOnlySpan<Submesh> Submeshes;
     }
 

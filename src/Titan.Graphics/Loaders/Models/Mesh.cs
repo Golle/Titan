@@ -7,8 +7,8 @@ namespace Titan.Graphics.Loaders.Models
 {
     public struct Mesh
     {
-        public Handle<Buffer> VertexBuffer;
-        public Handle<Buffer> IndexBuffer;
+        public Handle<ResourceBuffer> VertexBuffer;
+        public Handle<ResourceBuffer> IndexBuffer;
 
         public MemoryChunk<Submesh> Submeshes;
     }

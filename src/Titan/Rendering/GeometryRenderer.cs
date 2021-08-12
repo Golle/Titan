@@ -8,15 +8,14 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.Loaders;
 using Titan.Windows.D3D11;
-using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Rendering
 {
     internal sealed class GeometryRenderer : Renderer
     {
         private readonly SimpleRenderQueue _queue;
-        private readonly Handle<Buffer> _transformBuffer;
-        private readonly Handle<Buffer> _materialBuffer;
+        private readonly Handle<ResourceBuffer> _transformBuffer;
+        private readonly Handle<ResourceBuffer> _materialBuffer;
 
         private const uint TransformSlot = 5u;
 

@@ -4,7 +4,7 @@ using Titan.Windows.D3D11;
 namespace Titan.Graphics.D3D11.Buffers
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public unsafe struct Buffer
+    public unsafe struct ResourceBuffer
     {
         // D3d pointer
         public ID3D11Buffer* Resource;

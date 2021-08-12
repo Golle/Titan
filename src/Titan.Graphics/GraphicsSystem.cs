@@ -5,7 +5,6 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Pipeline;
 using Titan.Windows.D3D11;
-using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Graphics
 {
@@ -24,8 +23,8 @@ namespace Titan.Graphics
         private readonly Pipeline[] _pipeline;
         private readonly Context _immediateContext = GraphicsDevice.ImmediateContext;
         private readonly SwapChain _swapchain = GraphicsDevice.SwapChain;
-        private readonly Handle<Buffer> _cameraBufferHandle;
-        private readonly Handle<Buffer> _orthographicCameraHandle;
+        private readonly Handle<ResourceBuffer> _cameraBufferHandle;
+        private readonly Handle<ResourceBuffer> _orthographicCameraHandle;
         private readonly ViewPort _viewport;
         private Matrix4x4 _view;
         private Matrix4x4 _viewProject;

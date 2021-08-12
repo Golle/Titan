@@ -15,7 +15,6 @@ namespace Titan.UI
     {
         public string Identifier { get; set; }
         public int Index { get; set; }
-        public SpriteType Type { get; set; }
         public Margins Margins { get; set; }
     }
 
@@ -32,7 +31,6 @@ namespace Titan.UI
                 entity.AddComponent(new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
                 {
                     TextureIndex = (byte)Sprite.Index,
-                    Type = Sprite.Type,
                     Margins = Sprite.Margins
                 }));
                 entity.AddComponent(new InteractableComponent());

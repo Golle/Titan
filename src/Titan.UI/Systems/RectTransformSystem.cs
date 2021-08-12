@@ -1,4 +1,5 @@
 using Titan.ECS.Systems;
+using Titan.Input;
 using Titan.UI.Components;
 
 namespace Titan.UI.Systems
@@ -20,6 +21,22 @@ namespace Titan.UI.Systems
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref var transform = ref _transform.Get(entity);
+
+
+
+                if (InputManager.LeftMouseButtonDown)
+                {
+                    transform.Size.Width += 1;
+                    transform.Size.Height += 1;
+                }
+
+                if (InputManager.RightMouseButtonDown)
+                {
+                    transform.Size.Height -= 1;
+                    transform.Size.Width -= 1;
+                }
+                
+
                 if (EntityManager.TryGetParent(entity, out var parent) && _transform.Contains(parent))
                 {
                     ref readonly var parentTransform = ref _transform.Get(parent);

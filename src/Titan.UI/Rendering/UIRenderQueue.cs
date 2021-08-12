@@ -11,15 +11,14 @@ using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Common;
 using Titan.Windows.D3D11;
-using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.UI.Rendering
 {
     public unsafe class UIRenderQueue : IDisposable
     {
         private static readonly IComparer<SortableRenderable> Comparer = new UIComparer();
-        private Handle<Buffer> _vertexBuffer;
-        private Handle<Buffer> _indexBuffer;
+        private Handle<ResourceBuffer> _vertexBuffer;
+        private Handle<ResourceBuffer> _indexBuffer;
         private readonly MemoryChunk<QueuedRenderable> _renderableQueue;
         private readonly MemoryChunk<UIVertex> _vertices;
         private readonly UIElement[] _elements;
@@ -105,6 +104,7 @@ namespace Titan.UI.Rendering
             renderable->Texture = texture;
             renderable->Size = size;
             renderable->Color = color;
+            renderable->Slice = false;
             _sortable[index] = new SortableRenderable(zIndex, texture, renderable);
         }
 
@@ -170,7 +170,7 @@ namespace Titan.UI.Rendering
             
         }
 
-        private void RenderSlice(UIVertex* vertex, QueuedRenderable* renderable)
+        private static void RenderSlice(UIVertex* vertex, QueuedRenderable* renderable)
         {
             var size = renderable->Size;
             var position = renderable->Position;
@@ -227,17 +227,17 @@ namespace Titan.UI.Rendering
 
             vertex++;
             vertex->Position = new Vector2(position.X, top);
-            vertex->Texture = renderable->Coordinates[4];
+            vertex->Texture = renderable->Coordinates[1];
             vertex->Color = renderable->Color;
 
             vertex++;
             vertex->Position = new Vector2(right, top);
-            vertex->Texture = renderable->Coordinates[5];
+            vertex->Texture = renderable->Coordinates[2];
             vertex->Color = renderable->Color;
 
             vertex++;
             vertex->Position = new Vector2(right, position.Y);
-            vertex->Texture = renderable->Coordinates[1];
+            vertex->Texture = renderable->Coordinates[3];
             vertex->Color = renderable->Color;
         }
 

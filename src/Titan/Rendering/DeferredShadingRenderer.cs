@@ -29,9 +29,9 @@ namespace Titan.Rendering
 
     internal sealed class DeferredShadingRenderer : Renderer
     {
-        private readonly Handle<Buffer> _vertexBuffer;
-        private readonly Handle<Buffer> _indexBuffer;
-        private readonly Handle<Buffer> _lightBuffer;
+        private readonly Handle<ResourceBuffer> _vertexBuffer;
+        private readonly Handle<ResourceBuffer> _indexBuffer;
+        private readonly Handle<ResourceBuffer> _lightBuffer;
 
         public unsafe DeferredShadingRenderer()
         {

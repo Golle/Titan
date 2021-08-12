@@ -11,8 +11,8 @@ namespace Titan.Rendering
     {
         public Matrix4x4 Transform;
 
-        public Handle<Buffer> VertexBuffer;
-        public Handle<Buffer> IndexBuffer;
+        public Handle<ResourceBuffer> VertexBuffer;
+        public Handle<ResourceBuffer> IndexBuffer;
         public Handle<Material> Material;
         public uint StartIndex;
         public uint Count;

@@ -7,7 +7,6 @@ using Titan.Core.Logging;
 using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
 using Titan.Sandbox;
@@ -65,13 +64,29 @@ namespace Titan.Sandbox
             //    ZIndex = 10,
             //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
             //});
+
             container.AddButton(new UIButton
             {
-                Offset = new Vector2(400, 200),
+                Offset = new Vector2(400, 300),
                 Size = (100, 100),
                 ZIndex = 1,
-                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Type = SpriteType.Slice, Margins = 40}
+                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
             });
+
+            container.AddButton(new UIButton
+            {
+                Offset = new Vector2(600, 300),
+                Size = (150, 150),
+                ZIndex = 1,
+                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Margins = 20 }
+            });
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = new Vector2(400, 200),
+            //    Size = (100, 100),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Type = SpriteType.Slice, Margins = 40}
+            //});
 
             //container.AddButton(new UIButton
             //{
@@ -86,9 +101,9 @@ namespace Titan.Sandbox
             //    Size = (100, 125),
             //    ZIndex = 1,
             //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 3 },
-                
+
             //});
-            
+
             _uiManager.Add(container);
         }
 
