@@ -7,7 +7,7 @@ namespace Titan.Graphics.Windows
 {
     internal class WindowEventHandler
     {
-        public static void OnCreate() => EventManager.Push(new WindowCreatedEvent());
+        public static void OnCreate(uint width, uint height) => EventManager.Push(new WindowCreatedEvent(width,height));
         public static void OnClose() => EventManager.Push(new WindowClosedEvent());
         public static void OnLostFocus() => EventManager.Push(new WindowLostFocusEvent());
         public static void OnKeyUp(nuint code) => EventManager.Push(new KeyEvent((int)code, false, false));
@@ -29,5 +29,7 @@ namespace Titan.Graphics.Windows
         }
 
         public static void OnSetFocus() => EventManager.Push(new WindowSetFocusEvent());
+
+      
     }
 }

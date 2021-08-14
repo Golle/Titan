@@ -1,26 +1,31 @@
 using System;
 using System.Numerics;
 using Titan;
-using Titan.Assets.Models;
+using Titan.Assets;
 using Titan.Components;
 using Titan.Core.Logging;
+using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
 using Titan.Sandbox;
+using Titan.UI;
 
 Console.WriteLine($"Hello World!");
 
 Engine.StartNew<SandboxApplication>();
 
+
 namespace Titan.Sandbox
 {
     internal class SandboxApplication : Application
     {
+        private UIManager _uiManager;
+
         public override void OnStart(World world)
         {
             Logger.Info("Sandbox application starting");
-            
             var r = new Random();
             for (var i = 0; i < 10; ++i)
             {
@@ -43,6 +48,63 @@ namespace Titan.Sandbox
             var camera = world.CreateEntity();
             camera.AddComponent(new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
             camera.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
+            
+            _uiManager = new UIManager(world);
+
+            var container = new UIContainer
+            {
+                Offset = new Vector2(100, 100),
+                Size = (400, 400),
+                ZIndex = 0
+            };
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = Vector2.Zero,
+            //    Size = (100, 100),
+            //    ZIndex = 10,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
+            //});
+
+            container.AddButton(new UIButton
+            {
+                Offset = new Vector2(400, 300),
+                Size = (100, 100),
+                ZIndex = 1,
+                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
+            });
+
+            container.AddButton(new UIButton
+            {
+                Offset = new Vector2(600, 300),
+                Size = (150, 150),
+                ZIndex = 1,
+                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Margins = 20 }
+            });
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = new Vector2(400, 200),
+            //    Size = (100, 100),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Type = SpriteType.Slice, Margins = 40}
+            //});
+
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = Vector2.One* 120,
+            //    Size = (100, 150),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 2 }
+            //});
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = Vector2.One * 240,
+            //    Size = (100, 125),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 3 },
+
+            //});
+
+            _uiManager.Add(container);
         }
 
         public override void OnTerminate()
@@ -52,7 +114,8 @@ namespace Titan.Sandbox
 
         public override void ConfigureWorld(WorldBuilder builder) =>
             builder
-                .WithSystem(new FirstPersonCameraSystem(Window));
+                .WithSystem(new FirstPersonCameraSystem(Window))
+            ;
 
 
         public override EngineConfiguration ConfigureEngine(EngineConfiguration config) =>
@@ -66,6 +129,8 @@ namespace Titan.Sandbox
             {
                 Height = 1080,
                 Width = 1920,
+                //Height = 768,
+                //Width = 1024,
                 Title = "Sandbox",
                 Windowed = true
             };

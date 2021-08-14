@@ -5,17 +5,12 @@
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Titan.Assets\Titan.Assets.csproj" />
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
     <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
     <ProjectReference Include="..\Titan.Graphics\Titan.Graphics.csproj" />
+    <ProjectReference Include="..\Titan.Input\Titan.Input.csproj" />
+    <ProjectReference Include="..\Titan.UI\Titan.UI.csproj" />
   </ItemGroup>
 </Project>

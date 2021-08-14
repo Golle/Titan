@@ -1,25 +1,28 @@
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Numerics;
 using Titan.Assets;
-using Titan.Assets.Materials;
-using Titan.Assets.Models;
-using Titan.Assets.Shaders;
 using Titan.Components;
+using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
-using Titan.ECS.Components;
+using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Images;
+using Titan.Graphics.Loaders;
+using Titan.Graphics.Loaders.Atlas;
+using Titan.Graphics.Loaders.Materials;
+using Titan.Graphics.Loaders.Models;
+using Titan.Graphics.Loaders.Shaders;
 using Titan.Graphics.Windows;
 using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
+using Titan.UI;
+using Titan.UI.Rendering;
 
 namespace Titan
 {
@@ -33,7 +36,6 @@ namespace Titan
     {
         private readonly Application _app;
 
-        private Window _window;
         public static void StartNew<T>() where T : Application, new()
         {
             try
@@ -91,15 +93,19 @@ namespace Titan
             Trace($"Configure the {nameof(Window)}");
             var windowConfig = _app.ConfigureWindow(new WindowConfiguration(_app.GetType().Name, 800, 600, true));
             Trace($"Creating the {nameof(Window)}");
-            _window = Window.Create(windowConfig);
+            if (!Window.Init(windowConfig))
+            {
+                Logger.Error("Failed to init the window.", typeof(Engine));
+            }
+
             Trace($"Showing the {nameof(Window)}");
-            _window.Show();
-            _app.Window = new GameWindow(_window);
+            Window.Show();
+            _app.Window = new GameWindow();
 
             Trace($"Configure {nameof(GraphicsDevice)}");
-            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(60, true, true));
+            var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(windowConfig.Width, windowConfig.Height, 144, windowConfig.Windowed, true, true, true));
             Trace($"Init {typeof(GraphicsDevice).FullName}");
-            GraphicsDevice.Init(_window, deviceConfig);
+            GraphicsDevice.Init(deviceConfig, Window.Handle);
 
             Trace($"Init {nameof(Resources)}");
             Resources.Init();
@@ -110,6 +116,12 @@ namespace Titan
             {
                 Run();
             }
+            catch (Exception e)
+            {
+                Logger.Error("Exception was thrown at startup.");
+                Logger.Error(e.Message);
+                Logger.Error(e.StackTrace);
+            }
             finally
             {
                 Shutdown();
@@ -118,29 +130,29 @@ namespace Titan
         
         private unsafe void Run()
         {
+            var atlasManager = new AtlasManager(100);
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
                 .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
                 .Register(AssetTypes.VertexShader, new VertexShaderLoader())
                 .Register(AssetTypes.PixelShader, new PixelShaderLoader())
                 .Register(AssetTypes.Material, new MaterialsLoader())
+                .Register(AssetTypes.Atlas, new AtlasLoader(atlasManager))
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var renderQueue = new SimpleRenderQueue(1000);
-            
+            var uiRenderQueue = new UIRenderQueue(1000);
+
             var color = stackalloc float[4];
             color[0] = 1f;
             color[1] = 0.4f;
             color[2] = 0f;
             color[3] = 1f;
 
-            var timer = Stopwatch.StartNew();
-            var frameCount = 0;
-            
-            var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue);
+            var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue, uiRenderQueue);
             pipelineBuilder.LoadResources();
             // Preload assets for rendering pipeline
-            while (_window.Update() && !pipelineBuilder.IsReady())
+            while (Window.Update() && !pipelineBuilder.IsReady())
             {
                 assetsManager.Update();
             }
@@ -157,37 +169,40 @@ namespace Titan
                 .WithSystem(new Transform3DSystem())
                 .WithSystem(new Render3DSystem(assetsManager, renderQueue))
                 .WithSystem(new CameraSystem(graphicsSystem))
-                .WithSystem(new ModelLoaderSystem(assetsManager));
+                .WithSystem(new ModelLoaderSystem(assetsManager))
 
+                
+                .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager)
+                ;
             _app.ConfigureWorld(worldBuilder);
 
             Logger.Info<Engine>("Initialize starter world");
             using var starterWorld = new World(worldBuilder.Build());
             _app.OnStart(starterWorld);
 
+            var timer = Stopwatch.StartNew();
             // star the main loop
-            while (_window.Update())
+            while (Window.Update())
             {
                 renderQueue.Update();
-
+            
+                timer.Restart();
                 EventManager.Update();
+                EngineStats.SetStats(nameof(EventManager), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
                 InputManager.Update();
+                EngineStats.SetStats(nameof(InputManager), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
 
                 starterWorld.Update();
-
-                if (timer.Elapsed.Seconds >= 1f)
-                {
-                    var elapsed = timer.Elapsed;
-                    
-                    _window.SetTitle($"FPS: {(int)(frameCount/elapsed.TotalSeconds)}");
-
-                    timer.Restart();
-                    frameCount = 0;
-                }
+                EngineStats.SetStats(nameof(World), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
                 assetsManager.Update();
+                EngineStats.SetStats(nameof(AssetsManager), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
                 graphicsSystem.Render();
-
-                frameCount++;
+                EngineStats.SetStats(nameof(GraphicsSystem), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
             }
         }
 
@@ -211,7 +226,7 @@ namespace Titan
             Resources.Terminate();
 
             Logger.Trace<Engine>($"Close/Dispose {nameof(Window)}");
-            _window.Dispose();
+            Window.Destroy();
 
             Logger.Trace<Engine>($"Terminate {nameof(FileSystem)}");
             FileSystem.Terminate();

@@ -2,7 +2,7 @@ using Titan.Windows.D3D11;
 
 namespace Titan.Graphics.D3D11.Buffers
 {
-    public record BufferCreation
+    public readonly record struct BufferCreation
     {
         public D3D11_USAGE Usage { get; init; }
         public D3D11_CPU_ACCESS_FLAG CpuAccessFlags { get; init; }

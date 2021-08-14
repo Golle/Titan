@@ -15,7 +15,7 @@ namespace Titan.Graphics.Extensions
     public static class BufferManagerExtensions
     {
 
-        public static unsafe Handle<Buffer> CreateFullscreenVertexBuffer(this BufferManager manager)
+        public static unsafe Handle<ResourceBuffer> CreateFullscreenVertexBuffer(this BufferManager manager)
         {
             var vertices = stackalloc FullscreenVertex[4];
             vertices[0] = new FullscreenVertex { Position = new Vector2(-1, -1), Texture = new Vector2(0, 1) };
@@ -33,7 +33,7 @@ namespace Titan.Graphics.Extensions
             });
         }
 
-        public static unsafe Handle<Buffer> CreateFullscreenIndexBuffer(this BufferManager manager)
+        public static unsafe Handle<ResourceBuffer> CreateFullscreenIndexBuffer(this BufferManager manager)
         {
             var indices = stackalloc ushort[6];
             indices[0] = 0;

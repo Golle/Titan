@@ -1,6 +1,8 @@
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
+using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
@@ -14,6 +16,8 @@ namespace Titan.Graphics.D3D11
     public unsafe class Context
     {
         private readonly ID3D11DeviceContext* _context;
+
+        public ID3D11DeviceContext* D3dContext => _context;
         public Context(ID3D11DeviceContext* context)
         {
             _context = context;
@@ -32,7 +36,21 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Map<T>(in Handle<Buffer> handle, in T value) where T : unmanaged
+        public void Map(in Handle<ResourceBuffer> handle, void * data, uint size)
+        {
+            D3D11_MAPPED_SUBRESOURCE subresource;
+            ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
+            var resource = (ID3D11Resource*)buffer.Resource;
+            var result = _context->Map(resource, 0, D3D11_MAP.D3D11_MAP_WRITE_DISCARD, 0, &subresource);
+#if DEBUG
+            Common.CheckAndThrow(result, nameof(ID3D11DeviceContext.Map));
+#endif
+            System.Buffer.MemoryCopy(data, subresource.pData, size, size);
+            _context->Unmap(resource, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Map<T>(in Handle<ResourceBuffer> handle, in T value) where T : unmanaged
         {
             D3D11_MAPPED_SUBRESOURCE subresource;
             ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
@@ -115,7 +133,6 @@ namespace Titan.Graphics.D3D11
         public void SetRenderTargets(in Handle<Texture>[] handles, in Handle<Texture> depthBufferHandle)
         {
             var depthBuffer = depthBufferHandle.IsValid() ? GraphicsDevice.TextureManager.Access(depthBufferHandle).D3DDepthStencil : null;
-            
             var numberOfViews = handles.Length;
             if (numberOfViews == 1)
             {
@@ -132,9 +149,21 @@ namespace Titan.Graphics.D3D11
                 _context->OMSetRenderTargets((uint) numberOfViews, renderTargets, depthBuffer);
             }
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetPixelShaderResource(in Handle<Texture> handle, uint startSlot = 0u)
+        {
+            if (!handle.IsValid())
+            {
+                return;
+            }
+            var resource = GraphicsDevice.TextureManager.Access(handle).D3DResource;
+            _context->PSSetShaderResources(startSlot, 1, &resource);
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderResources(in Handle<Texture>[] handles, uint startSlot = 0u)
+        public void SetPixelShaderResources(in ReadOnlySpan<Handle<Texture>> handles, uint startSlot = 0u)
         {
             if (handles == null)
             {
@@ -185,7 +214,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnbindPixelShaderResources(in Handle<Texture>[] handles)
+        public void UnbindPixelShaderResources(ReadOnlySpan<Handle<Texture>> handles)
         {
             if (handles == null)
             {
@@ -209,17 +238,18 @@ namespace Titan.Graphics.D3D11
             Unsafe.InitBlock(resources, 0, (uint)(sizeof(ID3D11ShaderResourceView*) * numberOfResources));
             _context->VSSetShaderResources(0, (uint)numberOfResources, resources);
         }
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexShaderConstantBuffer(in Handle<Buffer> handle, uint slot = 0u)
+        public void SetVertexShaderConstantBuffer(in Handle<ResourceBuffer> handle, uint slot = 0u)
         {
             Debug.Assert(GraphicsDevice.BufferManager.Access(handle).BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER));
 
             var buffer = GraphicsDevice.BufferManager.Access(handle).Resource;
             _context->VSSetConstantBuffers(slot, 1, &buffer);
         }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetPixelShaderConstantBuffer(in Handle<Buffer> handle, uint slot = 0u)
+        public void SetPixelShaderConstantBuffer(in Handle<ResourceBuffer> handle, uint slot = 0u)
         {
             Debug.Assert(GraphicsDevice.BufferManager.Access(handle).BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_CONSTANT_BUFFER));
 
@@ -228,7 +258,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetVertexBuffer(in Handle<Buffer> handle)
+        public void SetVertexBuffer(in Handle<ResourceBuffer> handle)
         {
             ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
             Debug.Assert(buffer.BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_VERTEX_BUFFER));
@@ -239,7 +269,7 @@ namespace Titan.Graphics.D3D11
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetIndexBuffer(in Handle<Buffer> handle)
+        public void SetIndexBuffer(in Handle<ResourceBuffer> handle)
         {
             ref readonly var buffer = ref GraphicsDevice.BufferManager.Access(handle);
             Debug.Assert(buffer.BindFlag.HasFlag(D3D11_BIND_FLAG.D3D11_BIND_INDEX_BUFFER));
@@ -268,5 +298,22 @@ namespace Titan.Graphics.D3D11
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRasterizerState(in Handle<RasterizerState> handle) => _context->RSSetState(GraphicsDevice.RasterizerManager.Access(handle).State);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetBlendState(in Handle<BlendState> handle)
+        {
+            if (handle.IsValid())
+            {
+                ref readonly var blendState = ref GraphicsDevice.BlendStateManager.Access(handle);
+                fixed (float* pBlendFactor = blendState.BlendFactor)
+                {
+                    _context->OMSetBlendState(blendState.State, pBlendFactor, blendState.SampleMask);
+                }
+            }
+            else
+            {
+                _context->OMSetBlendState(null, null, 0xffffffff);
+            }
+        }
     }
 }

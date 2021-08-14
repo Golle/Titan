@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.IO;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Serialization;
@@ -15,8 +14,11 @@ namespace Titan.Assets.Database
         {
             Logger.Trace<AssetManifestDescriptor>($"Loading assets manifest from {file}");
             var timer = Stopwatch.StartNew();
-            var buffer = File.ReadAllBytes(FileSystem.GetFullPath(file));
-            var manifest = Json.Deserialize<AssetManifestDescriptor>(buffer);
+            
+            using var fileHandle = FileSystem.OpenReadHandle(file);
+            var bytes = fileHandle.ReadAllBytes();
+
+            var manifest = Json.Deserialize<AssetManifestDescriptor>(bytes);
             timer.Stop();
             Logger.Trace<AssetManifestDescriptor>($"Manifest deserialized in {timer.Elapsed}");
             Logger.Trace<AssetManifestDescriptor>($"Manifest contains {manifest.Assets.Length} assets");

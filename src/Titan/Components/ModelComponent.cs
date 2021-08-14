@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
-using Titan.Assets.Models;
 using Titan.Core;
+using Titan.Graphics.Loaders.Models;
 
 namespace Titan.Components
 {

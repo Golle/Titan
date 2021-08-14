@@ -27,11 +27,11 @@ namespace Titan.Rendering
         }
     }
 
-    internal class DeferredShadingRenderer : IRenderer
+    internal sealed class DeferredShadingRenderer : Renderer
     {
-        private readonly Handle<Buffer> _vertexBuffer;
-        private readonly Handle<Buffer> _indexBuffer;
-        private readonly Handle<Buffer> _lightBuffer;
+        private readonly Handle<ResourceBuffer> _vertexBuffer;
+        private readonly Handle<ResourceBuffer> _indexBuffer;
+        private readonly Handle<ResourceBuffer> _lightBuffer;
 
         public unsafe DeferredShadingRenderer()
         {
@@ -48,7 +48,7 @@ namespace Titan.Rendering
             });
         }
 
-        public void Render(Context context)
+        public override void Render(Context context)
         {
             var lights = new LightBuffer
             {
@@ -64,7 +64,7 @@ namespace Titan.Rendering
             context.DrawIndexed(6);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             GraphicsDevice.BufferManager.Release(_vertexBuffer);
             GraphicsDevice.BufferManager.Release(_indexBuffer);

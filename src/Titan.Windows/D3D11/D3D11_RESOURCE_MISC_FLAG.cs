@@ -1,6 +1,5 @@
 using System;
-
-// ReSharper disable UnusedMember.Global
+// ReSharper disable InconsistentNaming
 
 namespace Titan.Windows.D3D11
 {

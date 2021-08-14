@@ -92,11 +92,11 @@ namespace Titan.Graphics.D3D11.Textures
                 ArraySize = 1,
                 MipLevels = 1,
                 BindFlags = bindflags,
-                CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED,
+                CpuAccessFlags = args.CpuAccessFlag,
                 Height = height,
                 Width = width,
                 Usage = args.Usage,
-                MiscFlags = D3D11_RESOURCE_MISC_FLAG.UNSPECIFIED,
+                MiscFlags = args.MiscFlags,
                 SampleDesc = new DXGI_SAMPLE_DESC
                 {
                     Count = 1,
@@ -111,6 +111,7 @@ namespace Titan.Graphics.D3D11.Textures
             texture->Height = height;
             texture->Width = width;
             texture->Usage = args.Usage;
+            texture->CpuAccess = args.CpuAccessFlag;
             texture->D3DTarget = null;
             texture->D3DResource = null;
             texture->D3DDepthStencil = null;
@@ -205,7 +206,7 @@ namespace Titan.Graphics.D3D11.Textures
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ref readonly Texture Access(in Handle<Texture> handle) => ref _resourcePool.GetResourceReference(handle);
+        public ref readonly Texture Access(in Handle<Texture> handle) => ref _resourcePool.GetResourceReference(handle);
 
         public void Dispose()
         {

@@ -1,11 +1,11 @@
 using System;
 using Titan.Core.Logging;
+using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
-using Titan.Graphics.Windows;
 using Titan.Windows;
 using Titan.Windows.D3D11;
 using static Titan.Windows.Common;
@@ -19,7 +19,7 @@ using static Titan.Windows.D3D11.DXGI_USAGE;
 
 namespace Titan.Graphics.D3D11
 {
-    public record DeviceConfiguration(uint RefreshRate, bool Vsync, bool Debug);
+    public record DeviceConfiguration(uint Width, uint Height, uint RefreshRate, bool Windowed, bool Vsync, bool Debug, bool Stats);
 
     public static class GraphicsDevice
     {
@@ -27,7 +27,6 @@ namespace Titan.Graphics.D3D11
         private static ComPtr<ID3D11DeviceContext> _context;
         private static ComPtr<IDXGISwapChain> _swapChain;
         private static ComPtr<ID3D11RenderTargetView> _backbuffer;
-
 
         public static SwapChain SwapChain { get; private set; }
         public static Context ImmediateContext { get; private set; }
@@ -38,27 +37,38 @@ namespace Titan.Graphics.D3D11
         public static SamplerManager SamplerManager { get; private set; }
         public static ShaderManager ShaderManager { get; private set; }
         public static RasterizerManager RasterizerManager { get; private set; }
+        public static BlendStateManager BlendStateManager { get; private set; }
 
-        public static void Init(Window window, DeviceConfiguration config)
+        public static void Init(DeviceConfiguration config, HWND windowHandle)
         {
             if (IsInitialized)
             {
                 throw new InvalidOperationException($"{nameof(GraphicsDevice)} has already been initialized.");
             }
 
-            var flags = config.Debug ? 2u : 0u;
+            var deviceCreationFlags = D3D11_CREATE_DEVICE_FLAG.UNSPECIFIED;
+            if (config.Debug)
+            {
+                deviceCreationFlags |= D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_DEBUG;
+            }
+
+            if (config.Stats)
+            {
+                deviceCreationFlags |= D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+            }
+
             var featureLevel = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1;
             var desc = new DXGI_SWAP_CHAIN_DESC
             {
                 BufferCount = 2,
                 BufferDesc = new DXGI_MODE_DESC
                 {
-                    Width = window.Width,
-                    Height = window.Height,
+                    Width = config.Width,
+                    Height = config.Height,
                     RefreshRate = new DXGI_RATIONAL { Denominator = config.RefreshRate },
                     Scaling = DXGI_MODE_SCALING_UNSPECIFIED,
                     ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED,
-                    Format = DXGI_FORMAT_R8G8B8A8_UNORM
+                    Format = DXGI_FORMAT_B8G8R8A8_UNORM
                 },
                 SampleDesc = new DXGI_SAMPLE_DESC
                 {
@@ -67,16 +77,16 @@ namespace Titan.Graphics.D3D11
                 },
 
                 BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
-                OutputWindow = window.Handle,
+                OutputWindow = windowHandle,
                 SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
                 Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH,
-                Windowed = window.Windowed
+                Windowed = config.Windowed
             };
 
             Logger.Trace<ID3D11Device>("Creating device");
             unsafe
             {
-                CheckAndThrow(D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, flags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _context.GetAddressOf()), nameof(D3D11CreateDeviceAndSwapChain));
+                CheckAndThrow(D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, deviceCreationFlags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _context.GetAddressOf()), nameof(D3D11CreateDeviceAndSwapChain));
             }
             Logger.Trace<ID3D11Device>("Device created");
 
@@ -97,13 +107,14 @@ namespace Titan.Graphics.D3D11
             unsafe
             {
                 ImmediateContext = new Context(_context.Get());
-                SwapChain = new SwapChain(_swapChain.Get(), _backbuffer.Get(), config.Vsync, window.Width, window.Height);
+                SwapChain = new SwapChain(_swapChain.Get(), _backbuffer.Get(), config.Vsync, config.Width, config.Height);
 
                 BufferManager = new BufferManager(_device);
                 TextureManager = new TextureManager(_device.Get(), SwapChain);
                 SamplerManager = new SamplerManager(_device.Get());
                 ShaderManager = new ShaderManager(_device.Get());
                 RasterizerManager = new RasterizerManager(_device.Get());
+                BlendStateManager = new BlendStateManager(_device.Get());
             }
 
             IsInitialized = true;

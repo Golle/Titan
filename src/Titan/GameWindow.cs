@@ -6,15 +6,10 @@ namespace Titan
 {
     public class GameWindow
     {
-        private readonly Window _window;
-        public uint Height => _window.Height;
-        public uint Width => _window.Width;
-        public bool Windowed => _window.Windowed;
-        internal GameWindow(Window window)
-        {
-            _window = window;
-        }
-        
+        public uint Height => Window.Height;
+        public uint Width => Window.Width;
+        public bool Windowed => Window.Windowed;
+       
         public void HideMouse()
         {
             EventManager.Push(new MouseStateEvent(false));
@@ -24,7 +19,5 @@ namespace Titan
         {
             EventManager.Push(new MouseStateEvent(true));
         }
-
-        
     }
 }

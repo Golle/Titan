@@ -1,9 +1,9 @@
 using Titan.Assets;
-using Titan.Assets.Models;
 using Titan.Components;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.ECS.Systems;
+using Titan.Graphics.Loaders.Models;
 
 namespace Titan.Systems
 {

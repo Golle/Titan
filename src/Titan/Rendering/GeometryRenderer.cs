@@ -6,16 +6,18 @@ using Titan.Core;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
+using Titan.Graphics.Loaders;
 using Titan.Windows.D3D11;
-using Buffer = Titan.Graphics.D3D11.Buffers.Buffer;
 
 namespace Titan.Rendering
 {
-    internal class GeometryRenderer : IRenderer
+    internal sealed class GeometryRenderer : Renderer
     {
         private readonly SimpleRenderQueue _queue;
-        private readonly Handle<Buffer> _transformBuffer;
-        private readonly Handle<Buffer> _materialBuffer;
+        private readonly Handle<ResourceBuffer> _transformBuffer;
+        private readonly Handle<ResourceBuffer> _materialBuffer;
+
+        private const uint TransformSlot = 5u;
 
         public unsafe GeometryRenderer(SimpleRenderQueue queue)
         {
@@ -40,12 +42,12 @@ namespace Titan.Rendering
         }
 
 
-        public void Render(Context context)
+        public override void Render(Context context)
         {
             Unsafe.SkipInit(out MaterialBuffer materialBuffer);
 
             context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            context.SetVertexShaderConstantBuffer(_transformBuffer, 1);
+            context.SetVertexShaderConstantBuffer(_transformBuffer, TransformSlot);
             context.SetPixelShaderConstantBuffer(_materialBuffer, 1);
             foreach (ref readonly var renderable in _queue.GetRenderables())
             {
@@ -67,7 +69,7 @@ namespace Titan.Rendering
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             GraphicsDevice.BufferManager.Release(_transformBuffer);
             GraphicsDevice.BufferManager.Release(_materialBuffer);

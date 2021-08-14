@@ -30,7 +30,7 @@ namespace Titan.Graphics.Images
         {
             if (_buffer != null)
             {
-                Marshal.FreeHGlobal((nint)_buffer);
+                NativeMemory.Free(_buffer);
                 _buffer = null;
                 _imageSize = 0;
             }

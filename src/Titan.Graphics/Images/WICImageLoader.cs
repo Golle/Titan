@@ -81,7 +81,7 @@ namespace Titan.Graphics.Images
                 var rowPitch = (width * newBitsPerPixel + 7) / 8;
                 var imageSize = rowPitch * height;
 
-                var buffer = (byte*) Marshal.AllocHGlobal((int) imageSize);
+                var buffer = (byte*) NativeMemory.Alloc(imageSize);
                 try
                 {
                     using ComPtr<IWICFormatConverter> converter = default;
@@ -94,7 +94,7 @@ namespace Titan.Graphics.Images
                 catch
                 {
                     // If there's an exception, free the buffer
-                    Marshal.FreeHGlobal((nint) buffer);
+                    NativeMemory.Free(buffer);
                     throw;
                 }
             }
@@ -104,7 +104,7 @@ namespace Titan.Graphics.Images
                 var stride = (width * bitsPerPixel + 7) / 8;
                 var imageSize = stride * height;
 
-                var buffer = (byte*) Marshal.AllocHGlobal((int) imageSize);
+                var buffer = (byte*) NativeMemory.Alloc(imageSize);
                 try
                 {
                     CheckAndThrow(frameDecode.Get()->CopyPixels(null, stride, imageSize, buffer), nameof(IWICBitmapFrameDecode.CopyPixels));
@@ -112,7 +112,7 @@ namespace Titan.Graphics.Images
                 catch
                 {
                     // If there's an exception, free the buffer
-                    Marshal.FreeHGlobal((nint) buffer);
+                    NativeMemory.Free(buffer);
                     throw;
                 }
 

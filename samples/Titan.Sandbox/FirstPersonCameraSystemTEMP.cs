@@ -6,8 +6,6 @@ using Titan.Input;
 
 namespace Titan.Sandbox
 {
-   
-
     internal class FirstPersonCameraSystem : EntitySystem
     {
         private readonly GameWindow _window;
@@ -16,7 +14,7 @@ namespace Titan.Sandbox
         private bool _firstPerson;
         private Vector2 _rotation = Vector2.Zero;
         private EntityFilter _filter;
-        private MutableStorage<CameraComponent> _camera;
+        //private MutableStorage<CameraComponent> _camera;
 
         public FirstPersonCameraSystem(GameWindow window)
         {
@@ -43,7 +41,7 @@ namespace Titan.Sandbox
         protected override void Init()
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<CameraComponent>().With<Transform3D>());
-            _camera = GetMutable<CameraComponent>();
+            //_camera = GetMutable<CameraComponent>();
             _transform = GetMutable<Transform3D>();
         }
 
@@ -66,7 +64,7 @@ namespace Titan.Sandbox
                 {
                     const float constant = 0.003f;
                     _rotation.X -= delta.X * constant;
-                    _rotation.Y = Math.Clamp(_rotation.Y + delta.Y * constant, -maxRotation, maxRotation);
+                    _rotation.Y = Math.Clamp(_rotation.Y + -delta.Y * constant, -maxRotation, maxRotation);
                     transform.Rotation = Quaternion.CreateFromYawPitchRoll(_rotation.X, _rotation.Y, 0f);
                     //camera.Rotate(new Vector3(rotation, 0)); // not required?
                 }

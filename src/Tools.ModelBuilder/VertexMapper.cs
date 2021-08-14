@@ -1,6 +1,6 @@
 using System;
 using System.Numerics;
-using Titan.Assets.Models;
+using Titan.Graphics.Loaders.Models;
 using Tools.Core.WavefrontObj;
 
 namespace Tools.ModelBuilder

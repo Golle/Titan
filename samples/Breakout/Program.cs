@@ -2,10 +2,12 @@ using System;
 using System.Numerics;
 using Breakout;
 using Titan;
-using Titan.Assets.Models;
+using Titan.Assets;
 using Titan.Components;
 using Titan.Core.Logging;
+using Titan.ECS;
 using Titan.ECS.Worlds;
+using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
 
 Console.WriteLine($"Hello World!");

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.ECS.Events;
@@ -14,6 +15,8 @@ namespace Titan.ECS.Entities
 
         private readonly IdContainer _entityIds;
         private readonly uint _worldId;
+
+        private const int MaxEntityDepth = 64;
 
         public EntityManager(WorldConfiguration config)
         {
@@ -33,12 +36,12 @@ namespace Titan.ECS.Entities
         public unsafe void Attach(in Entity parent, in Entity entity)
         {
             Debug.Assert(!parent.IsNull() || !entity.IsNull(), "Parent or child is null");
-            ref var ent = ref _relationship[entity.Id];
-            if (ent.ParentId != 0u)
+            ref var relationship = ref _relationship[entity.Id];
+            if (relationship.ParentId != 0u)
             {
                 Detach(entity);
             }
-            ent.ParentId = parent.Id; // Add check if swapping parents
+            relationship.ParentId = parent.Id; // Add check if swapping parents
             var parentRel = _relationship.GetPointer(parent.Id);
             if (parentRel->ChildId != 0u)
             {
@@ -55,7 +58,53 @@ namespace Titan.ECS.Entities
                 // this is the first child on this parent
                 parentRel->ChildId = entity.Id;
             }
+            UpdateParentCount(ref relationship);
             EventManager.Push(new EntityAttachedEvent(parent, entity));
+        }
+
+        // TODO: might need to optimize this depending on the type of game
+        private unsafe void UpdateParentCount(ref Relationship relationship)
+        {
+            relationship.ParentCount = relationship.ParentId != 0u ? _relationship[relationship.ParentId].ParentCount + 1 : 0;
+
+            // No children, just return
+            if (relationship.ChildId == 0u)
+            {
+                return;
+            }
+            var parentCount = relationship.ParentCount + 1;
+
+            var count = 0;
+            var searchStack = stackalloc Relationship*[MaxEntityDepth];
+            var current = _relationship.GetPointer(relationship.ChildId);
+
+            while (true)
+            {
+                current->ParentCount = parentCount;
+                if (current->ChildId != 0)
+                {
+                    // Only push to the seach stack if there are siblings
+                    if (current->NextId != 0)
+                    {
+                        searchStack[count++] = current;
+                    }
+                    current = _relationship.GetPointer(current->ChildId);
+                    parentCount++;
+                    continue;
+                }
+                if (current->NextId != 0)
+                {
+                    current = _relationship.GetPointer(current->NextId);
+                    continue;
+                }
+
+                if (count == 0)
+                {
+                    break;
+                }
+                current = _relationship.GetPointer(searchStack[--count]->NextId);
+                parentCount--;
+            }
         }
 
         public unsafe void Detach(in Entity entity)
@@ -73,6 +122,7 @@ namespace Titan.ECS.Entities
             {
                 // This child is the first or only child, set the parent to point to next (next ID or 0 if empty)
                 parent.ChildId = relationship.NextId;
+                relationship.NextId = 0;
             }
             else
             {
@@ -89,6 +139,7 @@ namespace Titan.ECS.Entities
             }
             EventManager.Push(new EntityDetachedEvent(new Entity(relationship.ParentId, _worldId), entity));
             relationship.ParentId = 0u;
+            UpdateParentCount(ref relationship);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -179,19 +230,36 @@ namespace Titan.ECS.Entities
         public void Dispose() => _relationship.Free();
 
 
+        public unsafe void DebugPrint(in Entity entity)
+        {
+            var relationship = _relationship.GetPointer(entity.Id);
+            //Logger.Error($"E: {entity.Id} Parents: {relationship->ParentCount}");
+            TraverseRelation(entity.Id, relationship);
+        }
+
+        private unsafe void TraverseRelation(uint currentId, Relationship* rel)
+        {
+            Logger.Error($"E: {currentId} Parents: {rel->ParentCount}");
+            if (rel->ChildId != 0)
+            {
+                TraverseRelation(rel->ChildId, _relationship.GetPointer(rel->ChildId));
+            }
+
+            if (rel->NextId != 0)
+            {
+                TraverseRelation(rel->NextId, _relationship.GetPointer(rel->NextId));
+            }
+        }
+
         private struct Relationship
         {
             public uint ChildId;
             public uint ParentId;
             public uint NextId;
+            public uint ParentCount;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Reset()
-            {
-                ChildId = 0u;
-                ParentId = 0u;
-                NextId = 0u;
-            }
+            public void Reset() => this = default;
         }
     }
 }

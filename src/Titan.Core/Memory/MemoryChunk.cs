@@ -13,7 +13,7 @@ namespace Titan.Core.Memory
         {
             if (_ptr != null)
             {
-                Marshal.FreeHGlobal((nint)_ptr);
+                NativeMemory.Free(_ptr);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Titan.Core.Memory
         {
             if (_ptr != null)
             {
-                Marshal.FreeHGlobal((nint)_ptr);
+                NativeMemory.Free(_ptr);
             }
         }
 
