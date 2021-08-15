@@ -70,7 +70,8 @@ namespace Titan.Sandbox
                 Offset = new Vector2(400, 300),
                 Size = (100, 100),
                 ZIndex = 1,
-                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
+                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 },
+                Font = "fonts/seqoe_ui_light"
             });
 
             container.AddButton(new UIButton

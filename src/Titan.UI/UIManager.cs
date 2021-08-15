@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using Titan.Assets;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
@@ -23,6 +21,8 @@ namespace Titan.UI
     {
         public Sprite Sprite { get; set; }
         public Sprite OnHover { get; set; }
+        public string Text { get; set; }
+        public string Font { get; set; }
         internal override unsafe void OnCreate(in Entity entity)
         {
             base.OnCreate(entity);
@@ -33,6 +33,10 @@ namespace Titan.UI
                     TextureIndex = (byte)Sprite.Index,
                     Margins = Sprite.Margins
                 }));
+                if (Font != null)
+                {
+                    entity.AddComponent(new AssetComponent<FontComponent>(Font)); // should be a child entity
+                }
                 entity.AddComponent(new InteractableComponent());
             }
         }

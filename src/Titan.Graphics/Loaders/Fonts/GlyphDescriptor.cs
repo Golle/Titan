@@ -5,7 +5,7 @@ namespace Titan.Graphics.Loaders.Fonts
 {
     [DebuggerDisplay("<{Id} {X} {Y} {Width} {Height}>")]
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public struct CharacterDescriptor
+    public struct GlyphDescriptor
     {
         public char Id;
         public short X;

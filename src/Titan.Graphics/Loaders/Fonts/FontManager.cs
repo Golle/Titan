@@ -44,7 +44,7 @@ namespace Titan.Graphics.Loaders.Fonts
 
             return handle;
 
-            static (int min, int max) GetMinMax(ReadOnlySpan<CharacterDescriptor> characters)
+            static (int min, int max) GetMinMax(ReadOnlySpan<GlyphDescriptor> characters)
             {
                 var min = char.MaxValue;
                 var max = char.MinValue;

@@ -17,7 +17,7 @@ namespace Titan.Graphics.Loaders.Fonts
             var fontBytes = buffers[0].AsPointer();
 
             var descriptor = (FontDescriptor*)fontBytes;
-            var characters = (CharacterDescriptor*)(descriptor + 1);
+            var characters = (GlyphDescriptor*)(descriptor + 1);
             var kernings = characters + descriptor->CharactersCount;
 
             var textureHandle = dependencies[0].AssetHandle;
@@ -30,16 +30,18 @@ namespace Titan.Graphics.Loaders.Fonts
                 Width = texture.Width,
                 Height = texture.Height,
                 Texture = textureHandle,
-                Characters = new ReadOnlySpan<CharacterDescriptor>(characters, descriptor->CharactersCount)
+                Characters = new ReadOnlySpan<GlyphDescriptor>(characters, descriptor->CharactersCount)
             });
         }
 
         public void OnRelease(int handle)
         {
+            _manager.Release(handle);
         }
 
         public void Dispose()
         {
+            
         }
     }
 }

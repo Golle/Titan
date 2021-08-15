@@ -16,11 +16,14 @@ namespace Titan.UI
         public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager) =>
             builder
                 .WithComponent<AssetComponent<SpriteComponent>>(count: config.MaxSprites)
+                .WithComponent<AssetComponent<FontComponent>>(count: config.MaxSprites)
                 .WithComponent<SpriteComponent>(count: config.MaxComponents)
                 .WithComponent<RectTransform>(count: config.MaxComponents)
                 .WithComponent<InteractableComponent>(count: config.MaxComponents)
+                .WithComponent<FontComponent>(count: config.MaxComponents)
 
                 .WithSystem(new SpriteLoaderSystem(assetsManager))
+                .WithSystem(new FontLoaderSystem(assetsManager))
                 .WithSystem(new UIRenderSystem(renderQueue, atlasManager))
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())

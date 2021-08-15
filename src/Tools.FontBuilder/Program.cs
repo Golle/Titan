@@ -49,7 +49,7 @@ foreach (var fontFile in Directory.EnumerateFiles(resourcePath, "*.fnt"))
         Second = k.Second
     }).ToArray();
 
-    var characters = bitmapFont.Chars.Select(c => new CharacterDescriptor
+    var characters = bitmapFont.Chars.Select(c => new GlyphDescriptor
     {
         X = (short)c.X,
         Y = (short)c.Y,
@@ -76,9 +76,9 @@ foreach (var fontFile in Directory.EnumerateFiles(resourcePath, "*.fnt"))
         };
         outputFile.Write(new ReadOnlySpan<byte>(&font, sizeof(FontDescriptor)));
         
-        fixed (CharacterDescriptor* pCharacters = characters)
+        fixed (GlyphDescriptor* pCharacters = characters)
         {
-            outputFile.Write(new ReadOnlySpan<byte>(pCharacters, sizeof(CharacterDescriptor) * characters.Length));
+            outputFile.Write(new ReadOnlySpan<byte>(pCharacters, sizeof(GlyphDescriptor) * characters.Length));
         }
 
         fixed (KerningDescriptor* pKernings = kernings)
