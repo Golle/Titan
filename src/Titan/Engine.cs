@@ -14,6 +14,7 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.Images;
 using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Atlas;
+using Titan.Graphics.Loaders.Fonts;
 using Titan.Graphics.Loaders.Materials;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Loaders.Shaders;
@@ -130,7 +131,8 @@ namespace Titan
         
         private unsafe void Run()
         {
-            var atlasManager = new AtlasManager(100);
+            using var fontManager = new FontManager();
+            using var atlasManager = new AtlasManager(100);
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
                 .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
@@ -138,6 +140,7 @@ namespace Titan
                 .Register(AssetTypes.PixelShader, new PixelShaderLoader())
                 .Register(AssetTypes.Material, new MaterialsLoader())
                 .Register(AssetTypes.Atlas, new AtlasLoader(atlasManager))
+                .Register(AssetTypes.Font, new FontLoader(fontManager))
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var renderQueue = new SimpleRenderQueue(1000);

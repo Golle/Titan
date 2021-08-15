@@ -9,6 +9,7 @@ namespace Titan.Assets
         Model, 
         Material,
         Atlas,
+        Font,
         Count
     }
 }

@@ -34,7 +34,7 @@ namespace Titan.Graphics.Loaders.Models
             var size = model->Mesh.Submeshes.Size;
             fixed (Submesh* pSubmeshes = args.Submeshes)
             {
-                System.Buffer.MemoryCopy(pSubmeshes, model->Mesh.Submeshes.AsPointer(), size, size);
+                Buffer.MemoryCopy(pSubmeshes, model->Mesh.Submeshes.AsPointer(), size, size);
             }
             model->Mesh.IndexBuffer = args.IndexBuffer;
             model->Mesh.VertexBuffer = args.VertexBuffer;

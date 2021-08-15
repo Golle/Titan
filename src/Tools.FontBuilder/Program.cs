@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
+using Titan.Graphics.Loaders.Fonts;
 using Tools.FontBuilder.BitmapFonts;
 
 Logger.Start();
@@ -41,14 +42,14 @@ foreach (var fontFile in Directory.EnumerateFiles(resourcePath, "*.fnt"))
     Logger.Info($"Characters: {bitmapFont.Chars.Length}");
     Logger.Info($"Kernings: {bitmapFont.Kernings.Length}");
     Logger.Info($"Bitmap size: {bitmapFont.Bitmap.Length}");
-    var kernings = bitmapFont.Kernings.Select(k => new Kerning
+    var kernings = bitmapFont.Kernings.Select(k => new KerningDescriptor
     {
         Amount = (short)k.Amount,
         First = k.First,
         Second = k.Second
     }).ToArray();
 
-    var characters = bitmapFont.Chars.Select(c => new Character
+    var characters = bitmapFont.Chars.Select(c => new CharacterDescriptor
     {
         X = (short)c.X,
         Y = (short)c.Y,
@@ -66,23 +67,23 @@ foreach (var fontFile in Directory.EnumerateFiles(resourcePath, "*.fnt"))
 
     unsafe
     {
-        var font = new Font
+        var font = new FontDescriptor
         {
             Base = (ushort)bitmapFont.Common.Base,
             LineHeight = (ushort)bitmapFont.Common.LineHeight,
             CharactersCount = (ushort)bitmapFont.Chars.Length,
             KerningsCount = (ushort)bitmapFont.Kernings.Length
         };
-        outputFile.Write(new ReadOnlySpan<byte>(&font, sizeof(Font)));
+        outputFile.Write(new ReadOnlySpan<byte>(&font, sizeof(FontDescriptor)));
         
-        fixed (Character* pCharacters = characters)
+        fixed (CharacterDescriptor* pCharacters = characters)
         {
-            outputFile.Write(new ReadOnlySpan<byte>(pCharacters, sizeof(Character) * characters.Length));
+            outputFile.Write(new ReadOnlySpan<byte>(pCharacters, sizeof(CharacterDescriptor) * characters.Length));
         }
 
-        fixed (Kerning* pKernings = kernings)
+        fixed (KerningDescriptor* pKernings = kernings)
         {
-            outputFile.Write(new ReadOnlySpan<byte>(pKernings, sizeof(Kerning) * kernings.Length));
+            outputFile.Write(new ReadOnlySpan<byte>(pKernings, sizeof(KerningDescriptor) * kernings.Length));
         }
     }
     Logger.Info($"Export completed in {timer.Elapsed.TotalMilliseconds} ms");
@@ -91,34 +92,3 @@ foreach (var fontFile in Directory.EnumerateFiles(resourcePath, "*.fnt"))
 Logger.Shutdown();
 return 0;
 
-
-
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
-public struct Font
-{
-    public ushort LineHeight;
-    public ushort Base;
-    public ushort CharactersCount;
-    public ushort KerningsCount;
-}
-
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
-public struct Character
-{
-    public char Id;
-    public short X;
-    public short Y;
-    public short Width;
-    public short Height;
-    public short XOffset;
-    public short YOffset;
-    public short XAdvance;
-}
-
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
-public struct Kerning
-{
-    public char First;
-    public char Second;
-    public short Amount;
-}
