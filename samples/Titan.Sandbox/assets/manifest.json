@@ -158,6 +158,25 @@
             ],
             "Static": true,
             "Preload": true
-        }
+        },
+        {
+            "Id": "fonts/seqoe_ui_light",
+            "Type": "font",
+            "Files": [
+                "fonts/seqoe_ui_light.fnt"
+            ],
+            "Dependencies": [
+                {
+                    "Id": "textures/seqoe_ui_light"
+                }
+            ]
+        },
+        {
+            "Id": "textures/seqoe_ui_light",
+            "Type": "texture",
+            "Files": [
+                "textures/seqoe_ui_light.png"
+            ]
+        },
     ]
 }
