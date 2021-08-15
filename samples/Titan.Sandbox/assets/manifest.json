@@ -169,7 +169,9 @@
                 {
                     "Id": "textures/seqoe_ui_light"
                 }
-            ]
+            ],
+            "Static": true,
+            "Preload": true
         },
         {
             "Id": "textures/seqoe_ui_light",
@@ -177,6 +179,6 @@
             "Files": [
                 "textures/seqoe_ui_light.png"
             ]
-        },
+        }
     ]
 }
