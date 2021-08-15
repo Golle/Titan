@@ -71,7 +71,11 @@ namespace Titan.Sandbox
                 Size = (100, 100),
                 ZIndex = 1,
                 Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 },
-                Font = "fonts/seqoe_ui_light"
+                Text= new UIText
+                {
+                    Font = "fonts/seqoe_ui_light",
+                    Text = "this is my text"
+                }
             });
 
             container.AddButton(new UIButton

@@ -16,13 +16,22 @@ namespace Titan.UI
         public Margins Margins { get; set; }
     }
 
+    public class UIText : UIComponent
+    {
+        public string Text { get; set; }
+        public string Font { get; set; }
 
+        internal override void OnCreate(in Entity entity)
+        {
+            base.OnCreate(in entity);
+            entity.AddComponent(new AssetComponent<FontComponent>(Font));
+        }
+    }
     public class UIButton : UIComponent
     {
         public Sprite Sprite { get; set; }
         public Sprite OnHover { get; set; }
-        public string Text { get; set; }
-        public string Font { get; set; }
+        public UIText Text { get; set; }
         internal override unsafe void OnCreate(in Entity entity)
         {
             base.OnCreate(entity);
@@ -33,12 +42,9 @@ namespace Titan.UI
                     TextureIndex = (byte)Sprite.Index,
                     Margins = Sprite.Margins
                 }));
-                if (Font != null)
-                {
-                    entity.AddComponent(new AssetComponent<FontComponent>(Font)); // should be a child entity
-                }
                 entity.AddComponent(new InteractableComponent());
             }
+            Text?.OnCreate(entity.CreateChildEntity());
         }
     }
 
