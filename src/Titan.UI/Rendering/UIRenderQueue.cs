@@ -81,7 +81,7 @@ namespace Titan.UI.Rendering
             var renderable = _renderableQueue.GetPointer(index);
             fixed (Vector2* pCoordinates = coordinates)
             {
-                System.Buffer.MemoryCopy(pCoordinates, &renderable->Coordinates, 128, 128);
+                Buffer.MemoryCopy(pCoordinates, &renderable->Coordinates, 128, 128);
             }
             renderable->Position = position;
             renderable->Texture = texture;
@@ -98,7 +98,7 @@ namespace Titan.UI.Rendering
             var renderable = _renderableQueue.GetPointer(index);
             fixed (Vector2* pCoordinates = coordinates)
             {
-                System.Buffer.MemoryCopy(pCoordinates, &renderable->Coordinates, 128, 4 * sizeof(Vector2));
+                Buffer.MemoryCopy(pCoordinates, &renderable->Coordinates, 128, 4 * sizeof(Vector2));
             }
             renderable->Position = position;
             renderable->Texture = texture;
