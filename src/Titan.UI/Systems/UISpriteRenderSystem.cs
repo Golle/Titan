@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using Titan.ECS.Entities;
 using Titan.ECS.Systems;
 using Titan.Graphics;
 using Titan.Graphics.Loaders.Atlas;
@@ -7,16 +7,16 @@ using Titan.UI.Rendering;
 
 namespace Titan.UI.Systems
 {
-    public class UIRenderSystem : EntitySystem
+    public class UISpriteRenderSystem : EntitySystem
     {
         private readonly UIRenderQueue _renderQueue;
         private readonly AtlasManager _atlasManager;
-        private EntityFilter _filter;
+        private EntityFilter _spriteFilter;
         private ReadOnlyStorage<RectTransform> _transform;
         private ReadOnlyStorage<SpriteComponent> _sprite;
         private ReadOnlyStorage<InteractableComponent> _interactable;
 
-        public UIRenderSystem(UIRenderQueue renderQueue, AtlasManager atlasManager)
+        public UISpriteRenderSystem(UIRenderQueue renderQueue, AtlasManager atlasManager)
         {
             _renderQueue = renderQueue;
             _atlasManager = atlasManager;
@@ -24,22 +24,16 @@ namespace Titan.UI.Systems
 
         protected override void Init()
         {
-            _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<SpriteComponent>());
+            _spriteFilter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<SpriteComponent>());
 
             _transform = GetReadOnly<RectTransform>();
             _sprite = GetReadOnly<SpriteComponent>();
             _interactable = GetReadOnly<InteractableComponent>();
         }
 
-
-        protected override void OnPreUpdate()
-        {
-            _renderQueue.Begin();
-        }
-
         protected override void OnUpdate(in Timestep timestep)
         {
-            foreach (ref readonly var entity in _filter.GetEntities()) // TODO: this should be sorted by parent count
+            foreach (ref readonly var entity in _spriteFilter.GetEntities()) // TODO: this should be sorted by parent count
             {
                 ref readonly var transform = ref _transform.Get(entity);
                 ref readonly var sprite = ref _sprite.Get(entity);
@@ -47,23 +41,7 @@ namespace Titan.UI.Systems
                 var coordinates = atlas.Get(sprite.TextureIndex);
                 var type = atlas.Type(sprite.TextureIndex);
 
-                var color = Color.White;
-                if (_interactable.Contains(entity))
-                {
-                    var state = _interactable.Get(entity).MouseState;
-                    if ((state & MouseState.Down) > 0)
-                    {
-                        color = Color.Red;
-                    }
-                    else if ((state & MouseState.Up) > 0)
-                    {
-                        color = Color.Black;
-                    }
-                    else if ((state & MouseState.Hover) > 0)
-                    {
-                        color = Color.Blue;
-                    }
-                }
+                var color = GetColor(entity);
 
                 switch (type)
                 {
@@ -77,9 +55,28 @@ namespace Titan.UI.Systems
             }
         }
 
-        protected override void OnPostUpdate()
+        private Color GetColor(Entity entity)
         {
-            _renderQueue.End();
+            // Temporary, just to test out hover effect
+            var color = Color.White;
+            if (_interactable.Contains(entity))
+            {
+                var state = _interactable.Get(entity).MouseState;
+                if ((state & MouseState.Down) > 0)
+                {
+                    color = Color.Red;
+                }
+                else if ((state & MouseState.Up) > 0)
+                {
+                    color = Color.Black;
+                }
+                else if ((state & MouseState.Hover) > 0)
+                {
+                    color = Color.Blue;
+                }
+            }
+
+            return color;
         }
     }
 }

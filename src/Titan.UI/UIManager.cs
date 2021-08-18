@@ -24,7 +24,10 @@ namespace Titan.UI
         internal override void OnCreate(in Entity entity)
         {
             base.OnCreate(in entity);
-            entity.AddComponent(new AssetComponent<FontComponent>(Font));
+            entity.AddComponent(new AssetComponent<TextComponent>(Font, new TextComponent
+            {
+                Text = 12 // Create the handle for the text 
+            }));
         }
     }
     public class UIButton : UIComponent
@@ -57,23 +60,24 @@ namespace Titan.UI
         {
             _children.Add(button);
         }
+        public void Add(UIComponent component)
+        {
+            _children.Add(component);
+        }
     }
 
     public abstract class UIComponent
     {
-
         private Entity _entity;
         public ref readonly Entity Entity => ref _entity;
-
         public Size Size { get; set; }
         public Vector2 Offset { get; set; }
         public int ZIndex { get; set; }
         public bool IsDirty { get; set; }
-
         internal virtual void OnCreate(in Entity entity)
         {
             _entity = entity;
-            _entity.AddComponent(new RectTransform
+            entity.AddComponent(new RectTransform
             {
                 Size = Size,
                 Offset = Offset,
@@ -81,8 +85,7 @@ namespace Titan.UI
             });
         }
     }
-
-
+    
     public class UIManager
     {
         private readonly World _world;
@@ -106,7 +109,6 @@ namespace Titan.UI
         private void RecursiveCreate(in Entity parent, UIComponent component)
         {
             component.OnCreate(parent.CreateChildEntity());
-
             if (component is UIContainer container)
             {
                 foreach (var child in container.Children)

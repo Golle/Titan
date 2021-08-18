@@ -5,29 +5,29 @@ using Titan.UI.Components;
 
 namespace Titan.UI.Systems
 {
-    public class FontLoaderSystem : EntitySystem
+    public class TextLoaderSystem : EntitySystem
     {
         private readonly AssetsManager _assetsManager;
         private EntityFilter _filter;
-        private MutableStorage<AssetComponent<FontComponent>> _fonts;
+        private MutableStorage<AssetComponent<TextComponent>> _text;
 
-        public FontLoaderSystem(AssetsManager assetsManager)
+        public TextLoaderSystem(AssetsManager assetsManager)
         {
             _assetsManager = assetsManager;
         }
 
         protected override void Init()
         {
-            _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<FontComponent>>().Not<FontComponent>());
+            _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<TextComponent>>().Not<TextComponent>());
             
-            _fonts = GetMutable<AssetComponent<FontComponent>>();
+            _text = GetMutable<AssetComponent<TextComponent>>();
         }
 
         protected override void OnUpdate(in Timestep timestep)
         {
             foreach (ref readonly var entity in _filter.GetEntities())
             {
-                ref var font = ref _fonts.Get(entity);
+                ref var font = ref _text.Get(entity);
 
                 if (!font.AssetHandle.IsValid())
                 {
@@ -37,7 +37,7 @@ namespace Titan.UI.Systems
                 if (_assetsManager.IsLoaded(font.AssetHandle))
                 {
                     var component = font.DefaultValue;
-                    component.Font= _assetsManager.GetAssetHandle<Font>(font.AssetHandle);
+                    component.Font = _assetsManager.GetAssetHandle<Font>(font.AssetHandle);
                     entity.AddComponent(component);
                 }
             }

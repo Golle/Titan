@@ -174,8 +174,7 @@ namespace Titan
                 .WithSystem(new CameraSystem(graphicsSystem))
                 .WithSystem(new ModelLoaderSystem(assetsManager))
 
-                
-                .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager)
+                .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager, fontManager)
                 ;
             _app.ConfigureWorld(worldBuilder);
 
@@ -197,12 +196,16 @@ namespace Titan
                 EngineStats.SetStats(nameof(InputManager), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
 
+                uiRenderQueue.Begin();
                 starterWorld.Update();
+                uiRenderQueue.End();
+
                 EngineStats.SetStats(nameof(World), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
                 assetsManager.Update();
                 EngineStats.SetStats(nameof(AssetsManager), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
+
                 graphicsSystem.Render();
                 EngineStats.SetStats(nameof(GraphicsSystem), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();

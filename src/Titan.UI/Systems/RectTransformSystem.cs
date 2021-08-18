@@ -22,8 +22,6 @@ namespace Titan.UI.Systems
             {
                 ref var transform = ref _transform.Get(entity);
 
-
-
                 if (InputManager.LeftMouseButtonDown)
                 {
                     transform.Size.Width += 1;
@@ -43,6 +41,12 @@ namespace Titan.UI.Systems
                     // Increase z-index with 0.5 per parent so it gets rendered in the correct order
                     transform.Position = parentTransform.Position + transform.Offset;
                     transform.AbsoluteZIndex = transform.ZIndex + parentTransform.AbsoluteZIndex + 1;
+
+                    //TODO: not sure how we should do this. use constraints maybe?
+                    if (transform.Size.Height == 0 && transform.Size.Width == 0)
+                    {
+                        transform.Size = parentTransform.Size;
+                    }
                 }
                 else
                 {

@@ -25,6 +25,7 @@ namespace Titan.ECS.Components
             var componentsSize = sizeof(T) * numberOfComponents;
             var entitiesSize = sizeof(T*) * maxEntities;
             var totalSize = (uint)(componentsSize + entitiesSize);
+
             _memoryBlock = MemoryUtils.AllocateBlock(totalSize, true);
             _components = (T*) _memoryBlock.AsPointer();
             _indexers = (T**)(_components + numberOfComponents);

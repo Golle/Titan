@@ -3,6 +3,7 @@ using Titan.Assets;
 using Titan.ECS;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Atlas;
+using Titan.Graphics.Loaders.Fonts;
 using Titan.Input;
 using Titan.UI.Components;
 using Titan.UI.Rendering;
@@ -13,18 +14,19 @@ namespace Titan.UI
     public record UIConfiguration(uint MaxSprites = 100, uint MaxComponents = 1000);
     public static class UIInitializer
     {
-        public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager) =>
+        public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager, FontManager fontManager) =>
             builder
                 .WithComponent<AssetComponent<SpriteComponent>>(count: config.MaxSprites)
-                .WithComponent<AssetComponent<FontComponent>>(count: config.MaxSprites)
+                .WithComponent<AssetComponent<TextComponent>>(count: config.MaxSprites)
                 .WithComponent<SpriteComponent>(count: config.MaxComponents)
                 .WithComponent<RectTransform>(count: config.MaxComponents)
                 .WithComponent<InteractableComponent>(count: config.MaxComponents)
-                .WithComponent<FontComponent>(count: config.MaxComponents)
+                .WithComponent<TextComponent>(count: config.MaxComponents)
 
                 .WithSystem(new SpriteLoaderSystem(assetsManager))
-                .WithSystem(new FontLoaderSystem(assetsManager))
-                .WithSystem(new UIRenderSystem(renderQueue, atlasManager))
+                .WithSystem(new TextLoaderSystem(assetsManager))
+                .WithSystem(new UISpriteRenderSystem(renderQueue, atlasManager))
+                .WithSystem(new UITextRenderSystem(renderQueue, fontManager))
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())
                 .WithSystem(new TestDragAndDropSystem())
