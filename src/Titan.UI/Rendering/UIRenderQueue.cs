@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Titan.Core;
 using Titan.Core.Memory;
 using Titan.Graphics;
@@ -23,7 +24,7 @@ namespace Titan.UI.Rendering
         private readonly MemoryChunk<UIVertex> _vertices;
         private readonly UIElement[] _elements;
         private readonly SortableRenderable[] _sortable;
-        private int _count;
+        private volatile int _count;
 
         private int _elementCount;
 
@@ -75,9 +76,12 @@ namespace Titan.UI.Rendering
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int NextIndex() => Interlocked.Increment(ref _count) - 1;
+
         public void AddNineSlice(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture, ReadOnlySpan<Vector2> coordinates, in Color color, in Margins margins)
         {
-            var index = _count++;
+            var index = NextIndex();
             var renderable = _renderableQueue.GetPointer(index);
             fixed (Vector2* pCoordinates = coordinates)
             {
@@ -94,7 +98,7 @@ namespace Titan.UI.Rendering
 
         public void Add(in Vector2 position, int zIndex, in Size size, in Handle<Texture> texture, ReadOnlySpan<Vector2> coordinates, in Color color)
         {
-            var index = _count++;
+            var index = NextIndex();
             var renderable = _renderableQueue.GetPointer(index);
             fixed (Vector2* pCoordinates = coordinates)
             {
