@@ -1,4 +1,8 @@
 <Project>
+    <PropertyGroup>
+    <!-- Remove this when Resharper supports it -->
+        <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports> 
+    </PropertyGroup>
 <!-- STATS is used for timers and stats about the engine -->
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <DefineConstants>STATS</DefineConstants>
