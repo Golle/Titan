@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Graphics.Loaders.Fonts
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct Glyph
     {
         public Vector2 TopLeft;

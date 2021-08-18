@@ -1,15 +1,15 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Titan.UI.Common
 {
-    
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct Size
     {
         public int Width { get; set; }
         public int Height { get; set; }
-
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Size (in (int width, int height) val) => new (val.width, val.height);
         public Size(int width, int height)

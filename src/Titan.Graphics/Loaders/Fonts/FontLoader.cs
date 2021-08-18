@@ -1,7 +1,6 @@
 using System;
 using Titan.Assets;
 using Titan.Assets.Database;
-using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
 
