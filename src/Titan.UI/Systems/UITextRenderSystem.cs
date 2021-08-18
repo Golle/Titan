@@ -52,7 +52,6 @@ namespace Titan.UI.Systems
                     var position = new Vector2(transform.Position.X + i++ * transform.Size.Width, transform.Position.Y);
                     _renderQueue.Add(position, transform.AbsoluteZIndex, transform.Size, font.Texture, coordinates1, color);
                 }
-
             }
         }
     }

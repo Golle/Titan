@@ -181,13 +181,15 @@ namespace Titan
             Logger.Info<Engine>("Initialize starter world");
             using var starterWorld = new World(worldBuilder.Build());
             _app.OnStart(starterWorld);
-
+            
             var timer = Stopwatch.StartNew();
             // star the main loop
             while (Window.Update())
             {
-                renderQueue.Update();
-            
+                timer.Restart();
+                renderQueue.Begin();
+                uiRenderQueue.Begin();
+
                 timer.Restart();
                 EventManager.Update();
                 EngineStats.SetStats(nameof(EventManager), timer.Elapsed.TotalMilliseconds);
@@ -195,12 +197,14 @@ namespace Titan
                 InputManager.Update();
                 EngineStats.SetStats(nameof(InputManager), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
-
-                uiRenderQueue.Begin();
+                
                 starterWorld.Update();
-                uiRenderQueue.End();
-
                 EngineStats.SetStats(nameof(World), timer.Elapsed.TotalMilliseconds);
+                
+                timer.Restart();
+                uiRenderQueue.End();
+                renderQueue.End();
+                EngineStats.SetStats("RenderQueues.End()", timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
                 assetsManager.Update();
                 EngineStats.SetStats(nameof(AssetsManager), timer.Elapsed.TotalMilliseconds);

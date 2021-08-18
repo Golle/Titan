@@ -33,8 +33,6 @@ namespace Titan.UI
             ;
     }
 
-
-
     public class TestDragAndDropSystem : EntitySystem
     {
         private EntityFilter _filter;

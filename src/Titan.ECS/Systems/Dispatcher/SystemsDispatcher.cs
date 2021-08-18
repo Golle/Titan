@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Titan.Core;
 using Titan.Core.Threading;
 using Titan.ECS.Worlds;
@@ -24,14 +25,18 @@ namespace Titan.ECS.Systems.Dispatcher
         public void Execute()
         {
             _progress.Reset();
-
             Array.Fill(_status, NodeStatus.Waiting);
+
+            //fixed (NodeStatus* s = _status)
+            //{
+            //    Unsafe.InitBlock(s, 0, (uint)(sizeof(NodeStatus) * _status.Length));
+            //}
+            
             
             // Put it in a local variable to avoid bounds checking
             var status = _status; 
             var nodes = _nodes;
             var handles = _handles;
-
             while (!_progress.IsComplete())
             {
                 for (var i = 0; i < nodes.Length; ++i)
@@ -54,10 +59,9 @@ namespace Titan.ECS.Systems.Dispatcher
                     if (isReady)
                     {
                         status[i] = NodeStatus.Running;
-                        handles[i] = WorkerPool.Enqueue(new JobDescription(node.ExecuteFunc, autoReset: false), _progress);
+                        handles[i] = WorkerPool.Enqueue(new JobDescription(node.Update, autoReset: false), _progress);
                     }
                 }
-                //Thread.Yield(); // TODO: should this be used?
                 ResetHandles();
             }
             // Make sure all handles have been reset

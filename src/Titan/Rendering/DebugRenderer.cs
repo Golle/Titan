@@ -1,3 +1,4 @@
+using System.Linq;
 using Titan.Core;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -19,10 +20,11 @@ namespace Titan.Rendering
         {
             _surface = new ComPtr<IDXGISurface1>(surface);
 
-            const string fontName = "Segoe UI Light";
+            //const string fontName = "Segoe UI Light";
+            const string fontName = "Courier";
             fixed (char* pFont = fontName)
             {
-                _font = GDI32.CreateFontW(20, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, pFont);
+                _font = GDI32.CreateFontW(16, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, pFont);
             }
 
             _brush = GDI32.CreateSolidBrush(new COLORREF(50, 50, 50));
@@ -51,17 +53,14 @@ namespace Titan.Rendering
             {
                 Top = 0,
                 Left = 0,
-                Right = 400,
-                Bottom = 450
+                Right = 800,
+                Bottom = 500
             };
             GDI32.FillRect(hdc, &rect, _brush);
-
 
             var obj = GDI32.SelectObject(hdc, _font);
 
             //const string str = "Sample Data collection: {0}";
-
-            
             const string template = "{0}: {1:N6}ms";
             var i = 1;
             foreach (var (name, value) in EngineStats.GetStats())
@@ -73,7 +72,28 @@ namespace Titan.Rendering
                     i++;
                 }
             }
-            
+
+            const string systems = "Systems";
+            fixed (char* pStr = systems)
+            {
+                GDI32.TextOutW(hdc, 10, i * 25, pStr, systems.Length);
+                i++;
+            }
+
+            const string systemsTemplate = "{0} Pre: {1:N4}ms   Update: {2:N4}ms   Post: {3:N4}ms";
+            foreach (var stats in EngineStats.GetSystemStats().OrderBy(e => e.Key))
+            {
+                var s = stats.Value;
+                var str = string.Format(systemsTemplate, stats.Key.PadRight(25), s.PreUpdate, s.Update, s.PostUpdate);
+                fixed (char* pStr = str)
+                {
+                    GDI32.TextOutW(hdc, 10, i * 25, pStr, str.Length);
+                    i++;
+                }
+            }
+
+
+
             //Span<byte> strBytes = stackalloc byte[256];
             //var r = new Random(123123);
             //for (var i = 0; i < 10; ++i)
@@ -85,7 +105,7 @@ namespace Titan.Rendering
             //        GDI32.TextOutA(hdc, 10, 10 + i*20, pStr, length);
             //    }
             //}
-            
+
             GDI32.SelectObject(hdc, obj);
             _surface.Get()->ReleaseDC(null);
         }

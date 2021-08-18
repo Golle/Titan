@@ -37,18 +37,21 @@ namespace Titan.ECS.Systems
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void OnPostUpdate() { }
 
+        
 #if STATS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Update()
         {
             var s = Stopwatch.StartNew();
             OnPreUpdate();
-            OnUpdate(new Timestep(1f));
+            EngineStats.SetSystemStats(_name, SystemStats.PreUpdate, s.Elapsed.TotalMilliseconds);
+            s.Restart();
+            OnUpdate(new Timestep(1/144f)); // TODO: add support for timestep
+            EngineStats.SetSystemStats(_name, SystemStats.Update, s.Elapsed.TotalMilliseconds);
+            s.Restart();
             OnPostUpdate();
-            s.Stop();
-            EngineStats.SetStats(_name, s.Elapsed.TotalMilliseconds);
+            EngineStats.SetSystemStats(_name, SystemStats.PostUpdate, s.Elapsed.TotalMilliseconds);
         }
-
 #else
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Update()
@@ -98,10 +101,6 @@ namespace Titan.ECS.Systems
         }
     }
     
-
-
-        
-
 
     public readonly struct Timestep
     {
