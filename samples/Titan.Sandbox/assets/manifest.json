@@ -177,6 +177,25 @@
             "Files": [
                 "textures/seqoe_ui_light.png"
             ]
+        },
+        {
+            "Id": "textures/redsheet",
+            "Type": "texture",
+            "Files": [
+                "textures/redsheet.png"
+            ]
+        },
+        {
+            "Id": "atlas/redsheet",
+            "Type": "atlas",
+            "Files": [
+                "textures/redsheet.atlas"
+            ],
+            "Dependencies": [
+                {
+                    "Id": "textures/redsheet"
+                }
+            ]
         }
     ]
 }

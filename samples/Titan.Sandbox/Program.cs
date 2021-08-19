@@ -11,11 +11,11 @@ using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
 using Titan.Sandbox;
 using Titan.UI;
+using Titan.UI.Common;
 
 Console.WriteLine($"Hello World!");
 
 Engine.StartNew<SandboxApplication>();
-
 
 namespace Titan.Sandbox
 {
@@ -48,15 +48,49 @@ namespace Titan.Sandbox
             var camera = world.CreateEntity();
             camera.AddComponent(new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
             camera.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
-            
+
+
             _uiManager = new UIManager(world);
 
-            var container = new UIContainer
+            var container = new UIPanel()
             {
                 Offset = new Vector2(100, 100),
                 Size = (400, 400),
-                ZIndex = 0
+                ZIndex = 0,
+                Background = new Sprite
+                {
+                    Identifier = "atlas/redsheet", 
+                    Index = 25, 
+                    Margins = (12, 22, 12, 12)
+                }
             };
+
+            container.AddButton(new UIButton
+            {
+                Size = (38, 36),
+                ZIndex = 1,
+                Offset = new Vector2(372,372),
+                Sprite = new Sprite
+                {
+                    Identifier = "atlas/redsheet", 
+                    Index = 1
+                }
+            });
+
+            container.Add(new UIButton
+            {
+                Offset = new (115, 30),
+                Size = (190, 45),
+                ZIndex = 1,
+                Sprite = new Sprite
+                {
+                    Identifier = "atlas/redsheet", 
+                    Index = 3
+                }
+            });
+
+
+
             //container.AddButton(new UIButton
             //{
             //    Offset = Vector2.Zero,
@@ -65,26 +99,41 @@ namespace Titan.Sandbox
             //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
             //});
 
-            container.AddButton(new UIButton
-            {
-                Offset = new Vector2(400, 300),
-                Size = (100, 100),
-                ZIndex = 1,
-                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 },
-                Text= new UIText
-                {
-                    Font = "fonts/seqoe_ui_light",
-                    Text = "this is my text"
-                }
-            });
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = Vector2.One*200,
+            //    Size = (190, 45),
+            //    Sprite = new Sprite{ Identifier = "atlas/redsheet", Index = 4},
+            //    ZIndex = 100
+            //});
 
-            container.AddButton(new UIButton
-            {
-                Offset = new Vector2(600, 300),
-                Size = (150, 150),
-                ZIndex = 1,
-                Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Margins = 20 }
-            });
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = new Vector2(400, 300),
+            //    Size = (100, 100),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 },
+            //    Text= new UIText
+            //    {
+            //        Font = "fonts/seqoe_ui_light",
+            //        Text = "this is my text"
+            //    }
+            //});
+
+            //container.AddButton(new UIButton
+            //{
+            //    Offset = new Vector2(600, 300),
+            //    Size = (150, 150),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Margins = 20 }
+            //});
+
+            //container.Add(new UIText
+            //{
+            //    Size = new Size(30, 30),
+            //    Offset = new Vector2(100, 00),
+            //    Font = "fonts/seqoe_ui_light",
+            //});
             //container.AddButton(new UIButton
             //{
             //    Offset = new Vector2(400, 200),

@@ -16,6 +16,23 @@ namespace Titan.UI
         public Margins Margins { get; set; }
     }
 
+
+    public class UIPanel : UIContainer
+    {
+        public Sprite Background { get; set; }
+        internal override void OnCreate(in Entity entity)
+        {
+            base.OnCreate(in entity);
+            if (Background != null)
+            {
+                entity.AddComponent(new AssetComponent<SpriteComponent>(Background.Identifier, new SpriteComponent
+                {
+                    TextureIndex = (byte)Background.Index,
+                    Margins = Background.Margins
+                }));
+            }
+        }
+    }
     public class UIText : UIComponent
     {
         public string Text { get; set; }

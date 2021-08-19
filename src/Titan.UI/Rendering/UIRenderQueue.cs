@@ -184,7 +184,7 @@ namespace Titan.UI.Rendering
             var positions = stackalloc Vector2[4];
             positions[0] = position;
             positions[1] = new Vector2(positions->X + margins.Left, positions->Y + margins.Bottom);
-            positions[2] = new Vector2(positions->X + size.Width - margins.Right, positions->Y + size.Height - margins.Right);
+            positions[2] = new Vector2(positions->X + size.Width - margins.Right, positions->Y + size.Height - margins.Top);
             positions[3] = new Vector2(positions->X + size.Width, positions->Y + size.Height);
 
             // TODO: compare this with updating and uploading Indices. This creates 36 vertices, but only 16 are required. But if we use 16 we need to update the indices on each loop.

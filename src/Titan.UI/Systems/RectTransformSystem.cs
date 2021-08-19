@@ -22,17 +22,17 @@ namespace Titan.UI.Systems
             {
                 ref var transform = ref _transform.Get(entity);
 
-                if (InputManager.LeftMouseButtonDown)
-                {
-                    transform.Size.Width += 1;
-                    transform.Size.Height += 1;
-                }
+                //if (InputManager.LeftMouseButtonDown)
+                //{
+                //    transform.Size.Width += 1;
+                //    transform.Size.Height += 1;
+                //}
 
-                if (InputManager.RightMouseButtonDown)
-                {
-                    transform.Size.Height -= 1;
-                    transform.Size.Width -= 1;
-                }
+                //if (InputManager.RightMouseButtonDown)
+                //{
+                //    transform.Size.Height -= 1;
+                //    transform.Size.Width -= 1;
+                //}
                 
 
                 if (EntityManager.TryGetParent(entity, out var parent) && _transform.Contains(parent))
