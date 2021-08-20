@@ -1,11 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Titan.Core
 {
-
     public enum SystemStats
     {
         PreUpdate,
@@ -21,10 +18,10 @@ namespace Titan.Core
     }
     public static class EngineStats
     {
+        private static readonly ConcurrentDictionary<string, double> _values = new ();
+        private static readonly ConcurrentDictionary<string, SystemStat> _systemStats = new();
 
-        private static ConcurrentDictionary<string, double> _values = new ();
-        private static ConcurrentDictionary<string, SystemStat> _systemStats = new();
-
+        public static int TotalLines => _values.Count + _systemStats.Count;
         public static void SetStats(string name, double value)
         {
             _values[name] = value;

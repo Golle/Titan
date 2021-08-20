@@ -216,13 +216,6 @@ namespace Titan.Rendering
                 Renderer = new DebugRenderer(surface)
             };
             
-            var debugBlendState = GraphicsDevice.BlendStateManager.Create(new BlendStateCreation
-            {
-               SourceBlend = D3D11_BLEND.D3D11_BLEND_SRC_COLOR,
-               DestinationBlend = D3D11_BLEND.D3D11_BLEND_DEST_COLOR,
-               BlendOperation = D3D11_BLEND_OP.D3D11_BLEND_OP_MAX,
-            });
-
             var debugOverlay = new Pipeline
             {
                 ClearRenderTargets =  false,
@@ -232,7 +225,6 @@ namespace Titan.Rendering
                 VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
                 PixelShaderResources = new[] { debugTextureHandle },
                 PixelShaderSamplers = new[] { fullscreenSampler },
-                BlendState = debugBlendState
             };
             /***** DEBUG Stuff *****/
 
