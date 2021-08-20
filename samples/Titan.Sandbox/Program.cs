@@ -52,11 +52,12 @@ namespace Titan.Sandbox
 
             _uiManager = new UIManager(world);
 
-            var container = new UIPanel()
+            var container = new UIPanel
             {
-                Offset = new Vector2(100, 100),
+                Offset = new Vector2(100, 250),
                 Size = (400, 400),
                 ZIndex = 0,
+                Pivot = new (0,0),
                 Background = new Sprite
                 {
                     Identifier = "atlas/redsheet", 
@@ -65,29 +66,56 @@ namespace Titan.Sandbox
                 }
             };
 
-            container.AddButton(new UIButton
-            {
-                Size = (38, 36),
-                ZIndex = 1,
-                Offset = new Vector2(372,372),
-                Sprite = new Sprite
-                {
-                    Identifier = "atlas/redsheet", 
-                    Index = 1
-                }
-            });
+            var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
+            var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
 
-            container.Add(new UIButton
+            foreach (var vertical in a)
             {
-                Offset = new (115, 30),
-                Size = (190, 45),
-                ZIndex = 1,
-                Sprite = new Sprite
+                foreach (var horizontal in b)
                 {
-                    Identifier = "atlas/redsheet", 
-                    Index = 3
+                    container.AddButton(new UIButton
+                    {
+                        Size = (38, 36),
+                        ZIndex = 1,
+                        Offset = Vector2.Zero,
+                        AnchorPoint = vertical | horizontal,
+                        Pivot = new(0.5f, 0.5f),
+                        Sprite = new Sprite
+                        {
+                            Identifier = "atlas/redsheet",
+                            Index = 1
+                        }
+                    });
                 }
-            });
+            }
+
+
+            //container.AddButton(new UIButton
+            //{
+            //    Size = (38, 36),
+            //    ZIndex = 1,
+            //    Offset = Vector2.Zero,
+            //    AnchorPoint = AnchorPoint.Top | AnchorPoint.Center,
+            //    Pivot = new (0.5f,0.5f),
+            //    //Pivot = new (1,1),
+            //    Sprite = new Sprite
+            //    {
+            //        Identifier = "atlas/redsheet", 
+            //        Index = 1
+            //    }
+            //});
+
+            //container.Add(new UIButton
+            //{
+            //    Offset = new (115, 30),
+            //    Size = (190, 45),
+            //    ZIndex = 1,
+            //    Sprite = new Sprite
+            //    {
+            //        Identifier = "atlas/redsheet", 
+            //        Index = 3
+            //    }
+            //});
 
 
 
@@ -192,8 +220,10 @@ namespace Titan.Sandbox
         public override DeviceConfiguration ConfigureDevice(DeviceConfiguration config) =>
             config with
             {
+                //Debug = false,
                 Debug = true,
                 RefreshRate = 144,
+                //Vsync = false,
                 Vsync = true
             };
     }

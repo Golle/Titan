@@ -46,10 +46,10 @@ namespace Titan.UI.Systems
                 switch (type)
                 {
                     case SpriteType.Normal:
-                        _renderQueue.Add(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color);
+                        _renderQueue.Add(transform.AbsolutePosition, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color);
                         break;
                     case SpriteType.Slice:
-                        _renderQueue.AddNineSlice(transform.Position, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color, sprite.Margins);
+                        _renderQueue.AddNineSlice(transform.AbsolutePosition, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color, sprite.Margins);
                         break;
                 }
             }

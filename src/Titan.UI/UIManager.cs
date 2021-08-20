@@ -52,6 +52,9 @@ namespace Titan.UI
         public Sprite Sprite { get; set; }
         public Sprite OnHover { get; set; }
         public UIText Text { get; set; }
+        
+
+
         internal override unsafe void OnCreate(in Entity entity)
         {
             base.OnCreate(entity);
@@ -90,7 +93,8 @@ namespace Titan.UI
         public Size Size { get; set; }
         public Vector2 Offset { get; set; }
         public int ZIndex { get; set; }
-        public bool IsDirty { get; set; }
+        public AnchorPoint AnchorPoint { get; set; }
+        public Vector2 Pivot { get; set; } = new (0.5f, 0.5f); // default to center
         internal virtual void OnCreate(in Entity entity)
         {
             _entity = entity;
@@ -98,7 +102,9 @@ namespace Titan.UI
             {
                 Size = Size,
                 Offset = Offset,
-                ZIndex = ZIndex
+                ZIndex = ZIndex,
+                AnchorPoint = AnchorPoint,
+                Pivot = Pivot
             });
         }
     }

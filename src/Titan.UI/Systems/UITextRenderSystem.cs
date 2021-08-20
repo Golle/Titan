@@ -49,7 +49,7 @@ namespace Titan.UI.Systems
                     coordinates1[3] = glyph.BottomRight;
 
                     var color = Color.Magenta;
-                    var position = new Vector2(transform.Position.X + i++ * transform.Size.Width, transform.Position.Y);
+                    var position = new Vector2(transform.AbsolutePosition.X + i++ * transform.Size.Width, transform.AbsolutePosition.Y);
                     _renderQueue.Add(position, transform.AbsoluteZIndex, transform.Size, font.Texture, coordinates1, color);
                 }
             }

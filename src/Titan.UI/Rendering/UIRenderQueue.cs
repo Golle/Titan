@@ -176,7 +176,7 @@ namespace Titan.UI.Rendering
 
         private static void RenderSlice(UIVertex* vertex, QueuedRenderable* renderable)
         {
-            var size = renderable->Size;
+             var size = renderable->Size;
             var position = renderable->Position;
             var margins = renderable->Margins;
             var color = renderable->Color;

@@ -12,10 +12,21 @@ namespace Titan.UI.Common
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Size (in (int width, int height) val) => new (val.width, val.height);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Size(int width, int height)
         {
             Width = width;
             Height = height;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Size( uint width, uint height)
+        {
+            unchecked
+            {
+                Width = (int)width;
+                Height = (int)height;
+            }
         }
     }
 }
