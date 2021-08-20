@@ -66,28 +66,33 @@ namespace Titan.Sandbox
                 }
             };
 
-            var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
-            var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
 
-            foreach (var vertical in a)
+            for (var i = 0; i < 80; ++i)
             {
-                foreach (var horizontal in b)
+                var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
+                var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
+
+                foreach (var vertical in a)
                 {
-                    container.AddButton(new UIButton
+                    foreach (var horizontal in b)
                     {
-                        Size = (38, 36),
-                        ZIndex = 1,
-                        Offset = Vector2.Zero,
-                        AnchorPoint = vertical | horizontal,
-                        Pivot = new(0.5f, 0.5f),
-                        Sprite = new Sprite
+                        container.AddButton(new UIButton
                         {
-                            Identifier = "atlas/redsheet",
-                            Index = 1
-                        }
-                    });
+                            Size = (38, 36),
+                            ZIndex = 1,
+                            Offset = Vector2.One*i,
+                            AnchorPoint = vertical | horizontal,
+                            Pivot = new(0.5f, 0.5f),
+                            Sprite = new Sprite
+                            {
+                                Identifier = "atlas/redsheet",
+                                Index = 1
+                            }
+                        });
+                    }
                 }
             }
+            
 
 
             //container.AddButton(new UIButton
@@ -220,11 +225,11 @@ namespace Titan.Sandbox
         public override DeviceConfiguration ConfigureDevice(DeviceConfiguration config) =>
             config with
             {
-                //Debug = false,
-                Debug = true,
+                Debug = false,
+                //Debug = true,
                 RefreshRate = 144,
-                //Vsync = false,
-                Vsync = true
+                Vsync = false,
+                //Vsync = true
             };
     }
 }

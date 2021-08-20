@@ -37,8 +37,8 @@ namespace Titan.UI.Systems
                 ref readonly var transform = ref _transform.Get(entity);
                 ref readonly var text = ref _text.Get(entity);
                 ref readonly var font = ref _fontManager.Access(text.Font);
-
                 var i = 0;
+
                 foreach (var character in Characters)
                 {
                     ref readonly var glyph = ref font.Get(character);
@@ -52,6 +52,9 @@ namespace Titan.UI.Systems
                     var position = new Vector2(transform.AbsolutePosition.X + i++ * transform.Size.Width, transform.AbsolutePosition.Y);
                     _renderQueue.Add(position, transform.AbsoluteZIndex, transform.Size, font.Texture, coordinates1, color);
                 }
+
+
+                //_renderQueue.AddText(text.Text, text.Font, text.Overflow, transform.AbsoluteZIndex, transform.Size, transform.)
             }
         }
     }

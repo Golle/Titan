@@ -11,7 +11,7 @@ using Titan.UI.Systems;
 
 namespace Titan.UI
 {
-    public record UIConfiguration(uint MaxSprites = 100, uint MaxComponents = 1000);
+    public record UIConfiguration(uint MaxSprites = 1000, uint MaxComponents = 1000);
     public static class UIInitializer
     {
         public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager, FontManager fontManager) =>

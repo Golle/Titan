@@ -15,5 +15,6 @@ namespace Titan.UI.Components
         public Handle<Font> Font;
         public Handle<Text> Text;
         public Vector2 V;
+        public TextOverflow Overflow;
     }
 }

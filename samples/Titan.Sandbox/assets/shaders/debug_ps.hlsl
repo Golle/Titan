@@ -8,7 +8,7 @@ float4 main(float2 textureCoords: Texture) : SV_TARGET
     
     // Discard the black background
     float c = color.r + color.g + color.b;
-    if(c == 0){
+    if(c == 0) {
         discard;
     }
     return color;

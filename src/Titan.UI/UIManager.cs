@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using Titan.Assets;
+using Titan.Core.Logging;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
 using Titan.Graphics.Loaders.Atlas;
@@ -33,16 +36,26 @@ namespace Titan.UI
             }
         }
     }
+
+    public enum TextOverflow
+    {
+        Overflow,
+        Wrap,
+        WordWrap
+    }
+
     public class UIText : UIComponent
     {
         public string Text { get; set; }
         public string Font { get; set; }
+        public TextOverflow Overflow { get; set; }
 
         internal override void OnCreate(in Entity entity)
         {
             base.OnCreate(in entity);
             entity.AddComponent(new AssetComponent<TextComponent>(Font, new TextComponent
             {
+                Overflow = Overflow,
                 Text = 12 // Create the handle for the text 
             }));
         }
@@ -97,6 +110,7 @@ namespace Titan.UI
         public Vector2 Pivot { get; set; } = new (0.5f, 0.5f); // default to center
         internal virtual void OnCreate(in Entity entity)
         {
+            //Debug.Assert(Pivot.X is >= 0 and <= 1.0f && Pivot.Y is >= 0 and <= 1.0f, "Pivot must be in the range of <0.0f 0.0f> to <1.0f 1.0f>");
             _entity = entity;
             entity.AddComponent(new RectTransform
             {
@@ -104,7 +118,7 @@ namespace Titan.UI
                 Offset = Offset,
                 ZIndex = ZIndex,
                 AnchorPoint = AnchorPoint,
-                Pivot = Pivot
+                Pivot = Vector2.Clamp(Pivot, Vector2.Zero, Vector2.One)
             });
         }
     }
