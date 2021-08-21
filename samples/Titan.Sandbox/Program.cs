@@ -66,33 +66,30 @@ namespace Titan.Sandbox
                 }
             };
 
+            
+            var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
+            var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
 
-            for (var i = 0; i < 80; ++i)
+            foreach (var vertical in a)
             {
-                var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
-                var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
-
-                foreach (var vertical in a)
+                foreach (var horizontal in b)
                 {
-                    foreach (var horizontal in b)
+                    container.AddButton(new UIButton
                     {
-                        container.AddButton(new UIButton
+                        Size = (38, 36),
+                        ZIndex = 1,
+                        Offset = Vector2.Zero,
+                        AnchorPoint = vertical | horizontal,
+                        Pivot = new(0.5f, 0.5f),
+                        Sprite = new Sprite
                         {
-                            Size = (38, 36),
-                            ZIndex = 1,
-                            Offset = Vector2.One*i,
-                            AnchorPoint = vertical | horizontal,
-                            Pivot = new(0.5f, 0.5f),
-                            Sprite = new Sprite
-                            {
-                                Identifier = "atlas/redsheet",
-                                Index = 1
-                            }
-                        });
-                    }
+                            Identifier = "atlas/redsheet",
+                            Index = 1
+                        }
+                    });
                 }
             }
-            
+
 
 
             //container.AddButton(new UIButton
@@ -190,7 +187,6 @@ namespace Titan.Sandbox
             //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 3 },
 
             //});
-
             _uiManager.Add(container);
         }
 

@@ -51,10 +51,12 @@ namespace Titan.UI.Systems
                     var color = Color.Magenta;
                     var position = new Vector2(transform.AbsolutePosition.X + i++ * transform.Size.Width, transform.AbsolutePosition.Y);
                     _renderQueue.Add(position, transform.AbsoluteZIndex, transform.Size, font.Texture, coordinates1, color);
+
+                    
                 }
 
 
-                //_renderQueue.AddText(text.Text, text.Font, text.Overflow, transform.AbsoluteZIndex, transform.Size, transform.)
+                _renderQueue.AddText(transform.AbsolutePosition, transform.AbsoluteZIndex, transform.Size, Characters.AsSpan(), text.Font, text.Overflow);
             }
         }
     }

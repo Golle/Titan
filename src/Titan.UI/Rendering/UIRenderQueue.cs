@@ -10,15 +10,19 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Loaders.Atlas;
+using Titan.Graphics.Loaders.Fonts;
 using Titan.UI.Common;
 using Titan.Windows.D3D11;
 
 namespace Titan.UI.Rendering
 {
+    public record UIRenderQueueConfiguration(uint MaxSprites = 500, uint MaxNinePatchSprites = 100, uint MaxCharacters = 2_000);
+
     public unsafe class UIRenderQueue : IDisposable
     {
         private readonly SpriteBatch _spriteBatch;
         private readonly NineSliceSpriteBatch _nineSliceSprite;
+        private readonly TextBatch _textBatch;
 
         private static readonly IComparer<SortableRenderable> Comparer = new UIComparer();
         private Handle<ResourceBuffer> _vertexBuffer;
@@ -30,31 +34,18 @@ namespace Titan.UI.Rendering
 
         private int _elementCount;
 
-        public UIRenderQueue(uint maxSprites)
+        public UIRenderQueue(UIRenderQueueConfiguration config, FontManager fontManager)
         {
-            var maxVertices = maxSprites * 4;
-            _spriteBatch = new SpriteBatch(maxSprites);
-            _nineSliceSprite = new NineSliceSpriteBatch(maxSprites);
+            var maxVertices = (config.MaxSprites + config.MaxCharacters) * 4 + config.MaxNinePatchSprites * 4 * 9;
+            var maxIndices = maxVertices * 6;
+
+            _spriteBatch = new SpriteBatch(config.MaxSprites);
+            _nineSliceSprite = new NineSliceSpriteBatch(config.MaxNinePatchSprites);
+            _textBatch = new TextBatch(config.MaxCharacters, fontManager);
 
             _vertices = MemoryUtils.AllocateBlock<UIVertex>(maxVertices);
-            _elements = new UIElement[maxSprites];
-            _sortable = new SortableRenderable[maxSprites];
-            static uint[] CreateIndices(uint maxSprites)
-            {
-                var indices = new uint[6 * maxSprites];
-                var vertexIndex = 0u;
-                for (var i = 0u; i < indices.Length; i += 6)
-                {
-                    indices[i] = vertexIndex;
-                    indices[i + 1] = 1 + vertexIndex;
-                    indices[i + 2] = 2 + vertexIndex;
-                    indices[i + 3] = 0 + vertexIndex;
-                    indices[i + 4] = 2 + vertexIndex;
-                    indices[i + 5] = 3 + vertexIndex;
-                    vertexIndex += 4;
-                }
-                return indices;
-            }
+            _elements = new UIElement[100]; // TODO: Hardcoded for now, not sure what an optimal number would be. UIElements will be created for each texture change
+            _sortable = new SortableRenderable[1_000]; // TODO: hardcoded for now. This is the amount of "items" added to the queue. 1 for each text, sprite or nine patch.  
 
             _vertexBuffer = GraphicsDevice.BufferManager.Create(new BufferCreation
             {
@@ -65,18 +56,34 @@ namespace Titan.UI.Rendering
                 Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
             });
 
-            var indices = CreateIndices(maxSprites);
+            var indices = maxIndices < 800_000 ? stackalloc uint[(int)maxIndices] : new uint[(int)maxIndices];
+            InitInidices(indices);
             fixed (uint* pIndicies = indices)
             {
                 _indexBuffer = GraphicsDevice.BufferManager.Create(new BufferCreation
                 {
                     CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.UNSPECIFIED,
                     Type = BufferTypes.IndexBuffer,
-                    Count = (uint)indices.Length,
+                    Count = maxIndices,
                     Stride = sizeof(uint),
                     InitialData = pIndicies,
                     Usage = D3D11_USAGE.D3D11_USAGE_IMMUTABLE
                 });
+            }
+
+            static void InitInidices(Span<uint> indices)
+            {
+                var vertexIndex = 0u;
+                for (var i = 0; i < indices.Length; i += 6)
+                {
+                    indices[i] = vertexIndex;
+                    indices[i + 1] = 1 + vertexIndex;
+                    indices[i + 2] = 2 + vertexIndex;
+                    indices[i + 3] = 0 + vertexIndex;
+                    indices[i + 4] = 2 + vertexIndex;
+                    indices[i + 5] = 3 + vertexIndex;
+                    vertexIndex += 4;
+                }
             }
         }
 
@@ -95,6 +102,14 @@ namespace Titan.UI.Rendering
         {
             var spriteIndex = _spriteBatch.Add(position, size, color, coordinates);
             _sortable[NextIndex()] = new SortableRenderable(zIndex, texture, spriteIndex, RenderableType.Sprite);
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddText(in Vector2 position, int zIndex, in Size size, ReadOnlySpan<char> text, Handle<Font> font, TextOverflow overflow)
+        {
+            //var spriteIndex = _spriteBatch.Add(position, size, color, coordinates);
+            //_sortable[NextIndex()] = new SortableRenderable(zIndex, texture, spriteIndex, RenderableType.Sprite);
         }
 
         public void Begin()
@@ -162,7 +177,6 @@ namespace Titan.UI.Rendering
             };
             GraphicsDevice.ImmediateContext.Map(_vertexBuffer, _vertices.GetPointer(0), (uint)(vertexIndex * sizeof(UIVertex)));
         }
-        
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -176,7 +190,9 @@ namespace Titan.UI.Rendering
 
             _nineSliceSprite.Dispose();
             _spriteBatch.Dispose();
+            _textBatch.Dispose();
             _vertices.Free();
+
         }
     }
 }

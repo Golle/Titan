@@ -144,7 +144,7 @@ namespace Titan
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var renderQueue = new SimpleRenderQueue(1000);
-            var uiRenderQueue = new UIRenderQueue(1000);
+            var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), fontManager);
 
             var color = stackalloc float[4];
             color[0] = 1f;
