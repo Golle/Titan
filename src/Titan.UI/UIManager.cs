@@ -38,32 +38,28 @@ namespace Titan.UI
         }
     }
 
-    public enum TextOverflow
-    {
-        Overflow,
-        Wrap,
-        WordWrap
-    }
+
 
     public class UIText : UIComponent
     {
         public string Text { get; set; }
         public string Font { get; set; }
         public int LineHeight { get; set; }
-        public TextOverflow Overflow { get; set; }
-        
+        public HorizontalOverflow HorizontalOverflow{ get; set; }
+        public VerticalOverflow VerticalOverflow { get; set; }
         internal override void OnCreate(UIManager manager, in Entity entity)
         {
             base.OnCreate(manager, entity);
             entity.AddComponent(new AssetComponent<TextComponent>(Font, new TextComponent
             {
-                Overflow = Overflow,
-                Text = manager.TextManager.Create(new TextCreation
+                LineHeight =  (ushort)LineHeight,
+                HorizontalOverflow = HorizontalOverflow,
+                VerticalOverflow = VerticalOverflow,
+                Handle = manager.TextManager.Create(new TextCreation
                 {
                     MaxCharacters = 100,
-                    LineHeight = (ushort)LineHeight,
-                    Dynamic = false,
-                    InitialCharacters = Text
+                    InitialCharacters = Text,
+                    Dynamic = false
                 })
             }));
         }

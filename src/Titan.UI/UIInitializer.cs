@@ -27,8 +27,8 @@ namespace Titan.UI
                 .WithSystem(new SpriteLoaderSystem(assetsManager))
                 .WithSystem(new TextLoaderSystem(assetsManager, textManager))
                 .WithSystem(new UISpriteRenderSystem(renderQueue, atlasManager))
-                .WithSystem(new UITextRenderSystem(renderQueue, textManager))
-                .WithSystem(new TextUpdateSystem(textManager))
+                .WithSystem(new UITextRenderSystem(renderQueue))
+                .WithSystem(new TextUpdateSystem(textManager, fontManager))
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())
                 

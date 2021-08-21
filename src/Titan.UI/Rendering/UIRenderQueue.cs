@@ -35,14 +35,14 @@ namespace Titan.UI.Rendering
 
         private int _elementCount;
 
-        public UIRenderQueue(UIRenderQueueConfiguration config, TextManager textManager)
+        public UIRenderQueue(UIRenderQueueConfiguration config, TextManager textManager, FontManager fontManager)
         {
             var maxVertices = config.MaxSprites * 4 + config.MaxNinePatchSprites * 4 * 9 + config.MaxTextBlocks * 4 * 100; // 100 characters per block (TODO: change this at some point)
             var maxIndices = maxVertices * 6;
 
             _spriteBatch = new SpriteBatch(config.MaxSprites);
             _nineSliceSprite = new NineSliceSpriteBatch(config.MaxNinePatchSprites);
-            _textBatch = new TextBatch(config.MaxTextBlocks, textManager);
+            _textBatch = new TextBatch(config.MaxTextBlocks, textManager, fontManager);
 
             _vertices = MemoryUtils.AllocateBlock<UIVertex>(maxVertices);
             _elements = new UIElement[100]; // TODO: Hardcoded for now, not sure what an optimal number would be. UIElements will be created for each texture change
@@ -107,9 +107,9 @@ namespace Titan.UI.Rendering
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddText(in Vector2 position, int zIndex, Handle<TextBlock> text)
+        public void AddText(in Vector2 position, int zIndex, Handle<Texture> texture, Handle<Font> font, Handle<TextBlock> text, ushort count)
         {
-            var (spriteIndex, texture) = _textBatch.Add(position, text);
+            var spriteIndex = _textBatch.Add(position, text, font, count);
             _sortable[NextIndex()] = new SortableRenderable(zIndex, texture, spriteIndex, RenderableType.Text);
         }
 

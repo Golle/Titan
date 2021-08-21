@@ -40,8 +40,9 @@ namespace Titan.UI.Systems
                 if (_assetsManager.IsLoaded(text.AssetHandle))
                 {
                     var component = text.DefaultValue;
-                    var font = _assetsManager.GetAssetHandle<Font>(text.AssetHandle);
-                    _textManager.SetFont(component.Text, font);
+                    component.Font = _assetsManager.GetAssetHandle<Font>(text.AssetHandle);
+                    component.IsDirty = true;
+
                     entity.AddComponent(component);
                 }
             }

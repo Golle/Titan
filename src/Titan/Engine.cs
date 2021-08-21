@@ -134,7 +134,7 @@ namespace Titan
         {
             using var fontManager = new FontManager();
             using var atlasManager = new AtlasManager(100);
-            using var textManager = new TextManager(200, fontManager);
+            using var textManager = new TextManager(200);
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
                 .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
@@ -146,7 +146,7 @@ namespace Titan
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var renderQueue = new SimpleRenderQueue(1000);
-            var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), textManager);
+            var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), textManager, fontManager);
 
             var color = stackalloc float[4];
             color[0] = 1f;
