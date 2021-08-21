@@ -9,6 +9,7 @@ using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
+using Titan.UI;
 
 Console.WriteLine($"Hello World!");
 
@@ -18,7 +19,7 @@ namespace Breakout
 {
     internal class BreakoutApplication : Application
     {
-        public override void OnStart(World world)
+        public override void OnStart(World world, UIManager uiManager)
         {
             var block = world.CreateEntity();
             block.AddComponent(Transform3D.Default);

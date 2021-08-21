@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Titan.Input\Titan.Input.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Text\" />
+  </ItemGroup>
+
 </Project>

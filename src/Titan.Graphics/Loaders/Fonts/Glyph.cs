@@ -11,5 +11,7 @@ namespace Titan.Graphics.Loaders.Fonts
         public short XOffset;
         public short YOffset;
         public short XAdvance;
+        public short Height;
+        public short Width;
     }
 }

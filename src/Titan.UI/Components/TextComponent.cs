@@ -1,19 +1,12 @@
 using System.Numerics;
 using Titan.Core;
-using Titan.Graphics.Loaders.Fonts;
+using Titan.UI.Text;
 
 namespace Titan.UI.Components
 {
-
-    public struct Text
-    {
-        public string Value;
-    }
-
     public struct TextComponent
     {
-        public Handle<Font> Font;
-        public Handle<Text> Text;
+        public Handle<TextBlock> Text;
         public Vector2 V;
         public TextOverflow Overflow;
     }

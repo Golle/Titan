@@ -2,7 +2,6 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.Core.Logging;
 using Titan.Core.Memory;
 
 namespace Titan.Graphics.Loaders.Fonts
@@ -34,13 +33,15 @@ namespace Titan.Graphics.Loaders.Fonts
             foreach (ref readonly var character in args.Characters)
             {
                 var characterId = character.Id - min;
+                
                 font->Glyphs[characterId] = new Glyph
                 {
                     TopLeft = new Vector2(character.X / (float)args.Width, character.Y / (float)args.Height),
                     BottomRight = new Vector2((character.X + character.Width) / (float)args.Width, (character.Y + character.Height) / (float)args.Height),
                     XAdvance = character.XAdvance,
                     XOffset = character.XOffset,
-
+                    Height = character.Height,
+                    Width =  character.Width,
                     YOffset = character.YOffset
                 };
             }

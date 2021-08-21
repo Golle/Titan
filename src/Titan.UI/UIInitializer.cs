@@ -8,13 +8,14 @@ using Titan.Input;
 using Titan.UI.Components;
 using Titan.UI.Rendering;
 using Titan.UI.Systems;
+using Titan.UI.Text;
 
 namespace Titan.UI
 {
     public record UIConfiguration(uint MaxSprites = 1000, uint MaxComponents = 1000);
     public static class UIInitializer
     {
-        public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager, FontManager fontManager) =>
+        public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager, FontManager fontManager, TextManager textManager) =>
             builder
                 .WithComponent<AssetComponent<SpriteComponent>>(count: config.MaxSprites)
                 .WithComponent<AssetComponent<TextComponent>>(count: config.MaxSprites)
@@ -24,11 +25,13 @@ namespace Titan.UI
                 .WithComponent<TextComponent>(count: config.MaxComponents)
 
                 .WithSystem(new SpriteLoaderSystem(assetsManager))
-                .WithSystem(new TextLoaderSystem(assetsManager))
+                .WithSystem(new TextLoaderSystem(assetsManager, textManager))
                 .WithSystem(new UISpriteRenderSystem(renderQueue, atlasManager))
-                .WithSystem(new UITextRenderSystem(renderQueue, fontManager))
+                .WithSystem(new UITextRenderSystem(renderQueue, textManager))
+                .WithSystem(new TextUpdateSystem(textManager))
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())
+                
                 .WithSystem(new TestDragAndDropSystem())
             ;
     }

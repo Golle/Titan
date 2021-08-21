@@ -9,6 +9,7 @@ using Titan.ECS.Worlds;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Common;
 using Titan.UI.Components;
+using Titan.UI.Text;
 
 namespace Titan.UI
 {
@@ -23,9 +24,9 @@ namespace Titan.UI
     public class UIPanel : UIContainer
     {
         public Sprite Background { get; set; }
-        internal override void OnCreate(in Entity entity)
+        internal override void OnCreate(UIManager manager, in Entity entity)
         {
-            base.OnCreate(in entity);
+            base.OnCreate(manager, entity);
             if (Background != null)
             {
                 entity.AddComponent(new AssetComponent<SpriteComponent>(Background.Identifier, new SpriteComponent
@@ -48,15 +49,22 @@ namespace Titan.UI
     {
         public string Text { get; set; }
         public string Font { get; set; }
+        public int LineHeight { get; set; }
         public TextOverflow Overflow { get; set; }
-
-        internal override void OnCreate(in Entity entity)
+        
+        internal override void OnCreate(UIManager manager, in Entity entity)
         {
-            base.OnCreate(in entity);
+            base.OnCreate(manager, entity);
             entity.AddComponent(new AssetComponent<TextComponent>(Font, new TextComponent
             {
                 Overflow = Overflow,
-                Text = 12 // Create the handle for the text 
+                Text = manager.TextManager.Create(new TextCreation
+                {
+                    MaxCharacters = 100,
+                    LineHeight = (ushort)LineHeight,
+                    Dynamic = false,
+                    InitialCharacters = Text
+                })
             }));
         }
     }
@@ -68,9 +76,9 @@ namespace Titan.UI
         
 
 
-        internal override unsafe void OnCreate(in Entity entity)
+        internal override unsafe void OnCreate(UIManager manager, in Entity entity)
         {
-            base.OnCreate(entity);
+            base.OnCreate(manager, entity);
             if (Sprite != null)
             {
                 entity.AddComponent(new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
@@ -80,7 +88,7 @@ namespace Titan.UI
                 }));
                 entity.AddComponent(new InteractableComponent());
             }
-            Text?.OnCreate(entity.CreateChildEntity());
+            Text?.OnCreate(manager, entity.CreateChildEntity());
         }
     }
 
@@ -108,7 +116,7 @@ namespace Titan.UI
         public int ZIndex { get; set; }
         public AnchorPoint AnchorPoint { get; set; }
         public Vector2 Pivot { get; set; } = new (0.5f, 0.5f); // default to center
-        internal virtual void OnCreate(in Entity entity)
+        internal virtual void OnCreate(UIManager manager, in Entity entity)
         {
             //Debug.Assert(Pivot.X is >= 0 and <= 1.0f && Pivot.Y is >= 0 and <= 1.0f, "Pivot must be in the range of <0.0f 0.0f> to <1.0f 1.0f>");
             _entity = entity;
@@ -130,12 +138,13 @@ namespace Titan.UI
         
         private readonly Entity _baseEntity;
 
-        public UIManager(World world)
+        internal TextManager TextManager { get; }
+        public UIManager(World world, TextManager textManager)
         {
+            TextManager = textManager;
             _world = world;
             _baseEntity = _world.CreateEntity();
         }
-
         
         public void Add(UIComponent component)
         {
@@ -145,7 +154,7 @@ namespace Titan.UI
 
         private void RecursiveCreate(in Entity parent, UIComponent component)
         {
-            component.OnCreate(parent.CreateChildEntity());
+            component.OnCreate(this, parent.CreateChildEntity());
             if (component is UIContainer container)
             {
                 foreach (var child in container.Children)

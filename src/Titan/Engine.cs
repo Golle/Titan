@@ -24,6 +24,7 @@ using Titan.Rendering;
 using Titan.Systems;
 using Titan.UI;
 using Titan.UI.Rendering;
+using Titan.UI.Text;
 
 namespace Titan
 {
@@ -133,6 +134,7 @@ namespace Titan
         {
             using var fontManager = new FontManager();
             using var atlasManager = new AtlasManager(100);
+            using var textManager = new TextManager(200, fontManager);
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
                 .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
@@ -144,7 +146,7 @@ namespace Titan
                 .Init(new AssetManagerConfiguration("manifest.json", 2));
 
             var renderQueue = new SimpleRenderQueue(1000);
-            var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), fontManager);
+            var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), textManager);
 
             var color = stackalloc float[4];
             color[0] = 1f;
@@ -174,13 +176,13 @@ namespace Titan
                 .WithSystem(new CameraSystem(graphicsSystem))
                 .WithSystem(new ModelLoaderSystem(assetsManager))
 
-                .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager, fontManager)
+                .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager, fontManager, textManager)
                 ;
             _app.ConfigureWorld(worldBuilder);
 
             Logger.Info<Engine>("Initialize starter world");
             using var starterWorld = new World(worldBuilder.Build());
-            _app.OnStart(starterWorld);
+            _app.OnStart(starterWorld, new UIManager(starterWorld, textManager));
             
             var timer = Stopwatch.StartNew();
             // star the main loop

@@ -21,9 +21,7 @@ namespace Titan.Sandbox
 {
     internal class SandboxApplication : Application
     {
-        private UIManager _uiManager;
-
-        public override void OnStart(World world)
+        public override void OnStart(World world, UIManager uiManager)
         {
             Logger.Info("Sandbox application starting");
             var r = new Random();
@@ -49,46 +47,54 @@ namespace Titan.Sandbox
             camera.AddComponent(new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
             camera.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
 
-
-            _uiManager = new UIManager(world);
-
             var container = new UIPanel
             {
                 Offset = new Vector2(100, 250),
-                Size = (400, 400),
+                Size = (1200, 300),
                 ZIndex = 0,
-                Pivot = new (0,0),
+                Pivot = new(0, 0),
                 Background = new Sprite
                 {
-                    Identifier = "atlas/redsheet", 
-                    Index = 25, 
+                    Identifier = "atlas/redsheet",
+                    Index = 25,
                     Margins = (12, 22, 12, 12)
                 }
             };
 
-            
-            var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
-            var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
-
-            foreach (var vertical in a)
+            container.Add(new UIText
             {
-                foreach (var horizontal in b)
-                {
-                    container.AddButton(new UIButton
-                    {
-                        Size = (38, 36),
-                        ZIndex = 1,
-                        Offset = Vector2.Zero,
-                        AnchorPoint = vertical | horizontal,
-                        Pivot = new(0.5f, 0.5f),
-                        Sprite = new Sprite
-                        {
-                            Identifier = "atlas/redsheet",
-                            Index = 1
-                        }
-                    });
-                }
-            }
+                AnchorPoint = AnchorPoint.MiddleLeft,
+                Font = "fonts/seqoe_ui_light",
+                Size = (300, 40),
+                Offset = new Vector2(20, 0),
+                Text = "Some awesome text! 123",
+                LineHeight = 40,
+                Pivot = new(0,0),
+                ZIndex = 1
+            });
+            
+            //var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
+            //var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
+
+            //foreach (var vertical in a)
+            //{
+            //    foreach (var horizontal in b)
+            //    {
+            //        container.AddButton(new UIButton
+            //        {
+            //            Size = (38, 36),
+            //            ZIndex = 1,
+            //            Offset = Vector2.Zero,
+            //            AnchorPoint = vertical | horizontal,
+            //            Pivot = new(0.5f, 0.5f),
+            //            Sprite = new Sprite
+            //            {
+            //                Identifier = "atlas/redsheet",
+            //                Index = 1
+            //            }
+            //        });
+            //    }
+            //}
 
 
 
@@ -187,7 +193,7 @@ namespace Titan.Sandbox
             //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 3 },
 
             //});
-            _uiManager.Add(container);
+            uiManager.Add(container);
         }
 
         public override void OnTerminate()
