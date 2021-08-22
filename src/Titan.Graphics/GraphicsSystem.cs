@@ -98,6 +98,7 @@ namespace Titan.Graphics
                 _immediateContext.SetVertexShaderSamplers(pipeline.VertexShaderSamplers);
                 _immediateContext.SetPixelShaderResources(pipeline.PixelShaderResources);
                 _immediateContext.SetVertexShaderResources(pipeline.VertexShaderResources);
+                _immediateContext.SetRasterizerState(pipeline.RasterizerState);
                 if (pipeline.VertexShader.IsValid())
                 {
                     _immediateContext.SetVertexShader(pipeline.VertexShader);

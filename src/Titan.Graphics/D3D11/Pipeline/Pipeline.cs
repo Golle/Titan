@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Titan.Core;
 using Titan.Graphics.D3D11.BlendStates;
+using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
@@ -26,6 +27,7 @@ namespace Titan.Graphics.D3D11.Pipeline
         public Handle<Sampler>[] VertexShaderSamplers;
         public Handle<Texture> DepthBuffer;
         public Handle<BlendState> BlendState;
+        public Handle<RasterizerState> RasterizerState;
 
         public Renderer Renderer;
 

@@ -297,7 +297,18 @@ namespace Titan.Graphics.D3D11
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRasterizerState(in Handle<RasterizerState> handle) => _context->RSSetState(GraphicsDevice.RasterizerManager.Access(handle).State);
+        public void SetRasterizerState(in Handle<RasterizerState> handle)
+        {
+            if (handle.IsValid())
+            {
+                _context->RSSetState(GraphicsDevice.RasterizerManager.Access(handle).State);
+            }
+            else
+            {
+                _context->RSSetState(null);
+            }
+            
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetBlendState(in Handle<BlendState> handle)
