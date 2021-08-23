@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using Titan.Assets;
 using Titan.Core;
 using Titan.Graphics;
@@ -10,6 +12,7 @@ using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
+using Titan.UI.Debugging;
 using Titan.UI.Rendering;
 using Titan.Windows;
 using Titan.Windows.D3D11;
@@ -26,20 +29,24 @@ namespace Titan.Rendering
         private Handle<Asset> _uiVertexShaderHandle;
 
         private Handle<Asset> _debugPixelShaderHandle;
+        private Handle<Asset> _debugLinePixelShaderHandle;
+        private Handle<Asset> _debugLineVertexShaderHandle;
 
         private readonly AssetsManager _assetsManager;
         private readonly SimpleRenderQueue _simpleRenderQueue;
         private readonly UIRenderQueue _uiRenderQueue;
+        private readonly BoundingBoxRenderQueue _boundingBoxRenderQueue;
         private GeometryRenderer _geometryRenderer;
         private BackbufferRenderer _backbufferRenderer;
         private UIRenderer _uiRenderer;
         private DeferredShadingRenderer _deferredShadingRenderer;
 
-        public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue, UIRenderQueue uiRenderQueue)
+        public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue, UIRenderQueue uiRenderQueue, BoundingBoxRenderQueue boundingBoxRenderQueue)
         {
             _assetsManager = assetsManager;
             _simpleRenderQueue = simpleRenderQueue;
             _uiRenderQueue = uiRenderQueue;
+            _boundingBoxRenderQueue = boundingBoxRenderQueue;
         }
         public void LoadResources()
         {
@@ -53,6 +60,10 @@ namespace Titan.Rendering
             _uiPixelShaderHandle = _assetsManager.Load("shaders/ui_ps");
             _uiVertexShaderHandle = _assetsManager.Load("shaders/ui_vs");
             _debugPixelShaderHandle = _assetsManager.Load("shaders/debug_ps");
+
+
+            _debugLinePixelShaderHandle = _assetsManager.Load("shaders/debug_line_ps");
+            _debugLineVertexShaderHandle = _assetsManager.Load("shaders/debug_line_vs");
 
             _geometryRenderer = new GeometryRenderer(_simpleRenderQueue);
             _backbufferRenderer = new BackbufferRenderer();
@@ -68,7 +79,9 @@ namespace Titan.Rendering
                    _assetsManager.IsLoaded(_lambertianPixelShaderHandle) &&
                    _assetsManager.IsLoaded(_uiPixelShaderHandle) &&
                    _assetsManager.IsLoaded(_uiVertexShaderHandle) &&
-                   _assetsManager.IsLoaded(_debugPixelShaderHandle)
+                   _assetsManager.IsLoaded(_debugPixelShaderHandle) &&
+                   _assetsManager.IsLoaded(_debugLineVertexShaderHandle) &&
+                   _assetsManager.IsLoaded(_debugLinePixelShaderHandle)
                    ;
         }
 
@@ -197,9 +210,7 @@ namespace Titan.Rendering
                 BlendState = uiBlendState,
                 //RasterizerState = uiRasterizerState
             };
-
-
-
+            
 
             /***** DEBUG Stuff *****/
             var debugTextureHandle = GraphicsDevice.TextureManager.Create(new TextureCreation
@@ -241,7 +252,26 @@ namespace Titan.Rendering
             };
             /***** DEBUG Stuff *****/
 
-            return new[] {gBuffer, deferredShading, debugPipeline, backbuffer, ui, debugOverlay };
+
+            var debugVerticesPipeline = new Pipeline
+            {
+
+                RenderTargets = new[] { backbufferRenderTarget },
+                Renderer = new BoundingBoxRenderer(_boundingBoxRenderQueue),
+                VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_debugLineVertexShaderHandle),
+                PixelShader= _assetsManager.GetAssetHandle<PixelShader>(_debugLinePixelShaderHandle),
+            };
+
+            return new[] {gBuffer, deferredShading, debugPipeline, backbuffer, ui, debugOverlay, debugVerticesPipeline };
         }
+    }
+
+
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal struct LineVertex
+    {
+        public Vector2 Position;
+        public Color Color;
     }
 }

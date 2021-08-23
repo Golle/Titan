@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Numerics;
 using Titan.Assets;
 using Titan.Components;
 using Titan.Core;
@@ -8,6 +9,7 @@ using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
 using Titan.ECS;
+using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -23,6 +25,8 @@ using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
 using Titan.UI;
+using Titan.UI.Components;
+using Titan.UI.Debugging;
 using Titan.UI.Rendering;
 using Titan.UI.Text;
 
@@ -147,14 +151,14 @@ namespace Titan
 
             var renderQueue = new SimpleRenderQueue(1000);
             var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), textManager, fontManager);
-
+            var boundingBoxRenderQueue = new BoundingBoxRenderQueue();
             var color = stackalloc float[4];
             color[0] = 1f;
             color[1] = 0.4f;
             color[2] = 0f;
             color[3] = 1f;
 
-            var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue, uiRenderQueue);
+            var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue, uiRenderQueue, boundingBoxRenderQueue);
             pipelineBuilder.LoadResources();
             // Preload assets for rendering pipeline
             while (Window.Update() && !pipelineBuilder.IsReady())
@@ -177,6 +181,7 @@ namespace Titan
                 .WithSystem(new ModelLoaderSystem(assetsManager))
 
                 .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager, fontManager, textManager)
+                .WithSystem(new UIBoundingBoxDebugSystem(boundingBoxRenderQueue))
                 ;
             _app.ConfigureWorld(worldBuilder);
 
@@ -191,6 +196,7 @@ namespace Titan
                 timer.Restart();
                 renderQueue.Begin();
                 uiRenderQueue.Begin();
+                boundingBoxRenderQueue.Begin();
 
                 timer.Restart();
                 EventManager.Update();
@@ -206,6 +212,7 @@ namespace Titan
                 timer.Restart();
                 uiRenderQueue.End();
                 renderQueue.End();
+                boundingBoxRenderQueue.End();
                 EngineStats.SetStats("RenderQueues.End()", timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
                 assetsManager.Update();
@@ -247,4 +254,6 @@ namespace Titan
             EventManager.Terminate();
         }
     }
+
+    
 }

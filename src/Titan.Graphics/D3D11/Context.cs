@@ -279,6 +279,9 @@ namespace Titan.Graphics.D3D11
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DrawIndexed(uint count, uint startIndex = 0, int vertexIndex = 0) => _context->DrawIndexed(count, startIndex, vertexIndex);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Draw(uint vertexCount, uint vertexStartIndex = 0u) => _context->Draw(vertexCount, vertexStartIndex);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY topology) => _context->IASetPrimitiveTopology(topology);
