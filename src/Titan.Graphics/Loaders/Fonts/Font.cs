@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Memory;
@@ -14,6 +13,7 @@ namespace Titan.Graphics.Loaders.Fonts
         public Handle<Texture> Texture;
         internal MemoryChunk<Glyph> Glyphs;
         public ushort FontSize;
+        public ushort Base;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [Pure]

@@ -54,12 +54,12 @@ namespace Titan.Sandbox
                 Size = (1200, 300),
                 ZIndex = 0,
                 Pivot = new(0, 0),
-                Background = new Sprite
-                {
-                    Identifier = "atlas/redsheet",
-                    Index = 25,
-                    Margins = (12, 22, 12, 12)
-                }
+                //Background = new Sprite
+                //{
+                //    Identifier = "atlas/redsheet",
+                //    Index = 25,
+                //    Margins = (12, 22, 12, 12)
+                //}
             };
 
             container.Add(new UIText
@@ -69,8 +69,8 @@ namespace Titan.Sandbox
                 TextAlign = TextAlign.Center,
                 Size = (800, 200),
                 Offset = new Vector2(20, 0),
-                Text = "Some awesome text! 123",
-                LineHeight = 20,
+                Text = "abc123ABCqQpQjJgG",
+                LineHeight = 40,
                 Pivot = new(0.5f,0.5f),
                 ZIndex = 1
             });
