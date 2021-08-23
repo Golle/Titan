@@ -48,9 +48,6 @@ namespace Titan.UI.Systems
 
                 var aspectRatio = lineHeight / (float)font.FontSize;
 
-                ref readonly var c= ref font.Get('c');
-                ref readonly var q= ref font.Get('q');
-
                 
                 for (var i = 0; i < maxCharacters; ++i)
                 {
@@ -58,16 +55,12 @@ namespace Titan.UI.Systems
                     ref var characterBlock = ref textBlock.Positions[i];
                     ref readonly var glyph = ref font.Get(character);
 
-                    var glyphHeight = glyph.Height * aspectRatio;
-                    var xAdvance = glyph.XAdvance * aspectRatio;
-                    var glyphOffset = glyph.XOffset * aspectRatio;
-                    
-                    var yOffset = (font.Base - glyph.YOffset) * aspectRatio;
+                    var yOffset = (font.Base - glyph.YOffset);
 
-                    characterBlock.BottomLeft = new Vector2(xOffset + glyphOffset, yOffset - glyphHeight);
-                    characterBlock.TopRight = new Vector2(xOffset + xAdvance, yOffset);
+                    characterBlock.BottomLeft = new Vector2(xOffset + glyph.XOffset, yOffset - glyph.Height) * aspectRatio;
+                    characterBlock.TopRight = new Vector2(xOffset + glyph.XAdvance, yOffset) * aspectRatio;
 
-                    xOffset += xAdvance;
+                    xOffset += glyph.XAdvance;
                 }
 
                 text.CachedTexture = font.Texture;
