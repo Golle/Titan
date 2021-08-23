@@ -37,9 +37,7 @@ namespace Titan.UI
             }
         }
     }
-
-
-
+    
     public class UIText : UIComponent
     {
         public string Text { get; set; }
@@ -47,6 +45,8 @@ namespace Titan.UI
         public int LineHeight { get; set; }
         public HorizontalOverflow HorizontalOverflow{ get; set; }
         public VerticalOverflow VerticalOverflow { get; set; }
+        public TextAlign TextAlign { get; set; }
+
         internal override void OnCreate(UIManager manager, in Entity entity)
         {
             base.OnCreate(manager, entity);
@@ -55,6 +55,7 @@ namespace Titan.UI
                 LineHeight =  (ushort)LineHeight,
                 HorizontalOverflow = HorizontalOverflow,
                 VerticalOverflow = VerticalOverflow,
+                TextAlign = TextAlign,
                 Handle = manager.TextManager.Create(new TextCreation
                 {
                     MaxCharacters = 100,

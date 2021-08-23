@@ -12,6 +12,7 @@ using Titan.Graphics.Windows;
 using Titan.Sandbox;
 using Titan.UI;
 using Titan.UI.Common;
+using Titan.UI.Text;
 
 Console.WriteLine($"Hello World!");
 
@@ -63,13 +64,14 @@ namespace Titan.Sandbox
 
             container.Add(new UIText
             {
-                AnchorPoint = AnchorPoint.MiddleLeft,
+                AnchorPoint = AnchorPoint.MiddleCenter,
                 Font = "fonts/seqoe_ui_light",
-                Size = (300, 40),
+                TextAlign = TextAlign.Center,
+                Size = (800, 200),
                 Offset = new Vector2(20, 0),
                 Text = "Some awesome text! 123",
-                LineHeight = 40,
-                Pivot = new(0,0),
+                LineHeight = 20,
+                Pivot = new(0.5f,0.5f),
                 ZIndex = 1
             });
             
@@ -227,11 +229,13 @@ namespace Titan.Sandbox
         public override DeviceConfiguration ConfigureDevice(DeviceConfiguration config) =>
             config with
             {
-                Debug = false,
-                //Debug = true,
+                //Debug = false,
+                Debug = true,
                 RefreshRate = 144,
-                Vsync = false,
-                //Vsync = true
+                //Vsync = false,
+                Vsync = true
             };
     }
+
+    
 }

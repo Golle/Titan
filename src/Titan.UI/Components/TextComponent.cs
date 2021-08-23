@@ -14,6 +14,7 @@ namespace Titan.UI.Components
         public ushort VisibleChars;
         public VerticalOverflow VerticalOverflow;
         public HorizontalOverflow HorizontalOverflow;
+        public TextAlign TextAlign;
         public bool IsDirty;
     }
 }

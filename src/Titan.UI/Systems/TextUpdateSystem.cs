@@ -1,4 +1,3 @@
-using System;
 using System.Numerics;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Fonts;
@@ -65,6 +64,8 @@ namespace Titan.UI.Systems
 
                     xOffset += xAdvance;
                 }
+
+                
 
                 text.CachedTexture = font.Texture;
                 text.VisibleChars = maxCharacters;

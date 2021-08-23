@@ -6,6 +6,7 @@ using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Pipeline;
+using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
@@ -112,6 +113,8 @@ namespace Titan.Rendering
                 AddressAll = TextureAddressMode.Wrap,
             });
 
+            
+
             var gBuffer = new Pipeline
             {
                 RenderTargets = new[] {gBufferPosition, gBufferAlbedo, gBufferNormals},
@@ -172,7 +175,14 @@ namespace Titan.Rendering
             });
 
             var uiBlendState = GraphicsDevice.BlendStateManager.Create(new BlendStateCreation());
-         
+            var uiRasterizerState = GraphicsDevice.RasterizerManager.Create(new RasterizerStateCreation(CullMode.Back));
+
+            var uiSampler = GraphicsDevice.SamplerManager.Create(new SamplerCreation
+            {
+                Filter = TextureFilter.MinPointMagMipLinear,
+                AddressAll = TextureAddressMode.Clamp,
+            });
+
             // TODO: should we render it to an offscreen buffer to support multi-threaded rendering or directly to the backbuffer?
             var ui = new Pipeline
             {
@@ -181,11 +191,14 @@ namespace Titan.Rendering
                 //ClearDepthBuffer = true,
                 //DepthBufferClearValue = 1f,
                 Renderer = _uiRenderer,
-                PixelShaderSamplers = new []{ fullscreenSampler },
+                PixelShaderSamplers = new []{ uiSampler }, // TODO: text must be rendered with a different sampler :O
                 VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_uiVertexShaderHandle),
                 PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_uiPixelShaderHandle),
-                BlendState = uiBlendState
+                BlendState = uiBlendState,
+                //RasterizerState = uiRasterizerState
             };
+
+
 
 
             /***** DEBUG Stuff *****/
