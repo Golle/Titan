@@ -25,6 +25,7 @@ namespace Titan.Graphics.Loaders.Fonts
             return _manager.Create(new FontCreation
             {
                 LineHeight = descriptor->LineHeight,
+                FontSize = descriptor->FontSize,
                 Base = descriptor->Base,
                 Width = texture.Width,
                 Height = texture.Height,

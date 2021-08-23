@@ -39,6 +39,7 @@ foreach (var fontFile in Directory.EnumerateFiles(resourcePath, "*.fnt"))
     Logger.Info($"Name: {name}");
     var bitmapFont = BitmapFontParser.ReadFromFile(fontFile);
 
+    Logger.Info($"Font size: {bitmapFont.Info.Size}");
     Logger.Info($"Characters: {bitmapFont.Chars.Length}");
     Logger.Info($"Kernings: {bitmapFont.Kernings.Length}");
     Logger.Info($"Bitmap size: {bitmapFont.Bitmap.Length}");
@@ -69,6 +70,7 @@ foreach (var fontFile in Directory.EnumerateFiles(resourcePath, "*.fnt"))
     {
         var font = new FontDescriptor
         {
+            FontSize = (ushort)bitmapFont.Info.Size,
             Base = (ushort)bitmapFont.Common.Base,
             LineHeight = (ushort)bitmapFont.Common.LineHeight,
             CharactersCount = (ushort)bitmapFont.Chars.Length,

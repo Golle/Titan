@@ -12,7 +12,8 @@ namespace Titan.Graphics.Loaders.Fonts
     {
         public int Offset;
         public Handle<Texture> Texture;
-        public MemoryChunk<Glyph> Glyphs;
+        internal MemoryChunk<Glyph> Glyphs;
+        public ushort FontSize;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [Pure]

@@ -27,6 +27,8 @@ namespace Titan.Graphics.Loaders.Fonts
 
             font->Offset = min;
             font->Texture = args.Texture;
+            font->FontSize = args.FontSize;
+
             var maxElements = (uint)(max - min + 1);
             font->Glyphs = MemoryUtils.AllocateBlock<Glyph>(maxElements); //Sparse array to support indexing
 

@@ -12,5 +12,6 @@ namespace Titan.Graphics.Loaders.Fonts
         public ushort LineHeight;
         public ushort Base;
         public ReadOnlySpan<GlyphDescriptor> Characters;
+        public ushort FontSize;
     }
 }

@@ -40,20 +40,30 @@ namespace Titan.UI.Systems
                 }
 
                 ref readonly var font = ref _fontManager.Access(text.Font);
+                ref readonly var transform = ref _transform.Get(entity);
+                
                 ref var textBlock = ref _textManager.Access(text.Handle);
-
                 var maxCharacters = textBlock.CharacterCount;
-                var xOffset = 0;
+                var xOffset = 0f;
+                var yOffset = 0f;
                 var lineHeight = text.LineHeight;
 
+                var aspectRatio = lineHeight / (float)font.FontSize;
+                
                 for (var i = 0; i < maxCharacters; ++i)
                 {
                     var character = textBlock.Characters[i];
                     ref var characterBlock = ref textBlock.Positions[i];
                     ref readonly var glyph = ref font.Get(character);
-                    characterBlock.BottomLeft = new Vector2(xOffset + glyph.XOffset, lineHeight - glyph.YOffset - glyph.Height);
-                    characterBlock.TopRight = new Vector2(xOffset + glyph.XAdvance, lineHeight - glyph.YOffset);
-                    xOffset += glyph.XAdvance;
+
+                    var glyphHeight = glyph.Height * aspectRatio;
+                    var xAdvance = glyph.XAdvance * aspectRatio;
+                    var glyphOffset = glyph.XOffset * aspectRatio;
+
+                    characterBlock.BottomLeft = new Vector2(xOffset + glyphOffset, yOffset);
+                    characterBlock.TopRight = new Vector2(xOffset + xAdvance, yOffset + glyphHeight);
+
+                    xOffset += xAdvance;
                 }
 
                 text.CachedTexture = font.Texture;
