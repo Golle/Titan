@@ -134,7 +134,7 @@ namespace Titan.Rendering
                 ClearDepthBuffer = true,
                 DepthBufferClearValue = 1f,
                 DepthBuffer = depthBuffer,
-                ClearColor = Color.Magenta,
+                ClearColor = Color.White,
                 ClearRenderTargets = true,
                 Renderer = _geometryRenderer
             };
@@ -264,14 +264,5 @@ namespace Titan.Rendering
 
             return new[] {gBuffer, deferredShading, debugPipeline, backbuffer, ui, debugOverlay, debugVerticesPipeline };
         }
-    }
-
-
-
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal struct LineVertex
-    {
-        public Vector2 Position;
-        public Color Color;
     }
 }
