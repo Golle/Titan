@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Fonts;
@@ -40,14 +41,16 @@ namespace Titan.UI.Systems
 
                 ref readonly var font = ref _fontManager.Access(text.Font);
                 ref readonly var transform = ref _transform.Get(entity);
+
+                var width = transform.Size.Width;
                 
                 ref var textBlock = ref _textManager.Access(text.Handle);
                 var maxCharacters = textBlock.CharacterCount;
                 var xOffset = 0f;
                 var lineHeight = text.LineHeight;
+                var fontSize = text.FontSize;
 
-                var aspectRatio = lineHeight / (float)font.FontSize;
-
+                var aspectRatio = fontSize / (float)font.FontSize;
                 
                 for (var i = 0; i < maxCharacters; ++i)
                 {
@@ -63,10 +66,33 @@ namespace Titan.UI.Systems
                     xOffset += glyph.XAdvance;
                 }
 
+                var xAlignOffset = GetXOffset(text.TextAlign, textBlock.Positions[0], textBlock.Positions[maxCharacters - 1], width);
+
+                if (xAlignOffset != 0.0f)
+                {
+                    // TODO: this can be done by calculating first + last before the loop, and then loop over characters between 1 and maxCharacters-1.
+                    for (var i = 0; i < maxCharacters; ++i)
+                    {
+                        ref var characterBlock = ref textBlock.Positions[i];
+                        characterBlock.BottomLeft.X += xAlignOffset;
+                        characterBlock.TopRight.X += xAlignOffset;
+                    }
+                }
+
                 text.CachedTexture = font.Texture;
                 text.VisibleChars = maxCharacters;
                 text.IsDirty = false;
             }
+
+
+
+            static float GetXOffset(TextAlign align, in CharacterPositions first, in CharacterPositions last, int boxWidth) =>
+                align switch
+                {
+                    TextAlign.Center => (boxWidth - (last.TopRight.X - first.BottomLeft.X)) / 2f,
+                    TextAlign.Right => boxWidth - (last.TopRight.X - first.BottomLeft.X),
+                    _ => 0 // Same as Left
+                };
         }
     }
 }

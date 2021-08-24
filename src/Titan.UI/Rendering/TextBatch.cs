@@ -17,6 +17,7 @@ namespace Titan.UI.Rendering
         public Handle<TextBlock> Handle;
         public Handle<Font> Font;
         public ushort Count;
+        public Color Color;
     }
     internal class TextBatch : IDisposable
     {
@@ -33,7 +34,7 @@ namespace Titan.UI.Rendering
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining|MethodImplOptions.AggressiveOptimization)]
-        public unsafe int Add(in Vector2 position, in Handle<TextBlock> handle, in Handle<Font> font, ushort count)
+        public unsafe int Add(in Vector2 position, in Handle<TextBlock> handle, in Handle<Font> font, ushort count, in Color color)
         {
             var index = NextIndex();
             var text = _textBatches.GetPointer(index);
@@ -41,6 +42,7 @@ namespace Titan.UI.Rendering
             text->Font = font;
             text->Count = count;
             text->Position = position;
+            text->Color = color;
 
             return index;
         }
@@ -69,22 +71,22 @@ namespace Titan.UI.Rendering
 
                 vertex->Position = bottomLeft;
                 vertex->Texture = new Vector2(glyph.TopLeft.X, glyph.BottomRight.Y);
-                vertex->Color = Color.Black;
+                vertex->Color = batch->Color;
                 vertex++;
 
                 vertex->Position = new Vector2(bottomLeft.X, topRight.Y);
                 vertex->Texture = glyph.TopLeft;
-                vertex->Color = Color.Black;
+                vertex->Color = batch->Color;
                 vertex++;
 
                 vertex->Position = topRight;
                 vertex->Texture = new Vector2(glyph.BottomRight.X, glyph.TopLeft.Y);
-                vertex->Color = Color.Black;
+                vertex->Color = batch->Color;
                 vertex++;
 
                 vertex->Position = new Vector2(topRight.X, bottomLeft.Y);
                 vertex->Texture = glyph.BottomRight;
-                vertex->Color = Color.Black;
+                vertex->Color = batch->Color;
                 vertex++;
 
                 vertexIndex += 4;

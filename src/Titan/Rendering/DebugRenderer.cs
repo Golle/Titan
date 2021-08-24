@@ -14,7 +14,7 @@ namespace Titan.Rendering
         private readonly ComPtr<IDXGISurface1> _surface;
         private HFONT _font;
         private HBRUSH _brush;
-        private bool _enabled = true;
+        private bool _enabled = false;
 
         public DebugRenderer(ComPtr<IDXGISurface1> surface)
         {

@@ -30,7 +30,7 @@ namespace Titan.UI.Systems
                 ref readonly var transform = ref _transform.Get(entity);
                 ref readonly var text = ref _text.Get(entity);
 
-                _renderQueue.AddText(transform.AbsolutePosition, transform.AbsoluteZIndex, text.CachedTexture, text.Font, text.Handle, text.VisibleChars);
+                _renderQueue.AddText(transform.AbsolutePosition, transform.AbsoluteZIndex, text.CachedTexture, text.Font, text.Handle, text.VisibleChars, text.Color);
             }
         }
     }

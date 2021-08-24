@@ -262,7 +262,7 @@ namespace Titan.Rendering
                 PixelShader= _assetsManager.GetAssetHandle<PixelShader>(_debugLinePixelShaderHandle),
             };
 
-            return new[] {gBuffer, deferredShading, debugPipeline, backbuffer, ui, debugOverlay, debugVerticesPipeline };
+            return new[] {gBuffer, deferredShading, debugPipeline, backbuffer, ui, debugVerticesPipeline, debugOverlay };
         }
     }
 }

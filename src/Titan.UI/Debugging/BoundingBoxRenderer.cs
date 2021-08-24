@@ -8,7 +8,7 @@ namespace Titan.UI.Debugging
     public class BoundingBoxRenderer : Renderer
     {
         private readonly BoundingBoxRenderQueue _renderQueue;
-        private bool _enabled;
+        private bool _enabled = true;
 
         public BoundingBoxRenderer(BoundingBoxRenderQueue renderQueue)
         {

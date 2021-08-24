@@ -6,6 +6,7 @@ using Titan.Assets;
 using Titan.Core.Logging;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
+using Titan.Graphics;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Common;
 using Titan.UI.Components;
@@ -43,9 +44,12 @@ namespace Titan.UI
         public string Text { get; set; }
         public string Font { get; set; }
         public int LineHeight { get; set; }
+        public int FontSize{ get; set; }
         public HorizontalOverflow HorizontalOverflow{ get; set; }
         public VerticalOverflow VerticalOverflow { get; set; }
         public TextAlign TextAlign { get; set; }
+        public VerticalAlign VerticalAlign { get; set; }
+        public Color Color { get; set; } = Color.Black;
 
         internal override void OnCreate(UIManager manager, in Entity entity)
         {
@@ -56,6 +60,9 @@ namespace Titan.UI
                 HorizontalOverflow = HorizontalOverflow,
                 VerticalOverflow = VerticalOverflow,
                 TextAlign = TextAlign,
+                VerticalAlign = VerticalAlign,
+                FontSize =  (ushort)FontSize,
+                Color = Color,
                 Handle = manager.TextManager.Create(new TextCreation
                 {
                     MaxCharacters = 100,

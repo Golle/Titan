@@ -6,6 +6,7 @@ using Titan.Components;
 using Titan.Core.Logging;
 using Titan.ECS;
 using Titan.ECS.Worlds;
+using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
@@ -66,15 +67,34 @@ namespace Titan.Sandbox
             {
                 AnchorPoint = AnchorPoint.MiddleCenter,
                 Font = "fonts/seqoe_ui_light",
-                TextAlign = TextAlign.Center,
+                TextAlign = TextAlign.Right,
+                Color = Color.White,
+                VerticalAlign = VerticalAlign.Top,
                 Size = (800, 200),
                 Offset = new Vector2(20, 0),
                 Text = "abc123ABCqQpQjJgG",
                 LineHeight = 40,
+                FontSize = 45,
                 Pivot = new(0.5f,0.5f),
                 ZIndex = 1
             });
-            
+
+            container.Add(new UIText
+            {
+                AnchorPoint = AnchorPoint.MiddleCenter,
+                Font = "fonts/seqoe_ui_light",
+                TextAlign = TextAlign.Right,
+                Color = Color.Red,
+                VerticalAlign = VerticalAlign.Top,
+                Size = (300, 100),
+                Offset = new Vector2(20, 300),
+                Text = "abc123ABCqQpQjJgG",
+                LineHeight = 40,
+                FontSize = 45,
+                Pivot = new(0.5f, 0.5f),
+                ZIndex = 1
+            });
+
             //var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
             //var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
 
