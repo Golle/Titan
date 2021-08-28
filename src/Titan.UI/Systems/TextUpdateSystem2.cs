@@ -69,7 +69,7 @@ namespace Titan.UI.Systems
                         offset.X = 0f;
                     }
 
-                    WriteGlyphPositions(ref textBlock.Positions[i], offset, glyph, font.Base, multiplier, xAdvance);
+                    WriteGlyphPositions(ref textBlock.VisibleCharacters[i], offset, glyph, font.Base, multiplier, xAdvance);
                     offset.X += xAdvance;
                 }
 

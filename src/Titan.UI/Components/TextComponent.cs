@@ -13,15 +13,15 @@ namespace Titan.UI.Components
         public Handle<TextBlock> Handle;
         public Handle<Font> Font;
         internal Handle<Texture> CachedTexture;
+        internal ushort VisibleChars;
         public ushort LineHeight;
         public ushort FontSize;
-        public ushort StartIndex;
-        public ushort EndIndex;
         public VerticalOverflow VerticalOverflow;
         public HorizontalOverflow HorizontalOverflow;
         public TextAlign TextAlign;
         public VerticalAlign VerticalAlign;
         public Color Color;
         public bool IsDirty;
+        
     }
 }

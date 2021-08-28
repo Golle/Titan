@@ -18,7 +18,7 @@ namespace Titan.UI.Text
             var handle = _resources.CreateResource();
             var textBlock = _resources.GetResourcePointer(handle);
             // TODO: allocate these in the same block
-            textBlock->Positions = MemoryUtils.AllocateBlock<CharacterPositions>(args.MaxCharacters);
+            textBlock->VisibleCharacters = MemoryUtils.AllocateBlock<CharacterPositions>(args.MaxCharacters);
             textBlock->Characters = MemoryUtils.AllocateBlock<char>(args.MaxCharacters);
             textBlock->CharacterCount = (ushort)args.InitialCharacters.Length;
 
@@ -47,7 +47,7 @@ namespace Titan.UI.Text
             foreach (var handle in _resources.EnumerateUsedResources())
             {
                 var resource = _resources.GetResourcePointer(handle);
-                resource->Positions.Free();
+                resource->VisibleCharacters.Free();
                 resource->Characters.Free();
             }
             _resources.Terminate();

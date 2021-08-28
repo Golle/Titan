@@ -16,8 +16,7 @@ namespace Titan.UI.Rendering
         public Vector2 Position;
         public Handle<TextBlock> Handle;
         public Handle<Font> Font;
-        public ushort Start;
-        public ushort End;
+        public ushort Count;
         public Color Color;
     }
     internal class TextBatch : IDisposable
@@ -35,14 +34,13 @@ namespace Titan.UI.Rendering
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining|MethodImplOptions.AggressiveOptimization)]
-        public unsafe int Add(in Vector2 position, in Handle<TextBlock> handle, in Handle<Font> font, ushort start, ushort end, in Color color)
+        public unsafe int Add(in Vector2 position, in Handle<TextBlock> handle, in Handle<Font> font, ushort count, in Color color)
         {
             var index = NextIndex();
             var text = _textBatches.GetPointer(index);
             text->Handle = handle;
             text->Font = font;
-            text->Start = start;
-            text->End = end;
+            text->Count = count;
             text->Position = position;
             text->Color = color;
 
@@ -59,17 +57,16 @@ namespace Titan.UI.Rendering
         {
             var batch = _textBatches.GetPointer(index);
             ref readonly var text = ref _textManager.Access(batch->Handle);
-            ref readonly var positions = ref text.Positions;
-            ref readonly var characters = ref text.Characters;
+            ref readonly var visibleCharacters = ref text.VisibleCharacters;
             ref readonly var font = ref _fontManager.Access(batch->Font);
 
-            for (var i = batch->Start; i <= batch->End; ++i)
+            for (var i = 0; i < batch->Count; ++i)
             {
-                var position = positions.GetPointer(i);
-                ref readonly var glyph = ref font.Get(characters[i]);
+                var character = visibleCharacters.GetPointer(i);
+                ref readonly var glyph = ref font.Get(character->Value);
 
-                var bottomLeft = position->BottomLeft + batch->Position;
-                var topRight = position->TopRight + batch->Position;
+                var bottomLeft = character->BottomLeft + batch->Position;
+                var topRight = character->TopRight + batch->Position;
 
                 vertex->Position = bottomLeft;
                 vertex->Texture = new Vector2(glyph.TopLeft.X, glyph.BottomRight.Y);
@@ -90,10 +87,10 @@ namespace Titan.UI.Rendering
                 vertex->Texture = glyph.BottomRight;
                 vertex->Color = batch->Color;
                 vertex++;
-
-                vertexIndex += 4;
-                indexCount += 6;
             }
+
+            vertexIndex += (uint)(4 * batch->Count);
+            indexCount += (uint)(6 * batch->Count);
         }
 
 

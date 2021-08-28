@@ -66,7 +66,7 @@ namespace Titan.UI.Systems
                 for (var i = 0; i < maxCharacters; ++i)
                 {
                     var character = textBlock.Characters[i];
-                    ref var characterBlock = ref textBlock.Positions[i];
+                    ref var characterBlock = ref textBlock.VisibleCharacters[i];
                     ref readonly var glyph = ref font.Get(character);
 
                     var yOffset = (font.Base - glyph.YOffset);
@@ -77,14 +77,14 @@ namespace Titan.UI.Systems
                     xOffset += glyph.XAdvance;
                 }
 
-                var xAlignOffset = GetXOffset(text.TextAlign, textBlock.Positions[0], textBlock.Positions[maxCharacters - 1], width);
+                var xAlignOffset = GetXOffset(text.TextAlign, textBlock.VisibleCharacters[0], textBlock.VisibleCharacters[maxCharacters - 1], width);
 
                 if (xAlignOffset != 0.0f)
                 {
                     // TODO: this can be done by calculating first + last before the loop, and then loop over characters between 1 and maxCharacters-1.
                     for (var i = 0; i < maxCharacters; ++i)
                     {
-                        ref var characterBlock = ref textBlock.Positions[i];
+                        ref var characterBlock = ref textBlock.VisibleCharacters[i];
                         characterBlock.BottomLeft.X += xAlignOffset;
                         characterBlock.TopRight.X += xAlignOffset;
                     }
