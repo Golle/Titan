@@ -67,30 +67,31 @@ namespace Titan.UI.Systems
                 var lineHeight = text.LineHeight;
                 var multiplier = text.FontSize / (float)font.FontSize;
 
-                var numberOfLines = CalculateLines(linesBuffer, new ReadOnlySpan<char>(textBlock.Characters, textBlock.CharacterCount), font, boxSize, multiplier);
+                var numberOfLines = CalculateLines(linesBuffer, new ReadOnlySpan<char>(textBlock.Characters, textBlock.CharacterCount), font, boxSize, multiplier, text.HorizontalOverflow);
 
                 // TODO: handle numberof lines == 0
 
                 var lines = linesBuffer[..numberOfLines];
                 var yStartOffset = GetYOffsets(boxSize, text, lines);
-
                 var offset = new Vector2(0, yStartOffset);
-                
+
                 ushort characterCount = 0;
                 foreach (ref readonly var line in lines)
                 {
-                    offset.X = GetXOffset(line, boxSize, text.TextAlign, multiplier);
-
-                    for (var i = line.Start; i <= line.End; ++i)
+                    var shouldRender = (offset.Y + lineHeight <= boxSize.Height) || text.VerticalOverflow == VerticalOverflow.Overflow;
+                    if (shouldRender)
                     {
-                        var c = textBlock.Characters[i];
-                        ref readonly var glyph = ref font.Get(c);
-                        var xAdvance = glyph.XAdvance * multiplier;
-                        WriteGlyph(ref textBlock.VisibleCharacters[characterCount++], c, offset, glyph, font.Base, multiplier, xAdvance);
-                        offset.X += xAdvance;
+                        offset.X = GetXOffset(line, boxSize, text.TextAlign, multiplier);
+                        for (var i = line.Start; i <= line.End; ++i)
+                        {
+                            var c = textBlock.Characters[i];
+                            ref readonly var glyph = ref font.Get(c);
+                            var xAdvance = glyph.XAdvance * multiplier;
+                            WriteGlyph(ref textBlock.VisibleCharacters[characterCount++], c, offset, glyph, font.Base, multiplier, xAdvance);
+                            offset.X += xAdvance;
+                        }
                     }
                     offset.Y -= lineHeight;
-
                     if (offset.Y < 0.0f && text.VerticalOverflow == VerticalOverflow.Truncate)
                     {
                         break;
@@ -129,7 +130,7 @@ namespace Titan.UI.Systems
                 };
         }
 
-        private static int CalculateLines(Span<TextLine> lines, ReadOnlySpan<char> characters, in Font font, in Size box, float multiplier)
+        private static int CalculateLines(Span<TextLine> lines, ReadOnlySpan<char> characters, in Font font, in Size box, float multiplier, HorizontalOverflow overflow)
         {
             var multipliedBoxWidth = (int)(box.Width / multiplier + 0.5f); // Easier to multiply the box width than every glyph size
             var lineCount = 0;
@@ -163,7 +164,7 @@ namespace Titan.UI.Systems
                 ref readonly var glyph = ref font.Get(c);
                 // Calculate the new width and check if it's in the box, if it's not, create a new line and reset
                 var width = currentWidth + glyph.XAdvance;
-                if (width > multipliedBoxWidth && lastWhitespace >= 0)
+                if (overflow == HorizontalOverflow.Wrap && width > multipliedBoxWidth && lastWhitespace >= 0)
                 {
                     lines[lineCount++] = new TextLine
                     {
