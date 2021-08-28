@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Fonts;
+using Titan.UI.Common;
 using Titan.UI.Components;
 using Titan.UI.Text;
 
@@ -31,6 +32,9 @@ namespace Titan.UI.Systems
 
         protected override void OnUpdate(in Timestep timestep)
         {
+
+            Span<int> lines = stackalloc int[100];
+
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref var text = ref _text.Get(entity);
@@ -49,6 +53,13 @@ namespace Titan.UI.Systems
                 var xOffset = 0f;
                 var lineHeight = text.LineHeight;
                 var fontSize = text.FontSize;
+
+
+                unsafe
+                {
+                    var words = GetWords(new ReadOnlySpan<char>(textBlock.Characters.AsPointer(), textBlock.CharacterCount), lines, transform.Size, font);
+                }
+                
 
                 var aspectRatio = fontSize / (float)font.FontSize;
                 
@@ -80,7 +91,7 @@ namespace Titan.UI.Systems
                 }
 
                 text.CachedTexture = font.Texture;
-                text.VisibleChars = maxCharacters;
+                //text.VisibleChars = maxCharacters;
                 text.IsDirty = false;
             }
 
@@ -93,6 +104,31 @@ namespace Titan.UI.Systems
                     TextAlign.Right => boxWidth - (last.TopRight.X - first.BottomLeft.X),
                     _ => 0 // Same as Left
                 };
+
+
+
+            static int GetWords(ReadOnlySpan<char> characters, Span<int> wordIndex, in Size boxSize, in Font font)
+            {
+
+                var lineHeight = 20;
+                var count = 0;
+                var xOffset = 0;
+                var yOffset = 0;
+                for (var i = 0; i < characters.Length; ++i)
+                {
+                    var character = characters[i];
+                    ref readonly var glyph = ref font.Get(character);
+                    
+                    if (xOffset + glyph.XAdvance > boxSize.Width)
+                    {
+                        yOffset += lineHeight;
+                    }
+
+                    xOffset += glyph.XAdvance;
+                }
+
+                return count;
+            }
         }
     }
 }

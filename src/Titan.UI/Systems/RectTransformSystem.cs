@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.ECS.Systems;
 using Titan.Graphics.Windows;
+using Titan.Input;
 using Titan.UI.Common;
 using Titan.UI.Components;
 
@@ -22,6 +23,45 @@ namespace Titan.UI.Systems
 
         protected override void OnUpdate(in Timestep timestep)
         {
+            foreach (ref readonly var entity in _filter.GetEntities())
+            {
+                ref var transform = ref _transform.Get(entity);
+
+                if (InputManager.IsKeyDown(KeyCode.Up))
+                {
+                    transform.Size.Width += 1;
+                }
+
+                if (InputManager.IsKeyDown(KeyCode.Down))
+                {
+                    transform.Size.Width -= 1;
+                }
+
+
+                transform.AbsolutePivot = new Vector2(transform.Size.Width * transform.Pivot.X, transform.Size.Height * transform.Pivot.Y);
+
+                if (EntityManager.TryGetParent(entity, out var parent) && _transform.Contains(parent))
+                {
+                    ref readonly var parentTransform = ref _transform.Get(parent);
+                    
+                    transform.AbsolutePosition = CalculateNewPosition(parentTransform.AbsolutePosition, parentTransform.Size, transform);
+                    transform.AbsoluteZIndex = transform.ZIndex + parentTransform.AbsoluteZIndex + 1;
+
+                    //TODO: not sure how we should do this. use constraints maybe?
+                    if (transform.Size.Height == 0 && transform.Size.Width == 0)
+                    {
+                        transform.Size = parentTransform.Size;
+                    }
+                }
+                else
+                {
+                    var windowSize = new Size(Window.Width, Window.Height);
+                    transform.AbsolutePosition = CalculateNewPosition(Vector2.Zero, windowSize, transform);
+                    transform.AbsoluteZIndex = transform.ZIndex;
+                }
+            }
+
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             static Vector2 CalculateNewPosition(in Vector2 parentPosition, in Size parentSize, in RectTransform transform)
             {
@@ -59,34 +99,6 @@ namespace Titan.UI.Systems
                 //    AnchorPoint.TopCenter => parentPosition + transform.Offset,
                 //    AnchorPoint.TopRight => parentPosition + transform.Offset,
                 //};
-            }
-
-
-            foreach (ref readonly var entity in _filter.GetEntities())
-            {
-                ref var transform = ref _transform.Get(entity);
-
-                transform.AbsolutePivot = new Vector2(transform.Size.Width * transform.Pivot.X, transform.Size.Height * transform.Pivot.Y);
-
-                if (EntityManager.TryGetParent(entity, out var parent) && _transform.Contains(parent))
-                {
-                    ref readonly var parentTransform = ref _transform.Get(parent);
-                    
-                    transform.AbsolutePosition = CalculateNewPosition(parentTransform.AbsolutePosition, parentTransform.Size, transform);
-                    transform.AbsoluteZIndex = transform.ZIndex + parentTransform.AbsoluteZIndex + 1;
-
-                    //TODO: not sure how we should do this. use constraints maybe?
-                    if (transform.Size.Height == 0 && transform.Size.Width == 0)
-                    {
-                        transform.Size = parentTransform.Size;
-                    }
-                }
-                else
-                {
-                    var windowSize = new Size(Window.Width, Window.Height);
-                    transform.AbsolutePosition = CalculateNewPosition(Vector2.Zero, windowSize, transform);
-                    transform.AbsoluteZIndex = transform.ZIndex;
-                }
             }
         }
     }

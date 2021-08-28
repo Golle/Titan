@@ -28,14 +28,14 @@ namespace Titan.UI
                 .WithSystem(new TextLoaderSystem(assetsManager, textManager))
                 .WithSystem(new UISpriteRenderSystem(renderQueue, atlasManager))
                 .WithSystem(new UITextRenderSystem(renderQueue))
-                .WithSystem(new TextUpdateSystem(textManager, fontManager))
+                .WithSystem(new TextUpdateSystem3(textManager, fontManager))
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())
                 
                 .WithSystem(new TestDragAndDropSystem())
             ;
     }
-
+    
     public class TestDragAndDropSystem : EntitySystem
     {
         private EntityFilter _filter;

@@ -15,7 +15,8 @@ namespace Titan.UI.Components
         internal Handle<Texture> CachedTexture;
         public ushort LineHeight;
         public ushort FontSize;
-        public ushort VisibleChars;
+        public ushort StartIndex;
+        public ushort EndIndex;
         public VerticalOverflow VerticalOverflow;
         public HorizontalOverflow HorizontalOverflow;
         public TextAlign TextAlign;

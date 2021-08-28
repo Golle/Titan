@@ -107,9 +107,9 @@ namespace Titan.UI.Rendering
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddText(in Vector2 position, int zIndex, Handle<Texture> texture, Handle<Font> font, Handle<TextBlock> text, ushort count, in Color color)
+        public void AddText(in Vector2 position, int zIndex, Handle<Texture> texture, Handle<Font> font, Handle<TextBlock> text, ushort start, ushort end, in Color color)
         {
-            var spriteIndex = _textBatch.Add(position, text, font, count, color);
+            var spriteIndex = _textBatch.Add(position, text, font, start, end, color);
             _sortable[NextIndex()] = new SortableRenderable(zIndex, texture, spriteIndex, RenderableType.Text);
         }
 

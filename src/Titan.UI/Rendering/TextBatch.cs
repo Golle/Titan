@@ -16,7 +16,8 @@ namespace Titan.UI.Rendering
         public Vector2 Position;
         public Handle<TextBlock> Handle;
         public Handle<Font> Font;
-        public ushort Count;
+        public ushort Start;
+        public ushort End;
         public Color Color;
     }
     internal class TextBatch : IDisposable
@@ -34,13 +35,14 @@ namespace Titan.UI.Rendering
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining|MethodImplOptions.AggressiveOptimization)]
-        public unsafe int Add(in Vector2 position, in Handle<TextBlock> handle, in Handle<Font> font, ushort count, in Color color)
+        public unsafe int Add(in Vector2 position, in Handle<TextBlock> handle, in Handle<Font> font, ushort start, ushort end, in Color color)
         {
             var index = NextIndex();
             var text = _textBatches.GetPointer(index);
             text->Handle = handle;
             text->Font = font;
-            text->Count = count;
+            text->Start = start;
+            text->End = end;
             text->Position = position;
             text->Color = color;
 
@@ -61,7 +63,7 @@ namespace Titan.UI.Rendering
             ref readonly var characters = ref text.Characters;
             ref readonly var font = ref _fontManager.Access(batch->Font);
 
-            for (var i = 0; i < batch->Count; ++i)
+            for (var i = batch->Start; i <= batch->End; ++i)
             {
                 var position = positions.GetPointer(i);
                 ref readonly var glyph = ref font.Get(characters[i]);

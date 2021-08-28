@@ -50,6 +50,7 @@ namespace Titan.UI
         public TextAlign TextAlign { get; set; }
         public VerticalAlign VerticalAlign { get; set; }
         public Color Color { get; set; } = Color.Black;
+        public uint MaxCharacters { get; set; }
 
         internal override void OnCreate(UIManager manager, in Entity entity)
         {
@@ -65,7 +66,7 @@ namespace Titan.UI
                 Color = Color,
                 Handle = manager.TextManager.Create(new TextCreation
                 {
-                    MaxCharacters = 100,
+                    MaxCharacters = MaxCharacters == 0 ? (uint)Text.Length : MaxCharacters,
                     InitialCharacters = Text,
                     Dynamic = false
                 })
