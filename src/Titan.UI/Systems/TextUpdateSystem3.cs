@@ -79,7 +79,7 @@ namespace Titan.UI.Systems
                         var c = textBlock.Characters[i];
                         ref readonly var glyph = ref font.Get(c);
                         var xAdvance = glyph.XAdvance * multiplier;
-                        WriteGlyph(ref textBlock.VisibleCharacters[characterCount++],c, offset, glyph, font.Base, multiplier, xAdvance);
+                        WriteGlyph(ref textBlock.VisibleCharacters[characterCount++], c, offset, glyph, font.Base, multiplier, xAdvance);
                         offset.X += xAdvance;
                     }
                     
@@ -92,11 +92,7 @@ namespace Titan.UI.Systems
                     }
                 }
 
-                
-
                 text.CachedTexture = font.Texture;
-                //text.StartIndex = lines[0].Start;
-                //text.EndIndex = lines[numberOfLines - 1].End;
                 text.VisibleChars = (ushort)characterCount;
                 text.IsDirty = false;
             }
@@ -124,7 +120,6 @@ namespace Titan.UI.Systems
                 // Handle special characters
                 if (c == '\r') // Ignore carriage return
                 {
-                    // might cause issues, maybe this should be stripped when the string is created?
                     continue;
                 }
                 if (c == ' ')
@@ -139,7 +134,6 @@ namespace Titan.UI.Systems
                     currentWidth = 0;
                     continue;
                 }
-
 
                 ref readonly var glyph = ref font.Get(c);
                 // Calculate the new width and check if it's in the box, if it's not, create a new line and reset
