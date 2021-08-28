@@ -1,5 +1,7 @@
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Titan.Core;
 using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Models;
@@ -37,9 +39,14 @@ namespace Titan.Rendering
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<Renderable> GetRenderables() => new(_renderables, 0, _count);
 
-        public void Update()
+        public void Begin()
         {
             _count = 0;
+        }
+
+        public void End()
+        {
+            // Do the stuff
         }
     }
 }

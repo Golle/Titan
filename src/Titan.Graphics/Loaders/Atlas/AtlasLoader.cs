@@ -98,8 +98,8 @@ namespace Titan.Graphics.Loaders.Atlas
 
                 // Calculate all needed coordinates
                 coords[0] = new Vector2(x / textureWidth, (y + height) / textureHeight);
-                coords[1] = new Vector2((x + left) / textureWidth, (y + height - top) / textureHeight);
-                coords[2] = new Vector2((x + width - right) / textureWidth, (y + bottom) / textureHeight);
+                coords[1] = new Vector2((x + left) / textureWidth, (y + height - bottom) / textureHeight);
+                coords[2] = new Vector2((x + width - right) / textureWidth, (y + top) / textureHeight);
                 coords[3] = new Vector2((x + width) / textureWidth, y / textureHeight);
                 
                 // Map the coordinates to each vertex

@@ -72,12 +72,14 @@ namespace Titan.Graphics.D3D11
                 },
                 SampleDesc = new DXGI_SAMPLE_DESC
                 {
+                    //Count = 2, // TODO: look into how we should use AA/Multi Sampling in Titan
                     Count = 1,
                     Quality = 0
                 },
 
                 BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
                 OutputWindow = windowHandle,
+                //SwapEffect = DXGI_SWAP_EFFECT_SEQUENTIAL,
                 SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
                 Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH,
                 Windowed = config.Windowed
@@ -89,6 +91,27 @@ namespace Titan.Graphics.D3D11
                 CheckAndThrow(D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, 0, deviceCreationFlags, null, 0, D3D11_SDK_VERSION, &desc, _swapChain.GetAddressOf(), _device.GetAddressOf(), null, _context.GetAddressOf()), nameof(D3D11CreateDeviceAndSwapChain));
             }
             Logger.Trace<ID3D11Device>("Device created");
+
+#if DEBUG
+
+            Logger.Trace<ID3D11Device>("Sampling quality levels");
+            uint qualityLevel = 0;
+            for (var sampleCount = 1u; sampleCount <= 16u; ++sampleCount)
+            {
+                unsafe
+                {
+                    var result = _device.Get()->CheckMultisampleQualityLevels(DXGI_FORMAT_B8G8R8A8_UNORM, sampleCount, &qualityLevel);
+                    if (SUCCEEDED(result))
+                    {
+                        Logger.Debug($"Sample count {sampleCount} supports quality level {qualityLevel}", typeof(GraphicsDevice));
+                    }
+                    else
+                    {
+                        Logger.Debug($"Sample count {sampleCount} failed with HRESULT {result}", typeof(GraphicsDevice));
+                    }
+                }
+            }
+#endif
 
             // Get the backbuffer
             Logger.Trace<ID3D11Device>($"Creating Backbuffer ({D3D11Resource})");

@@ -1,7 +1,5 @@
 using Titan.Assets;
 using Titan.Components;
-using Titan.Core;
-using Titan.Core.Logging;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Models;
 
@@ -31,9 +29,7 @@ namespace Titan.Systems
                 ref var asset = ref _asset.Get(entity);
                 if (!asset.AssetHandle.IsValid())
                 {
-                    Logger.Warning<ModelLoader>($"Asset handle invalid, loading asset");
                     asset.AssetHandle = _assetsManager.Load(asset.ToString());
-                    continue;
                 }
 
                 if (_assetsManager.IsLoaded(asset.AssetHandle))

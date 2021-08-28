@@ -9,7 +9,7 @@ namespace Titan.Graphics.Loaders.Atlas
 {
     public readonly record struct AtlasCreation(uint TextureCount, uint NineSliceCount);
 
-    public class AtlasManager
+    public class AtlasManager : IDisposable
     {
         private ResourcePool<TextureAtlas> _resources;
         public AtlasManager(uint maxAtlases)
@@ -47,9 +47,15 @@ namespace Titan.Graphics.Loaders.Atlas
             _resources.ReleaseResource(handle);
         }
 
-        public void Dispose()
+        public unsafe void Dispose()
         {
             Logger.Trace<AtlasManager>("Terminate resource pool");
+            foreach (var resource in _resources.EnumerateUsedResources())
+            {
+                var atlas = _resources.GetResourcePointer(resource.Value);
+                atlas->Coordinates.Free();
+                atlas->Descriptors.Free();
+            }
             _resources.Terminate();
         }
     }

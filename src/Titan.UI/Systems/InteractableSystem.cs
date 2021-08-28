@@ -45,7 +45,7 @@ namespace Titan.UI.Systems
                 ref var interactable = ref _interactable.Get(entity);
                 
                 // TODO: implement IsDirty
-                ref readonly var rectPosition = ref transform.Position;
+                ref readonly var rectPosition = ref transform.AbsolutePosition;
                 ref readonly var size = ref transform.Size;
                 interactable.BottomRight = new Vector2(rectPosition.X + size.Width, rectPosition.Y + size.Height);
                 interactable.TopLeft = rectPosition;

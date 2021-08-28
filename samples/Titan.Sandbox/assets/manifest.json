@@ -77,6 +77,23 @@
             "Static": true
         },
         {
+            "Id": "shaders/debug_line_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/debug_line_ps.hlsl"
+            ],
+            "Static": true
+        },
+        {
+            "Id": "shaders/debug_line_vs",
+            "Type": "vertexshader",
+            "Files": [
+                "shaders/debug_line_vs.hlsl",
+                "shaders/debug_line_vs.layout"
+            ],
+            "Static": true
+        },
+        {
             "Id": "shaders/debug_ps",
             "Type": "pixelshader",
             "Files": [
@@ -158,6 +175,44 @@
             ],
             "Static": true,
             "Preload": true
+        },
+        {
+            "Id": "fonts/seqoe_ui_light",
+            "Type": "font",
+            "Files": [
+                "fonts/seqoe_ui_light.fnt"
+            ],
+            "Dependencies": [
+                {
+                    "Id": "textures/seqoe_ui_light"
+                }
+            ]
+        },
+        {
+            "Id": "textures/seqoe_ui_light",
+            "Type": "texture",
+            "Files": [
+                "textures/seqoe_ui_light.png"
+            ]
+        },
+        {
+            "Id": "textures/redsheet",
+            "Type": "texture",
+            "Files": [
+                "textures/redsheet.png"
+            ]
+        },
+        {
+            "Id": "atlas/redsheet",
+            "Type": "atlas",
+            "Files": [
+                "textures/redsheet.atlas"
+            ],
+            "Dependencies": [
+                {
+                    "Id": "textures/redsheet"
+                }
+            ]
         }
     ]
 }

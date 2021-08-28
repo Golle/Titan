@@ -3,33 +3,39 @@ using Titan.Assets;
 using Titan.ECS;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Atlas;
+using Titan.Graphics.Loaders.Fonts;
 using Titan.Input;
 using Titan.UI.Components;
 using Titan.UI.Rendering;
 using Titan.UI.Systems;
+using Titan.UI.Text;
 
 namespace Titan.UI
 {
-    public record UIConfiguration(uint MaxSprites = 100, uint MaxComponents = 1000);
+    public record UIConfiguration(uint MaxSprites = 1000, uint MaxComponents = 1000);
     public static class UIInitializer
     {
-        public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager) =>
+        public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager, FontManager fontManager, TextManager textManager) =>
             builder
                 .WithComponent<AssetComponent<SpriteComponent>>(count: config.MaxSprites)
+                .WithComponent<AssetComponent<TextComponent>>(count: config.MaxSprites)
                 .WithComponent<SpriteComponent>(count: config.MaxComponents)
                 .WithComponent<RectTransform>(count: config.MaxComponents)
                 .WithComponent<InteractableComponent>(count: config.MaxComponents)
+                .WithComponent<TextComponent>(count: config.MaxComponents)
 
                 .WithSystem(new SpriteLoaderSystem(assetsManager))
-                .WithSystem(new UIRenderSystem(renderQueue, atlasManager))
+                .WithSystem(new TextLoaderSystem(assetsManager, textManager))
+                .WithSystem(new UISpriteRenderSystem(renderQueue, atlasManager))
+                .WithSystem(new UITextRenderSystem(renderQueue))
+                .WithSystem(new TextUpdateSystem3(textManager, fontManager))
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())
+                
                 .WithSystem(new TestDragAndDropSystem())
             ;
     }
-
-
-
+    
     public class TestDragAndDropSystem : EntitySystem
     {
         private EntityFilter _filter;

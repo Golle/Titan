@@ -1,5 +1,10 @@
+using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using Titan.ECS.Systems;
+using Titan.Graphics.Windows;
 using Titan.Input;
+using Titan.UI.Common;
 using Titan.UI.Components;
 
 namespace Titan.UI.Systems
@@ -8,7 +13,7 @@ namespace Titan.UI.Systems
     {
         private EntityFilter _filter;
         private MutableStorage<RectTransform> _transform;
-        
+
         protected override void Init()
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>());
@@ -22,34 +27,87 @@ namespace Titan.UI.Systems
             {
                 ref var transform = ref _transform.Get(entity);
 
-
-
-                if (InputManager.LeftMouseButtonDown)
+                if (InputManager.IsKeyDown(KeyCode.Up))
                 {
-                    transform.Size.Width += 1;
                     transform.Size.Height += 1;
                 }
 
-                if (InputManager.RightMouseButtonDown)
+                if (InputManager.IsKeyDown(KeyCode.Down))
                 {
                     transform.Size.Height -= 1;
+                }
+                if (InputManager.IsKeyDown(KeyCode.Right))
+                {
+                    transform.Size.Width += 1;
+                }
+
+                if (InputManager.IsKeyDown(KeyCode.Left))
+                {
                     transform.Size.Width -= 1;
                 }
-                
+
+
+                transform.AbsolutePivot = new Vector2(transform.Size.Width * transform.Pivot.X, transform.Size.Height * transform.Pivot.Y);
 
                 if (EntityManager.TryGetParent(entity, out var parent) && _transform.Contains(parent))
                 {
                     ref readonly var parentTransform = ref _transform.Get(parent);
-                    // Increase z-index with 0.5 per parent so it gets rendered in the correct order
-                    transform.Position = parentTransform.Position + transform.Offset;
+                    
+                    transform.AbsolutePosition = CalculateNewPosition(parentTransform.AbsolutePosition, parentTransform.Size, transform);
                     transform.AbsoluteZIndex = transform.ZIndex + parentTransform.AbsoluteZIndex + 1;
+
+                    //TODO: not sure how we should do this. use constraints maybe?
+                    if (transform.Size.Height == 0 && transform.Size.Width == 0)
+                    {
+                        transform.Size = parentTransform.Size;
+                    }
                 }
                 else
                 {
-                    transform.Position = transform.Offset;
+                    var windowSize = new Size(Window.Width, Window.Height);
+                    transform.AbsolutePosition = CalculateNewPosition(Vector2.Zero, windowSize, transform);
                     transform.AbsoluteZIndex = transform.ZIndex;
                 }
-                
+            }
+
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            static Vector2 CalculateNewPosition(in Vector2 parentPosition, in Size parentSize, in RectTransform transform)
+            {
+                ref readonly var offset = ref transform.Offset;
+                ref readonly var pivot = ref transform.AbsolutePivot;
+
+                var anchorPoint = transform.AnchorPoint;
+
+                Unsafe.SkipInit<Vector2>(out var position);
+                position.X = (anchorPoint & AnchorPoint.HorizontalMask) switch
+                {
+                    AnchorPoint.Right => parentPosition.X + parentSize.Width - pivot.X + offset.X,
+                    AnchorPoint.Center => parentPosition.X + parentSize.Width / 2f - pivot.X + offset.X,
+                    _ => parentPosition.X + transform.Offset.X - pivot.X // This is Left as well
+                };
+
+                position.Y = (anchorPoint & AnchorPoint.VerticalMask) switch
+                {
+                    AnchorPoint.Top => parentPosition.Y + parentSize.Height - pivot.Y + offset.Y, 
+                    AnchorPoint.Middle => parentPosition.Y + parentSize.Height / 2f - pivot.Y + offset.Y,
+                    _ => parentPosition.Y + transform.Offset.Y - pivot.Y // This is Bottom as well
+                };
+                return position;
+
+                //return transform.AnchorPoint switch
+                //{
+                //    AnchorPoint.BottomLeft or AnchorPoint.Default => parentPosition + transform.Offset - pivot,
+                //    AnchorPoint.BottomCenter => new Vector2(parentPosition.X + parentSize.Width / 2f - pivot.X + offset.X, parentPosition.Y + offset.Y - pivot.Y),
+                //    AnchorPoint.BottomRight => new Vector2(parentPosition.X + parentSize.Width - pivot.X + offset.X, parentPosition.Y + offset.Y - pivot.Y),
+                    
+                //    AnchorPoint.CenterRight => parentPosition + transform.Offset,
+                //    AnchorPoint.Center => parentPosition + transform.Offset,
+                //    AnchorPoint.CenterLeft => parentPosition + transform.Offset,
+                //    AnchorPoint.TopLeft => parentPosition + transform.Offset,
+                //    AnchorPoint.TopCenter => parentPosition + transform.Offset,
+                //    AnchorPoint.TopRight => parentPosition + transform.Offset,
+                //};
             }
         }
     }

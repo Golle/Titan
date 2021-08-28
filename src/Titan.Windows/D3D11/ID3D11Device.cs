@@ -171,7 +171,7 @@ namespace Titan.Windows.D3D11
         //// /* [annotation] */
         //// _COM_Outptr_opt_  ID3D11Counter** ppCounter);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public HRESULT CreateDeferredContext(uint contextFlags, ID3D11DeviceContext ** ppDeferredContext) =>  ((delegate* unmanaged[Stdcall]<void*, uint, ID3D11DeviceContext**, HRESULT>)_vtbl[27])(Unsafe.AsPointer(ref this), contextFlags, ppDeferredContext);
+        public HRESULT CreateDeferredContext(uint contextFlags, ID3D11DeviceContext ** ppDeferredContext) => ((delegate* unmanaged[Stdcall]<void*, uint, ID3D11DeviceContext**, HRESULT>)_vtbl[27])(Unsafe.AsPointer(ref this), contextFlags, ppDeferredContext);
 
         ////HRESULT(STDMETHODCALLTYPE* OpenSharedResource)(
         //// ID3D11Device* This,
@@ -189,15 +189,8 @@ namespace Titan.Windows.D3D11
         //// /* [annotation] */
         //// _Out_  UINT* pFormatSupport);
 
-        ////HRESULT(STDMETHODCALLTYPE* CheckMultisampleQualityLevels)(
-        //// ID3D11Device* This,
-        //// /* [annotation] */
-        //// _In_ DXGI_FORMAT Format,
-        //// /* [annotation] */
-        //// _In_  UINT SampleCount,
-        //// /* [annotation] */
-        //// _Out_  UINT* pNumQualityLevels);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT CheckMultisampleQualityLevels(DXGI_FORMAT format, uint sampleCount, uint* pNumQualityLevels) => ((delegate* unmanaged[Stdcall]<void*, DXGI_FORMAT, uint, uint*, HRESULT>)_vtbl[30])(Unsafe.AsPointer(ref this), format, sampleCount, pNumQualityLevels);
         ////void (STDMETHODCALLTYPE* CheckCounterInfo ) (
         ////    ID3D11Device* This,
         ////    /* [annotation] */

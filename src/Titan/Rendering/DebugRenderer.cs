@@ -1,3 +1,4 @@
+using System.Linq;
 using Titan.Core;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -13,16 +14,17 @@ namespace Titan.Rendering
         private readonly ComPtr<IDXGISurface1> _surface;
         private HFONT _font;
         private HBRUSH _brush;
-        private bool _enabled = true;
+        private bool _enabled = false;
 
         public DebugRenderer(ComPtr<IDXGISurface1> surface)
         {
             _surface = new ComPtr<IDXGISurface1>(surface);
 
-            const string fontName = "Segoe UI Light";
+            //const string fontName = "Segoe UI Light";
+            const string fontName = "Courier";
             fixed (char* pFont = fontName)
             {
-                _font = GDI32.CreateFontW(20, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, pFont);
+                _font = GDI32.CreateFontW(16, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, pFont);
             }
 
             _brush = GDI32.CreateSolidBrush(new COLORREF(50, 50, 50));
@@ -46,21 +48,18 @@ namespace Titan.Rendering
             GDI32.SetBkColor(hdc, new COLORREF(0, 0, 0));
             GDI32.SetBkMode(hdc, BackgroundMode.Transparent);
 
+            const int lineHeight = 25;
+            var rectSize = (EngineStats.TotalLines + 2) * lineHeight; 
             //var oldBrush = GDI32.SelectObject(hdc, _brush);
             var rect = new RECT
             {
                 Top = 0,
                 Left = 0,
-                Right = 400,
-                Bottom = 450
+                Right = 800,
+                Bottom = rectSize
             };
             GDI32.FillRect(hdc, &rect, _brush);
-
-
             var obj = GDI32.SelectObject(hdc, _font);
-
-            //const string str = "Sample Data collection: {0}";
-
             
             const string template = "{0}: {1:N6}ms";
             var i = 1;
@@ -69,23 +68,29 @@ namespace Titan.Rendering
                 var str = string.Format(template, name, value);
                 fixed (char* pStr = str)
                 {
-                    GDI32.TextOutW(hdc, 10, i * 25, pStr, str.Length);
+                    GDI32.TextOutW(hdc, 10, i * lineHeight, pStr, str.Length);
                     i++;
                 }
             }
-            
-            //Span<byte> strBytes = stackalloc byte[256];
-            //var r = new Random(123123);
-            //for (var i = 0; i < 10; ++i)
-            //{
-            //    var formattedString1 = string.Format(str, r.Next(1000, 1000000));
-            //    var length = Encoding.UTF8.GetBytes(formattedString1, strBytes);
-            //    fixed (byte* pStr = strBytes)
-            //    {
-            //        GDI32.TextOutA(hdc, 10, 10 + i*20, pStr, length);
-            //    }
-            //}
-            
+
+            const string systems = "Systems";
+            fixed (char* pStr = systems)
+            {
+                GDI32.TextOutW(hdc, 10, i * 25, pStr, systems.Length);
+                i++;
+            }
+
+            const string systemsTemplate = "{0} Pre: {1:N4}ms   Update: {2:N4}ms   Post: {3:N4}ms";
+            foreach (var (key, value) in EngineStats.GetSystemStats().OrderBy(e => e.Key))
+            {
+                var str = string.Format(systemsTemplate, key.PadRight(25), value.PreUpdate, value.Update, value.PostUpdate);
+                fixed (char* pStr = str)
+                {
+                    GDI32.TextOutW(hdc, 10, i * lineHeight, pStr, str.Length);
+                    i++;
+                }
+            }
+
             GDI32.SelectObject(hdc, obj);
             _surface.Get()->ReleaseDC(null);
         }
