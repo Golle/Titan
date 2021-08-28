@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.VisualBasic.CompilerServices;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Fonts;
 using Titan.UI.Common;
@@ -50,8 +51,7 @@ namespace Titan.UI.Systems
 
         protected override void OnUpdate(in Timestep timestep)
         {
-            Span<TextLine> lines = stackalloc TextLine[100];
-            
+            Span<TextLine> linesBuffer = stackalloc TextLine[100];
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref var text = ref _text.Get(entity);
@@ -67,13 +67,20 @@ namespace Titan.UI.Systems
                 var lineHeight = text.LineHeight;
                 var multiplier = text.FontSize / (float)font.FontSize;
 
-                var numberOfLines = CalculateLines(lines, new ReadOnlySpan<char>(textBlock.Characters, textBlock.CharacterCount), font, boxSize, multiplier);
+                var numberOfLines = CalculateLines(linesBuffer, new ReadOnlySpan<char>(textBlock.Characters, textBlock.CharacterCount), font, boxSize, multiplier);
+
                 // TODO: handle numberof lines == 0
 
-                var offset = new Vector2(0, boxSize.Height - lineHeight);
-                var characterCount = 0;
-                foreach (ref readonly var line in lines.Slice(0, numberOfLines))
+                var lines = linesBuffer[..numberOfLines];
+                var yStartOffset = GetYOffsets(boxSize, text, lines);
+
+                var offset = new Vector2(0, yStartOffset);
+                
+                ushort characterCount = 0;
+                foreach (ref readonly var line in lines)
                 {
+                    offset.X = GetXOffset(line, boxSize, text.TextAlign, multiplier);
+
                     for (var i = line.Start; i <= line.End; ++i)
                     {
                         var c = textBlock.Characters[i];
@@ -82,9 +89,7 @@ namespace Titan.UI.Systems
                         WriteGlyph(ref textBlock.VisibleCharacters[characterCount++], c, offset, glyph, font.Base, multiplier, xAdvance);
                         offset.X += xAdvance;
                     }
-                    
                     offset.Y -= lineHeight;
-                    offset.X = 0f;
 
                     if (offset.Y < 0.0f && text.VerticalOverflow == VerticalOverflow.Truncate)
                     {
@@ -93,7 +98,7 @@ namespace Titan.UI.Systems
                 }
 
                 text.CachedTexture = font.Texture;
-                text.VisibleChars = (ushort)characterCount;
+                text.VisibleChars = characterCount;
                 text.IsDirty = false;
             }
 
@@ -105,6 +110,23 @@ namespace Titan.UI.Systems
                 character.TopRight = new Vector2(offset.X + xAdvance, y);
                 character.BottomLeft = new Vector2(offset.X + glyph.XOffset * multiplier, y - glyph.Height * multiplier);
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            static float GetYOffsets(in Size boxSize, in TextComponent text, in ReadOnlySpan<TextLine> lines) =>
+                text.VerticalAlign switch
+                {
+                    VerticalAlign.Top => boxSize.Height - text.LineHeight,
+                    VerticalAlign.Middle => boxSize.Height/2f + (lines.Length * text.LineHeight)/2f - text.LineHeight,
+                    VerticalAlign.Bottom or _ => text.LineHeight * (lines.Length - 1)
+                };
+
+            static float GetXOffset(in TextLine line, in Size boxSize, TextAlign align, float multiplier) =>
+                align switch
+                {
+                    TextAlign.Left => 0f,
+                    TextAlign.Center => (boxSize.Width/2f) - (line.Width * multiplier/2f),
+                    TextAlign.Right or _ => boxSize.Width - line.Width * multiplier
+                };
         }
 
         private static int CalculateLines(Span<TextLine> lines, ReadOnlySpan<char> characters, in Font font, in Size box, float multiplier)
@@ -112,6 +134,7 @@ namespace Titan.UI.Systems
             var multipliedBoxWidth = (int)(box.Width / multiplier + 0.5f); // Easier to multiply the box width than every glyph size
             var lineCount = 0;
             var currentWidth = 0;
+            var widthBeforeLastWhitespace = 0;
             var startIndex = 0;
             var lastWhitespace = -1;
             for (var index = 0; index < characters.Length; ++index)
@@ -125,6 +148,8 @@ namespace Titan.UI.Systems
                 if (c == ' ')
                 {
                     lastWhitespace = index;
+                    // Store the current width since it might be needed if there's a line break
+                    widthBeforeLastWhitespace = currentWidth;
                 }
                 else if (c == '\n')
                 {
@@ -140,19 +165,18 @@ namespace Titan.UI.Systems
                 var width = currentWidth + glyph.XAdvance;
                 if (width > multipliedBoxWidth && lastWhitespace >= 0)
                 {
-                    //var start = startIndex == 0 ? startIndex : startIndex + 1; // If the startindex is not the first character, increase the startindex with 1
                     lines[lineCount++] = new TextLine
                     {
                         Start = (ushort)startIndex,
                         End = (ushort)(lastWhitespace - 1),
-                        Width = currentWidth
+                        Width = widthBeforeLastWhitespace
                     };
                     // step back to the last whitespace found and set the startindex to the next character (TODO: what happens if the last character is a whitespace?)
                     index = lastWhitespace;
                     startIndex = lastWhitespace + 1;
                     // reset the last whitespace, so we don't step back to previous words
                     lastWhitespace = -1;
-                    currentWidth = 0;
+                    widthBeforeLastWhitespace = currentWidth = 0;
                 }
                 else
                 {

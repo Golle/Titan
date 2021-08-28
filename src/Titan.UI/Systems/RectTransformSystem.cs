@@ -29,10 +29,19 @@ namespace Titan.UI.Systems
 
                 if (InputManager.IsKeyDown(KeyCode.Up))
                 {
-                    transform.Size.Width += 1;
+                    transform.Size.Height += 1;
                 }
 
                 if (InputManager.IsKeyDown(KeyCode.Down))
+                {
+                    transform.Size.Height -= 1;
+                }
+                if (InputManager.IsKeyDown(KeyCode.Right))
+                {
+                    transform.Size.Width += 1;
+                }
+
+                if (InputManager.IsKeyDown(KeyCode.Left))
                 {
                     transform.Size.Width -= 1;
                 }

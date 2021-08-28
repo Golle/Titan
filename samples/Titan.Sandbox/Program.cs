@@ -79,32 +79,43 @@ namespace Titan.Sandbox
             //    ZIndex = 1
             //});
 
-            container.Add(new UIText
+
+            var textAlign = new[] { TextAlign.Left, TextAlign.Center, TextAlign.Right };
+            var verticalAlign = new[] { VerticalAlign.Bottom, VerticalAlign.Middle, VerticalAlign.Top };
+
+            for (var x = 0; x < textAlign.Length; ++x)
             {
-                AnchorPoint = AnchorPoint.Left,
-                Font = "fonts/seqoe_ui_light",
-                TextAlign = TextAlign.Center,
-                Color = Color.White,
-                VerticalAlign = VerticalAlign.Top,
-                VerticalOverflow = VerticalOverflow.Overflow,
-                Size = (300, 124),
-                Offset = new Vector2(200, 400),
-                //Text = "VerticalOverflow = Overflow Lorem ipsum dolor\nsit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                Text = "ipsum dolor\nsit amet",
-                LineHeight = 20,
-                FontSize = 23,
-                Pivot = Vector2.Zero,
-                ZIndex = 1
-            });
+                for (var y = 0; y < verticalAlign.Length; ++y)
+                {
+                    container.Add(new UIText
+                    {
+                        AnchorPoint = AnchorPoint.Left,
+                        Font = "fonts/seqoe_ui_light",
+                        TextAlign = textAlign[x],
+                        Color = Color.White,
+                        VerticalAlign = verticalAlign[y],
+                        VerticalOverflow = VerticalOverflow.Truncate,
+                        Size = (300, 124),
+                        Offset = new Vector2(200 + x * 400, 200 + y * 250),
+                        //Text = "VerticalOverflow = Overflow Lorem ipsum dolor\nsit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                        Text = "ipsum dolor\nsit amet",
+                        LineHeight = 20,
+                        FontSize = 23,
+                        Pivot = Vector2.Zero,
+                        ZIndex = 1
+                    });
 
 
+                }
+            }
+            
             //container.Add(new UIText
             //{
             //    AnchorPoint = AnchorPoint.Left,
             //    Font = "fonts/seqoe_ui_light",
             //    TextAlign = TextAlign.Right,
             //    Color = Color.White,
-                
+
             //    VerticalAlign = VerticalAlign.Top,
             //    VerticalOverflow = VerticalOverflow.Truncate,
             //    Size = (300, 124),
