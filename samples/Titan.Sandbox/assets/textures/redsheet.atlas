@@ -1,8 +1,7 @@
-25;1
+24;2
 380;0;38;36;red_boxCheckmark.png
 380;36;38;36;red_boxCross.png
 386;178;36;36;red_boxTick.png
-0;0;190;45;red_button00.png
 0;45;190;49;red_button01.png
 0;94;190;45;red_button02.png
 339;98;49;49;red_button04.png
@@ -25,3 +24,4 @@
 416;72;28;42;red_sliderUp.png
 39;233;17;17;red_tick.png
 337;188;49;49;6;11;6;6;red_button03.png
+0;0;190;45;10;10;10;10;red_button00.png

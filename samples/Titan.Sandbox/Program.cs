@@ -51,202 +51,107 @@ namespace Titan.Sandbox
 
             var container = new UIContainer
             {
-                Offset = new Vector2(0, 0),
-                //Size = (1200, 300),
+                Offset = new Vector2(100, 100),
+                Size = (1200, 600),
                 ZIndex = 0,
-                Pivot = new(0, 0),
-                //Background = new Sprite
-                //{
-                //    Identifier = "atlas/redsheet",
-                //    Index = 25,
-                //    Margins = (12, 22, 12, 12)
-                //}
+                Pivot = new(0, 0)
             };
 
-            //container.Add(new UIText
-            //{
-            //    AnchorPoint = AnchorPoint.MiddleCenter,
-            //    Font = "fonts/seqoe_ui_light",
-            //    TextAlign = TextAlign.Right,
-            //    Color = Color.White,
-            //    VerticalAlign = VerticalAlign.Top,
-            //    Size = (800, 200),
-            //    Offset = new Vector2(20, 0),
-            //    Text = "abc123ABCqQpQjJgG",
-            //    LineHeight = 40,
-            //    FontSize = 45,
-            //    Pivot = new(0.5f, 0.5f),
-            //    ZIndex = 1
-            //});
+
+            // Uncomment this to render the text-align/valign boxes
+            //ShowTextAlignBoxes();
+            //ShowAchorPoints();
+            ShowButtonIds();
 
 
-            var textAlign = new[] { TextAlign.Left, TextAlign.Center, TextAlign.Right };
-            var verticalAlign = new[] { VerticalAlign.Bottom, VerticalAlign.Middle, VerticalAlign.Top };
-
-            for (var x = 0; x < textAlign.Length; ++x)
+            void ShowTextAlignBoxes()
             {
-                for (var y = 0; y < verticalAlign.Length; ++y)
+                var textAlign = new[] { TextAlign.Left, TextAlign.Center, TextAlign.Right };
+                var verticalAlign = new[] { VerticalAlign.Bottom, VerticalAlign.Middle, VerticalAlign.Top };
+
+                for (var x = 0; x < textAlign.Length; ++x)
                 {
-                    container.Add(new UIText
+                    for (var y = 0; y < verticalAlign.Length; ++y)
                     {
-                        AnchorPoint = AnchorPoint.Left,
-                        Font = "fonts/seqoe_ui_light",
-                        TextAlign = textAlign[x],
-                        Color = Color.White,
-                        VerticalAlign = verticalAlign[y],
-                        VerticalOverflow = VerticalOverflow.Overflow,
-                        HorizontalOverflow = HorizontalOverflow.Wrap,
-                        Size = (300, 124),
-                        Offset = new Vector2(200 + x * 400, 200 + y * 250),
-                        //Text = "VerticalOverflow = Overflow Lorem ipsum dolor\nsit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                        Text = " ipsum dolor sit amet ipsum dolor sit amet ipsum dolor sit amet ipsum dolor sit amet ipsum dolor sit amet ipsum dolor sit amet ipsum dolor sit amet",
-                        LineHeight = 20,
-                        FontSize = 23,
-                        Pivot = Vector2.Zero,
-                        ZIndex = 1
-                    });
-
-
+                        container.Add(new UIText
+                        {
+                            AnchorPoint = AnchorPoint.Left,
+                            Font = "fonts/seqoe_ui_light",
+                            TextAlign = textAlign[x],
+                            Color = Color.White,
+                            VerticalAlign = verticalAlign[y],
+                            VerticalOverflow = VerticalOverflow.Truncate,
+                            HorizontalOverflow = HorizontalOverflow.Wrap,
+                            Size = (300, 124),
+                            Offset = new Vector2(200 + x * 400, 200 + y * 250),
+                            //Text = "VerticalOverflow = Overflow Lorem ipsum dolor\nsit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                            Text = "Aipsum dolor sit amet Aipsum dolor sit amet Aipsum dolor sit amet Aipsum dolor sit amet Aipsum dolor sit amet Aipsum dolor sit amet Aipsum dolor sit ametgq",
+                            LineHeight = 20,
+                            FontSize = 23,
+                            Pivot = Vector2.Zero,
+                            ZIndex = 1
+                        });
+                    }
                 }
             }
+
+            void ShowAchorPoints()
+            {
+                var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
+                var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
+
+                foreach (var vertical in a)
+                {
+                    foreach (var horizontal in b)
+                    {
+                        container.AddButton(new UIButton
+                        {
+                            Size = (38, 36),
+                            ZIndex = 1,
+                            Offset = Vector2.Zero,
+                            AnchorPoint = vertical | horizontal,
+                            Pivot = new(0.5f, 0.5f),
+                            Sprite = new Sprite
+                            {
+                                Identifier = "atlas/redsheet",
+                                Index = 1
+                            }
+                        });
+                    }
+                }
+            }
+
+
+            void ShowButtonIds()
+            {
+                container.Add(new UIButton
+                {
+                    Size = (300,100),
+                    Sprite = new Sprite
+                    {
+                        Identifier = "atlas/redsheet",
+                        Index = 25,
+                        Margins = (10,10,10,10)
+                    },
+                    AnchorPoint = AnchorPoint.MiddleCenter,
+                    Text = new UIText
+                    {
+                        FontSize = 22,
+                        LineHeight = 30,
+                        Text = "This is button!",
+                        Font = "fonts/seqoe_ui_light",
+                        Color = Color.Blue,
+                        TextAlign = TextAlign.Center,
+                        VerticalAlign = VerticalAlign.Middle,
+                        AnchorPoint = AnchorPoint.MiddleCenter,
+                        VerticalOverflow = VerticalOverflow.Overflow
+                    }
+                });
+            }
             
-            //container.Add(new UIText
-            //{
-            //    AnchorPoint = AnchorPoint.Left,
-            //    Font = "fonts/seqoe_ui_light",
-            //    TextAlign = TextAlign.Right,
-            //    Color = Color.White,
-
-            //    VerticalAlign = VerticalAlign.Top,
-            //    VerticalOverflow = VerticalOverflow.Truncate,
-            //    Size = (300, 124),
-            //    Offset = new Vector2(200, 600),
-            //    Text = "VerticalOverflow = Truncate Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-            //    LineHeight = 20,
-            //    FontSize = 22,
-            //    Pivot = Vector2.Zero,
-            //    ZIndex = 1
-            //});
-            //var a = new[] { AnchorPoint.Top, AnchorPoint.Bottom, AnchorPoint.Middle };
-            //var b = new[] { AnchorPoint.Left, AnchorPoint.Right, AnchorPoint.Center };
-
-            //foreach (var vertical in a)
-            //{
-            //    foreach (var horizontal in b)
-            //    {
-            //        container.AddButton(new UIButton
-            //        {
-            //            Size = (38, 36),
-            //            ZIndex = 1,
-            //            Offset = Vector2.Zero,
-            //            AnchorPoint = vertical | horizontal,
-            //            Pivot = new(0.5f, 0.5f),
-            //            Sprite = new Sprite
-            //            {
-            //                Identifier = "atlas/redsheet",
-            //                Index = 1
-            //            }
-            //        });
-            //    }
-            //}
 
 
-
-            //container.AddButton(new UIButton
-            //{
-            //    Size = (38, 36),
-            //    ZIndex = 1,
-            //    Offset = Vector2.Zero,
-            //    AnchorPoint = AnchorPoint.Top | AnchorPoint.Center,
-            //    Pivot = new (0.5f,0.5f),
-            //    //Pivot = new (1,1),
-            //    Sprite = new Sprite
-            //    {
-            //        Identifier = "atlas/redsheet", 
-            //        Index = 1
-            //    }
-            //});
-
-            //container.Add(new UIButton
-            //{
-            //    Offset = new (115, 30),
-            //    Size = (190, 45),
-            //    ZIndex = 1,
-            //    Sprite = new Sprite
-            //    {
-            //        Identifier = "atlas/redsheet", 
-            //        Index = 3
-            //    }
-            //});
-
-
-
-            //container.AddButton(new UIButton
-            //{
-            //    Offset = Vector2.Zero,
-            //    Size = (100, 100),
-            //    ZIndex = 10,
-            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 }
-            //});
-
-            //container.AddButton(new UIButton
-            //{
-            //    Offset = Vector2.One*200,
-            //    Size = (190, 45),
-            //    Sprite = new Sprite{ Identifier = "atlas/redsheet", Index = 4},
-            //    ZIndex = 100
-            //});
-
-            //container.AddButton(new UIButton
-            //{
-            //    Offset = new Vector2(400, 300),
-            //    Size = (100, 100),
-            //    ZIndex = 1,
-            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 0 },
-            //    Text= new UIText
-            //    {
-            //        Font = "fonts/seqoe_ui_light",
-            //        Text = "this is my text"
-            //    }
-            //});
-
-            //container.AddButton(new UIButton
-            //{
-            //    Offset = new Vector2(600, 300),
-            //    Size = (150, 150),
-            //    ZIndex = 1,
-            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Margins = 20 }
-            //});
-
-            //container.Add(new UIText
-            //{
-            //    Size = new Size(30, 30),
-            //    Offset = new Vector2(100, 00),
-            //    Font = "fonts/seqoe_ui_light",
-            //});
-            //container.AddButton(new UIButton
-            //{
-            //    Offset = new Vector2(400, 200),
-            //    Size = (100, 100),
-            //    ZIndex = 1,
-            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 4, Type = SpriteType.Slice, Margins = 40}
-            //});
-
-            //container.AddButton(new UIButton
-            //{
-            //    Offset = Vector2.One* 120,
-            //    Size = (100, 150),
-            //    ZIndex = 1,
-            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 2 }
-            //});
-            //container.AddButton(new UIButton
-            //{
-            //    Offset = Vector2.One * 240,
-            //    Size = (100, 125),
-            //    ZIndex = 1,
-            //    Sprite = new Sprite { Identifier = "atlas/ui_01", Index = 3 },
-
-            //});
+            
             uiManager.Add(container);
         }
 
@@ -274,6 +179,8 @@ namespace Titan.Sandbox
                 Width = 1920,
                 //Height = 768,
                 //Width = 1024,
+                //Width = 2560,
+                //Height = 1440,
                 Title = "Sandbox",
                 Windowed = true
             };

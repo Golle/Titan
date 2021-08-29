@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Numerics;
 using Titan.Assets;
-using Titan.Core.Logging;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
@@ -78,8 +75,6 @@ namespace Titan.UI
         public Sprite Sprite { get; set; }
         public Sprite OnHover { get; set; }
         public UIText Text { get; set; }
-        
-
 
         internal override unsafe void OnCreate(UIManager manager, in Entity entity)
         {

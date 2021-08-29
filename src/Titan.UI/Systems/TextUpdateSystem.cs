@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Fonts;
 using Titan.UI.Common;
@@ -8,7 +9,7 @@ using Titan.UI.Text;
 
 namespace Titan.UI.Systems
 {
-    internal class TextUpdateSystem : EntitySystem
+    internal unsafe class TextUpdateSystem : EntitySystem
     {
         private readonly TextManager _textManager;
         private readonly FontManager _fontManager;
@@ -16,7 +17,7 @@ namespace Titan.UI.Systems
         private MutableStorage<TextComponent> _text;
         private ReadOnlyStorage<RectTransform> _transform;
 
-        public TextUpdateSystem(TextManager textManager, FontManager fontManager) 
+        public TextUpdateSystem(TextManager textManager, FontManager fontManager)
             : base(int.MinValue)
         {
             _textManager = textManager;
@@ -32,103 +33,148 @@ namespace Titan.UI.Systems
 
         protected override void OnUpdate(in Timestep timestep)
         {
-
-            Span<int> lines = stackalloc int[100];
-
+            Span<TextLine> linesBuffer = stackalloc TextLine[100];
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref var text = ref _text.Get(entity);
                 if (!text.IsDirty)
                 {
-                    continue;
+                    //continue;
                 }
 
                 ref readonly var font = ref _fontManager.Access(text.Font);
                 ref readonly var transform = ref _transform.Get(entity);
-
-                var width = transform.Size.Width;
-                
+                ref readonly var boxSize = ref transform.Size;
                 ref var textBlock = ref _textManager.Access(text.Handle);
-                var maxCharacters = textBlock.CharacterCount;
-                var xOffset = 0f;
                 var lineHeight = text.LineHeight;
-                var fontSize = text.FontSize;
+                var multiplier = text.FontSize / (float)font.FontSize;
 
+                var numberOfLines = CalculateLines(linesBuffer, new ReadOnlySpan<char>(textBlock.Characters, textBlock.CharacterCount), font, boxSize, multiplier, text.HorizontalOverflow);
 
-                unsafe
+                // TODO: handle numberof lines == 0
+
+                var lines = linesBuffer[..numberOfLines];
+                var yStartOffset = GetYOffset(boxSize, text, lines);
+                var offset = new Vector2(0, yStartOffset);
+
+                ushort characterCount = 0;
+                foreach (ref readonly var line in lines)
                 {
-                    var words = GetWords(new ReadOnlySpan<char>(textBlock.Characters.AsPointer(), textBlock.CharacterCount), lines, transform.Size, font);
-                }
-                
-
-                var aspectRatio = fontSize / (float)font.FontSize;
-                
-                for (var i = 0; i < maxCharacters; ++i)
-                {
-                    var character = textBlock.Characters[i];
-                    ref var characterBlock = ref textBlock.VisibleCharacters[i];
-                    ref readonly var glyph = ref font.Get(character);
-
-                    var yOffset = (font.Base - glyph.YOffset);
-
-                    characterBlock.BottomLeft = new Vector2(xOffset + glyph.XOffset, yOffset - glyph.Height) * aspectRatio;
-                    characterBlock.TopRight = new Vector2(xOffset + glyph.XAdvance, yOffset) * aspectRatio;
-
-                    xOffset += glyph.XAdvance;
-                }
-
-                var xAlignOffset = GetXOffset(text.TextAlign, textBlock.VisibleCharacters[0], textBlock.VisibleCharacters[maxCharacters - 1], width);
-
-                if (xAlignOffset != 0.0f)
-                {
-                    // TODO: this can be done by calculating first + last before the loop, and then loop over characters between 1 and maxCharacters-1.
-                    for (var i = 0; i < maxCharacters; ++i)
+                    var shouldRender = (offset.Y + lineHeight <= boxSize.Height) || text.VerticalOverflow == VerticalOverflow.Overflow;
+                    if (shouldRender)
                     {
-                        ref var characterBlock = ref textBlock.VisibleCharacters[i];
-                        characterBlock.BottomLeft.X += xAlignOffset;
-                        characterBlock.TopRight.X += xAlignOffset;
+                        offset.X = GetXOffset(line, boxSize, text.TextAlign, multiplier);
+                        for (var i = line.Start; i <= line.End; ++i)
+                        {
+                            var c = textBlock.Characters[i];
+                            ref readonly var glyph = ref font.Get(c);
+                            var xAdvance = glyph.XAdvance * multiplier;
+                            WriteGlyph(ref textBlock.VisibleCharacters[characterCount++], c, offset, glyph, font.Base, multiplier, xAdvance);
+                            offset.X += xAdvance;
+                        }
+                    }
+                    offset.Y -= lineHeight;
+                    if (offset.Y < 0.0f && text.VerticalOverflow == VerticalOverflow.Truncate)
+                    {
+                        break;
                     }
                 }
 
                 text.CachedTexture = font.Texture;
-                //text.VisibleChars = maxCharacters;
+                text.VisibleChars = characterCount;
                 text.IsDirty = false;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            static void WriteGlyph(ref CharacterPositions character, char c, in Vector2 offset, in Glyph glyph, int fontBase, float multiplier, float xAdvance)
+            {
+                var y = (fontBase - glyph.YOffset) * multiplier + offset.Y;  // TODO: move this to pre-processing so it's not needed
+                character.Value = c;
+                character.TopRight = new Vector2(offset.X + xAdvance, y);
+                character.BottomLeft = new Vector2(offset.X + glyph.XOffset * multiplier, y - glyph.Height * multiplier);
+            }
 
-
-            static float GetXOffset(TextAlign align, in CharacterPositions first, in CharacterPositions last, int boxWidth) =>
-                align switch
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            static float GetYOffset(in Size boxSize, in TextComponent text, in ReadOnlySpan<TextLine> lines) =>
+                text.VerticalAlign switch
                 {
-                    TextAlign.Center => (boxWidth - (last.TopRight.X - first.BottomLeft.X)) / 2f,
-                    TextAlign.Right => boxWidth - (last.TopRight.X - first.BottomLeft.X),
-                    _ => 0 // Same as Left
+                    VerticalAlign.Top => boxSize.Height - text.LineHeight,
+                    VerticalAlign.Middle => boxSize.Height/2f + (lines.Length * text.LineHeight)/2f - text.LineHeight/2f,
+                    VerticalAlign.Bottom or _ => text.LineHeight * (lines.Length - 1)
                 };
 
-
-
-            static int GetWords(ReadOnlySpan<char> characters, Span<int> wordIndex, in Size boxSize, in Font font)
-            {
-
-                var lineHeight = 20;
-                var count = 0;
-                var xOffset = 0;
-                var yOffset = 0;
-                for (var i = 0; i < characters.Length; ++i)
+            static float GetXOffset(in TextLine line, in Size boxSize, TextAlign align, float multiplier) =>
+                align switch
                 {
-                    var character = characters[i];
-                    ref readonly var glyph = ref font.Get(character);
-                    
-                    if (xOffset + glyph.XAdvance > boxSize.Width)
-                    {
-                        yOffset += lineHeight;
-                    }
+                    TextAlign.Left => 0f,
+                    TextAlign.Center => (boxSize.Width/2f) - (line.Width * multiplier/2f),
+                    TextAlign.Right or _ => boxSize.Width - line.Width * multiplier
+                };
+        }
 
-                    xOffset += glyph.XAdvance;
+        private static int CalculateLines(Span<TextLine> lines, ReadOnlySpan<char> characters, in Font font, in Size box, float multiplier, HorizontalOverflow overflow)
+        {
+            var multipliedBoxWidth = (int)(box.Width / multiplier + 0.5f); // Easier to multiply the box width than every glyph size
+            var lineCount = 0;
+            var currentWidth = 0;
+            var widthBeforeLastWhitespace = 0;
+            var startIndex = 0;
+            var lastWhitespace = -1;
+            for (var index = 0; index < characters.Length; ++index)
+            {
+                var c = characters[index];
+                // Handle special characters
+                if (c == '\r') // Ignore carriage return
+                {
+                    continue;
+                }
+                if (c == ' ')
+                {
+                    lastWhitespace = index;
+                    // Store the current width since it might be needed if there's a line break
+                    widthBeforeLastWhitespace = currentWidth;
+                }
+                else if (c == '\n')
+                {
+                    lines[lineCount++] = new TextLine(startIndex, index - 1, currentWidth);
+                    startIndex = index + 1;
+                    lastWhitespace = -1;
+                    currentWidth = 0;
+                    continue;
                 }
 
-                return count;
+                ref readonly var glyph = ref font.Get(c);
+                // Calculate the new width and check if it's in the box, if it's not, create a new line and reset
+                var width = currentWidth + glyph.XAdvance;
+                if (overflow == HorizontalOverflow.Wrap && width > multipliedBoxWidth && lastWhitespace >= 0)
+                {
+                    lines[lineCount++] = new TextLine
+                    {
+                        Start = (ushort)startIndex,
+                        End = (ushort)(lastWhitespace - 1),
+                        Width = widthBeforeLastWhitespace
+                    };
+                    // step back to the last whitespace found and set the startindex to the next character (TODO: what happens if the last character is a whitespace?)
+                    index = lastWhitespace;
+                    startIndex = lastWhitespace + 1;
+                    // reset the last whitespace, so we don't step back to previous words
+                    lastWhitespace = -1;
+                    widthBeforeLastWhitespace = currentWidth = 0;
+                }
+                else
+                {
+                    currentWidth = width;
+                }
             }
+
+            lines[lineCount++] = new TextLine
+            {
+                Start = (ushort)startIndex,
+                End = (ushort)(characters.Length - 1),
+                Width = currentWidth
+            };
+            return lineCount;
         }
     }
 }
+
