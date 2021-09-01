@@ -32,7 +32,7 @@ namespace Titan.UI
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())
                 
-                .WithSystem(new TestDragAndDropSystem())
+                //.WithSystem(new TestDragAndDropSystem())
             ;
     }
     

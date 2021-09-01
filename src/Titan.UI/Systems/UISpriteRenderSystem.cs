@@ -41,7 +41,7 @@ namespace Titan.UI.Systems
                 var coordinates = atlas.Get(sprite.TextureIndex);
                 var type = atlas.Type(sprite.TextureIndex);
 
-                var color = GetColor(entity);
+                var color = sprite.Color;
 
                 switch (type)
                 {
@@ -55,28 +55,6 @@ namespace Titan.UI.Systems
             }
         }
 
-        private Color GetColor(Entity entity)
-        {
-            // Temporary, just to test out hover effect
-            var color = Color.White;
-            if (_interactable.Contains(entity))
-            {
-                var state = _interactable.Get(entity).MouseState;
-                if ((state & MouseState.Down) > 0)
-                {
-                    color = Color.Red;
-                }
-                else if ((state & MouseState.Up) > 0)
-                {
-                    color = Color.Black;
-                }
-                else if ((state & MouseState.Hover) > 0)
-                {
-                    color = Color.Blue;
-                }
-            }
-
-            return color;
-        }
+        
     }
 }
