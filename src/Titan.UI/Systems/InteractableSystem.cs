@@ -70,6 +70,7 @@ namespace Titan.UI.Systems
             
             var mousePosition = InputManager.MousePosition;
             var buttonDown = InputManager.LeftMouseButtonDown;
+            var buttonDownPrev = InputManager.PreviousLeftMouseButtonDown;
             
 
             foreach (ref readonly var entity in _filter.GetEntities())
@@ -102,7 +103,8 @@ namespace Titan.UI.Systems
                     EventManager.Push(new UIButtonEvent(entity, interactable.Id, ButtonState.Up));
                 }
 
-                if (isWithin && previousMouseButtonDown == false && buttonDown)
+                // only trigger down event if the mouse is over and is clicked in the same frame.
+                if (isWithin && previousMouseButtonDown == false && buttonDown && buttonDownPrev == false)
                 {
                     EventManager.Push(new UIButtonEvent(entity, interactable.Id, ButtonState.Down));
                 }

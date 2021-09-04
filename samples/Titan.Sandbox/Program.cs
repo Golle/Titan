@@ -124,29 +124,36 @@ namespace Titan.Sandbox
 
             void ShowButtonIds()
             {
-                container.Add(new UIButton
-                {
-                    Size = (300,100),
-                    Sprite = new Sprite
-                    {
-                        Identifier = "atlas/redsheet",
-                        Index = 25,
-                        Margins = (10,10,10,10)
-                    },
-                    AnchorPoint = AnchorPoint.MiddleCenter,
-                    Text = new UIText
-                    {
-                        FontSize = 22,
-                        LineHeight = 30,
-                        Text = "This is button!",
-                        Font = "fonts/seqoe_ui_light",
-                        Color = Color.Blue,
-                        TextAlign = TextAlign.Center,
-                        VerticalAlign = VerticalAlign.Middle,
-                        AnchorPoint = AnchorPoint.MiddleCenter,
-                        VerticalOverflow = VerticalOverflow.Overflow
-                    }
-                });
+                ushort count = 0;
+                for(var i =0 ; i < 4; ++i)
+                    for(var j = 0; j < 4; ++j)
+                        container.Add(new UIButton
+                        {
+                            Identifier = count,
+                            Size = (120,50),
+                            Sprite = new Sprite
+                            {
+                                Identifier = "atlas/redsheet",
+                                Index = 25,
+                                Margins = (10,10,10,10)
+                            },
+                            Offset = new (i*130, j *60),
+                            AnchorPoint = AnchorPoint.BottomLeft,
+                            Pivot = Vector2.Zero,
+                            Text = new UIText
+                            {
+                                FontSize = 20,
+                                LineHeight = 20,
+                                Text = $"Button ({count++})",
+                                Font = "fonts/seqoe_ui_light",
+                                Color = Color.Blue,
+                                TextAlign = TextAlign.Center,
+                                VerticalAlign = VerticalAlign.Middle,
+                                AnchorPoint = AnchorPoint.MiddleCenter,
+                                VerticalOverflow = VerticalOverflow.Overflow,
+                                HorizontalOverflow = HorizontalOverflow.Overflow
+                            }
+                        });
             }
             
 
