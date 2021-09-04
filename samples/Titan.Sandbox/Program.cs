@@ -169,6 +169,7 @@ namespace Titan.Sandbox
 
         public override void ConfigureWorld(WorldBuilder builder) =>
             builder
+                .WithFixedtimestep(1/30f) // 30 fps fixed update
                 .WithSystem(new FirstPersonCameraSystem(Window))
             ;
 

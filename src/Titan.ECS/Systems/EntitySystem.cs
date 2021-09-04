@@ -12,6 +12,7 @@ namespace Titan.ECS.Systems
     {
         private ComponentId _read;
         private ComponentId _mutable;
+        private GameTime _gameTime;
         private World _world;
         private readonly string _name;
         internal ref readonly ComponentId Read => ref _read;
@@ -32,6 +33,9 @@ namespace Titan.ECS.Systems
         protected virtual void OnPreUpdate(){}
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual void OnFixedUpdate(in Timestep timestep){}
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract void OnUpdate(in Timestep timestep);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -46,6 +50,16 @@ namespace Titan.ECS.Systems
             OnPreUpdate();
             EngineStats.SetSystemStats(_name, SystemStats.PreUpdate, s.Elapsed.TotalMilliseconds);
             s.Restart();
+            var gametime = _gameTime.Current;
+            if (gametime.FixedUpdateCalls > 0)
+            {
+                for (var i = 0; i < gametime.FixedUpdateCalls; ++i)
+                {
+                    OnFixedUpdate(gametime.FixedUpdateDeltaTime);
+                }
+            }
+            EngineStats.SetSystemStats(_name, SystemStats.FixedUpdate, s.Elapsed.TotalMilliseconds);
+            s.Restart();
             OnUpdate(new Timestep(1/144f)); // TODO: add support for timestep
             EngineStats.SetSystemStats(_name, SystemStats.Update, s.Elapsed.TotalMilliseconds);
             s.Restart();
@@ -57,13 +71,23 @@ namespace Titan.ECS.Systems
         internal void Update()
         {
             OnPreUpdate();
-            OnUpdate(new Timestep(1f));
+            var gametime = _gameTime.Current;
+            if (gametime.FixedUpdateCalls > 0)
+            {
+                for (var i = 0; i < gametime.FixedUpdateCalls; ++i)
+                {
+                    OnFixedUpdate(gametime.FixedUpdateDeltaTime);
+                }
+            }
+            OnUpdate(gametime.DeltaTime);
             OnPostUpdate();
         }
 #endif
         internal void InitSystem(World world)
         {
             _world = world;
+            _gameTime = world.GameTime;
+
             EntityManager = world.Manager;
             Init();
             _world = null;
@@ -98,16 +122,6 @@ namespace Titan.ECS.Systems
                 throw new InvalidOperationException($"{nameof(CreateFilter)} can only be called in the {nameof(Init)} method.");
             }
             return _world.FilterManager.Create(config);
-        }
-    }
-    
-
-    public readonly struct Timestep
-    {
-        public readonly float ElapsedTime;
-        public Timestep(float elapsedTime)
-        {
-            ElapsedTime = elapsedTime;
         }
     }
 }
