@@ -12,6 +12,7 @@ namespace Titan.Input
         private static readonly bool[] _keyState = new bool[(int)KeyCode.NumberOfKeys];
         private static readonly bool[] _previousKeyState = new bool[(int)KeyCode.NumberOfKeys];
         private static readonly bool[] _mouseState = new bool[(int)MouseButton.Other];
+        private static readonly bool[] _previousMouseState = new bool[(int)MouseButton.Other];
         private static Vector3 _position;
         private static Vector3 _lastPosition;
         private static Vector3 _deltaPosition;
@@ -22,7 +23,9 @@ namespace Titan.Input
         public static bool IsKeyPressed(KeyCode key) => IsKeyUp(key) && _previousKeyState[(int)key];
 
         public static bool LeftMouseButtonDown => _mouseState[(int)MouseButton.Left];
+        public static bool PreviousLeftMouseButtonDown => _previousMouseState[(int)MouseButton.Left];
         public static bool RightMouseButtonDown => _mouseState[(int)MouseButton.Right];
+        public static bool PreviousRightMouseButtonDown => _previousMouseState[(int)MouseButton.Right];
         public static ref readonly Vector3 MousePosition => ref _position;
         public static ref readonly Vector3 MouseLastPosition => ref _lastPosition;
         public static ref readonly Vector3 MouseDeltaPosition => ref _deltaPosition;
@@ -33,9 +36,11 @@ namespace Titan.Input
         public static void Update()
         {
             Array.Clear(_previousKeyState, 0, _previousKeyState.Length);
+            Array.Copy(_mouseState, _previousMouseState, (int)MouseButton.Other);
+
             _characterCount = 0;
             _lastPosition = _position;
-
+            
             var resetKeys = false;
             foreach (ref readonly var @event in EventManager.GetEvents())
             {

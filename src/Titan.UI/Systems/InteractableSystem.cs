@@ -1,5 +1,8 @@
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Titan.Core.Logging;
+using Titan.Core.Messaging;
 using Titan.ECS.Systems;
 using Titan.Input;
 using Titan.UI.Components;
@@ -25,6 +28,37 @@ namespace Titan.UI.Systems
             _transform = GetReadOnly<RectTransform>();
         }
 
+
+        protected override void OnPreUpdate()
+        {
+            foreach (ref readonly var @event in EventManager.GetEvents())
+            {
+                if (@event.Type == UIButtonEvent.Id)
+                {
+                    ref readonly var buttonEvent = ref @event.As<UIButtonEvent>();
+                    ref var interactable = ref _interactable.Get(buttonEvent.Entity);
+                    switch (buttonEvent.State)
+                    {
+                        case ButtonState.None:
+                            break;
+                        case ButtonState.Enter:
+                            interactable.MouseState |= MouseState.Hover;
+                            break;
+                        case ButtonState.Leave:
+                            interactable.MouseState ^= MouseState.Hover;
+                            break;
+                        case ButtonState.Down:
+                            interactable.MouseState |= MouseState.Down;
+                            break;
+                        case ButtonState.Up:
+                            interactable.MouseState ^= MouseState.Down;
+                            break;
+                    }
+                    Logger.Trace<InteractableSystem>($"ButtonEvent: {buttonEvent.State} ({buttonEvent.Entity.Id}, {buttonEvent.ButtonId})");
+                }
+            }
+        }
+
         protected override void OnUpdate(in Timestep timestep)
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -36,6 +70,7 @@ namespace Titan.UI.Systems
             
             var mousePosition = InputManager.MousePosition;
             var buttonDown = InputManager.LeftMouseButtonDown;
+            var buttonDownPrev = InputManager.PreviousLeftMouseButtonDown;
             
 
             foreach (ref readonly var entity in _filter.GetEntities())
@@ -49,25 +84,29 @@ namespace Titan.UI.Systems
                 interactable.BottomRight = new Vector2(rectPosition.X + size.Width, rectPosition.Y + size.Height);
                 interactable.TopLeft = rectPosition;
 
-                if (IsWithin(interactable, mousePosition))
+                var previousHover = (interactable.MouseState & MouseState.Hover) > 0;
+                var previousMouseButtonDown = (interactable.MouseState & MouseState.Down) > 0;
+                var isWithin = IsWithin(interactable, mousePosition);
+
+                if (isWithin && previousHover == false)
                 {
-                    var previousMouseButtonDown = (interactable.MouseState & MouseState.Down) > 0;
-                    if (buttonDown)
-                    {
-                        interactable.MouseState = MouseState.Down | MouseState.Hover;
-                    }
-                    else if(previousMouseButtonDown)
-                    {
-                        interactable.MouseState = MouseState.Up | MouseState.Hover;
-                    }
-                    else
-                    {
-                        interactable.MouseState = MouseState.Hover;
-                    }
+                    EventManager.Push(new UIButtonEvent(entity, interactable.Id, ButtonState.Enter));
                 }
-                else
+
+                if (previousHover && isWithin == false)
                 {
-                    interactable.MouseState = MouseState.None;
+                    EventManager.Push(new UIButtonEvent(entity, interactable.Id, ButtonState.Leave));
+                }
+
+                if (previousMouseButtonDown && !buttonDown)
+                {
+                    EventManager.Push(new UIButtonEvent(entity, interactable.Id, ButtonState.Up));
+                }
+
+                // only trigger down event if the mouse is over and is clicked in the same frame.
+                if (isWithin && previousMouseButtonDown == false && buttonDown && buttonDownPrev == false)
+                {
+                    EventManager.Push(new UIButtonEvent(entity, interactable.Id, ButtonState.Down));
                 }
             }
         }

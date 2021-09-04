@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Titan.Core;
+using Titan.Graphics;
 using Titan.Graphics.Loaders.Atlas;
 
 namespace Titan.UI.Components
@@ -10,5 +11,6 @@ namespace Titan.UI.Components
         public Handle<TextureAtlas> TextureAtlas;
         public byte TextureIndex;
         public Margins Margins;
+        public Color Color;
     }
 }

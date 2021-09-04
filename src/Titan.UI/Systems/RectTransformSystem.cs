@@ -25,29 +25,8 @@ namespace Titan.UI.Systems
             foreach (ref readonly var entity in _filter.GetEntities())
             {
                 ref var transform = ref _transform.Get(entity);
-
-                if (InputManager.IsKeyDown(KeyCode.Up))
-                {
-                    transform.Size.Height += 1;
-                }
-
-                if (InputManager.IsKeyDown(KeyCode.Down))
-                {
-                    transform.Size.Height -= 1;
-                }
-                if (InputManager.IsKeyDown(KeyCode.Right))
-                {
-                    transform.Size.Width += 1;
-                }
-
-                if (InputManager.IsKeyDown(KeyCode.Left))
-                {
-                    transform.Size.Width -= 1;
-                }
-
-
+                
                 transform.AbsolutePivot = new Vector2(transform.Size.Width * transform.Pivot.X, transform.Size.Height * transform.Pivot.Y);
-
                 if (EntityManager.TryGetParent(entity, out var parent) && _transform.Contains(parent))
                 {
                     ref readonly var parentTransform = ref _transform.Get(parent);
@@ -83,30 +62,16 @@ namespace Titan.UI.Systems
                 {
                     AnchorPoint.Right => parentPosition.X + parentSize.Width - pivot.X + offset.X,
                     AnchorPoint.Center => parentPosition.X + parentSize.Width / 2f - pivot.X + offset.X,
-                    _ => parentPosition.X + transform.Offset.X - pivot.X // This is Left as well
+                    _ => parentPosition.X + offset.X - pivot.X // This is Left as well
                 };
 
                 position.Y = (anchorPoint & AnchorPoint.VerticalMask) switch
                 {
                     AnchorPoint.Top => parentPosition.Y + parentSize.Height - pivot.Y + offset.Y, 
                     AnchorPoint.Middle => parentPosition.Y + parentSize.Height / 2f - pivot.Y + offset.Y,
-                    _ => parentPosition.Y + transform.Offset.Y - pivot.Y // This is Bottom as well
+                    _ => parentPosition.Y + offset.Y - pivot.Y // This is Bottom as well
                 };
                 return position;
-
-                //return transform.AnchorPoint switch
-                //{
-                //    AnchorPoint.BottomLeft or AnchorPoint.Default => parentPosition + transform.Offset - pivot,
-                //    AnchorPoint.BottomCenter => new Vector2(parentPosition.X + parentSize.Width / 2f - pivot.X + offset.X, parentPosition.Y + offset.Y - pivot.Y),
-                //    AnchorPoint.BottomRight => new Vector2(parentPosition.X + parentSize.Width - pivot.X + offset.X, parentPosition.Y + offset.Y - pivot.Y),
-                    
-                //    AnchorPoint.CenterRight => parentPosition + transform.Offset,
-                //    AnchorPoint.Center => parentPosition + transform.Offset,
-                //    AnchorPoint.CenterLeft => parentPosition + transform.Offset,
-                //    AnchorPoint.TopLeft => parentPosition + transform.Offset,
-                //    AnchorPoint.TopCenter => parentPosition + transform.Offset,
-                //    AnchorPoint.TopRight => parentPosition + transform.Offset,
-                //};
             }
         }
     }

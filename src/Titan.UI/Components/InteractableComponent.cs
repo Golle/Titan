@@ -8,7 +8,7 @@ namespace Titan.UI.Components
     {
         public Vector2 TopLeft;
         public Vector2 BottomRight;
-
         public MouseState MouseState;
+        public ushort Id;
     }
 }
