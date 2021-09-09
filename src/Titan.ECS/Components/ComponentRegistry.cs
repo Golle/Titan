@@ -53,16 +53,21 @@ namespace Titan.ECS.Components
 
         public void Update()
         {
+            foreach (var pool in _pools.Values)
+            {
+                pool.Update();
+            }
+
             foreach (ref readonly var @event in EventManager.GetEvents())
             {
                 if (@event.Type == EntityBeingDestroyedEvent.Id)
                 {
                     ref readonly var entityEvent = ref @event.As<EntityBeingDestroyedEvent>();
-                    if (entityEvent.WorldId == _worldId)
+                    if (entityEvent.Entity.WorldId == _worldId)
                     {
                         foreach (var pool in _pools.Values)
                         {
-                            pool.OnEntityDestroyed(entityEvent.EntityId);
+                            pool.Destroy(entityEvent.Entity);
                         }
                     }
                 }

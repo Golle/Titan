@@ -14,5 +14,11 @@ namespace Titan.ECS.Systems
         public ref T Get(in Entity entity) => ref _pool.Get(entity);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(in Entity entity) => _pool.Contains(entity);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref T Create(in Entity entity) => ref _pool.Create(entity);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Destroy(in Entity entity) => _pool.Destroy(entity);
     }
 }

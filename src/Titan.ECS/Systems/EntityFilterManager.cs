@@ -12,13 +12,15 @@ namespace Titan.ECS.Systems
 {
     internal class EntityFilterManager : IDisposable
     {
+        private readonly EntityInfoManager _entityInfo;
         private readonly List<EntityFilter> _filters = new (100);
 
         private readonly uint _maxEntities;
         private readonly uint _worldId;
 
-        public EntityFilterManager(WorldConfiguration configuration)
+        public EntityFilterManager(WorldConfiguration configuration, EntityInfoManager entityInfo)
         {
+            _entityInfo = entityInfo;
             _maxEntities = configuration.MaxEntities;
             _worldId = configuration.Id;
         }
@@ -43,11 +45,11 @@ namespace Titan.ECS.Systems
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void EntityDestroyed(uint entityId)
+        public void EntityDestroyed(in Entity entity)
         {
             foreach (var filter in _filters)
             {
-                filter.OnEntityDestroyed(entityId);
+                filter.OnEntityDestroyed(entity.Id);
             }
         }
 
@@ -55,20 +57,29 @@ namespace Titan.ECS.Systems
         {
             foreach (ref readonly var @event in EventManager.GetEvents())
             {
-                if (@event.Type == EntityChangedEvent.Id)
+                if (@event.Type == ComponentAddedEvent.Id)
                 {
-                    ref readonly var e = ref @event.As<EntityChangedEvent>();
-                    if (e.Entity.WorldId == _worldId)
+                    ref readonly var componentEvent = ref @event.As<ComponentAddedEvent>();
+                    if (componentEvent.Entity.WorldId == _worldId)
                     {
-                        EntityChanged(e.Entity, e.Components);
+                        EntityChanged(componentEvent.Entity, _entityInfo[componentEvent.Entity].Components);
                     }
                 }
+                else if (@event.Type == ComponentBeingRemovedEvent.Id)
+                {
+                    ref readonly var componentEvent = ref @event.As<ComponentBeingRemovedEvent>();
+                    if (componentEvent.Entity.WorldId == _worldId)
+                    {
+                        EntityChanged(componentEvent.Entity, _entityInfo[componentEvent.Entity].Components);
+                    }
+                }
+                
                 else if (@event.Type == EntityBeingDestroyedEvent.Id)
                 {
                     ref readonly var e = ref @event.As<EntityBeingDestroyedEvent>();
-                    if (e.WorldId == _worldId)
+                    if (e.Entity.WorldId == _worldId)
                     {
-                        EntityDestroyed(e.EntityId);
+                        EntityDestroyed(e.Entity);
                     }
                 }
             }

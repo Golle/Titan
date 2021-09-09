@@ -39,14 +39,6 @@ namespace Titan.ECS.Entities
             return entity;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>() where T : unmanaged => World.GetWorldById(WorldId).AddComponent<T>(this);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in T initialValue) where T : unmanaged => World.GetWorldById(WorldId).AddComponent(this, initialValue);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveComponent<T>() where T : unmanaged => World.GetWorldById(WorldId).RemoveComponent<T>(this);
-
-
         [Conditional("DEBUG")]
         public void DebugPrintEntityRelationship() => World.GetWorldById(WorldId).Manager.DebugPrint(this);
     }

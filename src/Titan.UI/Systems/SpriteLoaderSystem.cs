@@ -9,7 +9,8 @@ namespace Titan.UI.Systems
     {
         private readonly AssetsManager _assetsManager;
         private EntityFilter _filter;
-        private MutableStorage<AssetComponent<SpriteComponent>> _sprite;
+        private MutableStorage<AssetComponent<SpriteComponent>> _asset;
+        private MutableStorage<SpriteComponent> _sprite;
 
         public SpriteLoaderSystem(AssetsManager assetsManager)
         {
@@ -20,14 +21,16 @@ namespace Titan.UI.Systems
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<SpriteComponent>>().Not<SpriteComponent>());
             
-            _sprite = GetMutable<AssetComponent<SpriteComponent>>();
+            _asset = GetMutable<AssetComponent<SpriteComponent>>();
+            _sprite = GetMutable<SpriteComponent>();
+
         }
 
         protected override void OnUpdate(in Timestep timestep)
         {
             foreach (ref readonly var entity in _filter.GetEntities())
             {
-                ref var sprite = ref _sprite.Get(entity);
+                ref var sprite = ref _asset.Get(entity);
 
                 if (!sprite.AssetHandle.IsValid())
                 {
@@ -38,7 +41,7 @@ namespace Titan.UI.Systems
                 {
                     var component = sprite.DefaultValue;
                     component.TextureAtlas = _assetsManager.GetAssetHandle<TextureAtlas>(sprite.AssetHandle);
-                    entity.AddComponent(component);
+                    _sprite.Create(entity) = component;
                 }
             }
         }

@@ -23,7 +23,6 @@ namespace Titan.Core.Memory
         {
             static void OutOfMemoryException() => throw new OutOfMemoryException("Failed to allocate unmanaged memory.");
             var ptr = zeroMemory ? NativeMemory.AllocZeroed(size) : NativeMemory.Alloc(size);
-
             if (ptr == null)
             {
                 OutOfMemoryException();

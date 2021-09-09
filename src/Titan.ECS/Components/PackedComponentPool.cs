@@ -1,34 +1,37 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
+using Titan.Core.Messaging;
 using Titan.ECS.Entities;
+using Titan.ECS.Events;
 
 namespace Titan.ECS.Components
 {
     internal unsafe class PackedComponentPool<T> : IComponentPool<T> where T : unmanaged
     {
-        private T* _components;
+        private readonly ComponentId _componentId = ComponentId<T>.Id;
+
         private T** _indexers;
-        private readonly MemoryChunk _memoryBlock;
-        
+        private readonly MemoryChunk<T> _components;
+        private readonly MemoryChunk<nint> _indexersChunk;
+
         private int _numberOfComponents;
         private readonly uint _maxNumberOfComponents;
         private readonly ConcurrentQueue<nint> _freeComponents = new(); // use type nint because T* cant be stored in the queue
 
+        private bool _componentBeingRemoved;
+
         public PackedComponentPool(uint numberOfComponents, uint maxEntities)
         {
             _maxNumberOfComponents = numberOfComponents;
-            var componentsSize = sizeof(T) * numberOfComponents;
-            var entitiesSize = sizeof(T*) * maxEntities;
-            var totalSize = (uint)(componentsSize + entitiesSize);
-
-            _memoryBlock = MemoryUtils.AllocateBlock(totalSize, true);
-            _components = (T*) _memoryBlock.AsPointer();
-            _indexers = (T**)(_components + numberOfComponents);
+            _indexersChunk = MemoryUtils.AllocateBlock<nint>(maxEntities, true);
+            _components = MemoryUtils.AllocateBlock<T>(numberOfComponents, true);
+            _indexers = (T**)_indexersChunk.AsPointer();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,8 +64,10 @@ namespace Titan.ECS.Components
             }
             else
             {
-                pComponent = &_components[Interlocked.Increment(ref _numberOfComponents)];
+                pComponent = _components.GetPointer(Interlocked.Increment(ref _numberOfComponents));
             }
+
+            EventManager.Push(new ComponentAddedEvent(entity, _componentId));
             return ref *pComponent;
         }
 
@@ -78,31 +83,12 @@ namespace Titan.ECS.Components
         public bool Contains(in Entity entity) => _indexers[entity.Id] != null;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Destroy(in Entity entity) => Destroy(entity.Id);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Destroy(uint entityId)
+        public void Destroy(in Entity entity)
         {
-            ref var pComponent = ref _indexers[entityId];
-            Debug.Assert(pComponent != null, "Trying to destroy a component that has not been created.");
-            Logger.Trace<PackedComponentPool<T>>($"Removed {typeof(T).Name} from Entity {entityId}");
-            if (pComponent != null)
+            if (_indexers[entity.Id] != null)
             {
-                _freeComponents.Enqueue((nint)pComponent);
-                pComponent = null;
-            }
-        }
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void IComponentPool.OnEntityDestroyed(uint entityId)
-        {
-            // Internal call from ComponentRegistry, no validation
-            ref var pComponent = ref _indexers[entityId];
-            if (pComponent != null)
-            {
-                _freeComponents.Enqueue((nint)pComponent);
-                pComponent = null;
+                EventManager.Push(new ComponentBeingRemovedEvent(entity, _componentId));
+                _componentBeingRemoved = true;
             }
         }
 
@@ -112,10 +98,39 @@ namespace Titan.ECS.Components
             get => ref Get(entity);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Update()
+        {
+            if (!_componentBeingRemoved)
+            {
+                return;
+            }
+
+            foreach (ref readonly var @event in EventManager.GetEvents())
+            {
+                if (@event.Type == ComponentBeingRemovedEvent.Id)
+                {
+                    ref readonly var e = ref @event.As<ComponentBeingRemovedEvent>();
+                    if (e.Component != _componentId)
+                    {
+                        continue;
+                    }
+
+                    ref var pComponent = ref _indexers[e.Entity.Id];
+                    Debug.Assert(pComponent != null, "Trying to destroy a component that has not been created.");
+                    Logger.Trace<PackedComponentPool<T>>($"Removed {typeof(T).Name} from Entity {e.Entity.Id}");
+                    _freeComponents.Enqueue((nint)pComponent);
+                    pComponent = null;
+                    EventManager.Push(new ComponentRemovedEvent(e.Entity, _componentId));
+                }
+            }
+            _componentBeingRemoved = false;
+        }
+
         public void Dispose()
         {
-            _memoryBlock.Free();
-            _components = null;
+            _indexersChunk.Free();
+            _components.Free();
             _indexers = null;
         }
     }

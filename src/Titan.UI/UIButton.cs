@@ -1,6 +1,8 @@
+using System.Numerics;
 using Titan.Assets;
 using Titan.ECS.Entities;
-using Titan.Graphics;
+using Titan.ECS.Worlds;
+using Titan.UI.Animation;
 using Titan.UI.Components;
 
 namespace Titan.UI
@@ -11,23 +13,32 @@ namespace Titan.UI
         public Sprite OnHover { get; set; }
         public UIText Text { get; set; }
 
-        internal override unsafe void OnCreate(UIManager manager, in Entity entity)
+        internal override unsafe void OnCreate(UIManager manager, World world, in Entity entity)
         {
-            base.OnCreate(manager, entity);
+            base.OnCreate(manager, world, entity);
             if (Sprite != null)
             {
-                entity.AddComponent(new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
+                world.AddComponent(entity, new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
                 {
                     TextureIndex = (byte)Sprite.Index,
                     Margins = Sprite.Margins,
                     Color = Sprite.Color
                 }));
-                entity.AddComponent(new InteractableComponent
+                world.AddComponent(entity, new InteractableComponent
                 {
                     Id = Identifier
                 });
             }
-            Text?.OnCreate(manager, entity.CreateChildEntity());
+            world.AddComponent(entity, new AnimateTranslation
+            {
+                Start = Offset,
+                End = Offset+new Vector2(100,10),
+                State = new AnimationState
+                {
+                    Time = 0.5f
+                }
+            });
+            Text?.OnCreate(manager, world, entity.CreateChildEntity());
         }
     }
 }

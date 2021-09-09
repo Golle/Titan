@@ -3,7 +3,7 @@ using Titan.ECS.Entities;
 
 namespace Titan.ECS.Components
 {
-    internal unsafe class SparseComponentPool<T> : IComponentPool<T> where T : unmanaged
+    internal class SparseComponentPool<T> : IComponentPool<T> where T : unmanaged
     {
         public SparseComponentPool(uint maxEntities)
         {
@@ -42,7 +42,7 @@ namespace Titan.ECS.Components
             throw new NotImplementedException();
         }
 
-        void IComponentPool.OnEntityDestroyed(uint entityId)
+        public void Update()
         {
             throw new NotImplementedException();
         }

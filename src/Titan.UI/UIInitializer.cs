@@ -5,6 +5,7 @@ using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Loaders.Fonts;
 using Titan.Input;
+using Titan.UI.Animation;
 using Titan.UI.Components;
 using Titan.UI.Rendering;
 using Titan.UI.Systems;
@@ -31,6 +32,10 @@ namespace Titan.UI
                 .WithSystem(new TextUpdateSystem(textManager, fontManager))
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())
+
+
+                .WithSystem(new AnimateTranslationSystem())
+                .WithComponent<AnimateTranslation>(count:100)
                 
                 //.WithSystem(new TestDragAndDropSystem())
             ;
