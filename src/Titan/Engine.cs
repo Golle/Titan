@@ -149,7 +149,12 @@ namespace Titan
                 .Register(AssetTypes.Material, new MaterialsLoader())
                 .Register(AssetTypes.Atlas, new AtlasLoader(atlasManager))
                 .Register(AssetTypes.Font, new FontLoader(fontManager))
-                .Init(new AssetManagerConfiguration("manifest.json", 2));
+                .Init(new AssetManagerConfiguration(new[]
+                {
+                    "manifest.json",
+                    "builtin/manifest.json",
+                    "builtin/debug_manifest.json"
+                }, 2));
 
             var renderQueue = new SimpleRenderQueue(1000);
             var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), textManager, fontManager);

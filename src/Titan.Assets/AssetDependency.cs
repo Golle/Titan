@@ -1,13 +1,9 @@
 namespace Titan.Assets
 {
-    public readonly struct AssetDependency
+    public struct AssetDependency
     {
-        public readonly string Name;
-        public readonly int Index;
-        public AssetDependency(int index, string name)
-        {
-            Index = index;
-            Name = name;
-        }
+        public string Id;
+        public string Name;
+        public int Index;
     }
 }
