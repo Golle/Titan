@@ -37,6 +37,7 @@ namespace Titan
     {
         public string AssetsPath { get; init; }
         public uint MaxEvents { get; init; }
+        public string BasePathSearchPattern { get; init; }
     }
 
     public class Engine
@@ -89,7 +90,7 @@ namespace Titan
             EventManager.Init(new EventManagerConfiguration(engineConfig.MaxEvents));
 
             Trace($"Init {nameof(FileSystem)}");
-            FileSystem.Init(new FileSystemConfiguration(engineConfig.AssetsPath));
+            FileSystem.Init(new FileSystemConfiguration(engineConfig.AssetsPath, engineConfig.BasePathSearchPattern));
 
             Trace($"Init {nameof(WorkerPool)}");
             WorkerPool.Init(new WorkerPoolConfiguration(100, (uint) ((Environment.ProcessorCount/2) - 1)));

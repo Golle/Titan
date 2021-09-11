@@ -1,12 +1,11 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using Microsoft.Win32.SafeHandles;
 using Titan.Core.Logging;
 
 namespace Titan.Core.IO
 {
-    public record FileSystemConfiguration(string BasePath, string BasePathIdentifierPattern = "*.csproj");
+    public record FileSystemConfiguration(string BasePath, string BasePathIdentifierPattern);
     
     // TODO: add different types of file systems, right now we just use a path
     public static class FileSystem
@@ -30,10 +29,12 @@ namespace Titan.Core.IO
 
                 var maxDepth = 5;
                 var path = Directory.GetCurrentDirectory();
+
+                var basePathIdentifier = config.BasePathIdentifierPattern ?? "*.csproj";
                 do
                 {
                     path = Directory.GetParent(path)?.FullName;
-                } while (--maxDepth > 0 && path != null && Directory.GetFiles(path, config.BasePathIdentifierPattern, SearchOption.TopDirectoryOnly).Length == 0);
+                } while (--maxDepth > 0 && path != null && Directory.GetFiles(path, basePathIdentifier, SearchOption.TopDirectoryOnly).Length == 0);
 
                 if (path == null)
                 {
