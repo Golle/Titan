@@ -55,7 +55,6 @@ namespace Titan.Sandbox
                 Pivot = new(0, 0)
             };
 
-
             // Uncomment this to render the text-align/valign boxes
             //ShowTextAlignBoxes();
             //ShowAchorPoints();

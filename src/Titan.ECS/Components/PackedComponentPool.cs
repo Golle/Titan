@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -22,13 +21,15 @@ namespace Titan.ECS.Components
 
         private int _numberOfComponents;
         private readonly uint _maxNumberOfComponents;
-        private readonly ConcurrentQueue<nint> _freeComponents = new(); // use type nint because T* cant be stored in the queue
+        private readonly uint _worldId;
+        private readonly Queue<nint> _freeComponents = new(); // use type nint because T* cant be stored in the queue
 
         private bool _componentBeingRemoved;
 
-        public PackedComponentPool(uint numberOfComponents, uint maxEntities)
+        public PackedComponentPool(uint numberOfComponents, uint maxEntities, uint worldId)
         {
             _maxNumberOfComponents = numberOfComponents;
+            _worldId = worldId;
             _indexersChunk = MemoryUtils.AllocateBlock<nint>(maxEntities, true);
             _components = MemoryUtils.AllocateBlock<T>(numberOfComponents, true);
             _indexers = (T**)_indexersChunk.AsPointer();
@@ -45,7 +46,7 @@ namespace Titan.ECS.Components
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref T Create(in Entity entity)
         {
-            if (_numberOfComponents >= _maxNumberOfComponents && _freeComponents.IsEmpty)
+            if (_numberOfComponents >= _maxNumberOfComponents && _freeComponents.Count == 0)
             {
                 throw new InvalidOperationException($"Maximum components of type {typeof(T)} reached({_numberOfComponents})");
             }
@@ -57,7 +58,6 @@ namespace Titan.ECS.Components
                 throw new InvalidOperationException($"A component of type {typeof(T)} has already been added to this entity {entity.Id}");
             }
 
-            // TODO: if components are created by multiple threads this section of the code wont work reliable.
             if (_freeComponents.TryDequeue(out var pComp))
             {
                 pComponent = (T*)pComp;
@@ -68,6 +68,20 @@ namespace Titan.ECS.Components
             }
 
             EventManager.Push(new ComponentAddedEvent(entity, _componentId));
+            return ref *pComponent;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref T CreateOrReplace(in Entity entity, in T value = default)
+        {
+            var pComponent = _indexers[entity.Id];
+            if (pComponent == null)
+            {
+                ref var component = ref Create(entity);
+                component = value;
+                return ref component;
+            }
+            *pComponent = value;
             return ref *pComponent;
         }
 
@@ -111,7 +125,7 @@ namespace Titan.ECS.Components
                 if (@event.Type == ComponentBeingRemovedEvent.Id)
                 {
                     ref readonly var e = ref @event.As<ComponentBeingRemovedEvent>();
-                    if (e.Component != _componentId)
+                    if (e.Entity.WorldId != _worldId || e.Component != _componentId)
                     {
                         continue;
                     }

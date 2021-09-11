@@ -17,6 +17,8 @@ namespace Titan.ECS.Systems
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref T Create(in Entity entity) => ref _pool.Create(entity);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref T CreateOrReplace(in Entity entity, in T value = default) => ref _pool.CreateOrReplace(entity, value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Destroy(in Entity entity) => _pool.Destroy(entity);

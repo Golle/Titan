@@ -39,8 +39,8 @@ namespace Titan.ECS.Components
             var count = numberOfComponents == 0 ? _config.MaxEntities : numberOfComponents;
             var pool = poolType switch
             {
-                ComponentPoolTypes.Packed => (IComponentPool)Activator.CreateInstance(PackedType.MakeGenericType(componentType), count, _config.MaxEntities),
-                ComponentPoolTypes.Sparse => (IComponentPool)Activator.CreateInstance(SparseType.MakeGenericType(componentType), _config.MaxEntities),
+                ComponentPoolTypes.Packed => (IComponentPool)Activator.CreateInstance(PackedType.MakeGenericType(componentType), count, _config.MaxEntities, _worldId),
+                ComponentPoolTypes.Sparse => (IComponentPool)Activator.CreateInstance(SparseType.MakeGenericType(componentType), _config.MaxEntities, _worldId),
                 _ => throw new NotSupportedException()
             };
 

@@ -84,19 +84,15 @@ namespace Titan.ECS.Worlds
 
         public void Update()
         {
+            // The order of execution here is important
             InfoManager.Update();
             GameTime.Update();
             Manager.Update();
-            var s = Stopwatch.StartNew();
             Registry.Update();
-            s.Stop();
-            EngineStats.SetStats("Registry", s.Elapsed.TotalMilliseconds);
+            
             // Filter should be executed last (before dispatcher)
             FilterManager.Update();
             _dispatcher.Execute();
-            
-            
-            
         }
 
         internal static World GetWorldById(uint worldId)

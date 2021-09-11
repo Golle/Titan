@@ -1,13 +1,10 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Threading;
-using Titan.Core.Logging;
 using Titan.ECS.Systems;
 using Titan.UI.Components;
 
 namespace Titan.UI.Animation
 {
-
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct AnimationState
     {
@@ -33,7 +30,7 @@ namespace Titan.UI.Animation
         public AnimationState State;
     }
 
-    
+
     internal class AnimateTranslationSystem : EntitySystem
     {
         private EntityFilter _filter;
@@ -42,15 +39,11 @@ namespace Titan.UI.Animation
 
         protected override void Init()
         {
-            _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<AnimateTranslation>().With<SpriteComponent>());
+            _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<AnimateTranslation>());
 
             _transform = GetMutable<RectTransform>();
             _animation = GetMutable<AnimateTranslation>();
-            _sprite = GetMutable<SpriteComponent>();
         }
-
-        private int count = 0;
-        private MutableStorage<SpriteComponent> _sprite;
 
         protected override void OnUpdate(in Timestep timestep)
         {
@@ -70,13 +63,6 @@ namespace Titan.UI.Animation
                 {
                     (animation.End, animation.Start) = (animation.Start, animation.End);
                     animation.State.CurrentTime = 0f;
-                }
-
-                if (count++ > 150)
-                {
-                    count = 0;
-                    //entity.Destroy();
-                     _animation.Destroy(entity);
                 }
             }
         }

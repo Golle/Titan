@@ -1,6 +1,4 @@
-using Titan.ECS.Entities;
 using Titan.ECS.Systems;
-using Titan.Graphics;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Components;
 using Titan.UI.Rendering;

@@ -14,6 +14,7 @@ namespace Titan.ECS.Components
     {
         ref T Create(in Entity entity, in T initialValue);
         ref T Create(in Entity entity);
+        ref T CreateOrReplace(in Entity entity, in T value = default);
         ref T Get(in Entity entity);
         ref T this[in Entity entity] { get; }
     }

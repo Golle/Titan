@@ -20,6 +20,11 @@ namespace Titan.ECS.Components
             throw new NotImplementedException();
         }
 
+        public ref T CreateOrReplace(in Entity entity, in T value = default)
+        {
+            throw new NotImplementedException();
+        }
+
         public ref T Get(in Entity entity)
         {
             throw new NotImplementedException();
