@@ -31,23 +31,21 @@ namespace Titan.Sandbox
             {
                 for (var j = 0; j < 10; ++j)
                 {
+                    var tree = world.CreateEntity();
+                    var q = Quaternion.CreateFromAxisAngle(Vector3.UnitY, r.Next(0, 360));
+                    world.AddComponent(tree, new Transform3D
                     {
-                        var tree = world.CreateEntity();
-                        var q = Quaternion.CreateFromAxisAngle(Vector3.UnitY, r.Next(0, 360));
-                        tree.AddComponent(new Transform3D
-                        {
-                            Scale = Vector3.One * (r.NextSingle() * 5), 
-                            Rotation = q, 
-                            Position = new Vector3(i * (r.NextSingle() * 10 + 5), 0, j * (r.NextSingle() * 10 + 5))
-                        });
-                        tree.AddComponent(new AssetComponent<Model>("models/pillar"));
-                    }
+                        Scale = Vector3.One * (r.NextSingle() * 5), 
+                        Rotation = q, 
+                        Position = new Vector3(i * (r.NextSingle() * 10 + 5), 0, j * (r.NextSingle() * 10 + 5))
+                    });
+                    world.AddComponent(tree, new AssetComponent<Model>("models/pillar"));
                 }
             }
 
             var camera = world.CreateEntity();
-            camera.AddComponent(new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
-            camera.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
+            world.AddComponent(camera, new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
+            world.AddComponent(camera, CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
 
             var container = new UIContainer
             {
@@ -56,7 +54,6 @@ namespace Titan.Sandbox
                 ZIndex = 0,
                 Pivot = new(0, 0)
             };
-
 
             // Uncomment this to render the text-align/valign boxes
             //ShowTextAlignBoxes();
@@ -142,7 +139,7 @@ namespace Titan.Sandbox
                             Pivot = Vector2.Zero,
                             Text = new UIText
                             {
-                                FontSize = 20,
+                                FontSize = 25,
                                 LineHeight = 20,
                                 Text = $"Button ({count++})",
                                 Font = "fonts/seqoe_ui_light",
@@ -169,6 +166,7 @@ namespace Titan.Sandbox
 
         public override void ConfigureWorld(WorldBuilder builder) =>
             builder
+                .WithFixedtimestep(1/30f) // 30 fps fixed update
                 .WithSystem(new FirstPersonCameraSystem(Window))
             ;
 

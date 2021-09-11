@@ -1,5 +1,6 @@
 using Titan.Assets;
 using Titan.ECS.Entities;
+using Titan.ECS.Worlds;
 using Titan.UI.Components;
 
 namespace Titan.UI
@@ -7,12 +8,12 @@ namespace Titan.UI
     public class UIPanel : UIContainer
     {
         public Sprite Background { get; set; }
-        internal override void OnCreate(UIManager manager, in Entity entity)
+        internal override void OnCreate(UIManager manager, World world, in Entity entity)
         {
-            base.OnCreate(manager, entity);
+            base.OnCreate(manager, world, entity);
             if (Background != null)
             {
-                entity.AddComponent(new AssetComponent<SpriteComponent>(Background.Identifier, new SpriteComponent
+                world.AddComponent(entity, new AssetComponent<SpriteComponent>(Background.Identifier, new SpriteComponent
                 {
                     TextureIndex = (byte)Background.Index,
                     Margins = Background.Margins,

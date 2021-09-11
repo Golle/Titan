@@ -15,6 +15,7 @@ namespace Titan.ECS.Components
 
         private static readonly Type SparseType = typeof(SparseComponentPool<>);
         private static readonly Type PackedType = typeof(PackedComponentPool<>);
+        private static readonly Type DynamicPackedType = typeof(DynamicPackedComponentPool<>);
         private readonly uint _worldId;
         public ComponentRegistry(WorldConfiguration config)
         {
@@ -39,8 +40,9 @@ namespace Titan.ECS.Components
             var count = numberOfComponents == 0 ? _config.MaxEntities : numberOfComponents;
             var pool = poolType switch
             {
-                ComponentPoolTypes.Packed => (IComponentPool)Activator.CreateInstance(PackedType.MakeGenericType(componentType), count, _config.MaxEntities),
-                ComponentPoolTypes.Sparse => (IComponentPool)Activator.CreateInstance(SparseType.MakeGenericType(componentType), _config.MaxEntities),
+                ComponentPoolTypes.Packed => (IComponentPool)Activator.CreateInstance(PackedType.MakeGenericType(componentType), count, _config.MaxEntities, _worldId),
+                ComponentPoolTypes.DynamicPacked => (IComponentPool)Activator.CreateInstance(DynamicPackedType.MakeGenericType(componentType), count, _config.MaxEntities, _worldId),
+                ComponentPoolTypes.Sparse => (IComponentPool)Activator.CreateInstance(SparseType.MakeGenericType(componentType), _config.MaxEntities, _worldId),
                 _ => throw new NotSupportedException()
             };
 
@@ -53,16 +55,21 @@ namespace Titan.ECS.Components
 
         public void Update()
         {
+            foreach (var pool in _pools.Values)
+            {
+                pool.Update();
+            }
+
             foreach (ref readonly var @event in EventManager.GetEvents())
             {
                 if (@event.Type == EntityBeingDestroyedEvent.Id)
                 {
                     ref readonly var entityEvent = ref @event.As<EntityBeingDestroyedEvent>();
-                    if (entityEvent.WorldId == _worldId)
+                    if (entityEvent.Entity.WorldId == _worldId)
                     {
                         foreach (var pool in _pools.Values)
                         {
-                            pool.OnEntityDestroyed(entityEvent.EntityId);
+                            pool.Destroy(entityEvent.Entity);
                         }
                     }
                 }

@@ -1,10 +1,12 @@
 using System.Numerics;
 using Titan.Assets;
 using Titan.ECS;
+using Titan.ECS.Components;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Loaders.Fonts;
 using Titan.Input;
+using Titan.UI.Animation;
 using Titan.UI.Components;
 using Titan.UI.Rendering;
 using Titan.UI.Systems;
@@ -17,8 +19,8 @@ namespace Titan.UI
     {
         public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager, FontManager fontManager, TextManager textManager) =>
             builder
-                .WithComponent<AssetComponent<SpriteComponent>>(count: config.MaxSprites)
-                .WithComponent<AssetComponent<TextComponent>>(count: config.MaxSprites)
+                .WithComponent<AssetComponent<SpriteComponent>>(ComponentPoolTypes.DynamicPacked, count: 1)
+                .WithComponent<AssetComponent<TextComponent>>(ComponentPoolTypes.DynamicPacked, count: 1)
                 .WithComponent<SpriteComponent>(count: config.MaxComponents)
                 .WithComponent<RectTransform>(count: config.MaxComponents)
                 .WithComponent<InteractableComponent>(count: config.MaxComponents)
@@ -31,6 +33,10 @@ namespace Titan.UI
                 .WithSystem(new TextUpdateSystem(textManager, fontManager))
                 .WithSystem(new RectTransformSystem())
                 .WithSystem(new InteractableSystem())
+
+
+                .WithSystem(new AnimateTranslationSystem())
+                .WithComponent<AnimateTranslation>(count:100)
                 
                 //.WithSystem(new TestDragAndDropSystem())
             ;

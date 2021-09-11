@@ -14,6 +14,7 @@ namespace Titan.ECS.Components
         private static ulong _low = 1;
         private static ulong _high = 1;
         private static int _count;
+        
         public static ComponentId Next()
         {
             lock (Lock)

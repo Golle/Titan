@@ -10,6 +10,7 @@ namespace Titan.Systems
         private readonly AssetsManager _assetsManager;
         private EntityFilter _filter;
         private MutableStorage<AssetComponent<Model>> _asset;
+        private MutableStorage<ModelComponent> _model;
 
         public ModelLoaderSystem(AssetsManager assetsManager)
         {
@@ -20,6 +21,7 @@ namespace Titan.Systems
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<Model>>().Not<ModelComponent>());
             _asset = GetMutable<AssetComponent<Model>>();
+            _model = GetMutable<ModelComponent>();
         }
 
         protected override void OnUpdate(in Timestep timestep)
@@ -35,10 +37,10 @@ namespace Titan.Systems
                 if (_assetsManager.IsLoaded(asset.AssetHandle))
                 {
                     var assetHandle = _assetsManager.GetAssetHandle<Model>(asset.AssetHandle);
-                    entity.AddComponent(new ModelComponent
+                    _model.Create(entity) = new ModelComponent
                     {
                         Handle = assetHandle
-                    });
+                    };
                 }
             }
         }

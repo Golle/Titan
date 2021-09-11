@@ -1,5 +1,6 @@
 using Titan.Assets;
 using Titan.ECS.Entities;
+using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.UI.Components;
 using Titan.UI.Text;
@@ -19,10 +20,10 @@ namespace Titan.UI
         public Color Color { get; set; } = Color.Black;
         public uint MaxCharacters { get; set; }
 
-        internal override void OnCreate(UIManager manager, in Entity entity)
+        internal override void OnCreate(UIManager manager, World world, in Entity entity)
         {
-            base.OnCreate(manager, entity);
-            entity.AddComponent(new AssetComponent<TextComponent>(Font, new TextComponent
+            base.OnCreate(manager, world, entity);
+            world.AddComponent(entity, new AssetComponent<TextComponent>(Font, new TextComponent
             {
                 LineHeight =  (ushort)LineHeight,
                 HorizontalOverflow = HorizontalOverflow,

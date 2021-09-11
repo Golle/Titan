@@ -211,17 +211,17 @@ namespace Titan.ECS.Entities
                 if (@event.Type == EntityDestroyedEvent.Id)
                 {
                     ref readonly var e = ref @event.As<EntityDestroyedEvent>();
-                    if (e.WorldId == _worldId)
+                    if (e.Entity.WorldId == _worldId)
                     {
-                        _entityIds.Return(e.EntityId);
+                        _entityIds.Return(e.Entity.Id);
                     }
                 }
                 else if (@event.Type == EntityBeingDestroyedEvent.Id)
                 {
                     var e = @event.As<EntityBeingDestroyedEvent>();
-                    if (e.WorldId == _worldId)
+                    if (e.Entity.WorldId == _worldId)
                     {
-                        EventManager.Push(new EntityDestroyedEvent(e.WorldId, e.EntityId));
+                        EventManager.Push(new EntityDestroyedEvent(e.Entity));
                     }
                 }
             }

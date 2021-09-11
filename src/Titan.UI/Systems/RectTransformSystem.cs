@@ -2,7 +2,6 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.ECS.Systems;
 using Titan.Graphics.Windows;
-using Titan.Input;
 using Titan.UI.Common;
 using Titan.UI.Components;
 
@@ -19,7 +18,7 @@ namespace Titan.UI.Systems
 
             _transform = GetMutable<RectTransform>();
         }
-
+        
         protected override void OnUpdate(in Timestep timestep)
         {
             foreach (ref readonly var entity in _filter.GetEntities())

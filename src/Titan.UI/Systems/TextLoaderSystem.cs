@@ -11,7 +11,8 @@ namespace Titan.UI.Systems
         private readonly AssetsManager _assetsManager;
         private readonly TextManager _textManager;
         private EntityFilter _filter;
-        private MutableStorage<AssetComponent<TextComponent>> _text;
+        private MutableStorage<AssetComponent<TextComponent>> _asset;
+        private MutableStorage<TextComponent> _text;
 
         public TextLoaderSystem(AssetsManager assetsManager, TextManager textManager)
         {
@@ -23,27 +24,28 @@ namespace Titan.UI.Systems
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<TextComponent>>().Not<TextComponent>());
             
-            _text = GetMutable<AssetComponent<TextComponent>>();
+            _asset = GetMutable<AssetComponent<TextComponent>>();
+            _text = GetMutable<TextComponent>();
         }
 
         protected override void OnUpdate(in Timestep timestep)
         {
             foreach (ref readonly var entity in _filter.GetEntities())
             {
-                ref var text = ref _text.Get(entity);
+                ref var asset = ref _asset.Get(entity);
 
-                if (!text.AssetHandle.IsValid())
+                if (!asset.AssetHandle.IsValid())
                 {
-                    text.AssetHandle = _assetsManager.Load(text.ToString());
+                    asset.AssetHandle = _assetsManager.Load(asset.ToString());
                 }
 
-                if (_assetsManager.IsLoaded(text.AssetHandle))
+                if (_assetsManager.IsLoaded(asset.AssetHandle))
                 {
-                    var component = text.DefaultValue;
-                    component.Font = _assetsManager.GetAssetHandle<Font>(text.AssetHandle);
+                    var component = asset.DefaultValue;
+                    component.Font = _assetsManager.GetAssetHandle<Font>(asset.AssetHandle);
                     component.IsDirty = true;
+                    _text.Create(entity) = component;
 
-                    entity.AddComponent(component);
                 }
             }
         }

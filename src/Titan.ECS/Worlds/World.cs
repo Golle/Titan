@@ -1,18 +1,23 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Core.Messaging;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
-using Titan.ECS.Events;
 using Titan.ECS.Systems;
 using Titan.ECS.Systems.Dispatcher;
 
+
 namespace Titan.ECS.Worlds
 {
-    public record WorldConfiguration(uint MaxEntities, ComponentConfiguration[] Components, EntitySystem[] Systems)
+    public record WorldConfiguration
     {
         public uint Id { get; init; }
+        public float FixedTimeStep { get; init; } = 1f / 60f;
+        public uint MaxEntities { get; init; }
+        public ComponentConfiguration[] Components { get; init; }
+        public EntitySystem[] Systems { get; init; } 
     }
 
     public record ComponentConfiguration(Type Type, ComponentPoolTypes PoolType, uint Count = 0);
@@ -20,6 +25,7 @@ namespace Titan.ECS.Worlds
     public class World : IDisposable
     {
         internal uint Id => Config.Id;
+        internal GameTime GameTime { get; }
         internal EntityManager Manager { get; }
         internal EntityInfoManager InfoManager { get; }
         internal ComponentRegistry Registry { get; }
@@ -38,13 +44,15 @@ namespace Titan.ECS.Worlds
             Manager = new(Config);
             Registry = new (Config);
             InfoManager = new(Config);
-            FilterManager = new(Config);
+            FilterManager = new(Config, InfoManager);
+            GameTime = new(Config);
             Worlds[Id] = this;
 
             foreach (var system in config.Systems)
             {
                 system.InitSystem(this);
             }
+
             _dispatcher = new SystemsDispatcher(SystemNodeFactory.Create(config.Systems));
         }
 
@@ -62,47 +70,28 @@ namespace Titan.ECS.Worlds
         public Entity CreateEntity() => Manager.Create();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in Entity entity) where T : unmanaged
-        {
-            Registry.GetPool<T>().Create(entity);
-            ComponentAdded<T>(entity);
-        }
+        public void AddComponent<T>(in Entity entity) where T : unmanaged => Registry.GetPool<T>().Create(entity);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(in Entity entity, in T value) where T : unmanaged
-        {
-            Registry.GetPool<T>().Create(entity, value);
-            ComponentAdded<T>(entity);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ComponentAdded<T>(in Entity entity) where T : unmanaged
-        {
-            ref var info = ref InfoManager.Get(entity);
-            var componentId = ComponentId<T>.Id;
-            info.Components += componentId;
-            EventManager.Push(new ComponentAddedEvent(entity, componentId));
-            EventManager.Push(new EntityChangedEvent(entity, info.Components));
-        }
+        public void AddComponent<T>(in Entity entity, in T value) where T : unmanaged => Registry.GetPool<T>().Create(entity, value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemoveComponent<T>(in Entity entity) where T : unmanaged
         {
             // TODO: should this be done in 2 frames? flag for deletion, and delete in next frame?
             Registry.GetPool<T>().Destroy(entity);
-            ref var info = ref InfoManager.Get(entity);
-            var componentId = ComponentId<T>.Id;
-            info.Components -= componentId;
-            EventManager.Push(new ComponentRemovedEvent(entity, componentId));
-            EventManager.Push(new EntityChangedEvent(entity, info.Components));
         }
 
         public void Update()
         {
+            // The order of execution here is important
+            InfoManager.Update();
+            GameTime.Update();
             Manager.Update();
             Registry.Update();
-            FilterManager.Update();
             
+            // Filter should be executed last (before dispatcher)
+            FilterManager.Update();
             _dispatcher.Execute();
         }
 

@@ -55,7 +55,7 @@ namespace Titan.Rendering
             {
                 Top = 0,
                 Left = 0,
-                Right = 800,
+                Right = 1000,
                 Bottom = rectSize
             };
             GDI32.FillRect(hdc, &rect, _brush);
@@ -80,10 +80,10 @@ namespace Titan.Rendering
                 i++;
             }
 
-            const string systemsTemplate = "{0} Pre: {1:N4}ms   Update: {2:N4}ms   Post: {3:N4}ms";
+            const string systemsTemplate = "{0} Pre: {1:N4}ms    Fixed: {2:N4}ms   Update: {3:N4}ms   Post: {4:N4}ms";
             foreach (var (key, value) in EngineStats.GetSystemStats().OrderBy(e => e.Key))
             {
-                var str = string.Format(systemsTemplate, key.PadRight(25), value.PreUpdate, value.Update, value.PostUpdate);
+                var str = string.Format(systemsTemplate, key.PadRight(25), value.PreUpdate, value.FixedUpdate, value.Update, value.PostUpdate);
                 fixed (char* pStr = str)
                 {
                     GDI32.TextOutW(hdc, 10, i * lineHeight, pStr, str.Length);

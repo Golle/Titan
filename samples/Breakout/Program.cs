@@ -22,12 +22,12 @@ namespace Breakout
         public override void OnStart(World world, UIManager uiManager)
         {
             var block = world.CreateEntity();
-            block.AddComponent(Transform3D.Default);
-            block.AddComponent(new AssetComponent<Model>("models/block"));
+            world.AddComponent(block, Transform3D.Default);
+            world.AddComponent(block, new AssetComponent<Model>("models/block"));
 
             var camera = world.CreateEntity();
-            camera.AddComponent(new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
-            camera.AddComponent(CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
+            world.AddComponent(camera, new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
+            world.AddComponent(camera, CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
         }
 
         public override void ConfigureWorld(WorldBuilder builder) => 

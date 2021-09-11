@@ -6,6 +6,7 @@ namespace Titan.Core
     public enum SystemStats
     {
         PreUpdate,
+        FixedUpdate,
         Update,
         PostUpdate
     }
@@ -13,6 +14,7 @@ namespace Titan.Core
     public class SystemStat
     {
         public double PreUpdate;
+        public double FixedUpdate;
         public double PostUpdate;
         public double Update;
     }
@@ -33,6 +35,7 @@ namespace Titan.Core
             {
                 _systemStats[name] = systemStats = new SystemStat();
             }
+
             switch (type)
             {
                 case SystemStats.PreUpdate:
@@ -43,6 +46,9 @@ namespace Titan.Core
                     break;
                 case SystemStats.PostUpdate:
                     systemStats.PostUpdate = value;
+                    break;
+                case SystemStats.FixedUpdate:
+                    systemStats.FixedUpdate = value;
                     break;
             }
         }

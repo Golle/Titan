@@ -1,18 +1,10 @@
 using System.Collections.Generic;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
-using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Text;
 
 namespace Titan.UI
 {
-
-    internal struct UIComponentData
-    {
-        public Margins Margins;
-    }
-
-
     public class UIManager
     {
         private readonly World _world;
@@ -35,22 +27,13 @@ namespace Titan.UI
 
         private void RecursiveCreate(in Entity parent, UIComponent component)
         {
-            component.OnCreate(this, parent.CreateChildEntity());
+            component.OnCreate(this, _world, parent.CreateChildEntity());
             if (component is UIContainer container)
             {
                 foreach (var child in container.Children)
                 {
                     RecursiveCreate(component.Entity, child);
                 }
-            }
-        }
-
-        public void Update()
-        {
-            foreach (var uiComponent in _components)
-            {
-                
-                
             }
         }
     }
