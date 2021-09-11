@@ -9,6 +9,7 @@ using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Threading;
 using Titan.ECS;
+using Titan.ECS.Components;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
@@ -152,11 +153,6 @@ namespace Titan
             var renderQueue = new SimpleRenderQueue(1000);
             var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), textManager, fontManager);
             var boundingBoxRenderQueue = new BoundingBoxRenderQueue();
-            var color = stackalloc float[4];
-            color[0] = 1f;
-            color[1] = 0.4f;
-            color[2] = 0f;
-            color[3] = 1f;
 
             var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue, uiRenderQueue, boundingBoxRenderQueue);
             pipelineBuilder.LoadResources();
@@ -171,9 +167,9 @@ namespace Titan
 
             var worldBuilder = new WorldBuilder(defaultMaxEntities: 10_000)
                 .WithComponent<Transform3D>()
-                .WithComponent<CameraComponent>()
-                .WithComponent<AssetComponent<Model>>()
-                .WithComponent<ModelComponent>()
+                .WithComponent<CameraComponent>(ComponentPoolTypes.DynamicPacked, 2)
+                .WithComponent<AssetComponent<Model>>(ComponentPoolTypes.DynamicPacked, 20)
+                .WithComponent<ModelComponent>(ComponentPoolTypes.DynamicPacked, 100)
 
                 .WithSystem(new Transform3DSystem())
                 .WithSystem(new Render3DSystem(assetsManager, renderQueue))

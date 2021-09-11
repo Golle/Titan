@@ -15,6 +15,7 @@ namespace Titan.ECS.Components
 
         private static readonly Type SparseType = typeof(SparseComponentPool<>);
         private static readonly Type PackedType = typeof(PackedComponentPool<>);
+        private static readonly Type DynamicPackedType = typeof(DynamicPackedComponentPool<>);
         private readonly uint _worldId;
         public ComponentRegistry(WorldConfiguration config)
         {
@@ -40,6 +41,7 @@ namespace Titan.ECS.Components
             var pool = poolType switch
             {
                 ComponentPoolTypes.Packed => (IComponentPool)Activator.CreateInstance(PackedType.MakeGenericType(componentType), count, _config.MaxEntities, _worldId),
+                ComponentPoolTypes.DynamicPacked => (IComponentPool)Activator.CreateInstance(DynamicPackedType.MakeGenericType(componentType), count, _config.MaxEntities, _worldId),
                 ComponentPoolTypes.Sparse => (IComponentPool)Activator.CreateInstance(SparseType.MakeGenericType(componentType), _config.MaxEntities, _worldId),
                 _ => throw new NotSupportedException()
             };
