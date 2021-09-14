@@ -57,6 +57,12 @@ namespace Titan.Graphics.Windows
                 {
                     ToggleMouse(@event.As<MouseStateEvent>().Visible);
                 }
+                else if (@event.Type == ExitEvent.Id)
+                {
+                    ref readonly var e = ref @event.As<ExitEvent>();
+                    Logger.Trace($"Exit event received: {e.ExitCode}", typeof(Window));
+                    PostQuitMessage(e.ExitCode);
+                }
             }
             return true;
 
@@ -95,6 +101,7 @@ namespace Titan.Graphics.Windows
 
                 if (mouseMoved)
                 {
+                    
                     WindowEventHandler.OnMouseMove(_mousePosition);
                 }
             }

@@ -23,9 +23,12 @@ namespace Titan.UI
         internal override void OnCreate(UIManager manager, World world, in Entity entity)
         {
             base.OnCreate(manager, world, entity);
+
+
+            var lineheight = LineHeight > 0 ? LineHeight : FontSize;
             world.AddComponent(entity, new AssetComponent<TextComponent>(Font, new TextComponent
             {
-                LineHeight =  (ushort)LineHeight,
+                LineHeight =  (ushort)lineheight,
                 HorizontalOverflow = HorizontalOverflow,
                 VerticalOverflow = VerticalOverflow,
                 TextAlign = TextAlign,

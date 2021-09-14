@@ -20,7 +20,6 @@ namespace Titan.UI.Systems
         }
         protected override void Init()
         {
-            
             // TOOD: this must be sorted by Z-Index
             _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<InteractableComponent>());
 

@@ -24,20 +24,20 @@ namespace Titan.UI
                     Margins = Sprite.Margins,
                     Color = Sprite.Color
                 }));
-                world.AddComponent(entity, new InteractableComponent
-                {
-                    Id = Identifier
-                });
             }
-            world.AddComponent(entity, new AnimateTranslation
+            world.AddComponent(entity, new InteractableComponent
             {
-                Start = Offset,
-                End = Offset+new Vector2(100,10),
-                State = new AnimationState
-                {
-                    Time = 0.5f
-                }
+                Id = Identifier
             });
+            //world.AddComponent(entity, new AnimateTranslation
+            //{
+            //    Start = Offset,
+            //    End = Offset+new Vector2(100,10),
+            //    State = new AnimationState
+            //    {
+            //        Time = 0.5f
+            //    }
+            //});
             Text?.OnCreate(manager, world, entity.CreateChildEntity());
         }
     }
