@@ -1,21 +1,6 @@
 {
     "Assets": [
         {
-            "Id": "shaders/default_vs",
-            "Type": "vertexshader",
-            "Files": [
-                "shaders/lambertian_vertexshader.hlsl",
-                "shaders/lambertian_vertexshader.layout"
-            ]
-        },
-        {
-            "Id": "shaders/default_ps",
-            "Type": "pixelshader",
-            "Files": [
-                "shaders/lambertian_pixelshader.hlsl"
-            ]
-        },
-        {
             "Id": "materials/pillar_00",
             "Files": [
                 "materials/pillar_00.json"
@@ -41,73 +26,6 @@
                     "Id": "materials/pillar_00"
                 }
             ]
-        },
-        {
-            "Id": "shaders/gbuffer_vs",
-            "Type": "vertexshader",
-            "Files": [
-                "shaders/gbuffer_vs.hlsl",
-                "shaders/gbuffer.layout"
-            ]
-        },
-        {
-            "Id": "shaders/gbuffer_ps",
-            "Type": "pixelshader",
-            "Files": [
-                "shaders/gbuffer_ps.hlsl"
-            ]
-        },
-        {
-            "Id": "shaders/fullscreen_vs",
-            "Type": "vertexshader",
-            "Files": [
-                "shaders/fullscreen_vs.hlsl",
-                "shaders/fullscreen.layout"
-            ],
-            "Preload": true,
-            "Static": true
-        },
-        {
-            "Id": "shaders/fullscreen_ps",
-            "Type": "pixelshader",
-            "Files": [
-                "shaders/fullscreen_ps.hlsl"
-            ],
-            "Preload": true,
-            "Static": true
-        },
-        {
-            "Id": "shaders/debug_line_ps",
-            "Type": "pixelshader",
-            "Files": [
-                "shaders/debug_line_ps.hlsl"
-            ],
-            "Static": true
-        },
-        {
-            "Id": "shaders/debug_line_vs",
-            "Type": "vertexshader",
-            "Files": [
-                "shaders/debug_line_vs.hlsl",
-                "shaders/debug_line_vs.layout"
-            ],
-            "Static": true
-        },
-        {
-            "Id": "shaders/debug_ps",
-            "Type": "pixelshader",
-            "Files": [
-                "shaders/debug_ps.hlsl"
-            ],
-            "Static": true
-        },
-        {
-            "Id": "shaders/fullscreen_debug_ps",
-            "Type": "pixelshader",
-            "Files": [
-                "shaders/fullscreen_debug_ps.hlsl"
-            ],
-            "Static": true
         },
         {
             "Id": "textures/sample_texture",
@@ -155,25 +73,6 @@
                     "Id": "textures/ui_01"
                 }
             ],
-            "Preload": true
-        },
-        {
-            "Id": "shaders/ui_ps",
-            "Type": "pixelshader",
-            "Files": [
-                "shaders/ui_ps.hlsl"
-            ],
-            "Preload": true,
-            "Static": true
-        },
-        {
-            "Id": "shaders/ui_vs",
-            "Type": "vertexshader",
-            "Files": [
-                "shaders/ui_vs.hlsl",
-                "shaders/ui.layout"
-            ],
-            "Static": true,
             "Preload": true
         },
         {

@@ -1,0 +1,37 @@
+{
+    "Assets": [
+        {
+            "Id": "shaders/debug_line_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/debug_line_ps.hlsl"
+            ],
+            "Static": true
+        },
+        {
+            "Id": "shaders/debug_line_vs",
+            "Type": "vertexshader",
+            "Files": [
+                "shaders/debug_line_vs.hlsl",
+                "shaders/debug_line_vs.layout"
+            ],
+            "Static": true
+        },
+        {
+            "Id": "shaders/debug_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/debug_ps.hlsl"
+            ],
+            "Static": true
+        },
+        {
+            "Id": "shaders/fullscreen_debug_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/fullscreen_debug_ps.hlsl"
+            ],
+            "Static": true
+        }
+    ]
+}

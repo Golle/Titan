@@ -29,6 +29,10 @@ if (!Directory.Exists(destinationPath))
 {
     Directory.CreateDirectory(destinationPath);
 }
+if (!Directory.Exists(texturePath))
+{
+    Directory.CreateDirectory(texturePath);
+}
 
 
 foreach (var fontFile in Directory.EnumerateFiles(resourcePath, "*.fnt"))
