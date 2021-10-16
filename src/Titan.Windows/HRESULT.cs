@@ -17,6 +17,6 @@ namespace Titan.Windows
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 
-        public static implicit operator HRESULT(int hresult) => new HRESULT {Value = hresult};
+        public static implicit operator HRESULT(int hresult) => new() {Value = hresult};
     }
 }
