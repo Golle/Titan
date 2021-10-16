@@ -1,4 +1,6 @@
 using System.Runtime.InteropServices;
+using Titan.Windows.D3D;
+using Titan.Windows.DXGI;
 
 // ReSharper disable InconsistentNaming
 namespace Titan.Windows.D3D11

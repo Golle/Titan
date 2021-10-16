@@ -3,7 +3,9 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
+using Titan.Windows.D3D;
 using Titan.Windows.D3D11;
+using Titan.Windows.DXGI;
 using static Titan.Windows.Common;
 
 

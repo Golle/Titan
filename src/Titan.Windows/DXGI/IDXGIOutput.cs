@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 // ReSharper disable InconsistentNaming
 
-namespace Titan.Windows.D3D11
+namespace Titan.Windows.DXGI
 {
     public unsafe struct IDXGIOutput
     {

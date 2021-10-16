@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using Titan.Windows.D3D;
+using Titan.Windows.DXGI;
 
 // ReSharper disable InconsistentNaming
 

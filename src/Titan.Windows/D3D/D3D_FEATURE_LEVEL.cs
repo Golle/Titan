@@ -1,7 +1,7 @@
 using System;
 
 // ReSharper disable InconsistentNaming
-namespace Titan.Windows.D3D11
+namespace Titan.Windows.D3D
 {
     [Flags]
     public enum D3D_FEATURE_LEVEL

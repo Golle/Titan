@@ -3,7 +3,7 @@ using Titan.Windows.Win32;
 
 // ReSharper disable InconsistentNaming
 
-namespace Titan.Windows.D3D11
+namespace Titan.Windows.DXGI
 {
     public unsafe struct IDXGISurface1
     {

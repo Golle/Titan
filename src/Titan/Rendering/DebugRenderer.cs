@@ -5,6 +5,7 @@ using Titan.Graphics.D3D11;
 using Titan.Input;
 using Titan.Windows;
 using Titan.Windows.D3D11;
+using Titan.Windows.DXGI;
 using Titan.Windows.Win32;
 
 namespace Titan.Rendering

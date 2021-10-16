@@ -1,7 +1,7 @@
 using System;
 
 // ReSharper disable InconsistentNaming
-namespace Titan.Windows.D3D11
+namespace Titan.Windows.DXGI
 {
     [Flags]
     public enum DXGI_SWAP_CHAIN_FLAG

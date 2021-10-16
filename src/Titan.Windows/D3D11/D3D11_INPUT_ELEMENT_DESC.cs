@@ -1,4 +1,7 @@
 // ReSharper disable InconsistentNaming
+
+using Titan.Windows.DXGI;
+
 namespace Titan.Windows.D3D11
 {
     public unsafe struct D3D11_INPUT_ELEMENT_DESC

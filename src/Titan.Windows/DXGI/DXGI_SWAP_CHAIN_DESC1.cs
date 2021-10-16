@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 
-namespace Titan.Windows.D3D11
+namespace Titan.Windows.DXGI
 {
     public struct DXGI_SWAP_CHAIN_DESC1
     {

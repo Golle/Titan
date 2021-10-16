@@ -1,6 +1,7 @@
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Input;
+using Titan.Windows.D3D;
 using Titan.Windows.D3D11;
 
 namespace Titan.UI.Debugging

@@ -1,4 +1,7 @@
 // ReSharper disable InconsistentNaming
+
+using Titan.Windows.DXGI;
+
 namespace Titan.Windows.D3D11
 {
     public struct D3D11_TEXTURE2D_DESC

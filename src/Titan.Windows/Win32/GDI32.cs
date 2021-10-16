@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Titan.Windows.D3D11;
+using Titan.Windows.DXGI;
 
 namespace Titan.Windows.Win32
 {

@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Titan.Windows.D3D11;
+using Titan.Windows.DXGI;
 
 namespace Titan.Graphics.D3D11
 {

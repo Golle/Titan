@@ -7,6 +7,7 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Windows;
 using Titan.Windows.D3D11;
+using Titan.Windows.DXGI;
 using static Titan.Windows.Common;
 
 namespace Titan.Graphics.D3D11.Shaders
