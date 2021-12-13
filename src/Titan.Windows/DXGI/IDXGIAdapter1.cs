@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Titan.Core.Logging;
 
 namespace Titan.Windows.DXGI;
 // ReSharper disable InconsistentNaming

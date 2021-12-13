@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 
@@ -11,14 +10,11 @@ public unsafe struct IDXGIFactory1
     public static readonly Guid UUID = new("770aae78-f26f-4dba-a829-253c83d1b387");
     private void** _vtbl;
 
-    //HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-    //     IDXGIFactory1* This,
-    //     /* [in] */ REFIID riid,
-    //     /* [annotation][iid_is][out] */
-    //     _COM_Outptr_  void** ppvObject);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT QueryInterface(in Guid riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
 
-    //ULONG(STDMETHODCALLTYPE* AddRef)(
-    // IDXGIFactory1* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public uint AddRef() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint Release() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[2])(Unsafe.AsPointer(ref this));
@@ -70,14 +66,9 @@ public unsafe struct IDXGIFactory1
     //     /* [annotation][out] */
     //     _Out_ HWND * pWindowHandle);
 
-    //HRESULT(STDMETHODCALLTYPE* CreateSwapChain)(
-    // IDXGIFactory1* This,
-    // /* [annotation][in] */
-    // _In_ IUnknown * pDevice,
-    // /* [annotation][in] */
-    // _In_  DXGI_SWAP_CHAIN_DESC* pDesc,
-    // /* [annotation][out] */
-    // _COM_Outptr_  IDXGISwapChain** ppSwapChain);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT CreateSwapChain(IUnknown * pDevice, DXGI_SWAP_CHAIN_DESC* pDesc, IDXGISwapChain** ppSwapChain) =>
+        ((delegate* unmanaged[Stdcall]<void*, IUnknown*, DXGI_SWAP_CHAIN_DESC*, IDXGISwapChain**, HRESULT>)_vtbl[10])(Unsafe.AsPointer(ref this), pDevice, pDesc, ppSwapChain);
 
     //HRESULT(STDMETHODCALLTYPE* CreateSoftwareAdapter)(
     // IDXGIFactory1* This,
@@ -91,12 +82,4 @@ public unsafe struct IDXGIFactory1
 
     //BOOL(STDMETHODCALLTYPE* IsCurrent)(
     // IDXGIFactory1* This);
-
-
-}
-
-public static unsafe class DXGICommon
-{
-    [DllImport("dxgi", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HRESULT CreateDXGIFactory1(in Guid riid, void** ppFactory);
 }
