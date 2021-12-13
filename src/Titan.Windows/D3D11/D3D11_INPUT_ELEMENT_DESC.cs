@@ -6,7 +6,7 @@ namespace Titan.Windows.D3D11
 {
     public unsafe struct D3D11_INPUT_ELEMENT_DESC
     {
-        public sbyte* SemanticName;
+        public byte* SemanticName;
         public uint SemanticIndex;
         public DXGI_FORMAT Format;
         public uint InputSlot;

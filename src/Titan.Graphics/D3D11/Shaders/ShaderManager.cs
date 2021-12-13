@@ -58,14 +58,10 @@ namespace Titan.Graphics.D3D11.Shaders
                     _ => throw new NotSupportedException($"Format {format} is not supported.")
                 });
 
-            static MemoryChunk<sbyte> AllocAndCopy(string value)
+            static MemoryChunk<byte> AllocAndCopy(string value)
             {
-                var memory = MemoryUtils.AllocateBlock<sbyte>((uint)(value.Length + 1));
-                memory[value.Length] = 0;
-                fixed (byte* pValue = Encoding.ASCII.GetBytes(value))
-                {
-                    Buffer.MemoryCopy(pValue, memory, value.Length, value.Length);
-                }
+                var memory = MemoryUtils.AllocateBlock<byte>((uint)(value.Length + 1), true);
+                Encoding.ASCII.GetBytes(value, memory.AsSpan());
                 return memory;
             }
 
@@ -91,7 +87,7 @@ namespace Titan.Graphics.D3D11.Shaders
             CheckAndThrow(_device->CreateInputLayout(inputLayoutDescs, (uint)numberOfElements, vertexShaderBytecode.Get()->GetBufferPointer(), vertexShaderBytecode.Get()->GetBufferSize(), &vertexShader->InputLayout), nameof(ID3D11Device.CreateInputLayout));
             for (var i = 0; i < numberOfElements; ++i)
             {
-                ((MemoryChunk<sbyte>)inputLayoutDescs[i].SemanticName).Free();
+                ((MemoryChunk<byte>)inputLayoutDescs[i].SemanticName).Free();
             }
 
             CheckAndThrow(_device->CreateVertexShader(vertexShaderBytecode.Get()->GetBufferPointer(), vertexShaderBytecode.Get()->GetBufferSize(), null, &vertexShader->Shader), nameof(ID3D11Device.CreateVertexShader));
