@@ -1,6 +1,5 @@
-using Titan.Assets;
 using Titan.Components;
-using Titan.Core;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Rendering;
 
@@ -8,24 +7,17 @@ namespace Titan.Systems
 {
     internal class Render3DSystem : EntitySystem
     {
-        private readonly AssetsManager _assetsManager;
-        private readonly SimpleRenderQueue _queue;
+        private SimpleRenderQueue _queue;
         private EntityFilter _filter;
         private ReadOnlyStorage<Transform3D> _transform;
         private ReadOnlyStorage<ModelComponent> _model;
 
-        public Render3DSystem(AssetsManager assetsManager, SimpleRenderQueue queue)
-        {
-            _assetsManager = assetsManager;
-            _queue = queue;
-        }
-
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _transform = GetReadOnly<Transform3D>();
             _model = GetReadOnly<ModelComponent>();
             _filter = CreateFilter(new EntityFilterConfiguration().With<Transform3D>().With<ModelComponent>());
-
+            _queue = services.Get<SimpleRenderQueue>();
         }
 
         protected override void OnUpdate(in Timestep timestep)

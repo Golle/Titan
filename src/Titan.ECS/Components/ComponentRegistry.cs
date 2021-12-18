@@ -53,7 +53,7 @@ namespace Titan.ECS.Components
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IComponentPool<T> GetPool<T>() where T : unmanaged => (IComponentPool<T>)_pools[typeof(T)];
 
-        public void Update()
+        internal void Update()
         {
             foreach (var pool in _pools.Values)
             {

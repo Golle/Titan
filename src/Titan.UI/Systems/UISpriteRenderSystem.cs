@@ -1,3 +1,4 @@
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Components;
@@ -7,26 +8,23 @@ namespace Titan.UI.Systems
 {
     public class UISpriteRenderSystem : EntitySystem
     {
-        private readonly UIRenderQueue _renderQueue;
-        private readonly AtlasManager _atlasManager;
+        private UIRenderQueue _renderQueue;
+        private AtlasManager _atlasManager;
         private EntityFilter _spriteFilter;
         private ReadOnlyStorage<RectTransform> _transform;
         private ReadOnlyStorage<SpriteComponent> _sprite;
         private ReadOnlyStorage<InteractableComponent> _interactable;
 
-        public UISpriteRenderSystem(UIRenderQueue renderQueue, AtlasManager atlasManager)
-        {
-            _renderQueue = renderQueue;
-            _atlasManager = atlasManager;
-        }
-
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _spriteFilter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<SpriteComponent>());
 
             _transform = GetReadOnly<RectTransform>();
             _sprite = GetReadOnly<SpriteComponent>();
             _interactable = GetReadOnly<InteractableComponent>();
+
+            _renderQueue = services.Get<UIRenderQueue>();
+            _atlasManager = services.Get<AtlasManager>();
         }
 
         protected override void OnUpdate(in Timestep timestep)

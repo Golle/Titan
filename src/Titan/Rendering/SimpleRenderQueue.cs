@@ -3,12 +3,13 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core;
+using Titan.Core.Services;
 using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Models;
 
 namespace Titan.Rendering
 {
-    internal class SimpleRenderQueue
+    internal class SimpleRenderQueue : IServicePreUpdate
     {
         private readonly Renderable[] _renderables;
         private int _count;
@@ -39,7 +40,7 @@ namespace Titan.Rendering
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<Renderable> GetRenderables() => new(_renderables, 0, _count);
 
-        public void Begin()
+        public void PreUpdate()
         {
             _count = 0;
         }

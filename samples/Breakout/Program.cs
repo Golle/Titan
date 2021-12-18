@@ -13,11 +13,11 @@ using Titan.UI;
 
 Console.WriteLine($"Hello World!");
 
-Engine.StartNew<BreakoutApplication>();
+Engine.Start(new BreakoutApplication());
 
 namespace Breakout
 {
-    internal class BreakoutApplication : Application
+    internal class BreakoutApplication : Game
     {
         public override void OnStart(World world, UIManager uiManager)
         {
@@ -30,9 +30,9 @@ namespace Breakout
             world.AddComponent(camera, CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
         }
 
-        public override void ConfigureWorld(WorldBuilder builder) => 
+        public override void ConfigureStarterWorld(WorldBuilder builder) => 
             builder
-                .WithSystem(new FirstPersonCameraSystem(Window));
+                .WithSystem<FirstPersonCameraSystem>();
 
         public override EngineConfiguration ConfigureEngine(EngineConfiguration config) =>
             config with

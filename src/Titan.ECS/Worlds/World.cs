@@ -1,8 +1,9 @@
 using System;
-using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
-using Titan.Core;
 using Titan.Core.Logging;
+using Titan.Core.Services;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.Systems;
@@ -17,10 +18,39 @@ namespace Titan.ECS.Worlds
         public float FixedTimeStep { get; init; } = 1f / 60f;
         public uint MaxEntities { get; init; }
         public ComponentConfiguration[] Components { get; init; }
-        public EntitySystem[] Systems { get; init; } 
+        public EntitySystemConfiguration[] Systems { get; init; } 
     }
 
     public record ComponentConfiguration(Type Type, ComponentPoolTypes PoolType, uint Count = 0);
+    public record EntitySystemConfiguration(Type Type);
+
+    internal class SystemsManager
+    {
+        private readonly EntitySystem[] _systems;
+        private readonly SystemsDispatcher _dispatcher;
+
+        public SystemsManager(EntitySystemConfiguration[] systems)
+        {
+            _systems = systems
+                .Select(config => (EntitySystem)Activator.CreateInstance(config.Type))
+                .ToArray();
+            Logger.Trace<SystemsManager>($"Created {systems.Length} systems");
+            var nodes = SystemNodeFactory.Create(_systems);
+            _dispatcher = new SystemsDispatcher(nodes);
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RunDispatcher() => _dispatcher.Execute();
+
+        public void Init(World world, IServiceCollection services)
+        {
+            foreach (var system in _systems)
+            {
+                system.InitSystem(world, services);
+            }
+        }
+    }
 
     public class World : IDisposable
     {
@@ -31,29 +61,27 @@ namespace Titan.ECS.Worlds
         internal ComponentRegistry Registry { get; }
         internal WorldConfiguration Config { get; }
         internal EntityFilterManager FilterManager { get; }
+        
 
         private static readonly IdContainer WorldIds = new(100);
         private static readonly World[] Worlds = new World[100];
-        
-        private readonly SystemsDispatcher _dispatcher;
+        private static uint ActiveWorldId;
 
-        public World(WorldConfiguration config)
+        private readonly SystemsManager _systems;
+        private World(WorldConfiguration config, IServiceCollection services)
         {
             Config = config with {Id = WorldIds.Next() };
-            Logger.Trace<World>($"Creating world {Id}");
+            Logger.Info<World>($"Creating world {Id}");
             Manager = new(Config);
             Registry = new (Config);
             InfoManager = new(Config);
             FilterManager = new(Config, InfoManager);
             GameTime = new(Config);
+            _systems = new(config.Systems);
             Worlds[Id] = this;
 
-            foreach (var system in config.Systems)
-            {
-                system.InitSystem(this);
-            }
 
-            _dispatcher = new SystemsDispatcher(SystemNodeFactory.Create(config.Systems));
+            _systems.Init(this, services);
         }
 
 
@@ -82,17 +110,20 @@ namespace Titan.ECS.Worlds
             Registry.GetPool<T>().Destroy(entity);
         }
 
-        public void Update()
+        private void Update(bool isCurrentlyActive)
         {
             // The order of execution here is important
             InfoManager.Update();
             GameTime.Update();
             Manager.Update();
             Registry.Update();
-            
+
             // Filter should be executed last (before dispatcher)
             FilterManager.Update();
-            _dispatcher.Execute();
+            if (isCurrentlyActive) // Don't run the Systems when it's not active (This is something i think we want to change)
+            {
+                _systems.RunDispatcher();
+            }
         }
 
         internal static World GetWorldById(uint worldId)
@@ -115,6 +146,45 @@ namespace Titan.ECS.Worlds
             FilterManager.Dispose();
             Worlds[Id] = null;
             WorldIds.Return(Id);
+        }
+
+        public static World CreateWorld(WorldBuilder builder, IServiceCollection services, bool setActive)
+        {
+            var configuration = builder.Build();
+            var world = new World(configuration, services);
+
+            if (setActive)
+            {
+                ActiveWorldId = world.Id;
+            }
+            return world;
+        }
+
+        public static void UpdateWorlds()
+        {
+            foreach (var world in Worlds)
+            {
+                world?.Update(world.Id == ActiveWorldId);
+            }
+        }
+
+        public static void DisposeWorlds()
+        {
+            for (var i = 0; i < Worlds.Length; ++i)
+            {
+                ref var world = ref Worlds[i];
+                if (world != null)
+                {
+                    world.Dispose();
+                    world = null;
+                }       
+            }
+        }
+
+        public static void SetActive(World world)
+        {
+            // maybe do this some other way?
+            ActiveWorldId = world.Id;
         }
     }
 }

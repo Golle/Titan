@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.UI.Components;
 
@@ -7,19 +8,17 @@ namespace Titan.UI.Debugging
 {
     public class UIBoundingBoxDebugSystem : EntitySystem
     {
-        private readonly BoundingBoxRenderQueue _renderQueue;
+        private BoundingBoxRenderQueue _renderQueue;
         private EntityFilter _filter;
         private ReadOnlyStorage<RectTransform> _transform;
+        
 
-        public UIBoundingBoxDebugSystem(BoundingBoxRenderQueue renderQueue)
-        {
-            _renderQueue = renderQueue;
-        }
-
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>());
             _transform = GetReadOnly<RectTransform>();
+
+            _renderQueue = services.Get<BoundingBoxRenderQueue>();
         }
 
         protected override void OnUpdate(in Timestep timestep)

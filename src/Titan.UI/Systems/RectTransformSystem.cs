@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Windows;
 using Titan.UI.Common;
@@ -12,7 +13,7 @@ namespace Titan.UI.Systems
         private EntityFilter _filter;
         private MutableStorage<RectTransform> _transform;
 
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>());
 

@@ -17,11 +17,11 @@ using Titan.UI.Text;
 
 Console.WriteLine($"Hello World!");
 
-Engine.StartNew<SandboxApplication>();
+Engine.Start(new SandboxApplication());
 
 namespace Titan.Sandbox
 {
-    internal class SandboxApplication : Application
+    internal class SandboxApplication : Game
     {
         public override void OnStart(World world, UIManager uiManager)
         {
@@ -164,10 +164,10 @@ namespace Titan.Sandbox
             Logger.Info("Sandbox application shutting down");
         }
 
-        public override void ConfigureWorld(WorldBuilder builder) =>
+        public override void ConfigureStarterWorld(WorldBuilder builder) =>
             builder
                 .WithFixedtimestep(1/30f) // 30 fps fixed update
-                .WithSystem(new FirstPersonCameraSystem(Window))
+                .WithSystem<FirstPersonCameraSystem>()
             ;
 
 

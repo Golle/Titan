@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Fonts;
 using Titan.UI.Common;
@@ -11,24 +12,25 @@ namespace Titan.UI.Systems
 {
     internal unsafe class TextUpdateSystem : EntitySystem
     {
-        private readonly TextManager _textManager;
-        private readonly FontManager _fontManager;
+        private TextManager _textManager;
+        private FontManager _fontManager;
         private EntityFilter _filter;
         private MutableStorage<TextComponent> _text;
         private ReadOnlyStorage<RectTransform> _transform;
 
-        public TextUpdateSystem(TextManager textManager, FontManager fontManager)
+        public TextUpdateSystem()
             : base(int.MinValue)
         {
-            _textManager = textManager;
-            _fontManager = fontManager;
         }
 
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<TextComponent>().With<RectTransform>());
             _text = GetMutable<TextComponent>();
             _transform = GetReadOnly<RectTransform>();
+
+            _textManager = services.Get<TextManager>();
+            _fontManager = services.Get<FontManager>();
         }
 
         protected override void OnUpdate(in Timestep timestep)

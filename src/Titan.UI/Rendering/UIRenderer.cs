@@ -1,7 +1,6 @@
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Windows.D3D;
-using Titan.Windows.D3D11;
 
 namespace Titan.UI.Rendering
 {

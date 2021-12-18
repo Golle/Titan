@@ -1,5 +1,6 @@
 using Titan.Assets;
 using Titan.Components;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Models;
 
@@ -7,21 +8,18 @@ namespace Titan.Systems
 {
     public class ModelLoaderSystem : EntitySystem
     {
-        private readonly AssetsManager _assetsManager;
+        private AssetsManager _assetsManager;
         private EntityFilter _filter;
         private MutableStorage<AssetComponent<Model>> _asset;
         private MutableStorage<ModelComponent> _model;
 
-        public ModelLoaderSystem(AssetsManager assetsManager)
-        {
-            _assetsManager = assetsManager;
-        }
-
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<Model>>().Not<ModelComponent>());
             _asset = GetMutable<AssetComponent<Model>>();
             _model = GetMutable<ModelComponent>();
+
+            _assetsManager = services.Get<AssetsManager>();
         }
 
         protected override void OnUpdate(in Timestep timestep)

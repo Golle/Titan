@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Titan.Components;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Input;
 
@@ -8,18 +9,13 @@ namespace Titan.Sandbox
 {
     internal class FirstPersonCameraSystem : EntitySystem
     {
-        private readonly GameWindow _window;
+        private GameWindow _window;
 
         private MutableStorage<Transform3D> _transform;
         private bool _firstPerson;
         private Vector2 _rotation = Vector2.Zero;
         private EntityFilter _filter;
         //private MutableStorage<CameraComponent> _camera;
-
-        public FirstPersonCameraSystem(GameWindow window)
-        {
-            _window = window;
-        }
 
         protected override void OnPreUpdate()
         {
@@ -38,11 +34,13 @@ namespace Titan.Sandbox
             }
         }
 
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<CameraComponent>().With<Transform3D>());
             //_camera = GetMutable<CameraComponent>();
             _transform = GetMutable<Transform3D>();
+
+            _window = services.Get<GameWindow>();
         }
 
         protected override void OnUpdate(in Timestep timestep)

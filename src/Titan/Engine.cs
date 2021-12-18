@@ -1,19 +1,19 @@
 using System;
 using System.Diagnostics;
-using System.Numerics;
 using Titan.Assets;
 using Titan.Components;
 using Titan.Core;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
+using Titan.Core.Services;
 using Titan.Core.Threading;
 using Titan.ECS;
 using Titan.ECS.Components;
-using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
+using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.Images;
 using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Atlas;
@@ -26,7 +26,6 @@ using Titan.Input;
 using Titan.Rendering;
 using Titan.Systems;
 using Titan.UI;
-using Titan.UI.Components;
 using Titan.UI.Debugging;
 using Titan.UI.Rendering;
 using Titan.UI.Text;
@@ -42,13 +41,13 @@ namespace Titan
 
     public class Engine
     {
-        private readonly Application _app;
+        private readonly Game _app;
 
-        public static void StartNew<T>() where T : Application, new()
+        public static void Start(Game game)
         {
             try
             {
-                new Engine(new T())
+                new Engine(game)
                     .Start();
             }
             catch
@@ -59,9 +58,9 @@ namespace Titan
             {
                 Logger.Shutdown();
             }
+            
         }
-
-        private Engine(Application app)
+        private Engine(Game app)
         {
             _app = app;
         }
@@ -108,7 +107,6 @@ namespace Titan
 
             Trace($"Showing the {nameof(Window)}");
             Window.Show();
-            _app.Window = new GameWindow();
 
             Trace($"Configure {nameof(GraphicsDevice)}");
             var deviceConfig = _app.ConfigureDevice(new DeviceConfiguration(windowConfig.Width, windowConfig.Height, 144, windowConfig.Windowed, true, true, true));
@@ -119,7 +117,6 @@ namespace Titan
             Resources.Init();
             
             Info("Engine has been initialized.");
-
             try
             {
                 Run();
@@ -136,70 +133,85 @@ namespace Titan
             }
         }
         
-        private unsafe void Run()
+        private void Run()
         {
-            using var fontManager = new FontManager();
-            using var atlasManager = new AtlasManager(100);
-            using var textManager = new TextManager(200);
+            using var services = new ServiceCollection()
+                .Register(new GameWindow())
+                .Register(new FontManager())
+                .Register(new AtlasManager(100))
+                .Register(new TextManager(200));
+                
+            
+            // Managers
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
                 .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
                 .Register(AssetTypes.VertexShader, new VertexShaderLoader())
                 .Register(AssetTypes.PixelShader, new PixelShaderLoader())
                 .Register(AssetTypes.Material, new MaterialsLoader())
-                .Register(AssetTypes.Atlas, new AtlasLoader(atlasManager))
-                .Register(AssetTypes.Font, new FontLoader(fontManager))
+                .Register(AssetTypes.Atlas, new AtlasLoader(services.Get<AtlasManager>()))
+                .Register(AssetTypes.Font, new FontLoader(services.Get<FontManager>()))
                 .Init(new AssetManagerConfiguration(new[]
                 {
                     "manifest.json",
                     "builtin/manifest.json",
                     "builtin/debug_manifest.json"
-                }, 2));
+                }, MaxConcurrentFileReads: 2));
+            services
+                .Register(assetsManager)
+                //Rendering (Queues)
+                .Register(new SimpleRenderQueue(1000))
+                .Register(new UIRenderQueue(new UIRenderQueueConfiguration(), services.Get<TextManager>(), services.Get<FontManager>()))
+                .Register(new BoundingBoxRenderQueue());
 
-            var renderQueue = new SimpleRenderQueue(1000);
-            var uiRenderQueue = new UIRenderQueue(new UIRenderQueueConfiguration(), textManager, fontManager);
-            var boundingBoxRenderQueue = new BoundingBoxRenderQueue();
-
-            var pipelineBuilder = new PipelineBuilder(assetsManager, renderQueue, uiRenderQueue, boundingBoxRenderQueue);
-            pipelineBuilder.LoadResources();
+            // Rendering pipeline
+            var pipelineBuilder = new PipelineBuilder();
+            pipelineBuilder.LoadResources(services);
             // Preload assets for rendering pipeline
             while (Window.Update() && !pipelineBuilder.IsReady())
             {
                 assetsManager.Update();
             }
-            
-            var pipeline = pipelineBuilder.Create();
-            using var graphicsSystem = new GraphicsSystem(pipeline);
 
+            var graphicsSystem = new GraphicsSystem(pipelineBuilder.Create(services));
+            services.Register(graphicsSystem);
+
+            //The starter world
             var worldBuilder = new WorldBuilder(defaultMaxEntities: 10_000)
                 .WithComponent<Transform3D>()
                 .WithComponent<CameraComponent>(ComponentPoolTypes.DynamicPacked, 2)
                 .WithComponent<AssetComponent<Model>>(ComponentPoolTypes.DynamicPacked, 20)
                 .WithComponent<ModelComponent>(ComponentPoolTypes.DynamicPacked, 100)
 
-                .WithSystem(new Transform3DSystem())
-                .WithSystem(new Render3DSystem(assetsManager, renderQueue))
-                .WithSystem(new CameraSystem(graphicsSystem))
-                .WithSystem(new ModelLoaderSystem(assetsManager))
+                .WithSystem<Transform3DSystem>()
+                .WithSystem<Render3DSystem>()
+                .WithSystem<CameraSystem>()
+                .WithSystem<ModelLoaderSystem>()
 
-                .WithDefaultUI(new UIConfiguration(), uiRenderQueue, assetsManager, atlasManager, fontManager, textManager)
-                .WithSystem(new UIBoundingBoxDebugSystem(boundingBoxRenderQueue))
+                .WithDefaultUI(new UIConfiguration())
+                .WithSystem<UIBoundingBoxDebugSystem>()
                 ;
-            _app.ConfigureWorld(worldBuilder);
+            
+            _app.ConfigureStarterWorld(worldBuilder);
 
             Logger.Info<Engine>("Initialize starter world");
-            using var starterWorld = new World(worldBuilder.Build());
-            _app.OnStart(starterWorld, new UIManager(starterWorld, textManager));
+
+            var starterWorld = World.CreateWorld(worldBuilder, services, true);
+
+            //var secondWorld = World.CreateWorld(worldBuilder, services, false);
+            
+            _app.OnStart(starterWorld, new UIManager(starterWorld, services.Get<TextManager>()));
             
             var timer = Stopwatch.StartNew();
+
+            // Collect any garbage created at setup
+            GC.Collect();
             // star the main loop
             while (Window.Update())
             {
                 timer.Restart();
-                renderQueue.Begin();
-                uiRenderQueue.Begin();
-                boundingBoxRenderQueue.Begin();
-
+                services.PreUpdate();
+                EngineStats.SetStats("Services.PreUpdate()", timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
                 EventManager.Update();
                 EngineStats.SetStats(nameof(EventManager), timer.Elapsed.TotalMilliseconds);
@@ -207,15 +219,26 @@ namespace Titan
                 InputManager.Update();
                 EngineStats.SetStats(nameof(InputManager), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
-                
-                starterWorld.Update();
-                EngineStats.SetStats(nameof(World), timer.Elapsed.TotalMilliseconds);
-                
+
+                if (InputManager.IsKeyPressed(KeyCode.L))
+                {
+                    //World.SetActive(secondWorld);
+                }
+
+                if (InputManager.IsKeyPressed(KeyCode.K))
+                {
+                    World.SetActive(starterWorld);
+                }
                 timer.Restart();
-                uiRenderQueue.End();
-                renderQueue.End();
-                boundingBoxRenderQueue.End();
-                EngineStats.SetStats("RenderQueues.End()", timer.Elapsed.TotalMilliseconds);
+                services.Update();
+                EngineStats.SetStats("Services.Update()", timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
+                World.UpdateWorlds();
+                //starterWorld.Update();
+                EngineStats.SetStats(nameof(World), timer.Elapsed.TotalMilliseconds);
+                timer.Restart();
+                services.PostUpdate();
+                EngineStats.SetStats("Services.PostUpdate()", timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
                 assetsManager.Update();
                 EngineStats.SetStats(nameof(AssetsManager), timer.Elapsed.TotalMilliseconds);
@@ -225,6 +248,8 @@ namespace Titan
                 EngineStats.SetStats(nameof(GraphicsSystem), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
             }
+
+            World.DisposeWorlds();
         }
 
         private void Shutdown()

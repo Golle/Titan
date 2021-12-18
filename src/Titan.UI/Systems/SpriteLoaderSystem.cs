@@ -1,4 +1,5 @@
 using Titan.Assets;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.UI.Components;
@@ -7,22 +8,19 @@ namespace Titan.UI.Systems
 {
     public class SpriteLoaderSystem : EntitySystem
     {
-        private readonly AssetsManager _assetsManager;
+        private AssetsManager _assetsManager;
         private EntityFilter _filter;
         private MutableStorage<AssetComponent<SpriteComponent>> _asset;
         private MutableStorage<SpriteComponent> _sprite;
 
-        public SpriteLoaderSystem(AssetsManager assetsManager)
-        {
-            _assetsManager = assetsManager;
-        }
-
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<SpriteComponent>>().Not<SpriteComponent>());
             
             _asset = GetMutable<AssetComponent<SpriteComponent>>();
             _sprite = GetMutable<SpriteComponent>();
+
+            _assetsManager = services.Get<AssetsManager>();
 
         }
 

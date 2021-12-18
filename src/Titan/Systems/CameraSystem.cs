@@ -1,5 +1,6 @@
 using System.Numerics;
 using Titan.Components;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics;
 
@@ -8,7 +9,7 @@ namespace Titan.Systems
 {
     internal class CameraSystem : EntitySystem
     {
-        private readonly GraphicsSystem _graphicsSystem;
+        private GraphicsSystem _graphicsSystem;
 
         // TODO: read this from configuration?
         private static readonly Vector3 Forward = Vector3.UnitZ;
@@ -17,16 +18,14 @@ namespace Titan.Systems
         private MutableStorage<CameraComponent> _camera;
         private ReadOnlyStorage<Transform3D> _transform;
         private EntityFilter _filter;
-        public CameraSystem(GraphicsSystem graphicsSystem)
-        {
-            _graphicsSystem = graphicsSystem; // TODO: replace with publish event
-        }
 
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _camera = GetMutable<CameraComponent>();
             _transform = GetReadOnly<Transform3D>();
             _filter = CreateFilter(new EntityFilterConfiguration().With<CameraComponent>().With<Transform3D>());
+
+            _graphicsSystem = services.Get<GraphicsSystem>();
         }
 
         protected override void OnUpdate(in Timestep timestep)

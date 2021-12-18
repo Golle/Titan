@@ -1,5 +1,6 @@
 using System.Numerics;
 using Titan.Components;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 
 namespace Titan.Systems
@@ -9,7 +10,7 @@ namespace Titan.Systems
         private MutableStorage<Transform3D> _transform;
         private EntityFilter _filter;
         
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _transform = GetMutable<Transform3D>();
             _filter = CreateFilter(new EntityFilterConfiguration().With<Transform3D>());
@@ -18,6 +19,8 @@ namespace Titan.Systems
         protected override void OnUpdate(in Timestep timestep)
         {
             // TODO: implement sorting and IsDirty flag
+
+            // TODO: pack them so that we can use intrinsics to calculate (SSE2)
 
             foreach (ref readonly var entity in _filter.GetEntities())
             {

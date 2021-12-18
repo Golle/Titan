@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.UI.Components;
 
@@ -37,7 +38,7 @@ namespace Titan.UI.Animation
         private MutableStorage<RectTransform> _transform;
         private MutableStorage<AnimateTranslation> _animation;
 
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<AnimateTranslation>());
 

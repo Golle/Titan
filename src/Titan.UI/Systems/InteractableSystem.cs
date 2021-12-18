@@ -1,8 +1,8 @@
-using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Input;
 using Titan.UI.Components;
@@ -18,7 +18,7 @@ namespace Titan.UI.Systems
         public InteractableSystem() : base(-1000)
         {
         }
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             // TOOD: this must be sorted by Z-Index
             _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<InteractableComponent>());

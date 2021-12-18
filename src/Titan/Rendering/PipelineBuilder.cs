@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan.Assets;
 using Titan.Core;
+using Titan.Core.Services;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.BlendStates;
@@ -32,25 +33,12 @@ namespace Titan.Rendering
         private Handle<Asset> _debugPixelShaderHandle;
         private Handle<Asset> _debugLinePixelShaderHandle;
         private Handle<Asset> _debugLineVertexShaderHandle;
+        
+        private AssetsManager _assetsManager;
 
-        private readonly AssetsManager _assetsManager;
-        private readonly SimpleRenderQueue _simpleRenderQueue;
-        private readonly UIRenderQueue _uiRenderQueue;
-        private readonly BoundingBoxRenderQueue _boundingBoxRenderQueue;
-        private GeometryRenderer _geometryRenderer;
-        private BackbufferRenderer _backbufferRenderer;
-        private UIRenderer _uiRenderer;
-        private DeferredShadingRenderer _deferredShadingRenderer;
-
-        public PipelineBuilder(AssetsManager assetsManager, SimpleRenderQueue simpleRenderQueue, UIRenderQueue uiRenderQueue, BoundingBoxRenderQueue boundingBoxRenderQueue)
+        public void LoadResources(IServiceCollection services)
         {
-            _assetsManager = assetsManager;
-            _simpleRenderQueue = simpleRenderQueue;
-            _uiRenderQueue = uiRenderQueue;
-            _boundingBoxRenderQueue = boundingBoxRenderQueue;
-        }
-        public void LoadResources()
-        {
+            _assetsManager = services.Get<AssetsManager>();
             _lambertianVertexShaderHandle = _assetsManager.Load("shaders/default_vs");
             _lambertianPixelShaderHandle = _assetsManager.Load("shaders/default_ps");
             
@@ -66,10 +54,7 @@ namespace Titan.Rendering
             _debugLinePixelShaderHandle = _assetsManager.Load("shaders/debug_line_ps");
             _debugLineVertexShaderHandle = _assetsManager.Load("shaders/debug_line_vs");
 
-            _geometryRenderer = new GeometryRenderer(_simpleRenderQueue);
-            _backbufferRenderer = new BackbufferRenderer();
-            _deferredShadingRenderer = new DeferredShadingRenderer();
-            _uiRenderer = new UIRenderer(_uiRenderQueue);
+ 
         }
 
         public bool IsReady()
@@ -86,7 +71,7 @@ namespace Titan.Rendering
                    ;
         }
 
-        public Pipeline[] Create()
+        public Pipeline[] Create(IServiceCollection services)
         {
             Debug.Assert(GraphicsDevice.IsInitialized, $"{nameof(GraphicsDevice)} must be initialized before the {nameof(GraphicsSystem)} is created.");
 
@@ -127,8 +112,6 @@ namespace Titan.Rendering
                 AddressAll = TextureAddressMode.Wrap,
             });
 
-            
-
             var gBuffer = new Pipeline
             {
                 RenderTargets = new[] {gBufferPosition, gBufferAlbedo, gBufferNormals},
@@ -137,7 +120,7 @@ namespace Titan.Rendering
                 DepthBuffer = depthBuffer,
                 ClearColor = Color.White,
                 ClearRenderTargets = true,
-                Renderer = _geometryRenderer
+                Renderer = new GeometryRenderer(services.Get<SimpleRenderQueue>())
             };
 
             var deferredShadingTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
@@ -155,11 +138,12 @@ namespace Titan.Rendering
                 RenderTargets = new []{deferredShadingTarget},
                 PixelShaderResources = new []{gBufferPosition, gBufferAlbedo, gBufferNormals},
                 PixelShaderSamplers = new []{fullscreenSampler},
-                Renderer = _deferredShadingRenderer
+                Renderer = new DeferredShadingRenderer()
             };
 
 
             var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
+            var backbufferRenderer = new BackbufferRenderer();
             var backbuffer = new Pipeline
             {
                 ClearDepthBuffer = false,
@@ -170,7 +154,7 @@ namespace Titan.Rendering
                 VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
                 PixelShaderResources = new[] { deferredShadingTarget },
                 PixelShaderSamplers = new[] { fullscreenSampler },
-                Renderer = _backbufferRenderer
+                Renderer = backbufferRenderer
             };
 
             //var uiRenderTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
@@ -204,7 +188,7 @@ namespace Titan.Rendering
                 //DepthBuffer = uiDepthBuffer,
                 //ClearDepthBuffer = true,
                 //DepthBufferClearValue = 1f,
-                Renderer = _uiRenderer,
+                Renderer = new UIRenderer(services.Get<UIRenderQueue>()),
                 PixelShaderSamplers = new []{ uiSampler }, // TODO: text must be rendered with a different sampler :O
                 VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_uiVertexShaderHandle),
                 PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_uiPixelShaderHandle),
@@ -245,7 +229,7 @@ namespace Titan.Rendering
             {
                 ClearRenderTargets =  false,
                 RenderTargets = new[] { backbufferRenderTarget },
-                Renderer = _backbufferRenderer,
+                Renderer = backbufferRenderer,
                 PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_debugPixelShaderHandle),
                 VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
                 PixelShaderResources = new[] { debugTextureHandle },
@@ -258,7 +242,7 @@ namespace Titan.Rendering
             {
 
                 RenderTargets = new[] { backbufferRenderTarget },
-                Renderer = new BoundingBoxRenderer(_boundingBoxRenderQueue),
+                Renderer = new BoundingBoxRenderer(services.Get<BoundingBoxRenderQueue>()),
                 VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_debugLineVertexShaderHandle),
                 PixelShader= _assetsManager.GetAssetHandle<PixelShader>(_debugLinePixelShaderHandle),
             };

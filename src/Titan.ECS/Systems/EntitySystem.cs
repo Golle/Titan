@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
+using Titan.Core.Services;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
@@ -18,6 +19,7 @@ namespace Titan.ECS.Systems
         internal ref readonly ComponentId Read => ref _read;
         internal ref readonly ComponentId Mutable => ref _mutable;
         protected EntityManager EntityManager { get; private set; }
+        
         internal int Priority { get; }
 
         protected EntitySystem(int priority = 0)
@@ -27,7 +29,7 @@ namespace Titan.ECS.Systems
             _name = GetType().Name;
         }
 
-        protected abstract void Init();
+        protected abstract void Init(IServiceCollection services);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void OnPreUpdate(){}
@@ -83,15 +85,17 @@ namespace Titan.ECS.Systems
             OnPostUpdate();
         }
 #endif
-        internal void InitSystem(World world)
+        internal void InitSystem(World world, IServiceCollection services)
         {
             _world = world;
             _gameTime = world.GameTime;
 
             EntityManager = world.Manager;
-            Init();
+            Init(services);
             _world = null;
         }
+
+        
 
         public ReadOnlyStorage<T> GetReadOnly<T>() where T : unmanaged
         {

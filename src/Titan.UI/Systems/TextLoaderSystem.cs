@@ -1,31 +1,26 @@
 using Titan.Assets;
+using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Fonts;
 using Titan.UI.Components;
-using Titan.UI.Text;
 
 namespace Titan.UI.Systems
 {
     public class TextLoaderSystem : EntitySystem
     {
-        private readonly AssetsManager _assetsManager;
-        private readonly TextManager _textManager;
+        private AssetsManager _assetsManager;
         private EntityFilter _filter;
         private MutableStorage<AssetComponent<TextComponent>> _asset;
         private MutableStorage<TextComponent> _text;
 
-        public TextLoaderSystem(AssetsManager assetsManager, TextManager textManager)
-        {
-            _assetsManager = assetsManager;
-            _textManager = textManager;
-        }
-
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<TextComponent>>().Not<TextComponent>());
             
             _asset = GetMutable<AssetComponent<TextComponent>>();
             _text = GetMutable<TextComponent>();
+
+            _assetsManager = services.Get<AssetsManager>();
         }
 
         protected override void OnUpdate(in Timestep timestep)
@@ -45,7 +40,6 @@ namespace Titan.UI.Systems
                     component.Font = _assetsManager.GetAssetHandle<Font>(asset.AssetHandle);
                     component.IsDirty = true;
                     _text.Create(entity) = component;
-
                 }
             }
         }

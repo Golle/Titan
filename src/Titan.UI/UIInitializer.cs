@@ -1,23 +1,20 @@
 using System.Numerics;
 using Titan.Assets;
+using Titan.Core.Services;
 using Titan.ECS;
 using Titan.ECS.Components;
 using Titan.ECS.Systems;
-using Titan.Graphics.Loaders.Atlas;
-using Titan.Graphics.Loaders.Fonts;
 using Titan.Input;
 using Titan.UI.Animation;
 using Titan.UI.Components;
-using Titan.UI.Rendering;
 using Titan.UI.Systems;
-using Titan.UI.Text;
 
 namespace Titan.UI
 {
     public record UIConfiguration(uint MaxSprites = 1000, uint MaxComponents = 1000);
     public static class UIInitializer
     {
-        public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config, UIRenderQueue renderQueue, AssetsManager assetsManager, AtlasManager atlasManager, FontManager fontManager, TextManager textManager) =>
+        public static WorldBuilder WithDefaultUI(this WorldBuilder builder, UIConfiguration config) =>
             builder
                 .WithComponent<AssetComponent<SpriteComponent>>(ComponentPoolTypes.DynamicPacked, count: 1)
                 .WithComponent<AssetComponent<TextComponent>>(ComponentPoolTypes.DynamicPacked, count: 1)
@@ -26,16 +23,16 @@ namespace Titan.UI
                 .WithComponent<InteractableComponent>(count: config.MaxComponents)
                 .WithComponent<TextComponent>(count: config.MaxComponents)
 
-                .WithSystem(new SpriteLoaderSystem(assetsManager))
-                .WithSystem(new TextLoaderSystem(assetsManager, textManager))
-                .WithSystem(new UISpriteRenderSystem(renderQueue, atlasManager))
-                .WithSystem(new UITextRenderSystem(renderQueue))
-                .WithSystem(new TextUpdateSystem(textManager, fontManager))
-                .WithSystem(new RectTransformSystem())
-                .WithSystem(new InteractableSystem())
+                .WithSystem<SpriteLoaderSystem>()
+                .WithSystem<TextLoaderSystem>()
+                .WithSystem<UISpriteRenderSystem>()
+                .WithSystem<UITextRenderSystem>()
+                .WithSystem<TextUpdateSystem>()
+                .WithSystem<RectTransformSystem>()
+                .WithSystem<InteractableSystem>()
 
 
-                .WithSystem(new AnimateTranslationSystem())
+                //.WithSystem(new AnimateTranslationSystem())
                 .WithComponent<AnimateTranslation>(count:100)
                 
                 //.WithSystem(new TestDragAndDropSystem())
@@ -48,7 +45,7 @@ namespace Titan.UI
         private MutableStorage<RectTransform> _transform;
         private ReadOnlyStorage<InteractableComponent> _interactable;
 
-        protected override void Init()
+        protected override void Init(IServiceCollection services)
         {
             _filter = CreateFilter(new EntityFilterConfiguration().With<RectTransform>().With<InteractableComponent>());
 
