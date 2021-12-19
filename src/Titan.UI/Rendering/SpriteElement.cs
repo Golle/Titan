@@ -3,7 +3,7 @@ using Titan.Graphics.D3D11.Textures;
 
 namespace Titan.UI.Rendering
 {
-    public struct UIElement
+    public struct SpriteElement
     {
         public Handle<Texture> Texture;
         public uint StartIndex;

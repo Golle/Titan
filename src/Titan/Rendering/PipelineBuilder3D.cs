@@ -186,7 +186,7 @@ internal class PipelineBuilder3D
             //DepthBuffer = uiDepthBuffer,
             //ClearDepthBuffer = true,
             //DepthBufferClearValue = 1f,
-            Renderer = new UIRenderer(services.Get<UIRenderQueue>()),
+            Renderer = new SpriteRenderer(services.Get<SpriteRenderQueue>()),
             PixelShaderSamplers = new []{ uiSampler }, // TODO: text must be rendered with a different sampler :O
             VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_uiVertexShaderHandle),
             PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_uiPixelShaderHandle),

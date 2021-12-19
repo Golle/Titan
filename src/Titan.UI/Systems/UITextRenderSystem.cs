@@ -7,7 +7,7 @@ namespace Titan.UI.Systems
 {
     public class UITextRenderSystem : EntitySystem
     {
-        private UIRenderQueue _renderQueue;
+        private SpriteRenderQueue _renderQueue;
         private EntityFilter _filter;
         private ReadOnlyStorage<TextComponent> _text;
         private ReadOnlyStorage<RectTransform> _transform;
@@ -19,7 +19,7 @@ namespace Titan.UI.Systems
             _text = GetReadOnly<TextComponent>();
             _transform = GetReadOnly<RectTransform>();
 
-            _renderQueue = services.Get<UIRenderQueue>();
+            _renderQueue = services.Get<SpriteRenderQueue>();
         }
 
         protected override void OnUpdate(in Timestep timestep)

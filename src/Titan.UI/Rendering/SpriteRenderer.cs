@@ -4,20 +4,20 @@ using Titan.Windows.D3D;
 
 namespace Titan.UI.Rendering
 {
-    public sealed class UIRenderer : Renderer
+    public sealed class SpriteRenderer : Renderer
     {
-        private readonly UIRenderQueue _renderQueue;
-        public UIRenderer(UIRenderQueue renderQueue) => _renderQueue = renderQueue;
+        private readonly SpriteRenderQueue _renderQueue;
+        public SpriteRenderer(SpriteRenderQueue renderQueue) => _renderQueue = renderQueue;
 
         public override void Render(Context context)
         {
-            var uiComponents = _renderQueue.GetRenderables();
+            var renderables = _renderQueue.GetRenderables();
 
             context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            context.SetVertexBuffer(uiComponents.VertexBuffer);
-            context.SetIndexBuffer(uiComponents.IndexBuffer);
+            context.SetVertexBuffer(renderables.VertexBuffer);
+            context.SetIndexBuffer(renderables.IndexBuffer);
 
-            foreach (ref readonly var element in uiComponents.Elements)
+            foreach (ref readonly var element in renderables.Elements)
             {
                 context.SetPixelShaderResource(element.Texture);
                 context.DrawIndexed(element.Count, element.StartIndex);

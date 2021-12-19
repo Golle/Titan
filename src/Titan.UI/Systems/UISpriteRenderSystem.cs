@@ -8,7 +8,7 @@ namespace Titan.UI.Systems
 {
     public class UISpriteRenderSystem : EntitySystem
     {
-        private UIRenderQueue _renderQueue;
+        private SpriteRenderQueue _renderQueue;
         private AtlasManager _atlasManager;
         private EntityFilter _spriteFilter;
         private ReadOnlyStorage<RectTransform> _transform;
@@ -23,7 +23,7 @@ namespace Titan.UI.Systems
             _sprite = GetReadOnly<SpriteComponent>();
             _interactable = GetReadOnly<InteractableComponent>();
 
-            _renderQueue = services.Get<UIRenderQueue>();
+            _renderQueue = services.Get<SpriteRenderQueue>();
             _atlasManager = services.Get<AtlasManager>();
         }
 

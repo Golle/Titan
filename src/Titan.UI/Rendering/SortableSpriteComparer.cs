@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Titan.UI.Rendering
 {
-    internal class UIComparer : IComparer<SortableRenderable>
+    internal class SortableSpriteComparer : IComparer<SortableRenderable>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Compare(SortableRenderable x, SortableRenderable y) => x.Key.CompareTo(y.Key);

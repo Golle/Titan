@@ -9,6 +9,8 @@ using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Rendering.Sprites;
 using Titan.UI.Rendering;
+using SpriteRenderer = Titan.UI.Rendering.SpriteRenderer;
+using SpriteRenderQueue = Titan.UI.Rendering.SpriteRenderQueue;
 
 namespace Titan.Rendering;
 
@@ -59,7 +61,7 @@ internal class PipelineBuilder2D
             PixelShader = assetsManager.GetAssetHandle<PixelShader>(_spritePS),
             VertexShader = assetsManager.GetAssetHandle<VertexShader>(_spriteVS),
             PixelShaderSamplers = new[] { pointSampler },
-            Renderer = new SpriteRenderer(services.Get<SpriteRenderQueue>())
+            Renderer = new Sprites.SpriteRenderer(services.Get<Sprites.SpriteRenderQueue>())
         };
 
         var uiBlendState = GraphicsDevice.BlendStateManager.Create(new BlendStateCreation());
@@ -69,7 +71,7 @@ internal class PipelineBuilder2D
             //DepthBuffer = uiDepthBuffer,
             //ClearDepthBuffer = true,
             //DepthBufferClearValue = 1f,
-            Renderer = new UIRenderer(services.Get<UIRenderQueue>()),
+            Renderer = new SpriteRenderer(services.Get<SpriteRenderQueue>()),
             PixelShaderSamplers = new[] { linearSampler }, // TODO: text must be rendered with a different sampler :O
             VertexShader = assetsManager.GetAssetHandle<VertexShader>(_uiVS),
             PixelShader = assetsManager.GetAssetHandle<PixelShader>(_uiPS),

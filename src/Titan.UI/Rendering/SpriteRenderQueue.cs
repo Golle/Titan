@@ -20,23 +20,23 @@ namespace Titan.UI.Rendering;
 
 public record UIRenderQueueConfiguration(uint MaxSprites = 500, uint MaxNinePatchSprites = 100, uint MaxTextBlocks = 100);
 
-public unsafe class UIRenderQueue : IDisposable, IServicePreUpdate, IServicePostUpdate
+public unsafe class SpriteRenderQueue : IDisposable, IServicePreUpdate, IServicePostUpdate
 {
     private readonly SpriteBatch _spriteBatch;
     private readonly NineSliceSpriteBatch _nineSliceSprite;
     private readonly TextBatch _textBatch;
 
-    private static readonly IComparer<SortableRenderable> Comparer = new UIComparer();
+    private static readonly IComparer<SortableRenderable> Comparer = new SortableSpriteComparer();
     private Handle<ResourceBuffer> _vertexBuffer;
     private Handle<ResourceBuffer> _indexBuffer;
-    private readonly MemoryChunk<UIVertex> _vertices;
-    private readonly UIElement[] _elements;
+    private readonly MemoryChunk<SpriteVertex> _vertices;
+    private readonly SpriteElement[] _elements;
     private readonly SortableRenderable[] _sortable;
     private volatile int _count;
 
     private int _elementCount;
 
-    public UIRenderQueue(UIRenderQueueConfiguration config, TextManager textManager, FontManager fontManager)
+    public SpriteRenderQueue(UIRenderQueueConfiguration config, TextManager textManager, FontManager fontManager)
     {
         var maxVertices = config.MaxSprites * 4 + config.MaxNinePatchSprites * 4 * 9 + config.MaxTextBlocks * 4 * 100; // 100 characters per block (TODO: change this at some point)
         var maxIndices = maxVertices * 6;
@@ -45,14 +45,14 @@ public unsafe class UIRenderQueue : IDisposable, IServicePreUpdate, IServicePost
         _nineSliceSprite = new NineSliceSpriteBatch(config.MaxNinePatchSprites);
         _textBatch = new TextBatch(config.MaxTextBlocks, textManager, fontManager);
 
-        _vertices = MemoryUtils.AllocateBlock<UIVertex>(maxVertices);
-        _elements = new UIElement[100]; // TODO: Hardcoded for now, not sure what an optimal number would be. UIElements will be created for each texture change
+        _vertices = MemoryUtils.AllocateBlock<SpriteVertex>(maxVertices);
+        _elements = new SpriteElement[100]; // TODO: Hardcoded for now, not sure what an optimal number would be. UIElements will be created for each texture change
         _sortable = new SortableRenderable[1_000]; // TODO: hardcoded for now. This is the amount of "items" added to the queue. 1 for each text, sprite or nine patch.  
 
         _vertexBuffer = GraphicsDevice.BufferManager.Create(new BufferCreation
         {
             Count = maxVertices,
-            Stride = (uint)sizeof(UIVertex),
+            Stride = (uint)sizeof(SpriteVertex),
             CpuAccessFlags = D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_WRITE,
             Type = BufferTypes.VertexBuffer,
             Usage = D3D11_USAGE.D3D11_USAGE_DYNAMIC
@@ -141,7 +141,7 @@ public unsafe class UIRenderQueue : IDisposable, IServicePreUpdate, IServicePost
             if (renderable.Texture.Value != texture.Value)
             {
                 // new renderable
-                _elements[_elementCount++] = new UIElement
+                _elements[_elementCount++] = new SpriteElement
                 {
                     Count = indexCount,
                     StartIndex = lastStartIndex,
@@ -172,18 +172,18 @@ public unsafe class UIRenderQueue : IDisposable, IServicePreUpdate, IServicePost
             }
         }
 
-        _elements[_elementCount++] = new UIElement
+        _elements[_elementCount++] = new SpriteElement
         {
             Count = indexCount,
             StartIndex = lastStartIndex,
             Texture = texture
         };
-        GraphicsDevice.ImmediateContext.Map(_vertexBuffer, _vertices.GetPointer(0), (uint)(vertexIndex * sizeof(UIVertex)));
+        GraphicsDevice.ImmediateContext.Map(_vertexBuffer, _vertices.GetPointer(0), (uint)(vertexIndex * sizeof(SpriteVertex)));
     }
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public UIRenderables GetRenderables() => new(_vertexBuffer, _indexBuffer, new ReadOnlySpan<UIElement>(_elements, 0, _elementCount));
+    public Renderables GetRenderables() => new(_vertexBuffer, _indexBuffer, new ReadOnlySpan<SpriteElement>(_elements, 0, _elementCount));
 
     public void Dispose()
     {

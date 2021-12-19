@@ -6,13 +6,13 @@ using Titan.Graphics.D3D11.Buffers;
 namespace Titan.UI.Rendering
 {
     [SkipLocalsInit]
-    public readonly ref struct UIRenderables
+    public readonly ref struct Renderables
     {
         public readonly Handle<ResourceBuffer> VertexBuffer;
         public readonly Handle<ResourceBuffer> IndexBuffer;
-        public readonly ReadOnlySpan<UIElement> Elements;
+        public readonly ReadOnlySpan<SpriteElement> Elements;
 
-        public UIRenderables(Handle<ResourceBuffer> vertexBuffer, Handle<ResourceBuffer> indexBuffer, ReadOnlySpan<UIElement> elements)
+        public Renderables(Handle<ResourceBuffer> vertexBuffer, Handle<ResourceBuffer> indexBuffer, ReadOnlySpan<SpriteElement> elements)
         {
             VertexBuffer = vertexBuffer;
             IndexBuffer = indexBuffer;

@@ -32,7 +32,7 @@ namespace Titan.UI.Rendering
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining|MethodImplOptions.AggressiveOptimization)]
-        public void Render(int index, ref UIVertex* vertex)
+        public void Render(int index, ref SpriteVertex* vertex)
         {
             var sprite = _sprites.GetPointer(index);
 

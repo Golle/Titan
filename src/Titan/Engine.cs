@@ -30,6 +30,7 @@ using Titan.UI;
 using Titan.UI.Debugging;
 using Titan.UI.Rendering;
 using Titan.UI.Text;
+using SpriteRenderQueue = Titan.UI.Rendering.SpriteRenderQueue;
 
 namespace Titan
 {
@@ -162,9 +163,9 @@ namespace Titan
                 .Register(assetsManager)
                 //Rendering (Queues)
                 .Register(new SimpleRenderQueue(1000))
-                .Register(new UIRenderQueue(new UIRenderQueueConfiguration(), services.Get<TextManager>(), services.Get<FontManager>()))
+                .Register(new SpriteRenderQueue(new UIRenderQueueConfiguration(), services.Get<TextManager>(), services.Get<FontManager>()))
                 .Register(new BoundingBoxRenderQueue())
-                .Register(new SpriteRenderQueue());
+                .Register(new Rendering.Sprites.SpriteRenderQueue());
 
 
             // Rendering pipeline
