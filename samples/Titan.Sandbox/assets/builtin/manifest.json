@@ -22,7 +22,6 @@
                 "shaders/gbuffer_vs.hlsl",
                 "shaders/gbuffer.layout"
             ],
-            "Preload": true,
             "Static": true
         },
         {
@@ -31,7 +30,6 @@
             "Files": [
                 "shaders/gbuffer_ps.hlsl"
             ],
-            "Preload": true,
             "Static": true
         },
         {
@@ -41,7 +39,6 @@
                 "shaders/fullscreen_vs.hlsl",
                 "shaders/fullscreen.layout"
             ],
-            "Preload": true,
             "Static": true
         },
         {
@@ -50,7 +47,6 @@
             "Files": [
                 "shaders/fullscreen_ps.hlsl"
             ],
-            "Preload": true,
             "Static": true
         },
         {
@@ -59,7 +55,6 @@
             "Files": [
                 "shaders/ui_ps.hlsl"
             ],
-            "Preload": true,
             "Static": true
         },
         {
@@ -69,8 +64,23 @@
                 "shaders/ui_vs.hlsl",
                 "shaders/ui.layout"
             ],
-            "Static": true,
-            "Preload": true
+            "Static": true
+        },{
+            "Id": "shaders/sprite_ps",
+            "Type": "pixelshader",
+            "Files": [
+                "shaders/sprite_ps.hlsl"
+            ],
+            "Static": true
+        },
+        {
+            "Id": "shaders/sprite_vs",
+            "Type": "vertexshader",
+            "Files": [
+                "shaders/sprite_vs.hlsl",
+                "shaders/sprite.layout"
+            ],
+            "Static": true
         }
     ]
 }

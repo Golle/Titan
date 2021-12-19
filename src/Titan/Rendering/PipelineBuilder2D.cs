@@ -7,9 +7,7 @@ using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
-using Titan.Rendering.Sprites;
-using SpriteRenderer = Titan.Graphics.Rendering.Sprites.SpriteRenderer;
-using SpriteRenderQueue = Titan.Graphics.Rendering.Sprites.SpriteRenderQueue;
+using Titan.Graphics.Rendering.Sprites;
 
 namespace Titan.Rendering;
 
@@ -51,33 +49,21 @@ internal class PipelineBuilder2D
             AddressAll = TextureAddressMode.Wrap,
         });
 
+        var blendState = GraphicsDevice.BlendStateManager.Create(new BlendStateCreation());
         var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
         var backbuffer = new Pipeline
         {
             ClearRenderTargets = true,
             ClearColor = Color.Red,
+            BlendState = blendState,
             RenderTargets = new[] { backbufferRenderTarget },
             PixelShader = assetsManager.GetAssetHandle<PixelShader>(_spritePS),
             VertexShader = assetsManager.GetAssetHandle<VertexShader>(_spriteVS),
-            PixelShaderSamplers = new[] { pointSampler },
-            Renderer = new Sprites.SpriteRenderer(services.Get<Sprites.SpriteRenderQueue>())
+            PixelShaderSamplers = new[] { pointSampler, linearSampler },
+            Renderer = new SpriteRenderer(services.Get<SpriteRenderQueue>())
         };
 
-        var uiBlendState = GraphicsDevice.BlendStateManager.Create(new BlendStateCreation());
-        var ui = new Pipeline
-        {
-            RenderTargets = new[] { backbufferRenderTarget },
-            //DepthBuffer = uiDepthBuffer,
-            //ClearDepthBuffer = true,
-            //DepthBufferClearValue = 1f,
-            Renderer = new SpriteRenderer(services.Get<SpriteRenderQueue>()),
-            PixelShaderSamplers = new[] { linearSampler }, // TODO: text must be rendered with a different sampler :O
-            VertexShader = assetsManager.GetAssetHandle<VertexShader>(_uiVS),
-            PixelShader = assetsManager.GetAssetHandle<PixelShader>(_uiPS),
-            BlendState = uiBlendState,
-            //RasterizerState = uiRasterizerState
-        };
-
-        return new[] { backbuffer, ui };
+        
+        return new[] { backbuffer };
     }
 }

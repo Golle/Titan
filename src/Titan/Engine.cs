@@ -13,7 +13,6 @@ using Titan.ECS.Components;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
-using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.Images;
 using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Atlas;
@@ -27,11 +26,9 @@ using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;
 using Titan.Input;
 using Titan.Rendering;
-using Titan.Rendering.Sprites;
 using Titan.Systems;
 using Titan.UI;
 using Titan.UI.Debugging;
-using SpriteRenderQueue = Titan.Graphics.Rendering.Sprites.SpriteRenderQueue;
 
 namespace Titan
 {
@@ -156,7 +153,6 @@ namespace Titan
                 {
                     "manifest.json",
                     "builtin/manifest.json",
-                    //"builtin/manifest2D.json",
                     "builtin/debug_manifest.json"
                 }, MaxConcurrentFileReads: 2));
 
@@ -166,37 +162,37 @@ namespace Titan
                 .Register(new SimpleRenderQueue(1000))
                 .Register(new SpriteRenderQueue(new UIRenderQueueConfiguration(), services.Get<TextManager>(), services.Get<FontManager>()))
                 .Register(new BoundingBoxRenderQueue())
-                .Register(new Rendering.Sprites.SpriteRenderQueue());
+                ;
 
 
             // Rendering pipeline
 
             GraphicsSystem graphicsSystem;
             //3D
-            {
-                var pipelineBuilder = new PipelineBuilder3D();
-                pipelineBuilder.LoadResources(services);
-                // Preload assets for rendering pipeline
-                while (Window.Update() && !pipelineBuilder.IsReady())
-                {
-                    assetsManager.Update();
-                }
-                graphicsSystem = new GraphicsSystem(pipelineBuilder.Create(services));
-                services.Register(graphicsSystem);
-            }
-
-            // 2D
             //{
-            //    var pipelineBuilder = new PipelineBuilder2D();
-            //    pipelineBuilder.LoadResources(assetsManager);
+            //    var pipelineBuilder = new PipelineBuilder3D();
+            //    pipelineBuilder.LoadResources(services);
             //    // Preload assets for rendering pipeline
-            //    while (Window.Update() && !pipelineBuilder.IsReady(assetsManager))
+            //    while (Window.Update() && !pipelineBuilder.IsReady())
             //    {
             //        assetsManager.Update();
             //    }
-            //    graphicsSystem = new GraphicsSystem(pipelineBuilder.BuildPipeline(services));
+            //    graphicsSystem = new GraphicsSystem(pipelineBuilder.Create(services));
             //    services.Register(graphicsSystem);
             //}
+
+            // 2D
+            {
+                var pipelineBuilder = new PipelineBuilder2D();
+                pipelineBuilder.LoadResources(assetsManager);
+                // Preload assets for rendering pipeline
+                while (Window.Update() && !pipelineBuilder.IsReady(assetsManager))
+                {
+                    assetsManager.Update();
+                }
+                graphicsSystem = new GraphicsSystem(pipelineBuilder.BuildPipeline(services));
+                services.Register(graphicsSystem);
+            }
 
 
             //The starter world
