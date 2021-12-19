@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
 
+namespace Titan.ECS.Worlds;
+
 public readonly struct Timestep
 {
     public readonly float Seconds;

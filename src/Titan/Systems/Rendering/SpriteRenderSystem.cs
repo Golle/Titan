@@ -1,19 +1,19 @@
 using Titan.Core.Services;
 using Titan.ECS.Systems;
+using Titan.ECS.Worlds;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Rendering.Sprites;
 using Titan.UI.Components;
 
-namespace Titan.UI.Systems
+namespace Titan.Systems
 {
-    public class UISpriteRenderSystem : EntitySystem
+    public class SpriteRenderSystem : EntitySystem
     {
         private SpriteRenderQueue _renderQueue;
         private AtlasManager _atlasManager;
         private EntityFilter _spriteFilter;
         private ReadOnlyStorage<RectTransform> _transform;
         private ReadOnlyStorage<SpriteComponent> _sprite;
-        private ReadOnlyStorage<InteractableComponent> _interactable;
 
         protected override void Init(IServiceCollection services)
         {
@@ -21,7 +21,6 @@ namespace Titan.UI.Systems
 
             _transform = GetReadOnly<RectTransform>();
             _sprite = GetReadOnly<SpriteComponent>();
-            _interactable = GetReadOnly<InteractableComponent>();
 
             _renderQueue = services.Get<SpriteRenderQueue>();
             _atlasManager = services.Get<AtlasManager>();

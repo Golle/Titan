@@ -53,7 +53,7 @@ internal class PipelineBuilder2D : PipelineBuilder
         var backbuffer = new Graphics.D3D11.Pipeline.Pipeline
         {
             ClearRenderTargets = true,
-            ClearColor = Color.Red,
+            ClearColor = Color.Black,
             BlendState = blendState,
             RenderTargets = new[] { backbufferRenderTarget },
             PixelShader = assetsManager.GetAssetHandle<PixelShader>(_spritePS),

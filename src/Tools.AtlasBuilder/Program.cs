@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 using Titan.Core.Logging;
-
+using Tools.AtlasBuilder;
 
 Logger.Start();
 
@@ -87,25 +87,27 @@ static void Write(Stream stream, ReadOnlySpan<char> text)
     stream.Write(buffer[..length]);
 }
 
-public class TextureAtlas
+namespace Tools.AtlasBuilder
 {
-    [XmlAttribute(AttributeName = "imagePath")]
-    public string? ImagePath { get; set; }
-    [XmlElement(ElementName = "SubTexture")]
-    public SubTexture[]? SubTextures { get; set; }
-}
+    public class TextureAtlas
+    {
+        [XmlAttribute(AttributeName = "imagePath")]
+        public string? ImagePath { get; set; }
+        [XmlElement(ElementName = "SubTexture")]
+        public SubTexture[]? SubTextures { get; set; }
+    }
 
-public class SubTexture
-{
-    [XmlAttribute("name")]
-    public string? Name { get; set; }
-    [XmlAttribute("x")]
-    public int X { get; set; }
-    [XmlAttribute("y")]
-    public int Y { get; set; }
-    [XmlAttribute("width")]
-    public int Width { get; set; }
-    [XmlAttribute("height")]
-    public int Height { get; set; }
+    public class SubTexture
+    {
+        [XmlAttribute("name")]
+        public string? Name { get; set; }
+        [XmlAttribute("x")]
+        public int X { get; set; }
+        [XmlAttribute("y")]
+        public int Y { get; set; }
+        [XmlAttribute("width")]
+        public int Width { get; set; }
+        [XmlAttribute("height")]
+        public int Height { get; set; }
+    }
 }
-

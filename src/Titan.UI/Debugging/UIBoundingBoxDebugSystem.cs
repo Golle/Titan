@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
+using Titan.ECS.Worlds;
 using Titan.UI.Components;
 
 namespace Titan.UI.Debugging

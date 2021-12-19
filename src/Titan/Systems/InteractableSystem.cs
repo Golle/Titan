@@ -4,10 +4,12 @@ using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
+using Titan.ECS.Worlds;
 using Titan.Input;
+using Titan.UI;
 using Titan.UI.Components;
 
-namespace Titan.UI.Systems
+namespace Titan.Systems
 {
     public class InteractableSystem : EntitySystem
     {

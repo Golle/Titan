@@ -7,7 +7,6 @@ using Titan.Systems;
 using Titan.UI.Animation;
 using Titan.UI.Components;
 using Titan.UI.Debugging;
-using Titan.UI.Systems;
 
 namespace Titan;
 
@@ -20,25 +19,22 @@ public static class WorldBuilderExtensions
             .WithSystem<Render3DSystem>()
             .WithSystem<ModelLoaderSystem>();
 
-    public static WorldBuilder WithDefault2D(this WorldBuilder builder, uint numberOfAssets = 2, uint numberOfSprites = 1000) =>
+    public static WorldBuilder WithDefault2D(this WorldBuilder builder, uint numberOfAssets = 2, uint numberOfSprites = 1000) => 
+        WithDefaultUI(builder, numberOfAssets, numberOfSprites);
+
+    public static WorldBuilder WithDefaultUI(this WorldBuilder builder, uint numberOfAssets = 2, uint numberOfSprites = 1000) =>
         builder
             .WithComponent<AssetComponent<SpriteComponent>>(ComponentPoolTypes.DynamicPacked, count: numberOfAssets)
             .WithComponent<SpriteComponent>(count: numberOfSprites)
             .WithSystem<SpriteLoaderSystem>()
-        ;
-
-    // TODO: remove this when we have a different UI system.
-    public static WorldBuilder WithDefaultUI(this WorldBuilder builder, uint numberOfAssets = 2, uint numberOfSprites = 1000) =>
-        builder
-            .WithDefault2D(numberOfAssets, numberOfSprites)
             .WithComponent<AssetComponent<TextComponent>>(ComponentPoolTypes.DynamicPacked, count: 1)
             .WithComponent<RectTransform>(count: numberOfSprites)
             .WithComponent<InteractableComponent>(count: numberOfSprites)
             .WithComponent<TextComponent>(count: numberOfSprites)
 
             .WithSystem<TextLoaderSystem>()
-            .WithSystem<UISpriteRenderSystem>()
-            .WithSystem<UITextRenderSystem>()
+            .WithSystem<SpriteRenderSystem>()
+            .WithSystem<TextRenderSystem>()
             .WithSystem<TextUpdateSystem>()
             .WithSystem<RectTransformSystem>()
             .WithSystem<InteractableSystem>()

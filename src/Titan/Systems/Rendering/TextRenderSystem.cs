@@ -1,11 +1,12 @@
 using Titan.Core.Services;
 using Titan.ECS.Systems;
+using Titan.ECS.Worlds;
 using Titan.Graphics.Rendering.Sprites;
 using Titan.UI.Components;
 
-namespace Titan.UI.Systems
+namespace Titan.Systems
 {
-    public class UITextRenderSystem : EntitySystem
+    public class TextRenderSystem : EntitySystem
     {
         private SpriteRenderQueue _renderQueue;
         private EntityFilter _filter;

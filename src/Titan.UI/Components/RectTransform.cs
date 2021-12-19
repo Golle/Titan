@@ -12,12 +12,23 @@ namespace Titan.UI.Components
         public Vector2 Pivot;
         public Size Size;
         public int ZIndex;
+
+        // TODO: move this to UI specific code
         public AnchorPoint AnchorPoint;
 
         // Calculated values
-        internal Vector2 AbsolutePosition;
-        internal Vector2 AbsolutePivot;
-        internal Size AbsoluteSize;
-        internal int AbsoluteZIndex;
+        // TODO: make these internal
+        public Vector2 AbsolutePosition;
+        public Vector2 AbsolutePivot;
+        public Size AbsoluteSize;
+        public int AbsoluteZIndex;
+
+
+        public static RectTransform Create(in Vector2 offset, in Size size) =>
+            new()
+            {
+                Size = size,
+                Offset = offset
+            };
     }
 }

@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Titan.UI.Systems
+namespace Titan.Systems
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct TextLine

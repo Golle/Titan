@@ -2,12 +2,13 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
+using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.Windows;
 using Titan.UI.Common;
 using Titan.UI.Components;
 
-namespace Titan.UI.Systems
+namespace Titan.Systems
 {
     public class RectTransformSystem : EntitySystem
     {

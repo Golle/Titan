@@ -192,9 +192,7 @@ namespace Titan
                 var worldBuilder = new WorldBuilder(defaultMaxEntities: 10_000)
                         .WithComponent<CameraComponent>(ComponentPoolTypes.DynamicPacked, 2)
                         .WithComponent<Transform3D>()
-                        .WithComponent<Transform2D>()
                         .WithSystem<Transform3DSystem>()
-                        .WithSystem<Transform2DSystem>()
                         .WithSystem<CameraSystem>()
                     ;
                 Logger.Info<Engine>("Initialize starter world");

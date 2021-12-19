@@ -12,8 +12,10 @@ namespace Titan.UI.Components
     {
         public Handle<TextBlock> Handle;
         public Handle<Font> Font;
-        internal Handle<Texture> CachedTexture;
-        internal ushort VisibleChars;
+        // TODO: these should be internal
+        public Handle<Texture> CachedTexture;
+        public ushort VisibleChars;
+        // TODO: END: these should be internal
         public ushort LineHeight;
         public ushort FontSize;
         public VerticalOverflow VerticalOverflow;
