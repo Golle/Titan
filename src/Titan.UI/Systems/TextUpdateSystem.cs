@@ -10,7 +10,7 @@ using Titan.UI.Text;
 
 namespace Titan.UI.Systems
 {
-    internal unsafe class TextUpdateSystem : EntitySystem
+    public unsafe class TextUpdateSystem : EntitySystem
     {
         private TextManager _textManager;
         private FontManager _fontManager;

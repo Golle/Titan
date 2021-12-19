@@ -3,33 +3,33 @@ using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Rendering;
 
-namespace Titan.Systems
+namespace Titan.Systems;
+
+internal class Render3DSystem : EntitySystem
 {
-    internal class Render3DSystem : EntitySystem
+    private SimpleRenderQueue _queue;
+    private EntityFilter _filter;
+    private ReadOnlyStorage<Transform3D> _transform;
+    private ReadOnlyStorage<ModelComponent> _model;
+
+    protected override void Init(IServiceCollection services)
     {
-        private SimpleRenderQueue _queue;
-        private EntityFilter _filter;
-        private ReadOnlyStorage<Transform3D> _transform;
-        private ReadOnlyStorage<ModelComponent> _model;
+        _transform = GetReadOnly<Transform3D>();
+        _model = GetReadOnly<ModelComponent>();
+        _filter = CreateFilter(new EntityFilterConfiguration().With<Transform3D>().With<ModelComponent>());
+            
+        _queue = services.Get<SimpleRenderQueue>();
+    }
 
-        protected override void Init(IServiceCollection services)
+    protected override void OnUpdate(in Timestep timestep)
+    {
+        var entities = _filter.GetEntities();
+        foreach (ref readonly var entity in entities)
         {
-            _transform = GetReadOnly<Transform3D>();
-            _model = GetReadOnly<ModelComponent>();
-            _filter = CreateFilter(new EntityFilterConfiguration().With<Transform3D>().With<ModelComponent>());
-            _queue = services.Get<SimpleRenderQueue>();
-        }
+            ref readonly var transform = ref _transform.Get(entity);
+            ref readonly var model = ref _model.Get(entity);
 
-        protected override void OnUpdate(in Timestep timestep)
-        {
-            var entities = _filter.GetEntities();
-            foreach (ref readonly var entity in entities)
-            {
-                ref readonly var transform = ref _transform.Get(entity);
-                ref readonly var model = ref _model.Get(entity);
-
-                _queue.Push(transform.WorldMatrix, model.Handle);
-            }
+            _queue.Push(transform.WorldMatrix, model.Handle);
         }
     }
 }

@@ -24,6 +24,7 @@ using Titan.Graphics.Loaders.Shaders;
 using Titan.Graphics.Windows;
 using Titan.Input;
 using Titan.Rendering;
+using Titan.Rendering.Sprites;
 using Titan.Systems;
 using Titan.UI;
 using Titan.UI.Debugging;
@@ -140,9 +141,7 @@ namespace Titan
                 .Register(new FontManager())
                 .Register(new AtlasManager(100))
                 .Register(new TextManager(200));
-                
             
-            // Managers
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
                 .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
@@ -155,41 +154,58 @@ namespace Titan
                 {
                     "manifest.json",
                     "builtin/manifest.json",
+                    //"builtin/manifest2D.json",
                     "builtin/debug_manifest.json"
                 }, MaxConcurrentFileReads: 2));
+
             services
                 .Register(assetsManager)
                 //Rendering (Queues)
                 .Register(new SimpleRenderQueue(1000))
                 .Register(new UIRenderQueue(new UIRenderQueueConfiguration(), services.Get<TextManager>(), services.Get<FontManager>()))
-                .Register(new BoundingBoxRenderQueue());
+                .Register(new BoundingBoxRenderQueue())
+                .Register(new SpriteRenderQueue());
+
 
             // Rendering pipeline
-            var pipelineBuilder = new PipelineBuilder();
-            pipelineBuilder.LoadResources(services);
-            // Preload assets for rendering pipeline
-            while (Window.Update() && !pipelineBuilder.IsReady())
+
+            GraphicsSystem graphicsSystem;
+            //3D
             {
-                assetsManager.Update();
+                var pipelineBuilder = new PipelineBuilder3D();
+                pipelineBuilder.LoadResources(services);
+                // Preload assets for rendering pipeline
+                while (Window.Update() && !pipelineBuilder.IsReady())
+                {
+                    assetsManager.Update();
+                }
+                graphicsSystem = new GraphicsSystem(pipelineBuilder.Create(services));
+                services.Register(graphicsSystem);
             }
 
-            var graphicsSystem = new GraphicsSystem(pipelineBuilder.Create(services));
-            services.Register(graphicsSystem);
+            // 2D
+            //{
+            //    var pipelineBuilder = new PipelineBuilder2D();
+            //    pipelineBuilder.LoadResources(assetsManager);
+            //    // Preload assets for rendering pipeline
+            //    while (Window.Update() && !pipelineBuilder.IsReady(assetsManager))
+            //    {
+            //        assetsManager.Update();
+            //    }
+            //    graphicsSystem = new GraphicsSystem(pipelineBuilder.BuildPipeline(services));
+            //    services.Register(graphicsSystem);
+            //}
+
 
             //The starter world
             var worldBuilder = new WorldBuilder(defaultMaxEntities: 10_000)
-                .WithComponent<Transform3D>()
                 .WithComponent<CameraComponent>(ComponentPoolTypes.DynamicPacked, 2)
-                .WithComponent<AssetComponent<Model>>(ComponentPoolTypes.DynamicPacked, 20)
-                .WithComponent<ModelComponent>(ComponentPoolTypes.DynamicPacked, 100)
-
+                .WithComponent<Transform3D>()
+                .WithComponent<Transform2D>()
                 .WithSystem<Transform3DSystem>()
-                .WithSystem<Render3DSystem>()
+                .WithSystem<Transform2DSystem>()
                 .WithSystem<CameraSystem>()
-                .WithSystem<ModelLoaderSystem>()
 
-                .WithDefaultUI(new UIConfiguration())
-                .WithSystem<UIBoundingBoxDebugSystem>()
                 ;
             
             _app.ConfigureStarterWorld(worldBuilder);
@@ -197,8 +213,7 @@ namespace Titan
             Logger.Info<Engine>("Initialize starter world");
 
             var starterWorld = World.CreateWorld(worldBuilder, services, true);
-
-            //var secondWorld = World.CreateWorld(worldBuilder, services, false);
+            var secondWorld = World.CreateWorld(worldBuilder, services, false);
             
             _app.OnStart(starterWorld, new UIManager(starterWorld, services.Get<TextManager>()));
             
@@ -206,6 +221,7 @@ namespace Titan
 
             // Collect any garbage created at setup
             GC.Collect();
+
             // star the main loop
             while (Window.Update())
             {
@@ -222,7 +238,7 @@ namespace Titan
 
                 if (InputManager.IsKeyPressed(KeyCode.L))
                 {
-                    //World.SetActive(secondWorld);
+                    World.SetActive(secondWorld);
                 }
 
                 if (InputManager.IsKeyPressed(KeyCode.K))
@@ -234,7 +250,6 @@ namespace Titan
                 EngineStats.SetStats("Services.Update()", timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
                 World.UpdateWorlds();
-                //starterWorld.Update();
                 EngineStats.SetStats(nameof(World), timer.Elapsed.TotalMilliseconds);
                 timer.Restart();
                 services.PostUpdate();

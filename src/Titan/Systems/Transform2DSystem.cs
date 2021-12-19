@@ -1,19 +1,18 @@
-using System.Numerics;
 using Titan.Components;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
 
 namespace Titan.Systems;
 
-internal class Transform3DSystem : EntitySystem
+internal class Transform2DSystem : EntitySystem
 {
-    private MutableStorage<Transform3D> _transform;
+    private MutableStorage<Transform2D> _transform;
     private EntityFilter _filter;
         
     protected override void Init(IServiceCollection services)
     {
-        _transform = GetMutable<Transform3D>();
-        _filter = CreateFilter(new EntityFilterConfiguration().With<Transform3D>());
+        _transform = GetMutable<Transform2D>();
+        _filter = CreateFilter(new EntityFilterConfiguration().With<Transform2D>());
     }
 
     protected override void OnUpdate(in Timestep timestep)
@@ -25,19 +24,14 @@ internal class Transform3DSystem : EntitySystem
         foreach (ref readonly var entity in _filter.GetEntities())
         {
             ref var transform = ref _transform.Get(entity);
-            transform.ModelMatrix =
-                Matrix4x4.CreateScale(transform.Scale) *
-                Matrix4x4.CreateFromQuaternion(transform.Rotation) *
-                Matrix4x4.CreateTranslation(transform.Position)
-                ;
-
+            // TODO: add calculations for parent transforms
             if (EntityManager.TryGetParent(entity, out var parent))
             {
-                transform.WorldMatrix = transform.ModelMatrix * _transform.Get(parent).WorldMatrix;
+                //transform.WorldMatrix = transform.ModelMatrix * _transform.Get(parent).WorldMatrix;
             }
             else
             {
-                transform.WorldMatrix = transform.ModelMatrix;
+                //transform.WorldMatrix = transform.ModelMatrix;
             }
         }
     }

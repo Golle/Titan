@@ -9,7 +9,7 @@ using Titan.UI.Components;
 
 namespace Titan.UI.Systems
 {
-    internal class InteractableSystem : EntitySystem
+    public class InteractableSystem : EntitySystem
     {
         private EntityFilter _filter;
         private MutableStorage<InteractableComponent> _interactable;

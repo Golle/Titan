@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Components
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct Transform3D
     {
         public Vector3 Position;

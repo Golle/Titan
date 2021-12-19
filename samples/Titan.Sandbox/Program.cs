@@ -168,6 +168,8 @@ namespace Titan.Sandbox
             builder
                 .WithFixedtimestep(1/30f) // 30 fps fixed update
                 .WithSystem<FirstPersonCameraSystem>()
+                .WithDefault3D()
+                .WithDefaultUI()
             ;
 
 

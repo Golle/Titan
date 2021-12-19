@@ -4,42 +4,41 @@ using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Models;
 
-namespace Titan.Systems
+namespace Titan.Systems;
+
+public class ModelLoaderSystem : EntitySystem
 {
-    public class ModelLoaderSystem : EntitySystem
+    private AssetsManager _assetsManager;
+    private EntityFilter _filter;
+    private MutableStorage<AssetComponent<Model>> _asset;
+    private MutableStorage<ModelComponent> _model;
+
+    protected override void Init(IServiceCollection services)
     {
-        private AssetsManager _assetsManager;
-        private EntityFilter _filter;
-        private MutableStorage<AssetComponent<Model>> _asset;
-        private MutableStorage<ModelComponent> _model;
+        _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<Model>>().Not<ModelComponent>());
+        _asset = GetMutable<AssetComponent<Model>>();
+        _model = GetMutable<ModelComponent>();
 
-        protected override void Init(IServiceCollection services)
+        _assetsManager = services.Get<AssetsManager>();
+    }
+
+    protected override void OnUpdate(in Timestep timestep)
+    {
+        foreach (ref readonly var entity in _filter.GetEntities())
         {
-            _filter = CreateFilter(new EntityFilterConfiguration().With<AssetComponent<Model>>().Not<ModelComponent>());
-            _asset = GetMutable<AssetComponent<Model>>();
-            _model = GetMutable<ModelComponent>();
-
-            _assetsManager = services.Get<AssetsManager>();
-        }
-
-        protected override void OnUpdate(in Timestep timestep)
-        {
-            foreach (ref readonly var entity in _filter.GetEntities())
+            ref var asset = ref _asset.Get(entity);
+            if (!asset.AssetHandle.IsValid())
             {
-                ref var asset = ref _asset.Get(entity);
-                if (!asset.AssetHandle.IsValid())
-                {
-                    asset.AssetHandle = _assetsManager.Load(asset.ToString());
-                }
+                asset.AssetHandle = _assetsManager.Load(asset.ToString());
+            }
 
-                if (_assetsManager.IsLoaded(asset.AssetHandle))
+            if (_assetsManager.IsLoaded(asset.AssetHandle))
+            {
+                var assetHandle = _assetsManager.GetAssetHandle<Model>(asset.AssetHandle);
+                _model.Create(entity) = new ModelComponent
                 {
-                    var assetHandle = _assetsManager.GetAssetHandle<Model>(asset.AssetHandle);
-                    _model.Create(entity) = new ModelComponent
-                    {
-                        Handle = assetHandle
-                    };
-                }
+                    Handle = assetHandle
+                };
             }
         }
     }
