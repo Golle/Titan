@@ -6,7 +6,6 @@ using Titan.Core.Services;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.BlendStates;
-using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
@@ -20,9 +19,9 @@ using Titan.Windows;
 using Titan.Windows.D3D11;
 using Titan.Windows.DXGI;
 
-namespace Titan.Rendering;
+namespace Titan.Pipeline;
 
-internal class PipelineBuilder3D
+internal class PipelineBuilder3D : PipelineBuilder
 {
     private Handle<Asset> _fullscreenPixelShaderHandle;
     private Handle<Asset> _lambertianPixelShaderHandle;
@@ -34,47 +33,41 @@ internal class PipelineBuilder3D
     private Handle<Asset> _debugPixelShaderHandle;
     private Handle<Asset> _debugLinePixelShaderHandle;
     private Handle<Asset> _debugLineVertexShaderHandle;
-        
-    private AssetsManager _assetsManager;
 
-    public void LoadResources(IServiceCollection services)
+    public override void LoadResources(AssetsManager assetsManager)
     {
-        _assetsManager = services.Get<AssetsManager>();
-        _lambertianVertexShaderHandle = _assetsManager.Load("shaders/default_vs");
-        _lambertianPixelShaderHandle = _assetsManager.Load("shaders/default_ps");
+        _lambertianVertexShaderHandle = assetsManager.Load("shaders/default_vs");
+        _lambertianPixelShaderHandle = assetsManager.Load("shaders/default_ps");
             
-        _fullscreenVertexShaderHandle = _assetsManager.Load("shaders/fullscreen_vs");
+        _fullscreenVertexShaderHandle = assetsManager.Load("shaders/fullscreen_vs");
         //_fullscreenPixelShaderHandle = _assetsManager.Load("shaders/fullscreen_ps");
-        _fullscreenPixelShaderHandle = _assetsManager.Load("shaders/fullscreen_debug_ps");
+        _fullscreenPixelShaderHandle = assetsManager.Load("shaders/fullscreen_debug_ps");
 
-        _uiPixelShaderHandle = _assetsManager.Load("shaders/ui_ps");
-        _uiVertexShaderHandle = _assetsManager.Load("shaders/ui_vs");
-        _debugPixelShaderHandle = _assetsManager.Load("shaders/debug_ps");
+        _uiPixelShaderHandle = assetsManager.Load("shaders/ui_ps");
+        _uiVertexShaderHandle = assetsManager.Load("shaders/ui_vs");
+        _debugPixelShaderHandle = assetsManager.Load("shaders/debug_ps");
 
 
-        _debugLinePixelShaderHandle = _assetsManager.Load("shaders/debug_line_ps");
-        _debugLineVertexShaderHandle = _assetsManager.Load("shaders/debug_line_vs");
-
- 
+        _debugLinePixelShaderHandle = assetsManager.Load("shaders/debug_line_ps");
+        _debugLineVertexShaderHandle = assetsManager.Load("shaders/debug_line_vs");
     }
 
-    public bool IsReady()
-    {
-        return _assetsManager.IsLoaded(_fullscreenVertexShaderHandle) &&
-               _assetsManager.IsLoaded(_lambertianVertexShaderHandle) &&
-               _assetsManager.IsLoaded(_fullscreenPixelShaderHandle) &&
-               _assetsManager.IsLoaded(_lambertianPixelShaderHandle) &&
-               _assetsManager.IsLoaded(_uiPixelShaderHandle) &&
-               _assetsManager.IsLoaded(_uiVertexShaderHandle) &&
-               _assetsManager.IsLoaded(_debugPixelShaderHandle) &&
-               _assetsManager.IsLoaded(_debugLineVertexShaderHandle) &&
-               _assetsManager.IsLoaded(_debugLinePixelShaderHandle)
-            ;
-    }
+    public override bool IsReady(AssetsManager assetsManager) =>
+        assetsManager.IsLoaded(_fullscreenVertexShaderHandle) &&
+        assetsManager.IsLoaded(_lambertianVertexShaderHandle) &&
+        assetsManager.IsLoaded(_fullscreenPixelShaderHandle) &&
+        assetsManager.IsLoaded(_lambertianPixelShaderHandle) &&
+        assetsManager.IsLoaded(_uiPixelShaderHandle) &&
+        assetsManager.IsLoaded(_uiVertexShaderHandle) &&
+        assetsManager.IsLoaded(_debugPixelShaderHandle) &&
+        assetsManager.IsLoaded(_debugLineVertexShaderHandle) &&
+        assetsManager.IsLoaded(_debugLinePixelShaderHandle);
 
-    public Pipeline[] Create(IServiceCollection services)
+    public override Graphics.D3D11.Pipeline.Pipeline[] BuildPipeline(IServiceCollection services)
     {
         Debug.Assert(GraphicsDevice.IsInitialized, $"{nameof(GraphicsDevice)} must be initialized before the {nameof(GraphicsSystem)} is created.");
+
+        var assetsManager = services.Get<AssetsManager>();
 
         var swapchain = GraphicsDevice.SwapChain;
 
@@ -113,7 +106,7 @@ internal class PipelineBuilder3D
             AddressAll = TextureAddressMode.Wrap,
         });
 
-        var gBuffer = new Pipeline
+        var gBuffer = new Graphics.D3D11.Pipeline.Pipeline
         {
             RenderTargets = new[] {gBufferPosition, gBufferAlbedo, gBufferNormals},
             ClearDepthBuffer = true,
@@ -132,10 +125,10 @@ internal class PipelineBuilder3D
             Binding = TextureBindFlags.FrameBuffer
         });
 
-        var deferredShading = new Pipeline
+        var deferredShading = new Graphics.D3D11.Pipeline.Pipeline
         {
-            PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_lambertianPixelShaderHandle),
-            VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_lambertianVertexShaderHandle),
+            PixelShader = assetsManager.GetAssetHandle<PixelShader>(_lambertianPixelShaderHandle),
+            VertexShader = assetsManager.GetAssetHandle<VertexShader>(_lambertianVertexShaderHandle),
             RenderTargets = new []{deferredShadingTarget},
             PixelShaderResources = new []{gBufferPosition, gBufferAlbedo, gBufferNormals},
             PixelShaderSamplers = new []{fullscreenSampler},
@@ -145,14 +138,14 @@ internal class PipelineBuilder3D
 
         var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
         var backbufferRenderer = new BackbufferRenderer();
-        var backbuffer = new Pipeline
+        var backbuffer = new Graphics.D3D11.Pipeline.Pipeline
         {
             ClearDepthBuffer = false,
             //ClearRenderTargets = true,
             //ClearColor = Color.Black,
             RenderTargets = new[] { backbufferRenderTarget },
-            PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_fullscreenPixelShaderHandle),
-            VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
+            PixelShader = assetsManager.GetAssetHandle<PixelShader>(_fullscreenPixelShaderHandle),
+            VertexShader = assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
             PixelShaderResources = new[] { deferredShadingTarget },
             PixelShaderSamplers = new[] { fullscreenSampler },
             Renderer = backbufferRenderer
@@ -183,7 +176,7 @@ internal class PipelineBuilder3D
         });
 
         // TODO: should we render it to an offscreen buffer to support multi-threaded rendering or directly to the backbuffer?
-        var ui = new Pipeline
+        var ui = new Graphics.D3D11.Pipeline.Pipeline
         {
             RenderTargets = new[] { backbufferRenderTarget },
             //DepthBuffer = uiDepthBuffer,
@@ -191,8 +184,8 @@ internal class PipelineBuilder3D
             //DepthBufferClearValue = 1f,
             Renderer = new SpriteRenderer(services.Get<SpriteRenderQueue>()),
             PixelShaderSamplers = new []{ uiSampler }, // TODO: text must be rendered with a different sampler :O
-            VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_uiVertexShaderHandle),
-            PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_uiPixelShaderHandle),
+            VertexShader = assetsManager.GetAssetHandle<VertexShader>(_uiVertexShaderHandle),
+            PixelShader = assetsManager.GetAssetHandle<PixelShader>(_uiPixelShaderHandle),
             BlendState = uiBlendState,
             //RasterizerState = uiRasterizerState
         };
@@ -218,7 +211,7 @@ internal class PipelineBuilder3D
             }
         }
 
-        var debugPipeline = new Pipeline
+        var debugPipeline = new Graphics.D3D11.Pipeline.Pipeline
         {
             ClearColor = Color.Zero,
             ClearRenderTargets = true,
@@ -226,26 +219,26 @@ internal class PipelineBuilder3D
             Renderer = new DebugRenderer(surface)
         };
             
-        var debugOverlay = new Pipeline
+        var debugOverlay = new Graphics.D3D11.Pipeline.Pipeline
         {
             ClearRenderTargets =  false,
             RenderTargets = new[] { backbufferRenderTarget },
             Renderer = backbufferRenderer,
-            PixelShader = _assetsManager.GetAssetHandle<PixelShader>(_debugPixelShaderHandle),
-            VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
+            PixelShader = assetsManager.GetAssetHandle<PixelShader>(_debugPixelShaderHandle),
+            VertexShader = assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
             PixelShaderResources = new[] { debugTextureHandle },
             PixelShaderSamplers = new[] { fullscreenSampler },
         };
         /***** DEBUG Stuff *****/
 
 
-        var debugVerticesPipeline = new Pipeline
+        var debugVerticesPipeline = new Graphics.D3D11.Pipeline.Pipeline
         {
 
             RenderTargets = new[] { backbufferRenderTarget },
             Renderer = new BoundingBoxRenderer(services.Get<BoundingBoxRenderQueue>()),
-            VertexShader = _assetsManager.GetAssetHandle<VertexShader>(_debugLineVertexShaderHandle),
-            PixelShader= _assetsManager.GetAssetHandle<PixelShader>(_debugLinePixelShaderHandle),
+            VertexShader = assetsManager.GetAssetHandle<VertexShader>(_debugLineVertexShaderHandle),
+            PixelShader= assetsManager.GetAssetHandle<PixelShader>(_debugLinePixelShaderHandle),
         };
 
         return new[] {gBuffer, deferredShading, debugPipeline, backbuffer, ui, debugVerticesPipeline, debugOverlay };

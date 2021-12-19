@@ -25,7 +25,7 @@ using Titan.Graphics.Rendering.Sprites;
 using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;
 using Titan.Input;
-using Titan.Rendering;
+using Titan.Pipeline;
 using Titan.Systems;
 using Titan.UI;
 using Titan.UI.Debugging;
@@ -165,25 +165,16 @@ namespace Titan
                 ;
 
 
-            // Rendering pipeline
-
             GraphicsSystem graphicsSystem;
-            //3D
-            //{
-            //    var pipelineBuilder = new PipelineBuilder3D();
-            //    pipelineBuilder.LoadResources(services);
-            //    // Preload assets for rendering pipeline
-            //    while (Window.Update() && !pipelineBuilder.IsReady())
-            //    {
-            //        assetsManager.Update();
-            //    }
-            //    graphicsSystem = new GraphicsSystem(pipelineBuilder.Create(services));
-            //    services.Register(graphicsSystem);
-            //}
-
-            // 2D
             {
-                var pipelineBuilder = new PipelineBuilder2D();
+                // Rendering pipeline
+                PipelineBuilder pipelineBuilder = _app.ConfigureRenderingPipeline() switch
+                {
+                    RenderingPipeline.Render2D => new PipelineBuilder2D(),
+                    RenderingPipeline.Render3D => new PipelineBuilder3D(),
+                    RenderingPipeline.Custom => throw new NotSupportedException("Custom pipeline is not supported yet."),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
                 pipelineBuilder.LoadResources(assetsManager);
                 // Preload assets for rendering pipeline
                 while (Window.Update() && !pipelineBuilder.IsReady(assetsManager))
@@ -195,28 +186,25 @@ namespace Titan
             }
 
 
-            //The starter world
-            var worldBuilder = new WorldBuilder(defaultMaxEntities: 10_000)
-                .WithComponent<CameraComponent>(ComponentPoolTypes.DynamicPacked, 2)
-                .WithComponent<Transform3D>()
-                .WithComponent<Transform2D>()
-                .WithSystem<Transform3DSystem>()
-                .WithSystem<Transform2DSystem>()
-                .WithSystem<CameraSystem>()
-
-                ;
-            
-            _app.ConfigureStarterWorld(worldBuilder);
-
-            Logger.Info<Engine>("Initialize starter world");
-
-            var starterWorld = World.CreateWorld(worldBuilder, services, true);
-            var secondWorld = World.CreateWorld(worldBuilder, services, false);
+            World starterWorld;
+            // The starter world
+            {
+                var worldBuilder = new WorldBuilder(defaultMaxEntities: 10_000)
+                        .WithComponent<CameraComponent>(ComponentPoolTypes.DynamicPacked, 2)
+                        .WithComponent<Transform3D>()
+                        .WithComponent<Transform2D>()
+                        .WithSystem<Transform3DSystem>()
+                        .WithSystem<Transform2DSystem>()
+                        .WithSystem<CameraSystem>()
+                    ;
+                Logger.Info<Engine>("Initialize starter world");
+                _app.ConfigureStarterWorld(worldBuilder);
+                starterWorld = World.CreateWorld(worldBuilder, services, true);
+            }
             
             _app.OnStart(starterWorld, new UIManager(starterWorld, services.Get<TextManager>()));
             
             var timer = Stopwatch.StartNew();
-
             // Collect any garbage created at setup
             GC.Collect();
 
@@ -232,17 +220,6 @@ namespace Titan
                 timer.Restart();
                 InputManager.Update();
                 EngineStats.SetStats(nameof(InputManager), timer.Elapsed.TotalMilliseconds);
-                timer.Restart();
-
-                if (InputManager.IsKeyPressed(KeyCode.L))
-                {
-                    World.SetActive(secondWorld);
-                }
-
-                if (InputManager.IsKeyPressed(KeyCode.K))
-                {
-                    World.SetActive(starterWorld);
-                }
                 timer.Restart();
                 services.Update();
                 EngineStats.SetStats("Services.Update()", timer.Elapsed.TotalMilliseconds);

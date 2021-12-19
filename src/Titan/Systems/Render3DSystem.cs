@@ -2,7 +2,6 @@ using Titan.Components;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Rendering.Geometry;
-using Titan.Rendering;
 
 namespace Titan.Systems;
 

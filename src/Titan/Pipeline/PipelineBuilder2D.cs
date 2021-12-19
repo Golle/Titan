@@ -4,21 +4,20 @@ using Titan.Core.Services;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.BlendStates;
-using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.Rendering.Sprites;
 
-namespace Titan.Rendering;
+namespace Titan.Pipeline;
 
-internal class PipelineBuilder2D
+internal class PipelineBuilder2D : PipelineBuilder
 {
     private Handle<Asset> _uiVS;
     private Handle<Asset> _uiPS;
     private Handle<Asset> _spriteVS;
     private Handle<Asset> _spritePS;
 
-    public void LoadResources(AssetsManager assetsManager)
+    public override void LoadResources(AssetsManager assetsManager)
     {
         _uiVS = assetsManager.Load("shaders/ui_vs");
         _uiPS = assetsManager.Load("shaders/ui_ps");
@@ -27,14 +26,14 @@ internal class PipelineBuilder2D
     }
 
 
-    public bool IsReady(AssetsManager assetsManager) =>
+    public override bool IsReady(AssetsManager assetsManager) =>
         assetsManager.IsLoaded(_spritePS) &&
         assetsManager.IsLoaded(_spriteVS) &&
         assetsManager.IsLoaded(_uiPS) &&
         assetsManager.IsLoaded(_uiVS);
 
 
-    public Pipeline[] BuildPipeline(IServiceCollection services)
+    public override Graphics.D3D11.Pipeline.Pipeline[] BuildPipeline(IServiceCollection services)
     {
         var assetsManager = services.Get<AssetsManager>();
         var pointSampler = GraphicsDevice.SamplerManager.Create(new SamplerCreation
@@ -51,7 +50,7 @@ internal class PipelineBuilder2D
 
         var blendState = GraphicsDevice.BlendStateManager.Create(new BlendStateCreation());
         var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
-        var backbuffer = new Pipeline
+        var backbuffer = new Graphics.D3D11.Pipeline.Pipeline
         {
             ClearRenderTargets = true,
             ClearColor = Color.Red,
