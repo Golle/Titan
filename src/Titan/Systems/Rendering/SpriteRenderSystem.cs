@@ -40,6 +40,7 @@ namespace Titan.Systems
 
                 switch (type)
                 {
+                        
                     case SpriteType.Normal:
                         _renderQueue.Add(transform.AbsolutePosition, transform.AbsoluteZIndex, transform.Size, atlas.Texture, coordinates, color);
                         break;

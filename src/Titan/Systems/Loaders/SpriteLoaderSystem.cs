@@ -1,4 +1,5 @@
 using Titan.Assets;
+using Titan.Core.Logging;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;

@@ -49,7 +49,16 @@ namespace Titan.ECS.Systems
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void OnEntityDestroyed(uint entityId) => _indexers[entityId] = -1;
+        internal void OnEntityDestroyed(uint entityId)
+        {
+            ref var index = ref _indexers[entityId];
+            if (index != -1)
+            {
+                _entities[index] = _entities[--_numberOfEntities];
+                _indexers[_entities[index]] = index;
+                index = -1;
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<Entity> GetEntities() => new(_entities, _numberOfEntities);

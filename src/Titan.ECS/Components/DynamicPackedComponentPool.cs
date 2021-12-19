@@ -27,7 +27,7 @@ namespace Titan.ECS.Components
             _maxCount = initialComponents;
             _worldId = worldId;
             _indexers = MemoryUtils.AllocateBlock<uint>(maxEntities, true);
-            _components = MemoryUtils.AllocateBlock<T>(initialComponents);
+            _components = MemoryUtils.AllocateBlock<T>(initialComponents, true);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,16 +43,15 @@ namespace Titan.ECS.Components
             if (_count >= _maxCount && _freeComponents.Count == 0)
             {
                 _maxCount *= 2;
-
                 Logger.Trace<DynamicPackedComponentPool<T>>($"Reallocating memory. Old: {_components.Size} New: {_maxCount * _componentSize}");
                 _components = MemoryUtils.ReAllocate(ref _components, _maxCount);
             }
 
             if (!_freeComponents.TryDequeue(out var index))
             {
-                index = _indexers[entity.Id] = _count++;
+                index = _count++;
             }
-
+            _indexers[entity.Id] = index;
             ref var components = ref _components[index];
             EventManager.Push(new ComponentAddedEvent(entity, ComponentId));
             return ref components;
@@ -75,7 +74,7 @@ namespace Titan.ECS.Components
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Destroy(in Entity entity)
         {
-            ref var index = ref _indexers[entity.Id];
+            var index = _indexers[entity.Id];
             if (index != 0)
             {
                 EventManager.Push(new ComponentBeingRemovedEvent(entity, ComponentId));

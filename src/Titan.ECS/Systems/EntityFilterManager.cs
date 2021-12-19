@@ -73,7 +73,6 @@ namespace Titan.ECS.Systems
                         EntityChanged(componentEvent.Entity, _entityInfo[componentEvent.Entity].Components);
                     }
                 }
-                
                 else if (@event.Type == EntityBeingDestroyedEvent.Id)
                 {
                     ref readonly var e = ref @event.As<EntityBeingDestroyedEvent>();

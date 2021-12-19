@@ -16,7 +16,7 @@ namespace Titan.ECS.Systems
         public bool Contains(in Entity entity) => _pool.Contains(entity);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref T Create(in Entity entity) => ref _pool.Create(entity);
+        public ref T Create(in Entity entity, in T initialValue = default) => ref _pool.Create(entity, initialValue);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref T CreateOrReplace(in Entity entity, in T value = default) => ref _pool.CreateOrReplace(entity, value);
 

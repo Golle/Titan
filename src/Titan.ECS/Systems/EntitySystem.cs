@@ -15,6 +15,7 @@ namespace Titan.ECS.Systems
         private ComponentId _mutable;
         private GameTime _gameTime;
         private World _world;
+        private bool _initialized;
         private readonly string _name;
         internal ref readonly ComponentId Read => ref _read;
         internal ref readonly ComponentId Mutable => ref _mutable;
@@ -92,14 +93,14 @@ namespace Titan.ECS.Systems
 
             EntityManager = world.Manager;
             Init(services);
-            _world = null;
+            _initialized = true;
         }
 
         
 
         public ReadOnlyStorage<T> GetReadOnly<T>() where T : unmanaged
         {
-            if (_world == null)
+            if (_initialized)
             {
                 throw new InvalidOperationException($"{nameof(GetReadOnly)} can only be called in the {nameof(Init)} method.");
             }
@@ -110,7 +111,7 @@ namespace Titan.ECS.Systems
 
         protected MutableStorage<T> GetMutable<T>() where T : unmanaged
         {
-            if (_world == null)
+            if (_initialized)
             {
                 throw new InvalidOperationException($"{nameof(GetMutable)} can only be called in the {nameof(Init)} method.");
             }
@@ -121,11 +122,13 @@ namespace Titan.ECS.Systems
 
         protected EntityFilter CreateFilter(EntityFilterConfiguration config)
         {
-            if(_world == null)
+            if(_initialized)
             {
                 throw new InvalidOperationException($"{nameof(CreateFilter)} can only be called in the {nameof(Init)} method.");
             }
             return _world.FilterManager.Create(config);
         }
+
+        protected Entity CreateEntity() => _world.CreateEntity();
     }
 }

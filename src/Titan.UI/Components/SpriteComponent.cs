@@ -5,12 +5,12 @@ using Titan.Graphics.Loaders.Atlas;
 
 namespace Titan.UI.Components
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct SpriteComponent
     {
         public Handle<TextureAtlas> TextureAtlas;
-        public byte TextureIndex;
         public Margins Margins;
         public Color Color;
+        public byte TextureIndex;
     }
 }

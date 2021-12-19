@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Core.Services;
@@ -27,7 +26,7 @@ namespace Titan.ECS.Worlds
     internal class SystemsManager
     {
         private readonly EntitySystem[] _systems;
-        private readonly SystemsDispatcher _dispatcher;
+        private SystemsDispatcher _dispatcher;
 
         public SystemsManager(EntitySystemConfiguration[] systems)
         {
@@ -35,8 +34,6 @@ namespace Titan.ECS.Worlds
                 .Select(config => (EntitySystem)Activator.CreateInstance(config.Type))
                 .ToArray();
             Logger.Trace<SystemsManager>($"Created {systems.Length} systems");
-            var nodes = SystemNodeFactory.Create(_systems);
-            _dispatcher = new SystemsDispatcher(nodes);
         }
 
 
@@ -45,10 +42,14 @@ namespace Titan.ECS.Worlds
 
         public void Init(World world, IServiceCollection services)
         {
+            Logger.Trace<SystemsManager>("Init all systems");
             foreach (var system in _systems)
             {
                 system.InitSystem(world, services);
             }
+            Logger.Trace<SystemsManager>("Create system nodes and the SystemsDispatcher");
+            var nodes = SystemNodeFactory.Create(_systems);
+            _dispatcher = new SystemsDispatcher(nodes);
         }
     }
 
