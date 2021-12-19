@@ -3,10 +3,10 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
+using Titan.Graphics;
 using Titan.Graphics.Loaders.Fonts;
-using Titan.UI.Common;
+using Titan.Graphics.Rendering.Text;
 using Titan.UI.Components;
-using Titan.UI.Text;
 
 namespace Titan.UI.Systems
 {

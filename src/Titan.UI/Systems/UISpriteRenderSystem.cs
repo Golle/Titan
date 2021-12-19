@@ -1,8 +1,8 @@
 using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.Graphics.Loaders.Atlas;
+using Titan.Graphics.Rendering.Sprites;
 using Titan.UI.Components;
-using Titan.UI.Rendering;
 
 namespace Titan.UI.Systems
 {

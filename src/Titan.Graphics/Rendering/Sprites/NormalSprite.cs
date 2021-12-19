@@ -2,10 +2,8 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Graphics;
-using Titan.UI.Common;
 
-namespace Titan.UI.Rendering
+namespace Titan.Graphics.Rendering.Sprites
 {
     [SkipLocalsInit]
     [StructLayout(LayoutKind.Sequential, Pack = 4)]

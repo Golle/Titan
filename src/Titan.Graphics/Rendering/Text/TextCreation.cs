@@ -1,6 +1,6 @@
 using System;
 
-namespace Titan.UI.Text
+namespace Titan.Graphics.Rendering.Text
 {
     public ref struct TextCreation
     {

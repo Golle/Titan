@@ -21,6 +21,8 @@ using Titan.Graphics.Loaders.Fonts;
 using Titan.Graphics.Loaders.Materials;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Loaders.Shaders;
+using Titan.Graphics.Rendering.Sprites;
+using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;
 using Titan.Input;
 using Titan.Rendering;
@@ -28,9 +30,7 @@ using Titan.Rendering.Sprites;
 using Titan.Systems;
 using Titan.UI;
 using Titan.UI.Debugging;
-using Titan.UI.Rendering;
-using Titan.UI.Text;
-using SpriteRenderQueue = Titan.UI.Rendering.SpriteRenderQueue;
+using SpriteRenderQueue = Titan.Graphics.Rendering.Sprites.SpriteRenderQueue;
 
 namespace Titan
 {

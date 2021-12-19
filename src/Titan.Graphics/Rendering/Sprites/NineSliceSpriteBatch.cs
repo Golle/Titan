@@ -3,11 +3,9 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
-using Titan.Graphics;
 using Titan.Graphics.Loaders.Atlas;
-using Titan.UI.Common;
 
-namespace Titan.UI.Rendering
+namespace Titan.Graphics.Rendering.Sprites
 {
     internal unsafe class NineSliceSpriteBatch : IDisposable
     {

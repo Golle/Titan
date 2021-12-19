@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Memory;
 
-namespace Titan.UI.Text
+namespace Titan.Graphics.Rendering.Text
 {
     public unsafe class TextManager : IDisposable
     {

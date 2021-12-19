@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Folder Include="Debugging\" />
+    <Folder Include="Rendering\" />
     <Folder Include="Text\" />
   </ItemGroup>
 

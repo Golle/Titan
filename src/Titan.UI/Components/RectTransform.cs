@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Titan.Graphics;
 using Titan.UI.Common;
 
 namespace Titan.UI.Components

@@ -1,7 +1,7 @@
 using Titan.Core;
 using Titan.Graphics.D3D11.Textures;
 
-namespace Titan.UI.Rendering
+namespace Titan.Graphics.Rendering.Sprites
 {
     public struct SpriteElement
     {

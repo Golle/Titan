@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Titan.UI.Common
+namespace Titan.Graphics
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct Size

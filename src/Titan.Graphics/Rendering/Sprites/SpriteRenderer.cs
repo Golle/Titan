@@ -1,8 +1,7 @@
-using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Windows.D3D;
 
-namespace Titan.UI.Rendering
+namespace Titan.Graphics.Rendering.Sprites
 {
     public sealed class SpriteRenderer : Renderer
     {

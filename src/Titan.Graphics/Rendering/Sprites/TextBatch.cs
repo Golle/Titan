@@ -4,11 +4,10 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core;
 using Titan.Core.Memory;
-using Titan.Graphics;
 using Titan.Graphics.Loaders.Fonts;
-using Titan.UI.Text;
+using Titan.Graphics.Rendering.Text;
 
-namespace Titan.UI.Rendering;
+namespace Titan.Graphics.Rendering.Sprites;
 
 internal struct TextBatchSprite
 {

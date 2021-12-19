@@ -8,9 +8,8 @@ using Titan.Graphics.D3D11.Pipeline;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Rendering.Sprites;
-using Titan.UI.Rendering;
-using SpriteRenderer = Titan.UI.Rendering.SpriteRenderer;
-using SpriteRenderQueue = Titan.UI.Rendering.SpriteRenderQueue;
+using SpriteRenderer = Titan.Graphics.Rendering.Sprites.SpriteRenderer;
+using SpriteRenderQueue = Titan.Graphics.Rendering.Sprites.SpriteRenderQueue;
 
 namespace Titan.Rendering;
 

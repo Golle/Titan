@@ -6,17 +6,15 @@ using System.Threading;
 using Titan.Core;
 using Titan.Core.Memory;
 using Titan.Core.Services;
-using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Loaders.Fonts;
-using Titan.UI.Common;
-using Titan.UI.Text;
+using Titan.Graphics.Rendering.Text;
 using Titan.Windows.D3D11;
 
-namespace Titan.UI.Rendering;
+namespace Titan.Graphics.Rendering.Sprites;
 
 public record UIRenderQueueConfiguration(uint MaxSprites = 500, uint MaxNinePatchSprites = 100, uint MaxTextBlocks = 100);
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Titan.ECS.Entities;
 using Titan.ECS.Worlds;
-using Titan.UI.Text;
+using Titan.Graphics.Rendering.Text;
 
 namespace Titan.UI
 {

@@ -1,6 +1,6 @@
 using Titan.Core.Memory;
 
-namespace Titan.UI.Text
+namespace Titan.Graphics.Rendering.Text
 {
     public struct TextBlock
     {

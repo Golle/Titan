@@ -1,4 +1,4 @@
-namespace Titan.UI.Text
+namespace Titan.Graphics.Rendering.Text
 {
     public enum VerticalOverflow : byte
     {

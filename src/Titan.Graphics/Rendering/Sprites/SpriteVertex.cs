@@ -1,8 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Titan.Graphics;
 
-namespace Titan.UI.Rendering
+namespace Titan.Graphics.Rendering.Sprites
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct SpriteVertex

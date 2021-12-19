@@ -3,12 +3,10 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core;
-using Titan.Graphics;
 using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Loaders.Atlas;
-using Titan.UI.Common;
 
-namespace Titan.UI.Rendering
+namespace Titan.Graphics.Rendering.Sprites
 {
     [SkipLocalsInit]
     [StructLayout(LayoutKind.Sequential, Pack = 4)]

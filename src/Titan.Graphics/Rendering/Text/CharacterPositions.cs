@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace Titan.UI.Text
+namespace Titan.Graphics.Rendering.Text
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct CharacterPositions

@@ -9,11 +9,11 @@ using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.Loaders.Models;
+using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;
 using Titan.Sandbox;
 using Titan.UI;
 using Titan.UI.Common;
-using Titan.UI.Text;
 
 Console.WriteLine($"Hello World!");
 

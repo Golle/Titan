@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Graphics.D3D11.Buffers;
 
-namespace Titan.UI.Rendering
+namespace Titan.Graphics.Rendering.Sprites
 {
     [SkipLocalsInit]
     public readonly ref struct Renderables
