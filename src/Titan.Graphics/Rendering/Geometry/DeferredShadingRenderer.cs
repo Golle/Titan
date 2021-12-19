@@ -1,17 +1,16 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Titan.Core;
-using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.Extensions;
 using Titan.Windows.D3D;
 using Titan.Windows.D3D11;
 
-namespace Titan.Rendering
+namespace Titan.Graphics.Rendering.Geometry
 {
     [StructLayout(LayoutKind.Explicit, Size = 1024)]
-    internal unsafe struct LightBuffer
+    public unsafe struct LightBuffer
     {
         [FieldOffset(0)]
         public fixed float Lights[32 * 4];
@@ -28,7 +27,7 @@ namespace Titan.Rendering
         }
     }
 
-    internal sealed class DeferredShadingRenderer : Renderer
+    public sealed class DeferredShadingRenderer : Renderer
     {
         private readonly Handle<ResourceBuffer> _vertexBuffer;
         private readonly Handle<ResourceBuffer> _indexBuffer;

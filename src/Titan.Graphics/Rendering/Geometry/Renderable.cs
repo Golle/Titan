@@ -4,10 +4,10 @@ using Titan.Core;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.Loaders.Materials;
 
-namespace Titan.Rendering
+namespace Titan.Graphics.Rendering.Geometry
 {
     [SkipLocalsInit]
-    internal struct Renderable
+    public struct Renderable
     {
         public Matrix4x4 Transform;
 

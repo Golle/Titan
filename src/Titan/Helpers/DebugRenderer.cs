@@ -4,13 +4,12 @@ using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Input;
 using Titan.Windows;
-using Titan.Windows.D3D11;
 using Titan.Windows.DXGI;
 using Titan.Windows.Win32;
 
-namespace Titan.Rendering
+namespace Titan.Helpers
 {
-    internal sealed unsafe class DebugRenderer : Renderer
+    public sealed unsafe class DebugRenderer : Renderer
     {
         private readonly ComPtr<IDXGISurface1> _surface;
         private HFONT _font;

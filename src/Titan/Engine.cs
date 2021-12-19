@@ -21,6 +21,7 @@ using Titan.Graphics.Loaders.Fonts;
 using Titan.Graphics.Loaders.Materials;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Loaders.Shaders;
+using Titan.Graphics.Rendering.Geometry;
 using Titan.Graphics.Rendering.Sprites;
 using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;

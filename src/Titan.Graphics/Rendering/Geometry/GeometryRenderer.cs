@@ -1,18 +1,16 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Assets;
 using Titan.Core;
-using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.Loaders;
 using Titan.Windows.D3D;
 using Titan.Windows.D3D11;
 
-namespace Titan.Rendering
+namespace Titan.Graphics.Rendering.Geometry
 {
-    internal sealed class GeometryRenderer : Renderer
+    public sealed class GeometryRenderer : Renderer
     {
         private readonly SimpleRenderQueue _queue;
         private readonly Handle<ResourceBuffer> _transformBuffer;

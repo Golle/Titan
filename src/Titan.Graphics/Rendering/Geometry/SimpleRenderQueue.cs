@@ -7,9 +7,9 @@ using Titan.Core.Services;
 using Titan.Graphics.Loaders;
 using Titan.Graphics.Loaders.Models;
 
-namespace Titan.Rendering
+namespace Titan.Graphics.Rendering.Geometry
 {
-    internal class SimpleRenderQueue : IServicePreUpdate
+    public class SimpleRenderQueue : IServicePreUpdate
     {
         private readonly Renderable[] _renderables;
         private int _count;
