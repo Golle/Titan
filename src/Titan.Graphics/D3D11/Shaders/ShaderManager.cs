@@ -55,6 +55,7 @@ namespace Titan.Graphics.D3D11.Shaders
                     TextureFormats.RGB32F => sizeof(Vector3),
                     TextureFormats.RGBA32F => sizeof(Vector4),
                     TextureFormats.R32U => sizeof(uint),
+                    TextureFormats.R32F => sizeof(float),
                     _ => throw new NotSupportedException($"Format {format} is not supported.")
                 });
 

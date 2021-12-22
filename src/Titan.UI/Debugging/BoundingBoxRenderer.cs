@@ -2,7 +2,6 @@ using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Input;
 using Titan.Windows.D3D;
-using Titan.Windows.D3D11;
 
 namespace Titan.UI.Debugging
 {
@@ -27,7 +26,6 @@ namespace Titan.UI.Debugging
             {
                 return;
             }
-
             context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY.D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
             context.SetVertexBuffer(_renderQueue.VertexBuffer);
             context.Draw((uint)_renderQueue.NumberOfVertices);

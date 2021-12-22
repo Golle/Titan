@@ -4,6 +4,7 @@ using Titan.ECS;
 using Titan.ECS.Components;
 using Titan.Graphics.Loaders.Models;
 using Titan.Systems;
+using Titan.Systems.Physics;
 using Titan.UI.Animation;
 using Titan.UI.Components;
 using Titan.UI.Debugging;
@@ -17,10 +18,20 @@ public static class WorldBuilderExtensions
             .WithComponent<AssetComponent<Model>>(ComponentPoolTypes.DynamicPacked, numberOfAssets)
             .WithComponent<ModelComponent>(ComponentPoolTypes.DynamicPacked, numberOfModels)
             .WithSystem<Render3DSystem>()
-            .WithSystem<ModelLoaderSystem>();
+            .WithSystem<ModelLoaderSystem>()
+#if DEBUG
+            .WithSystem<BoundingBox2DDebugSystem>()
+#endif
+        ;
 
     public static WorldBuilder WithDefault2D(this WorldBuilder builder, uint numberOfAssets = 2, uint numberOfSprites = 1000) => 
         WithDefaultUI(builder, numberOfAssets, numberOfSprites);
+
+    public static WorldBuilder WithDefault2DCollisions(this WorldBuilder builder, uint numberOfColliders = 100) =>
+        builder
+            .WithComponent<BoxColliderComponent>(ComponentPoolTypes.Packed, numberOfColliders)
+            .WithSystem<BoxCollision2DSystem>();
+
 
     public static WorldBuilder WithDefaultUI(this WorldBuilder builder, uint numberOfAssets = 2, uint numberOfSprites = 1000) =>
         builder
@@ -40,7 +51,7 @@ public static class WorldBuilderExtensions
             .WithSystem<InteractableSystem>()
             .WithComponent<AnimateTranslation>(count: 100)
 #if DEBUG
-            .WithSystem<UIBoundingBoxDebugSystem>()
+            .WithSystem<BoundingBox2DDebugSystem>()
 #endif
     ;
 }

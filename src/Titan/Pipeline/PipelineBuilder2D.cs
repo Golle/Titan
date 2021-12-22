@@ -7,6 +7,7 @@ using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.Rendering.Sprites;
+using Titan.UI.Debugging;
 
 namespace Titan.Pipeline;
 
@@ -16,6 +17,8 @@ internal class PipelineBuilder2D : PipelineBuilder
     private Handle<Asset> _uiPS;
     private Handle<Asset> _spriteVS;
     private Handle<Asset> _spritePS;
+    private Handle<Asset> _lineVS;
+    private Handle<Asset> _linePS;
 
     public override void LoadResources(AssetsManager assetsManager)
     {
@@ -23,6 +26,9 @@ internal class PipelineBuilder2D : PipelineBuilder
         _uiPS = assetsManager.Load("shaders/ui_ps");
         _spriteVS = assetsManager.Load("shaders/sprite_vs");
         _spritePS = assetsManager.Load("shaders/sprite_ps");
+
+        _lineVS = assetsManager.Load("shaders/debug_line_vs");
+        _linePS = assetsManager.Load("shaders/debug_line_ps");
     }
 
 
@@ -30,7 +36,10 @@ internal class PipelineBuilder2D : PipelineBuilder
         assetsManager.IsLoaded(_spritePS) &&
         assetsManager.IsLoaded(_spriteVS) &&
         assetsManager.IsLoaded(_uiPS) &&
-        assetsManager.IsLoaded(_uiVS);
+        assetsManager.IsLoaded(_uiVS) &&
+        assetsManager.IsLoaded(_linePS) &&
+        assetsManager.IsLoaded(_lineVS)
+        ;
 
 
     public override Graphics.D3D11.Pipeline.Pipeline[] BuildPipeline(IServiceCollection services)
@@ -61,8 +70,15 @@ internal class PipelineBuilder2D : PipelineBuilder
             PixelShaderSamplers = new[] { pointSampler, linearSampler },
             Renderer = new SpriteRenderer(services.Get<SpriteRenderQueue>())
         };
-
         
-        return new[] { backbuffer };
+        var debugVerticesPipeline = new Graphics.D3D11.Pipeline.Pipeline
+        {
+            RenderTargets = new[] { backbufferRenderTarget },
+            Renderer = new BoundingBoxRenderer(services.Get<BoundingBoxRenderQueue>()),
+            VertexShader = assetsManager.GetAssetHandle<VertexShader>(_lineVS),
+            PixelShader = assetsManager.GetAssetHandle<PixelShader>(_linePS),
+        };
+
+        return new[] { backbuffer, debugVerticesPipeline };
     }
 }

@@ -3,11 +3,12 @@ using System.Numerics;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
+using Titan.Graphics;
 using Titan.UI.Components;
 
 namespace Titan.UI.Debugging
 {
-    public class UIBoundingBoxDebugSystem : EntitySystem
+    public class BoundingBox2DDebugSystem : EntitySystem
     {
         private BoundingBoxRenderQueue _renderQueue;
         private EntityFilter _filter;
@@ -30,10 +31,10 @@ namespace Titan.UI.Debugging
                 ref readonly var transform = ref _transform.Get(entity);
 
                 positions[0] = new Vector3(transform.AbsolutePosition, 1f);
-                positions[1] = new Vector3(transform.AbsolutePosition, 1f) + Vector3.UnitX*transform.Size.Width;
+                positions[1] = new Vector3(transform.AbsolutePosition, 1f) + Vector3.UnitX * transform.Size.Width;
                 positions[2] = new Vector3(transform.AbsolutePosition, 1f) + Vector3.UnitX * transform.Size.Width + Vector3.UnitY * transform.Size.Height;
                 positions[3] = new Vector3(transform.AbsolutePosition, 1f) + Vector3.UnitY * transform.Size.Height;
-                _renderQueue.Add(positions);
+                _renderQueue.Add(positions, Color.Blue);
             }
         }
     }
