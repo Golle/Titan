@@ -1,9 +1,10 @@
 
-// cbuffer ColorBuffer : register(b5) {
-//     float4 Color;
-// };
+struct PS_INPUT {
+    float4 Color: Color;
+};
 
-float4 main() : SV_TARGET
+float4 main(PS_INPUT input) : SV_TARGET
 {
-    return float4(1,0,0,0);
+    return input.Color;
+    return float4(1,1,0,0);
 }

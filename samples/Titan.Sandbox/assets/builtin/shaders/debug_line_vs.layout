@@ -1,6 +1,14 @@
 [
     {
+        "Name": "Color",
+        "Format": "RGBA32F"
+    },
+    {
         "Name": "Position",
         "Format": "RGB32F"
+    },
+    {
+        "Name": "Nothing",
+        "Format": "R32F"
     }
 ]
