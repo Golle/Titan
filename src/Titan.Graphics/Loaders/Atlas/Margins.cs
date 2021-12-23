@@ -24,5 +24,14 @@ namespace Titan.Graphics.Loaders.Atlas
         public static implicit operator Margins(byte margin) => new(margin);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Margins(in (byte top, byte bottom, byte left, byte right) val) => new(val.top, val.bottom, val.left, val.right);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public static Margins operator *(in Margins margins, byte value) =>
+            new(
+                (byte)(margins.Top * value),
+                (byte)(margins.Bottom * value),
+                (byte)(margins.Left * value),
+                (byte)(margins.Right * value)
+            );
     }
 }
