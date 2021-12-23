@@ -5,15 +5,16 @@ using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.UI.Components;
+using Titan.UI.Debugging;
 
-namespace Titan.UI.Debugging
+namespace Titan.Systems.Debugging
 {
     public class BoundingBox2DDebugSystem : EntitySystem
     {
         private BoundingBoxRenderQueue _renderQueue;
         private EntityFilter _filter;
         private ReadOnlyStorage<RectTransform> _transform;
-        
+
 
         protected override void Init(IServiceCollection services)
         {

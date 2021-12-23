@@ -4,6 +4,7 @@ using Titan.ECS;
 using Titan.ECS.Components;
 using Titan.Graphics.Loaders.Models;
 using Titan.Systems;
+using Titan.Systems.Debugging;
 using Titan.Systems.Physics;
 using Titan.UI.Animation;
 using Titan.UI.Components;
