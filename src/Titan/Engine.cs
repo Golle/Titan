@@ -25,6 +25,7 @@ using Titan.Graphics.Rendering.Sprites;
 using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;
 using Titan.Input;
+using Titan.Physics;
 using Titan.Pipeline;
 using Titan.Systems;
 using Titan.UI;
@@ -164,6 +165,14 @@ namespace Titan
                 .Register(new BoundingBoxRenderQueue())
                 ;
 
+
+            {
+                var config = _app.ConfigureCollisionMatrix();
+                if (config != null)
+                {
+                    services.Register(config);
+                }
+            }
 
             GraphicsSystem graphicsSystem;
             {

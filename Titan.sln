@@ -43,7 +43,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Input", "src\Titan.In
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.FontBuilder", "src\Tools.FontBuilder\Tools.FontBuilder.csproj", "{3D7C970F-9CFA-4AA9-8E8E-F1E850DE0745}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.AtlasBuilder", "src\Tools.AtlasBuilder\Tools.AtlasBuilder.csproj", "{1BF75D92-5F7B-4AEE-969B-267956A13393}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.AtlasBuilder", "src\Tools.AtlasBuilder\Tools.AtlasBuilder.csproj", "{1BF75D92-5F7B-4AEE-969B-267956A13393}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Physics", "src\Titan.Physics\Titan.Physics.csproj", "{1DFFC1E2-AED1-4061-A21F-AF6296A95F96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +121,10 @@ Global
 		{1BF75D92-5F7B-4AEE-969B-267956A13393}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BF75D92-5F7B-4AEE-969B-267956A13393}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BF75D92-5F7B-4AEE-969B-267956A13393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DFFC1E2-AED1-4061-A21F-AF6296A95F96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DFFC1E2-AED1-4061-A21F-AF6296A95F96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DFFC1E2-AED1-4061-A21F-AF6296A95F96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DFFC1E2-AED1-4061-A21F-AF6296A95F96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -141,6 +147,7 @@ Global
 		{3F516423-6920-4DC6-8AE7-D5BB33E3C215} = {74127627-7DB8-4DB4-B491-454C750DB930}
 		{3D7C970F-9CFA-4AA9-8E8E-F1E850DE0745} = {D078C8E6-5D88-4DF0-9425-84E84CB7A6CD}
 		{1BF75D92-5F7B-4AEE-969B-267956A13393} = {D078C8E6-5D88-4DF0-9425-84E84CB7A6CD}
+		{1DFFC1E2-AED1-4061-A21F-AF6296A95F96} = {74127627-7DB8-4DB4-B491-454C750DB930}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {78854958-BC31-4FAE-99A7-2C398C2607BD}
