@@ -6,8 +6,7 @@ namespace Titan.ECS.Worlds;
 
 internal class GameTime
 {
-
-    private const float MaxDeltaTime = 1.0f/60f; // 16.7ms
+    private const float MaxDeltaTime = 1.0f/60f; // 16.7ms // TODO: what should we do with this? if the framerate is less than 60fps the game will run at a slower speed since it will clamp it.
     private readonly Stopwatch _time;
     private double _previousFrame;
     private double _fixedTime;

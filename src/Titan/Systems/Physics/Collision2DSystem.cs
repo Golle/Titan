@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Components;
 using Titan.Core.Logging;
+using Titan.Core.Messaging;
 using Titan.Core.Services;
 using Titan.ECS.Entities;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
+using Titan.Events;
 using Titan.Graphics;
 using Titan.Physics;
 using Titan.UI.Components;
@@ -90,13 +91,15 @@ internal class BoxCollision2DSystem : EntitySystem
                 var isOverlapping = Overlaps(collider, innerCollider);
                 if (isOverlapping && !wasOverlapping)
                 {
-                    Logger.Error<BoxCollision2DSystem>($"OnEnter: Entity {entity.Id} overlaps with {innerEntity.Id}");
+                    //Logger.Error<BoxCollision2DSystem>($"OnEnter: Entity {entity.Id} overlaps with {innerEntity.Id}");
                     SetAsOverlapping(ref collider, innerEntity);
+                    EventManager.Push(new BoxCollisionEnterEvent(entity, innerEntity, collider.ColliderMask, innerCollider.ColliderMask));
                 }
                 else if(!isOverlapping && wasOverlapping)
                 {
-                    Logger.Error<BoxCollision2DSystem>($"OnLeave: Entity {entity.Id} overlaps with {innerEntity.Id}");
+                    //Logger.Error<BoxCollision2DSystem>($"OnLeave: Entity {entity.Id} overlaps with {innerEntity.Id}");
                     UnSetAsOverlapping(ref collider, innerEntity);
+                    EventManager.Push(new BoxCollisionLeaveEvent(entity, innerEntity, collider.ColliderMask, innerCollider.ColliderMask));
                 }
             }
         }
