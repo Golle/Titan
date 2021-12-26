@@ -1,33 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Titan.Components;
 using Titan.Core.Logging;
 using Titan.Core.Services;
 using Titan.ECS.Entities;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
-using Titan.Graphics.Loaders.Atlas;
 using Titan.Physics;
 using Titan.UI.Components;
 using Titan.UI.Debugging;
 
 namespace Titan.Systems.Physics;
-
-public struct BoxColliderComponent
-{
-    public Margins Margins;
-
-    private const int MaxOverlappingEntities = 10;
-    public uint ColliderMask;
-
-    //private fixed Entity Entities[MaxOverlappingEntities];
-    
-    
-    internal Vector2 BottomLeft;
-    internal Vector2 TopRight;
-}
 
 internal class BoxCollision2DSystem : EntitySystem
 {
@@ -85,7 +72,7 @@ internal class BoxCollision2DSystem : EntitySystem
         var entities = _filter.GetEntities();
         foreach (ref readonly var entity in entities)
         {
-            ref readonly var collider = ref _collider.Get(entity);
+            ref var collider = ref _collider.Get(entity);
             foreach (ref readonly var innerEntity in entities)
             {
                 if (entity.Id == innerEntity.Id)
@@ -98,13 +85,18 @@ internal class BoxCollision2DSystem : EntitySystem
                 {
                     continue;
                 }
-                
-                if (Overlaps(collider, innerCollider))
+
+                var wasOverlapping = IsOverlapping(collider, innerEntity);
+                var isOverlapping = Overlaps(collider, innerCollider);
+                if (isOverlapping && !wasOverlapping)
                 {
-                    Logger.Error<BoxCollision2DSystem>($"Entity {entity.Id} overlaps with {innerEntity.Id}");
-                    
-                    //entity.Destroy();
-                    //innerEntity.Destroy();
+                    Logger.Error<BoxCollision2DSystem>($"OnEnter: Entity {entity.Id} overlaps with {innerEntity.Id}");
+                    SetAsOverlapping(ref collider, innerEntity);
+                }
+                else if(!isOverlapping && wasOverlapping)
+                {
+                    Logger.Error<BoxCollision2DSystem>($"OnLeave: Entity {entity.Id} overlaps with {innerEntity.Id}");
+                    UnSetAsOverlapping(ref collider, innerEntity);
                 }
             }
         }
@@ -122,6 +114,50 @@ internal class BoxCollision2DSystem : EntitySystem
                 return false;
             }
             return true;
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining|MethodImplOptions.AggressiveOptimization)]
+        static unsafe bool IsOverlapping(in BoxColliderComponent box, in Entity entity)
+        {
+            for (var i = 0; i < box.OverlappingEntites; ++i)
+            {
+                if (box.Entities[i] == entity.Id)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        static unsafe void SetAsOverlapping(ref BoxColliderComponent box, in Entity entity)
+        {
+            if (box.OverlappingEntites >= BoxColliderComponent.MaxOverlappingEntities)
+            {
+                Logger.Warning<BoxCollision2DSystem>($"Max overlapping boxes { BoxColliderComponent.MaxOverlappingEntities} has been reached.");
+            }
+            else
+            {
+                box.Entities[box.OverlappingEntites++] = entity.Id;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        static unsafe void UnSetAsOverlapping(ref BoxColliderComponent box, in Entity entity)
+        {
+            for (var i = 0; i < box.OverlappingEntites; ++i)
+            {
+                var id = box.Entities[i];
+                if (id == entity.Id)
+                {
+                    box.OverlappingEntites--;
+                    if (i != box.OverlappingEntites)
+                    {
+                        box.Entities[i] = box.Entities[box.OverlappingEntites];
+                    }
+                }
+            }
         }
     }
 }
