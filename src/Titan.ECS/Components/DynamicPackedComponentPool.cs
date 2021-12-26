@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
@@ -26,8 +27,12 @@ namespace Titan.ECS.Components
         {
             _maxCount = initialComponents;
             _worldId = worldId;
-            _indexers = MemoryUtils.AllocateBlock<uint>(maxEntities, true);
+            _indexers = MemoryUtils.AllocateBlock<uint>(maxEntities);
             _components = MemoryUtils.AllocateBlock<T>(initialComponents, true);
+            for (var i = 0; i < maxEntities; ++i)
+            {
+                _indexers[i] = uint.MaxValue;
+            }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -59,7 +64,7 @@ namespace Titan.ECS.Components
 
         public ref T CreateOrReplace(in Entity entity, in T value = default)
         {
-            if (_indexers[entity.Id] == 0)
+            if (_indexers[entity.Id] == uint.MaxValue)
             {
                 return ref Create(entity, value);
             }
@@ -69,13 +74,13 @@ namespace Titan.ECS.Components
             return ref component;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Contains(in Entity entity) => _indexers[entity.Id] != 0;
+        public bool Contains(in Entity entity) => _indexers[entity.Id] != uint.MaxValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Destroy(in Entity entity)
         {
             var index = _indexers[entity.Id];
-            if (index != 0)
+            if (index != uint.MaxValue)
             {
                 EventManager.Push(new ComponentBeingRemovedEvent(entity, ComponentId));
                 _componentBeingRemoved = true;
@@ -99,10 +104,10 @@ namespace Titan.ECS.Components
                     }
 
                     ref var index = ref _indexers[e.Entity.Id];
-                    Debug.Assert(index != 0, "Trying to destroy a component that has not been created.");
+                    Debug.Assert(index != uint.MaxValue, "Trying to destroy a component that has not been created.");
                     Logger.Trace<DynamicPackedComponentPool<T>>($"Removed {typeof(T).Name} from Entity {e.Entity.Id}");
                     _freeComponents.Enqueue(index);
-                    index = 0;
+                    index = uint.MaxValue;
                     EventManager.Push(new ComponentRemovedEvent(e.Entity, ComponentId));
                 }
             }
