@@ -11,7 +11,8 @@ using static Titan.Windows.Win32.WindowsMessage;
 
 namespace Titan.Graphics.Windows
 {
-    public record WindowConfiguration(string Title, uint Width, uint Height, bool Windowed = true);
+    public record WindowConfiguration(string Title, uint Width, uint Height, bool Windowed = true, bool Resizable = true);
+
     public static unsafe class Window
     {
         private const string ClassName = "titan_game_engine";
@@ -163,7 +164,11 @@ namespace Titan.Graphics.Windows
             }
 
             // Adjust the window size to take into account for the menu etc
-            const WindowStyles wsStyle = WindowStyles.OverlappedWindow | WindowStyles.Visible;
+            var wsStyle = WindowStyles.OverlappedWindow | WindowStyles.Visible;
+            if (!config.Resizable)
+            {
+                wsStyle ^= WindowStyles.ThickFrame;
+            }
             const int windowOffset = 100;
             var windowRect = new RECT
             {
