@@ -17,18 +17,42 @@ public unsafe class SoundManager : IDisposable
     {
         var handle = _resources.CreateResource();
         if (!handle.IsValid())
-        {
+        { 
             throw new InvalidOperationException("Failed to Create SoundClip Handle");
         }
 
         var soundclip = _resources.GetResourcePointer(handle);
         soundclip->Format = args.Format;
-        var dataLength = (uint)args.Data.Length;
-        soundclip->Data = MemoryUtils.AllocateBlock<byte>(dataLength);
-        fixed (byte* pBytes = args.Data)
+
+        var size = (uint)args.Data.Length;
+
+        
+        // MONO, convert to stereo
+        if (args.Format.nChannels == 1 && args.Format.wBitsPerSample == 8)
         {
-            Unsafe.CopyBlockUnaligned(soundclip->Data.AsPointer(), pBytes, dataLength);
+            
+            // change from uint8 to int16 (byte to short)
+            size *= 4;
+            soundclip->Data = MemoryUtils.AllocateBlock<byte>(size, true);
+            var mem = (short*)soundclip->Data;
+
+            for (var i = 0; i < args.Data.Length; ++i)
+            {
+                var value = args.Data[i] * 256 - short.MaxValue;
+                mem[i * 2 + 1] = mem[i * 2] = (short)value;
+            }
         }
+        else
+        {
+            var dataLength = (uint)args.Data.Length;
+            soundclip->Data = MemoryUtils.AllocateBlock<byte>(dataLength);
+            fixed (byte* pBytes = args.Data)
+            {
+                Unsafe.CopyBlockUnaligned(soundclip->Data.AsPointer(), pBytes, dataLength);
+            }
+        }
+        
+        
         return handle;
     }
 

@@ -1,4 +1,4 @@
-﻿namespace Titan.Windows.XAudio2;
+namespace Titan.Windows.XAudio2;
 
 public static class XAudio2Constants
 {

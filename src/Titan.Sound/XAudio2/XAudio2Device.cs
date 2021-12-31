@@ -37,16 +37,17 @@ internal unsafe class XAudio2Device : IDisposable
         // TODO: how should this be configured? 
         var format = new WAVEFORMATEX
         {
-            
-            //nBlockAlign = 4,
-            nBlockAlign = 1,
+
+            nBlockAlign = 4,
+            //nBlockAlign = 1,
+            //nBlockAlign = 2,
 
             wFormatTag = 1,
-            //wBitsPerSample = 16,
-            wBitsPerSample = 8,
+            wBitsPerSample = 16,
+            //wBitsPerSample = 8,
             nSamplesPerSec = 44100,
-            //nChannels = 2,
-            nChannels = 1,
+            nChannels = 2,
+            //nChannels = 1,
             cbSize = (WORD)sizeof(WAVEFORMATEX)
         };
 
@@ -55,6 +56,7 @@ internal unsafe class XAudio2Device : IDisposable
         for (var i = 0; i < config.NumberOfSounds; ++i)
         {
             _sourceVoices[i] = new SourceVoice(_xAudio2, format);
+            
         }
     }
 
@@ -69,7 +71,7 @@ internal unsafe class XAudio2Device : IDisposable
         else
         {
             Logger.Trace<XAudio2Device>($"Playing on source voice: {index}");
-            var counter = _sourceVoices[index].Play(soundData);
+            var counter = _sourceVoices[index].Play(soundData, default);
             handle = new PlaySoundHandle(index, counter);
             return true;
         }

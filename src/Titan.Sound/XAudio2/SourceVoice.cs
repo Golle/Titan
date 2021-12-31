@@ -21,9 +21,11 @@ internal unsafe class SourceVoice : IXAudio2VoiceCallback.Interface, IDisposable
         {
             Common.CheckAndThrow(xAudio2.Get()->CreateSourceVoice(ppVoice, &format, pCallback: _callback), nameof(IXAudio2.CreateSourceVoice));
         }
+
+        _voice->SetVolume(0.1f);
     }
 
-    public int Play(in MemoryChunk<byte> soundData)
+    public int Play(in MemoryChunk<byte> soundData, in WAVEFORMATEX format)
     {
         var buffer = new XAUDIO2_BUFFER
         {
