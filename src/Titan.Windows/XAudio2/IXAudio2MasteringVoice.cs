@@ -25,4 +25,8 @@ public unsafe struct IXAudio2MasteringVoice
         float* pVolume
     )
         => ((delegate* unmanaged[Stdcall]<void*, float*, void>)_vtbl[13])(Unsafe.AsPointer(ref this), pVolume);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DestroyVoice()
+        => ((delegate* unmanaged[Stdcall]<void*, void>)_vtbl[18])(Unsafe.AsPointer(ref this));
 }

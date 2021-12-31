@@ -10,6 +10,7 @@ namespace Titan.Assets
         Material,
         Atlas,
         Font,
+        Wave,
         Count
     }
 }

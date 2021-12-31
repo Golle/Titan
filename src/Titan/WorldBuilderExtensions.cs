@@ -5,15 +5,21 @@ using Titan.ECS.Components;
 using Titan.Graphics.Loaders.Models;
 using Titan.Systems;
 using Titan.Systems.Debugging;
+using Titan.Systems.Loaders;
 using Titan.Systems.Physics;
 using Titan.UI.Animation;
 using Titan.UI.Components;
-using Titan.UI.Debugging;
 
 namespace Titan;
 
 public static class WorldBuilderExtensions
 {
+    public static WorldBuilder WithDefaultSound(this WorldBuilder builder, uint numberOfSoundClipAssets = 50, uint numberOfSoundComponents = 1000) =>
+        builder
+            .WithComponent<SoundClipComponent>(ComponentPoolTypes.Packed, numberOfSoundComponents)
+            .WithComponent<AssetComponent<SoundClipComponent>>(ComponentPoolTypes.Packed, numberOfSoundClipAssets)
+            .WithSystem<SoundClipLoaderSystem>();
+
     public static WorldBuilder WithDefault3D(this WorldBuilder builder, uint numberOfAssets = 20, uint numberOfModels = 100) =>
         builder
             .WithComponent<AssetComponent<Model>>(ComponentPoolTypes.DynamicPacked, numberOfAssets)

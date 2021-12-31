@@ -29,6 +29,10 @@ public unsafe struct IXAudio2SourceVoice
         => ((delegate* unmanaged[Stdcall]<void*, float*, void>)_vtbl[13])(Unsafe.AsPointer(ref this), pVolume);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DestroyVoice()
+        => ((delegate* unmanaged[Stdcall]<void*, void>)_vtbl[18])(Unsafe.AsPointer(ref this));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT Start(
         uint Flags = 0,
         uint OperationSet = XAUDIO2_COMMIT_NOW

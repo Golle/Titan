@@ -25,8 +25,9 @@ using Titan.Graphics.Rendering.Sprites;
 using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;
 using Titan.Input;
-using Titan.Physics;
 using Titan.Pipeline;
+using Titan.Sound;
+using Titan.Sound.Loaders;
 using Titan.Systems;
 using Titan.UI;
 using Titan.UI.Debugging;
@@ -116,7 +117,7 @@ namespace Titan
 
             Trace($"Init {nameof(Resources)}");
             Resources.Init();
-            
+
             Info("Engine has been initialized.");
             try
             {
@@ -133,14 +134,15 @@ namespace Titan
                 Shutdown();
             }
         }
-        
+
         private void Run()
         {
             using var services = new ServiceCollection()
                 .Register(new GameWindow())
                 .Register(new FontManager())
                 .Register(new AtlasManager(100))
-                .Register(new TextManager(200));
+                .Register(new TextManager(200))
+                .Register(new SoundManager());
             
             var assetsManager = new AssetsManager()
                 .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
@@ -150,6 +152,7 @@ namespace Titan
                 .Register(AssetTypes.Material, new MaterialsLoader())
                 .Register(AssetTypes.Atlas, new AtlasLoader(services.Get<AtlasManager>()))
                 .Register(AssetTypes.Font, new FontLoader(services.Get<FontManager>()))
+                .Register(AssetTypes.Wave, new WaveLoader(services.Get<SoundManager>()))
                 .Init(new AssetManagerConfiguration(new[]
                 {
                     "manifest.json",
@@ -159,13 +162,16 @@ namespace Titan
 
             services
                 .Register(assetsManager)
+                
                 //Rendering (Queues)
                 .Register(new SimpleRenderQueue(1000))
                 .Register(new SpriteRenderQueue(new UIRenderQueueConfiguration(), services.Get<TextManager>(), services.Get<FontManager>()))
                 .Register(new BoundingBoxRenderQueue())
+
+                // Sound system
+                .Register(new SoundSystem(services.Get<SoundManager>()))
                 ;
-
-
+            
             {
                 var config = _app.ConfigureCollisionMatrix();
                 if (config != null)
