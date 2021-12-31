@@ -1,11 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <!--<OutputType>WinExe</OutputType>-->
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
+    <Configurations>Debug;Release;Shipping</Configurations>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
+    <DefineConstants></DefineConstants>
+    <OutputType>WinExe</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' != 'Shipping|AnyCPU'">
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\Titan\Titan.csproj" />
   </ItemGroup>

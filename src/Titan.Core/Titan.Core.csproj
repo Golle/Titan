@@ -4,5 +4,9 @@
     <LangVersion>preview</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Configurations>Debug;Release;Shipping</Configurations>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
+    <DefineConstants></DefineConstants>
   </PropertyGroup>
 </Project>

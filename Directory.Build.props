@@ -3,12 +3,14 @@
     <!-- Remove this when Resharper supports it -->
         <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports> 
     </PropertyGroup>
-<!-- STATS is used for timers and stats about the engine -->
+    <!-- STATS is used for timers and stats about the engine -->
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
+        <DefineConstants></DefineConstants>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <DefineConstants>STATS</DefineConstants>
     </PropertyGroup>
-
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DefineConstants>DEBUG;TRACE;STATS</DefineConstants>
+        <DefineConstants>$(DefineConstants);DEBUG;TRACE;STATS</DefineConstants>
     </PropertyGroup>
 </Project>

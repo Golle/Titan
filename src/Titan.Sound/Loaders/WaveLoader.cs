@@ -28,13 +28,11 @@ internal enum WaveFileType : uint
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
-struct WaveChunkHeader
+internal struct WaveChunkHeader
 {
     public WaveChunkTypes Type;
     public uint Size;
 }
-
-
 
 public unsafe class WaveLoader : IAssetLoader
 {
