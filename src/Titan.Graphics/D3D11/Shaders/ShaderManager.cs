@@ -46,7 +46,7 @@ namespace Titan.Graphics.D3D11.Shaders
             var vertexShader = _vertexShaderPool.GetResourcePointer(handle);
             vertexShader->Handle = handle;
 
-            using var vertexShaderBytecode = new ComPtr<ID3DBlob>(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
+            using var vertexShaderBytecode = ComPtr<ID3DBlob>.Wrap(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
 
             static uint GetSize(TextureFormats format) =>
                 (uint)(format switch
@@ -107,7 +107,7 @@ namespace Titan.Graphics.D3D11.Shaders
             var pixelShader = _pixelShaderPool.GetResourcePointer(handle);
             pixelShader->Handle = handle;
             
-            using var pixelShaderBytecode = new ComPtr<ID3DBlob>(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
+            using var pixelShaderBytecode = ComPtr<ID3DBlob>.Wrap(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
             CheckAndThrow(_device->CreatePixelShader(pixelShaderBytecode.Get()->GetBufferPointer(), pixelShaderBytecode.Get()->GetBufferSize(), null, &pixelShader->Shader), nameof(ID3D11Device.CreatePixelShader));
             
             return handle;
