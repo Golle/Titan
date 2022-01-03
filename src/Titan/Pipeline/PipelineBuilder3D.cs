@@ -114,7 +114,7 @@ internal class PipelineBuilder3D : PipelineBuilder
             DepthBuffer = depthBuffer,
             ClearColor = Color.White,
             ClearRenderTargets = true,
-            Renderer = new GeometryRenderer(services.Get<SimpleRenderQueue>())
+            Renderer = services.Get<GeometryRenderer>()
         };
 
         var deferredShadingTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
@@ -132,12 +132,12 @@ internal class PipelineBuilder3D : PipelineBuilder
             RenderTargets = new []{deferredShadingTarget},
             PixelShaderResources = new []{gBufferPosition, gBufferAlbedo, gBufferNormals},
             PixelShaderSamplers = new []{fullscreenSampler},
-            Renderer = new DeferredShadingRenderer()
+            Renderer = services.Get<DeferredShadingRenderer>()
         };
 
 
-        var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
-        var backbufferRenderer = new BackbufferRenderer();
+        var backbufferRenderTarget = GraphicsDevice.Backbuffer;
+        var fullscreenRenderer = services.Get<FullscreenRenderer>();
         var backbuffer = new Graphics.D3D11.Pipeline.Pipeline
         {
             ClearDepthBuffer = false,
@@ -148,7 +148,7 @@ internal class PipelineBuilder3D : PipelineBuilder
             VertexShader = assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
             PixelShaderResources = new[] { deferredShadingTarget },
             PixelShaderSamplers = new[] { fullscreenSampler },
-            Renderer = backbufferRenderer
+            Renderer = fullscreenRenderer
         };
 
         //var uiRenderTarget = GraphicsDevice.TextureManager.Create(new TextureCreation
@@ -182,7 +182,7 @@ internal class PipelineBuilder3D : PipelineBuilder
             //DepthBuffer = uiDepthBuffer,
             //ClearDepthBuffer = true,
             //DepthBufferClearValue = 1f,
-            Renderer = new SpriteRenderer(services.Get<SpriteRenderQueue>()),
+            Renderer = services.Get<SpriteRenderer>(),
             PixelShaderSamplers = new []{ uiSampler }, // TODO: text must be rendered with a different sampler :O
             VertexShader = assetsManager.GetAssetHandle<VertexShader>(_uiVertexShaderHandle),
             PixelShader = assetsManager.GetAssetHandle<PixelShader>(_uiPixelShaderHandle),
@@ -223,7 +223,7 @@ internal class PipelineBuilder3D : PipelineBuilder
         {
             ClearRenderTargets =  false,
             RenderTargets = new[] { backbufferRenderTarget },
-            Renderer = backbufferRenderer,
+            Renderer = fullscreenRenderer,
             PixelShader = assetsManager.GetAssetHandle<PixelShader>(_debugPixelShaderHandle),
             VertexShader = assetsManager.GetAssetHandle<VertexShader>(_fullscreenVertexShaderHandle),
             PixelShaderResources = new[] { debugTextureHandle },
@@ -236,7 +236,7 @@ internal class PipelineBuilder3D : PipelineBuilder
         {
 
             RenderTargets = new[] { backbufferRenderTarget },
-            Renderer = new BoundingBoxRenderer(services.Get<BoundingBoxRenderQueue>()),
+            Renderer = services.Get<BoundingBoxRenderer>(),
             VertexShader = assetsManager.GetAssetHandle<VertexShader>(_debugLineVertexShaderHandle),
             PixelShader= assetsManager.GetAssetHandle<PixelShader>(_debugLinePixelShaderHandle),
         };

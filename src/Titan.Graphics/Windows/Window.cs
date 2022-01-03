@@ -224,8 +224,17 @@ namespace Titan.Graphics.Windows
         [UnmanagedCallersOnly]
         private static nint WndProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
         {
+            if (message is not WM_SETCURSOR and not WM_NCHITTEST and not WM_GETICON and not (WindowsMessage)174 and not WM_MOUSEFIRST and not WM_SETTEXT)
+            {
+                //Logger.Error($"Message: {message} ({hWnd})", typeof(Window));
+            }
+            
             switch (message)
             {
+                case WM_ACTIVATE:
+                    break;
+                case WM_ACTIVATEAPP:
+                    break;
                 case WM_KILLFOCUS:
                     WindowEventHandler.OnLostFocus();
                     break;
@@ -251,10 +260,13 @@ namespace Titan.Graphics.Windows
                     Height = height;
                     Width = width;
                     _center = new POINT((int)(Width / 2), (int)(Height / 2));
-                }
+
+                    //Logger.Error($"Message: {message} ({width} x {height})", typeof(Window));
+                    }
                     break;
                 case WM_EXITSIZEMOVE:
                     WindowEventHandler.OnWindowResize(Width, Height);
+                    //Logger.Error($"Message: {message} ({Width} x {Height})", typeof(Window));
                     break;
                 case WM_LBUTTONDOWN:
                     WindowEventHandler.OnLeftMouseButtonDown();

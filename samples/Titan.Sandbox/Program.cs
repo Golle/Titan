@@ -48,7 +48,6 @@ namespace Titan.Sandbox
             var camera = world.CreateEntity();
             world.AddComponent(camera, new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
             world.AddComponent(camera, CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
-            world.AddComponent(camera, new AssetComponent<SoundClipComponent>("sound/music"));
 
             var container = new UIContainer
             {

@@ -29,5 +29,8 @@ namespace Titan.Windows
         public override bool Equals(object obj) => obj is HWND other && other.Value == Value;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Value.GetHashCode();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => Value.ToString();
     }
 }

@@ -1,30 +1,51 @@
+using System;
 using System.Runtime.CompilerServices;
+using Titan.Core;
+using Titan.Graphics.D3D11.Textures;
+using Titan.Windows;
 using Titan.Windows.D3D11;
 using Titan.Windows.DXGI;
 
 namespace Titan.Graphics.D3D11
 {
-    public unsafe class SwapChain
+    public unsafe class SwapChain : IDisposable
     {
         public bool Vsync { get; }
-        public uint Width { get; }
-        public uint Height { get; }
-        public ID3D11RenderTargetView* Backbuffer { get; }
+        public uint Width { get; private set; }
+        public uint Height { get; private set; }
 
-        private readonly IDXGISwapChain* _swapChain;
+        private ComPtr<IDXGISwapChain> _swapChain;
         private readonly uint _syncInterval;
-
-        internal SwapChain(IDXGISwapChain* swapChain, ID3D11RenderTargetView* backbuffer, bool vsync, uint width, uint height)
+        public SwapChain(IDXGISwapChain* swapChain, DeviceConfiguration config)
         {
-            Vsync = vsync;
-            Width = width;
-            Height = height;
-            Backbuffer = backbuffer;
-            _swapChain = swapChain;
-            _syncInterval = vsync ? 1u : 0u;
+            Vsync = config.Vsync;
+            Width = config.Width;
+            Height = config.Height;
+            _swapChain = new ComPtr<IDXGISwapChain>(swapChain);
+            _syncInterval = Vsync ? 1u : 0u;
         }
-     
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Present() => _swapChain->Present(_syncInterval, 0);
+        internal void Resize(uint width, uint height)
+        {
+            if (height != 0)
+            {
+                Height = height;
+            }
+            if (width != 0)
+            {
+                Width = width;
+            }
+            _swapChain.Get()->ResizeBuffers(0, width, height, DXGI_FORMAT.DXGI_FORMAT_UNKNOWN, 0);
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Present() => _swapChain.Get()->Present(_syncInterval, 0);
+
+        public void Dispose()
+        {
+            _swapChain.Dispose();
+        }
     }
 }

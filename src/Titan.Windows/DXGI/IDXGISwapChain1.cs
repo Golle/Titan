@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 
@@ -62,18 +63,13 @@ namespace Titan.Windows.DXGI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public HRESULT GetBuffer(uint buffer, Guid* riid, void** ppSurface) => ((delegate* unmanaged[Stdcall]<void*, uint, Guid*, void**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), buffer, riid, ppSurface);
 
-        //HRESULT(STDMETHODCALLTYPE* SetFullscreenState)(
-        // IDXGISwapChain* This,
-        // /* [in] */ BOOL Fullscreen,
-        // /* [annotation][in] */
-        // _In_opt_ IDXGIOutput * pTarget);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT SetFullscreenState([MarshalAs(UnmanagedType.Bool)] bool Fullscreen, IDXGIOutput* pTarget) =>
+            ((delegate* unmanaged[Stdcall]<void*, bool, IDXGIOutput*, HRESULT>)_vtbl[10])(Unsafe.AsPointer(ref this), Fullscreen, pTarget);
 
-        //HRESULT(STDMETHODCALLTYPE* GetFullscreenState)(
-        // IDXGISwapChain* This,
-        // /* [annotation][out] */
-        // _Out_opt_ BOOL * pFullscreen,
-        // /* [annotation][out] */
-        // _COM_Outptr_opt_result_maybenull_  IDXGIOutput** ppTarget);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public HRESULT GetFullscreenState([MarshalAs(UnmanagedType.Bool)] bool* pFullscreen, IDXGIOutput** ppTarget) =>
+            ((delegate* unmanaged[Stdcall]<void*, bool*, IDXGIOutput**, HRESULT>)_vtbl[11])(Unsafe.AsPointer(ref this), pFullscreen, ppTarget);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public HRESULT GetDesc(DXGI_SWAP_CHAIN_DESC* pDesc) => ((delegate* unmanaged[Stdcall]<void*, DXGI_SWAP_CHAIN_DESC*, HRESULT>)_vtbl[12])(Unsafe.AsPointer(ref this), pDesc);

@@ -20,20 +20,16 @@ namespace Titan.Graphics
         private const uint CameraSlot = 0u;
         private const uint OrthographicCameraSlot = 1u;
 
-        private readonly Pipeline[] _pipeline;
-        private readonly Context _immediateContext = GraphicsDevice.ImmediateContext;
-        private readonly SwapChain _swapchain = GraphicsDevice.SwapChain;
+        private Pipeline[] _pipeline = Array.Empty<Pipeline>();
         private readonly Handle<ResourceBuffer> _cameraBufferHandle;
         private readonly Handle<ResourceBuffer> _orthographicCameraHandle;
-        private readonly ViewPort _viewport;
+        private ViewPort _viewport;
         private Matrix4x4 _view;
         private Matrix4x4 _viewProject;
         private readonly Matrix4x4 _orthographicCamera;
 
-        public unsafe GraphicsSystem(Pipeline[] pipeline)
+        public unsafe GraphicsSystem()
         {
-            _pipeline = pipeline;
-
             _cameraBufferHandle = GraphicsDevice.BufferManager.Create(new BufferCreation
             {
                 Type = BufferTypes.ConstantBuffer,
@@ -68,13 +64,14 @@ namespace Titan.Graphics
         {
             // set up camera
             //Matrix4x4.Transpose(cam.ViewProjection)
-            _immediateContext.Map(_cameraBufferHandle, new CameraBuffer {View = _view, ViewProjection = _viewProject});
-            _immediateContext.Map(_orthographicCameraHandle, _orthographicCamera);
+            var context = GraphicsDevice.ImmediateContext;
+            context.Map(_cameraBufferHandle, new CameraBuffer {View = _view, ViewProjection = _viewProject});
+            context.Map(_orthographicCameraHandle, _orthographicCamera);
 
-            _immediateContext.SetVertexShaderConstantBuffer(_cameraBufferHandle, CameraSlot);
-            _immediateContext.SetVertexShaderConstantBuffer(_orthographicCameraHandle, OrthographicCameraSlot);
-            
-            _immediateContext.SetViewPort(_viewport); // change this if we want to support more than a single viewport
+            context.SetVertexShaderConstantBuffer(_cameraBufferHandle, CameraSlot);
+            context.SetVertexShaderConstantBuffer(_orthographicCameraHandle, OrthographicCameraSlot);
+
+            context.SetViewPort(_viewport); // change this if we want to support more than a single viewport
             //execute pipeline
             foreach (ref readonly var pipeline in _pipeline.AsSpan())
             {
@@ -84,43 +81,43 @@ namespace Titan.Graphics
                 {
                     foreach (var handle in pipeline.RenderTargets)
                     {
-                        _immediateContext.ClearRenderTarget(handle, pipeline.ClearColor);
+                        context.ClearRenderTarget(handle, pipeline.ClearColor);
                     }
                 }
 
                 if (pipeline.ClearDepthBuffer)
                 {
-                    _immediateContext.ClearDepthBuffer(pipeline.DepthBuffer, pipeline.DepthBufferClearValue);
+                    context.ClearDepthBuffer(pipeline.DepthBuffer, pipeline.DepthBufferClearValue);
                 }
-                
-                _immediateContext.SetRenderTargets(pipeline.RenderTargets, pipeline.DepthBuffer);
-                _immediateContext.SetPixelShaderSamplers(pipeline.PixelShaderSamplers);
-                _immediateContext.SetVertexShaderSamplers(pipeline.VertexShaderSamplers);
-                _immediateContext.SetPixelShaderResources(pipeline.PixelShaderResources);
-                _immediateContext.SetVertexShaderResources(pipeline.VertexShaderResources);
-                _immediateContext.SetRasterizerState(pipeline.RasterizerState);
+
+                context.SetRenderTargets(pipeline.RenderTargets, pipeline.DepthBuffer);
+                context.SetPixelShaderSamplers(pipeline.PixelShaderSamplers);
+                context.SetVertexShaderSamplers(pipeline.VertexShaderSamplers);
+                context.SetPixelShaderResources(pipeline.PixelShaderResources);
+                context.SetVertexShaderResources(pipeline.VertexShaderResources);
+                context.SetRasterizerState(pipeline.RasterizerState);
                 if (pipeline.VertexShader.IsValid())
                 {
-                    _immediateContext.SetVertexShader(pipeline.VertexShader);
+                    context.SetVertexShader(pipeline.VertexShader);
                 }
 
                 if (pipeline.PixelShader.IsValid())
                 {
-                    _immediateContext.SetPixelShader(pipeline.PixelShader);
+                    context.SetPixelShader(pipeline.PixelShader);
                 }
 
-                _immediateContext.SetBlendState(pipeline.BlendState);
+                context.SetBlendState(pipeline.BlendState);
 
-                renderer.Render(_immediateContext);
+                renderer.Render(context);
                 
                 
-                _immediateContext.UnbindRenderTargets();
-                _immediateContext.UnbindPixelShaderResources(pipeline.PixelShaderResources);
-                _immediateContext.UnbindVertexShaderResources(pipeline.VertexShaderResources);
+                context.UnbindRenderTargets();
+                context.UnbindPixelShaderResources(pipeline.PixelShaderResources);
+                context.UnbindVertexShaderResources(pipeline.VertexShaderResources);
             }
 
             // swapchain
-            _swapchain.Present();
+            GraphicsDevice.SwapChain.Present();
             //Thread.Sleep(100);
         }
 
@@ -128,6 +125,14 @@ namespace Titan.Graphics
         {
             GraphicsDevice.BufferManager.Release(_cameraBufferHandle);
             GraphicsDevice.BufferManager.Release(_orthographicCameraHandle);
+        }
+
+        public void Init(Pipeline[] buildPipeline)
+        {
+            _pipeline = buildPipeline;
+            var width = (int)GraphicsDevice.SwapChain.Width;
+            var height = (int)GraphicsDevice.SwapChain.Height;
+            _viewport = new ViewPort(width, height);
         }
     }
 }

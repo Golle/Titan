@@ -112,21 +112,6 @@
                     "Id": "textures/redsheet"
                 }
             ]
-        },
-        {
-            "Id": "sound/click",
-            "Type": "wave",
-            "Files": [
-                "sounds/sample_click_004.wav"
-            ]
-            
-        },
-        {
-            "Id": "sound/music",
-            "Type": "wave",
-            "Files": [
-                "sounds/sample_music_001.wav"
-            ]
         }
     ]
 }

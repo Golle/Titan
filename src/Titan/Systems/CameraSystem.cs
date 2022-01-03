@@ -4,6 +4,7 @@ using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
+using Titan.Graphics.D3D11;
 
 
 namespace Titan.Systems;
@@ -37,6 +38,7 @@ internal class CameraSystem : EntitySystem
             // Go through components until the first camera is found
             if (camera.Active)
             {
+                camera = CameraComponent.CreatePerspective((int)GraphicsDevice.SwapChain.Width, (int)GraphicsDevice.SwapChain.Height, 0.5f, 10000f);
                 ref readonly var transform = ref _transform.Get(entity);
                 var forward = Vector3.Transform(Forward, transform.Rotation);
                 var up = Vector3.Transform(Up, transform.Rotation);

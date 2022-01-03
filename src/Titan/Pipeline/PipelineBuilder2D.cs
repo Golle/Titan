@@ -75,7 +75,7 @@ internal class PipelineBuilder2D : PipelineBuilder
         });
 
         var blendState = GraphicsDevice.BlendStateManager.Create(new BlendStateCreation());
-        var backbufferRenderTarget = GraphicsDevice.TextureManager.CreateBackbufferRenderTarget();
+        var backbufferRenderTarget = GraphicsDevice.Backbuffer;
         var backbuffer = new Graphics.D3D11.Pipeline.Pipeline
         {
             ClearRenderTargets = true,
@@ -133,7 +133,7 @@ internal class PipelineBuilder2D : PipelineBuilder
         {
             ClearRenderTargets = false,
             RenderTargets = new[] { backbufferRenderTarget },
-            Renderer = new BackbufferRenderer(),
+            Renderer = new FullscreenRenderer(),
             PixelShader = assetsManager.GetAssetHandle<PixelShader>(_debugPS),
             VertexShader = assetsManager.GetAssetHandle<VertexShader>(_fullscreenVS),
             PixelShaderResources = new[] { debugTextureHandle },

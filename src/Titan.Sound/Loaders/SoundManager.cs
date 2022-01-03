@@ -27,7 +27,9 @@ public unsafe class SoundManager : IDisposable
         var size = (uint)args.Data.Length;
 
         
-        // MONO, convert to stereo
+        //TODO: MONO, convert to stereo (add support for more formats)
+        //NOTE(jens): might not be the best solution, but we want to keep the sound playback simple for now, so convert all sounds at runtime.
+        //NOTE(jens): 16 samples, 44.1kz, 2 channels.
         if (args.Format.nChannels == 1 && args.Format.wBitsPerSample == 8)
         {
             
