@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Titan.Graphics
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [DebuggerDisplay(@"\{<{Width} {Height}>\}")]
     public struct Size
     {
         public int Width { get; set; }
@@ -27,5 +29,8 @@ namespace Titan.Graphics
                 Height = (int)height;
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => $"{{<{Width} {Height}>}}";
     }
 }
