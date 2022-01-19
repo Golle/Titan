@@ -26,7 +26,6 @@ using Titan.Graphics.Rendering.Sprites;
 using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;
 using Titan.Graphics.Windows.Events;
-using Titan.Helpers;
 using Titan.Input;
 using Titan.Pipeline;
 using Titan.Sound;
