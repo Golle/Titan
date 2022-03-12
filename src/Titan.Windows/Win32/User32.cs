@@ -160,4 +160,30 @@ public unsafe class User32
         void* pvParam,
         SystemParametersInfoFlags fWinIni
     );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool RegisterRawInputDevices(
+        RAWINPUTDEVICE* pRawInputDevices,
+        uint uiNumDevices,
+        uint cbSize
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern uint GetRawInputData(
+        HRAWINPUT hRawInput,
+        RIDCOMMAND uiCommand,
+        void* pData,
+        uint* pcbSize,
+        uint cbSizeHeader
+    );
+
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern uint GetRawInputDeviceInfoW(
+        HANDLE hDevice,
+        RIDICOMMAND uiCommand,
+        void* pData,
+        uint* pcbSize
+    );
 }
