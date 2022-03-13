@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace Titan.Windows.Win32;
 
@@ -6,11 +6,11 @@ namespace Titan.Windows.Win32;
 public struct RAWINPUT
 {
     [FieldOffset(0)]
-    public RAWINPUTHEADER header;
+    public RAWINPUTHEADER Header;
     
     //NOTE(Jens): Hardcoded size 24, this is on a x64 architecture. We might be able to replace this with a property and an unsafe cast on an offset.
     [FieldOffset(24)] 
-    public RAWHID hid;
+    public RAWHID Hid;
     //[FieldOffset(24)]
     //public RAWMOUSE mouse;
     //[FieldOffset(24)]

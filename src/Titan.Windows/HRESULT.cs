@@ -3,24 +3,23 @@ using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 
-namespace Titan.Windows
+namespace Titan.Windows;
+
+[SkipLocalsInit]
+[StructLayout(LayoutKind.Sequential)]
+public struct HRESULT
 {
-    [SkipLocalsInit]
-    [StructLayout(LayoutKind.Sequential)]
-    public struct HRESULT
-    {
-        public int Value;
-        public override string ToString() => $"0x{Value:X}";
+    public int Value;
+    public override string ToString() => $"0x{Value:X}";
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator int(HRESULT hresult) => hresult.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator int(HRESULT hresult) => hresult.Value;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 
-        public static implicit operator HRESULT(int hresult) => new() {Value = hresult};
+    public static implicit operator HRESULT(int hresult) => new() {Value = hresult};
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 
-        public static implicit operator HRESULT(uint hresult) => new() { Value = (int)hresult };
-    }
+    public static implicit operator HRESULT(uint hresult) => new() { Value = (int)hresult };
 }
