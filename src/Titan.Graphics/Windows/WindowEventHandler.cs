@@ -30,6 +30,9 @@ namespace Titan.Graphics.Windows
 
         public static void OnSetFocus() => EventManager.Push(new WindowSetFocusEvent());
 
-      
+
+        //public static void OnGamepadArrival(nuint handle);
+        //public static void OnGamepadRemoved(nuint handle);
+
     }
 }

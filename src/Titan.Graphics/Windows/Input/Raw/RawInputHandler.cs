@@ -70,7 +70,7 @@ internal unsafe class RawInputHandler
         if (Hid.HidP_GetCaps(pPreparsedData, &caps) != 0)
         {
             var pButtonCaps = (HIDP_BUTTON_CAPS*)NativeMemory.Alloc((nuint)(sizeof(HIDP_BUTTON_CAPS) * caps.NumberInputButtonCaps));
-            
+
             var capsLength = caps.NumberInputButtonCaps;
 
             var hidPGetButtonCaps = Hid.HidP_GetButtonCaps(HIDP_REPORT_TYPE.HidP_Input, pButtonCaps, &capsLength, pPreparsedData);
@@ -106,7 +106,7 @@ internal unsafe class RawInputHandler
                             if (pValueCaps[i].IsRange == 0)
                             {
                                 //Logger.Error("Crap, it's not correct..");
-                                break;;
+                                break; ;
                             }
                             switch (pValueCaps[i].Range.UsageMin)
                             {
@@ -154,20 +154,45 @@ internal unsafe class RawInputHandler
 
         NativeMemory.Free(pPreparsedData);
 
-        var b = new StringBuilder();
-        b.Append($"{_xAxis.ToString().PadLeft(5)} {_yAxis.ToString().PadLeft(5)} {_zAxis.ToString().PadLeft(5)} {_rZAxis.ToString().PadLeft(5)} {_lHat.ToString().PadLeft(5)} - ");
-        for (var i = 0; i < _buttonState.Length; ++i)
-        {
-            if (_buttonState[i])
-            {
-                b.Append($"{i} = Down, ");
-            }
-        }
-        Logger.Info(b.ToString());
+        //var b = new StringBuilder();
+        //b.Append($"{_xAxis.ToString().PadLeft(5)} {_yAxis.ToString().PadLeft(5)} {_zAxis.ToString().PadLeft(5)} {_rZAxis.ToString().PadLeft(5)} {_lHat.ToString().PadLeft(5)} - ");
+        //for (var i = 0; i < _buttonState.Length; ++i)
+        //{
+        //    if (_buttonState[i])
+        //    {
+        //        b.Append($"{i} = Down, ");
+        //    }
+        //}
+        //Logger.Info(b.ToString());
     }
 
-    public void DeviceChange()
+    public void DeviceChange(nuint lParam, WPARAM wParam)
     {
-        Logger.Error("Device change");
+
+        if (wParam.Value == 1)
+        {
+
+            var size = 1024;
+            var buff = stackalloc char[size];
+            if (User32.GetRawInputDeviceInfoW(lParam, RIDICOMMAND.RIDI_DEVICENAME, buff, (uint*)&size) > 0)
+            {
+                var name = new string(buff, 0, size);
+                Logger.Info<RawInputHandler>($"Device with Handle {lParam} connected ({name})");
+            }
+
+            RID_DEVICE_INFO info;
+            size = sizeof(RID_DEVICE_INFO);
+            if (User32.GetRawInputDeviceInfoW(lParam, RIDICOMMAND.RIDI_DEVICEINFO, &info, (uint*)&size) > 0)
+            {
+                ref readonly var hid = ref info.Hid;
+                Logger.Info<RawInputHandler>($"Device info: {hid.usUsage} {hid.usUsagePage} 0x{hid.dwProductId.Value:X} 0x{hid.dwVendorId.Value:X} {hid.dwVersionNumber}");
+                Logger.Info<RawInputHandler>($"Vendor: {DeviceTranslation.VendorName(hid.dwVendorId)} Product: {DeviceTranslation.ProductName(hid.dwProductId)}");
+            }
+        }
+        else if (wParam.Value == 2)
+        {
+            Logger.Info<RawInputHandler>($"Device with Handle {lParam} removed");
+        }
+        //Logger.Error("Device change");
     }
 }

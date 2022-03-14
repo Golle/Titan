@@ -303,7 +303,7 @@ public static unsafe class Window
                 _rawInputHandler.Handle(lParam, wParam);
                 break;
             case WM_INPUT_DEVICE_CHANGE:
-                _rawInputHandler.DeviceChange();
+                _rawInputHandler.DeviceChange(lParam, wParam);
                 break;
             case WM_CREATE:
                 WindowEventHandler.OnCreate(Width, Height);
