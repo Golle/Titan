@@ -186,4 +186,11 @@ public unsafe class User32
         void* pData,
         uint* pcbSize
     );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern uint GetRawInputBuffer(
+        RAWINPUT* pData,
+        uint* pcbSize,
+        uint cbSizeHeader
+    );
 }
