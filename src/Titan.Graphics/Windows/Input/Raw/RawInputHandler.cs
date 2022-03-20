@@ -1,7 +1,12 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Json;
+using System.Text;
+using System.Threading;
 using Titan.Core.Logging;
 using Titan.Windows;
 using Titan.Windows.Win32;
@@ -22,7 +27,7 @@ internal unsafe class RawInputHandler
     public const int MaxButtons = 128;
 
     private const int MaxDevices = 16;
-    
+
 
     private readonly bool[] _buttonState = new bool[MaxButtons];
 
@@ -32,6 +37,9 @@ internal unsafe class RawInputHandler
     private void* _preparsedData = NativeMemory.Alloc(1024 * 1024);
     private HIDP_BUTTON_CAPS* _buttonCaps = (HIDP_BUTTON_CAPS*)NativeMemory.Alloc(1024 * 1024);
     private HIDP_VALUE_CAPS* _valueCaps = (HIDP_VALUE_CAPS*)NativeMemory.Alloc(1024 * 1024);
+
+
+    private HWND _hwnd;
     public void Register(HWND hwnd)
     {
         // Register for input device on the current Window and for both generic joystick (ps4) and gamepad (xbox)
@@ -40,11 +48,12 @@ internal unsafe class RawInputHandler
         {
             usUsagePage = HID_USAGE_PAGE.HID_USAGE_PAGE_GENERIC,
             usUsage = HID_USAGE.HID_USAGE_GENERIC_GAMEPAD,
-            hwndTarget = hwnd,
+            hwndTarget = _hwnd,
             dwFlags = (uint)RIDEV.RIDEV_DEVNOTIFY
         };
         devices[1] = devices[0];
         devices[1].usUsage = HID_USAGE.HID_USAGE_GENERIC_JOYSTICK;
+
 
         if (!User32.RegisterRawInputDevices(devices, 2, (uint)sizeof(RAWINPUTDEVICE)))
         {
@@ -58,12 +67,14 @@ internal unsafe class RawInputHandler
 
     public void Handle(nuint lParam, nuint wParam)
     {
-        uint size;
-        User32.GetRawInputData(lParam, RIDCOMMAND.RID_INPUT, null, &size, (uint)sizeof(RAWINPUTHEADER));
-        if (size == 0)
-        {
-            return;
-        }
+        uint size = 500;
+        //User32.GetRawInputData(lParam, RIDCOMMAND.RID_INPUT, null, &size, (uint)sizeof(RAWINPUTHEADER));
+        //timer.Stop();
+        //_ticks[0] = timer.Elapsed.Ticks;
+        //if (size == 0)
+        //{
+        //    return null;
+        //}
 
         var input1 = stackalloc byte[(int)size];
         var input = (RAWINPUT*)input1;
@@ -73,15 +84,15 @@ internal unsafe class RawInputHandler
         {
             return;
         }
-        //User32.GetRawInputDeviceInfoW(input->Header.hDevice, RIDICOMMAND.RIDI_PREPARSEDDATA, null, &size);
         size = 1024 * 1024;
-        var gotPreparsedData = User32.GetRawInputDeviceInfoW(input->Header.hDevice, RIDICOMMAND.RIDI_PREPARSEDDATA, _preparsedData, &size) > 0;
+        var gotPreparsedData = User32.GetRawInputDeviceInfoA(input->Header.hDevice, RIDICOMMAND.RIDI_PREPARSEDDATA, _preparsedData, &size) > 0;
         if (!gotPreparsedData)
         {
             return;
         }
 
         Unsafe.SkipInit(out HIDP_CAPS caps);
+
         if (Hid.HidP_GetCaps(_preparsedData, &caps) != 0)
         {
             var capsLength = caps.NumberInputButtonCaps;
@@ -108,11 +119,12 @@ internal unsafe class RawInputHandler
                             }
                         }
                     }
-
                     for (var i = 0; i < caps.NumberInputValueCaps; i++)
                     {
                         uint value;
+
                         if (Hid.HidP_GetUsageValue(HIDP_REPORT_TYPE.HidP_Input, _valueCaps[i].UsagePage, 0, _valueCaps[i].Range.UsageMin, &value, _preparsedData, input->Hid.bRawData, input->Hid.dwSizeHid) == (int)HIDP_STATUS.HIDP_STATUS_SUCCESS)
+
                         {
                             switch (_valueCaps[i].Range.UsageMin)
                             {
@@ -149,11 +161,6 @@ internal unsafe class RawInputHandler
         {
             Logger.Error($"{nameof(Hid.HidP_GetCaps)} failed");
         }
-
-
-        //Logger.Error("Raw input");
-
-
         //var b = new StringBuilder();
         //b.Append($"{_xAxis.ToString().PadLeft(5)} {_yAxis.ToString().PadLeft(5)} {_zAxis.ToString().PadLeft(5)} {_rZAxis.ToString().PadLeft(5)} {_lHat.ToString().PadLeft(5)} - ");
         //for (var i = 0; i < _buttonState.Length; ++i)
@@ -173,13 +180,16 @@ internal unsafe class RawInputHandler
         const nuint Arrival = 1;
         const nuint Removed = 2;
 
+
         uint size;
         var a = User32.GetRawInputData(lParam, RIDCOMMAND.RID_INPUT, null, &size, (uint)sizeof(RAWINPUTHEADER));
 
         switch (wParam.Value)
         {
-            case Arrival: DeviceArrival(lParam); break;
-            case Removed:  DeviceRemoved(lParam); break;
+            case Arrival:
+                DeviceArrival(lParam);
+                _loadedDevices[0] = lParam; break;
+            case Removed: DeviceRemoved(lParam); break;
             default:
                 Logger.Warning<RawInputHandler>($"Recieved unrecognized command {wParam} for device change event.");
                 break;
@@ -205,7 +215,7 @@ internal unsafe class RawInputHandler
                 Logger.Info<RawInputHandler>($"Vendor: {DeviceTranslation.VendorName(hid.dwVendorId)} Product: {DeviceTranslation.ProductName(hid.dwProductId)}");
             }
 
-            
+
         }
 
         static void DeviceRemoved(nuint handle)
@@ -214,25 +224,101 @@ internal unsafe class RawInputHandler
         }
     }
 
-    private RAWINPUT[] _raw = new RAWINPUT[20];
-    public void WmInput()
+    public uint BufferedRead()
     {
-        fixed (RAWINPUT* pRaw = _raw)
-        {
-            var size = (uint)(sizeof(RAWINPUT) * 20);
-            var a = User32.GetRawInputBuffer(pRaw, &size, (uint)sizeof(RAWINPUTHEADER));
+        var size = 5 * 1024;
+        var rawInput = stackalloc byte[size];
+        var usage = stackalloc ushort[128];
 
-        }
+        var count = User32.GetRawInputBuffer((RAWINPUT*)rawInput, (uint*)&size, (uint)sizeof(RAWINPUTHEADER));
+        Unsafe.SkipInit(out HIDP_CAPS caps);
 
+        //var builder = new StringBuilder();
+        var offset = 0u;
+        for (var aaa = 0; aaa < count; ++aaa)
         {
-            var size = 1024u * 1024u;
-            var gotPreparsedData = User32.GetRawInputDeviceInfoW(_raw[0].Header.hDevice, RIDICOMMAND.RIDI_PREPARSEDDATA, _preparsedData, &size) > 0;
+            var raw = (RAWINPUT*)(rawInput + offset);
+            var dataSize = 1024u * 1024u;
+            //var gotPreparsedData = User32.GetRawInputDeviceInfoA(raw->Header.hDevice, RIDICOMMAND.RIDI_PREPARSEDDATA, _preparsedData, &dataSize) > 0;
+            var gotPreparsedData = User32.GetRawInputDeviceInfoA(raw->Header.hDevice, RIDICOMMAND.RIDI_PREPARSEDDATA, _preparsedData, &dataSize) > 0;
             if (!gotPreparsedData)
             {
-                return;
+                continue;
             }
+
+
+            if (Hid.HidP_GetCaps(_preparsedData, &caps) != 0)
+            {
+                var capsLength = caps.NumberInputButtonCaps;
+
+                var hidPGetButtonCaps = Hid.HidP_GetButtonCaps(HIDP_REPORT_TYPE.HidP_Input, _buttonCaps, &capsLength, _preparsedData);
+                if (hidPGetButtonCaps == (int)HIDP_STATUS.HIDP_STATUS_SUCCESS)
+                {
+
+                    var numberOfButtons = _buttonCaps->Range.UsageMax - _buttonCaps->Range.UsageMin + 1;
+
+                    capsLength = caps.NumberInputValueCaps;
+                    if (Hid.HidP_GetValueCaps(HIDP_REPORT_TYPE.HidP_Input, _valueCaps, &capsLength, _preparsedData) == (int)HIDP_STATUS.HIDP_STATUS_SUCCESS)
+                    {
+                        {
+                            var usageLength = (uint)numberOfButtons;
+                            if (Hid.HidP_GetUsages(HIDP_REPORT_TYPE.HidP_Input, _buttonCaps->UsagePage, 0, usage, &usageLength, _preparsedData, raw->Hid.bRawData, raw->Hid.dwSizeHid) == (int)HIDP_STATUS.HIDP_STATUS_SUCCESS)
+                            {
+                                Array.Fill(_buttonState, false);
+                                for (var i = 0; i < usageLength; i++)
+                                {
+                                    _buttonState[usage[i] - _buttonCaps->Range.UsageMin] = true;
+                                }
+                            }
+                        }
+                        for (var i = 0; i < caps.NumberInputValueCaps; i++)
+                        {
+                            uint value;
+
+                            if (Hid.HidP_GetUsageValue(HIDP_REPORT_TYPE.HidP_Input, _valueCaps[i].UsagePage, 0, _valueCaps[i].Range.UsageMin, &value, _preparsedData, raw->Hid.bRawData, raw->Hid.dwSizeHid) == (int)HIDP_STATUS.HIDP_STATUS_SUCCESS)
+                            {
+                                switch (_valueCaps[i].Range.UsageMin)
+                                {
+                                    case 0x30: // X-axis
+                                        _xAxis = (int)value - 128;
+                                        break;
+
+                                    case 0x31: // Y-axis
+                                        _yAxis = (int)value - 128;
+                                        break;
+
+                                    case 0x32: // Z-axis
+                                        _zAxis = (int)value - 128;
+                                        break;
+
+                                    case 0x35: // Rotate-Z
+                                        _rZAxis = (int)value - 128;
+                                        break;
+
+                                    case 0x39: // Hat Switch
+                                        _lHat = (int)value;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Logger.Error($"{nameof(Hid.HidP_GetButtonCaps)} failed");
+                }
+            }
+            else
+            {
+                Logger.Error($"{nameof(Hid.HidP_GetCaps)} failed");
+            }
+            offset += raw->Header.dwSize.Value;
         }
-        
+
+
+        return offset;
+        //Logger.Error(builder.ToString());
+
 
     }
 }

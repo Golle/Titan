@@ -52,4 +52,17 @@ public static unsafe class Hid
         byte* Report,
         uint ReportLength
     );
+
+    [DllImport(HidDll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool HidD_GetPreparsedData(
+        HANDLE HidDeviceObject,
+        void* /*PHIDP_PREPARSED_DATA*/ PreparsedData
+    );
+    
+    [DllImport(HidDll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool HidD_FreePreparsedData(
+        void* /*PHIDP_PREPARSED_DATA*/ PreparsedData
+    );
 }

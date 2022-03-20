@@ -32,7 +32,7 @@ internal class GameTime
         var delta = current - _previousFrame;
         if (delta > MaxDeltaTime)
         {
-            Logger.Warning<GameTime>($"Delta time is greater than {MaxDeltaTime}, clamping the value to {MaxDeltaTime}.");
+            //Logger.Warning<GameTime>($"Delta time is greater than {MaxDeltaTime}, clamping the value to {MaxDeltaTime}.");
             delta = MaxDeltaTime;
         }
         _fixedTime += delta;

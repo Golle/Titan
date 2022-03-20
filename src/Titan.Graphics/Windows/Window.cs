@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
 using Titan.Graphics.Windows.Events;
@@ -15,7 +16,7 @@ public record WindowConfiguration(string Title, uint Width, uint Height, bool Wi
 public static unsafe class Window
 {
 
-    private static RawInputHandler _rawInputHandler = new ();
+    private static readonly RawInputHandler _rawInputHandler = new ();
 
     private const string ClassName = "titan_game_engine";
     private static HCURSOR _defaultCursor;
@@ -42,6 +43,8 @@ public static unsafe class Window
             _timer.Restart();
             _frames = 1;
         }
+
+   
         while (PeekMessageA(out var msg, 0, 0, 0, 1)) // pass IntPtr.Zero as HWND to detect mouse movement outside of the window
         {
             switch (msg.Message)
@@ -49,13 +52,16 @@ public static unsafe class Window
                 case WM_QUIT:
                     SetWindowLongPtrA(Handle, GWLP_USERDATA, 0);
                     return false;
-
+                case WM_INPUT:
+                //    _rawInputHandler.Handle(msg.LParam, msg.WParam);
+                break;
                 default:
                     TranslateMessage(msg);
                     DispatchMessage(msg);
                     break;
             }
         }
+
         UpdateMousePosition();
 
         foreach (ref readonly var @event in EventManager.GetEvents())
@@ -299,9 +305,12 @@ public static unsafe class Window
                 break;
 
             // Collect raw Input
-            case WM_INPUT:
-                _rawInputHandler.Handle(lParam, wParam);
-                break;
+            //case WM_INPUT:
+            //    var t = Stopwatch.StartNew();
+            //    _rawInputHandler.Handle(lParam, wParam);
+            //    t.Stop();
+            //    //Logger.Error<RawInputHandler>($"Time : {t.Elapsed.TotalMilliseconds}");
+            //    break;
             case WM_INPUT_DEVICE_CHANGE:
                 _rawInputHandler.DeviceChange(lParam, wParam);
                 break;
