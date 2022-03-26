@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Physics", "src\Titan.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Sound", "src\Titan.Sound\Titan.Sound.csproj", "{04AB8E57-9333-4191-8941-D4B244AF0441}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Systems", "src\Titan.Systems\Titan.Systems.csproj", "{B7061948-E242-4B8A-8E3F-0988F4CCAAE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +166,12 @@ Global
 		{04AB8E57-9333-4191-8941-D4B244AF0441}.Release|Any CPU.Build.0 = Release|Any CPU
 		{04AB8E57-9333-4191-8941-D4B244AF0441}.Shipping|Any CPU.ActiveCfg = Shipping|Any CPU
 		{04AB8E57-9333-4191-8941-D4B244AF0441}.Shipping|Any CPU.Build.0 = Shipping|Any CPU
+		{B7061948-E242-4B8A-8E3F-0988F4CCAAE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7061948-E242-4B8A-8E3F-0988F4CCAAE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7061948-E242-4B8A-8E3F-0988F4CCAAE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7061948-E242-4B8A-8E3F-0988F4CCAAE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7061948-E242-4B8A-8E3F-0988F4CCAAE2}.Shipping|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7061948-E242-4B8A-8E3F-0988F4CCAAE2}.Shipping|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,6 +196,7 @@ Global
 		{1BF75D92-5F7B-4AEE-969B-267956A13393} = {D078C8E6-5D88-4DF0-9425-84E84CB7A6CD}
 		{1DFFC1E2-AED1-4061-A21F-AF6296A95F96} = {74127627-7DB8-4DB4-B491-454C750DB930}
 		{04AB8E57-9333-4191-8941-D4B244AF0441} = {74127627-7DB8-4DB4-B491-454C750DB930}
+		{B7061948-E242-4B8A-8E3F-0988F4CCAAE2} = {74127627-7DB8-4DB4-B491-454C750DB930}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {78854958-BC31-4FAE-99A7-2C398C2607BD}

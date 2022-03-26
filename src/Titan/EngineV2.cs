@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Titan.Core.Logging;
 using Titan.Graphics.Windows;
 
@@ -72,9 +67,5 @@ public class EngineV2
         }
         active = false;
         thread.Join();
-        //Thread.Sleep(TimeSpan.FromMinutes(1));
-        //while (window.Update())
-        //{
-        //}
     }
 }
