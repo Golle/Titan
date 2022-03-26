@@ -56,6 +56,22 @@ public unsafe class User32
     );
 
     [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern int GetMessageA(
+        MSG* lpMsg,
+        HWND hWnd,
+        uint wMsgFilterMin,
+        uint wMsgFilterMax
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern int GetMessageW(
+        MSG* lpMsg,
+        HWND hWnd,
+        uint wMsgFilterMin,
+        uint wMsgFilterMax
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool TranslateMessage(
         [In] in MSG lpMsg
@@ -82,6 +98,13 @@ public unsafe class User32
     public static extern bool UnregisterClassA(
         [In, MarshalAs(UnmanagedType.LPStr)] string LpszClassName,
         [In] nint hInstance
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool UnregisterClassW(
+        char* LpszClassName,
+        nint hInstance
     );
 
     [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]

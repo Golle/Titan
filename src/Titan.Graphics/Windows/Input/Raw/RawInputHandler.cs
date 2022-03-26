@@ -188,7 +188,8 @@ internal unsafe class RawInputHandler
         {
             case Arrival:
                 DeviceArrival(lParam);
-                _loadedDevices[0] = lParam; break;
+                //_loadedDevices[0] = lParam;
+                break;
             case Removed: DeviceRemoved(lParam); break;
             default:
                 Logger.Warning<RawInputHandler>($"Recieved unrecognized command {wParam} for device change event.");

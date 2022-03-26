@@ -19,7 +19,7 @@ using Titan.UI.Common;
 
 Console.WriteLine($"Hello World!");
 
-Engine.Start(new SandboxApplication());
+EngineV2.Start(new SandboxApplication());
 
 namespace Titan.Sandbox
 {
