@@ -5,9 +5,11 @@ using Titan.Core;
 using Titan.Core.Services;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
+using Titan.ECS.Systems.Resources;
 using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Systems;
+
 
 public abstract class EntitySystem
 {
@@ -17,6 +19,8 @@ public abstract class EntitySystem
     private World _world;
     private bool _initialized;
     private readonly string _name;
+    private ISharedResources _resources;
+
     internal ref readonly ComponentId Read => ref _read;
     internal ref readonly ComponentId Mutable => ref _mutable;
     protected EntityManager EntityManager { get; private set; }
@@ -92,13 +96,13 @@ public abstract class EntitySystem
         _gameTime = world.GameTime;
 
         EntityManager = world.Manager;
+        _resources = services.Get<ISharedResources>();
         Init(services);
         _initialized = true;
     }
 
-        
 
-    public ReadOnlyStorage<T> GetReadOnly<T>() where T : unmanaged
+    protected ReadOnlyStorage<T> GetReadOnly<T>() where T : unmanaged
     {
         if (_initialized)
         {
@@ -127,6 +131,33 @@ public abstract class EntitySystem
             throw new InvalidOperationException($"{nameof(CreateFilter)} can only be called in the {nameof(Init)} method.");
         }
         return _world.FilterManager.Create(config);
+    }
+
+
+    protected ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged
+    {
+        if (_initialized)
+        {
+            throw new InvalidOperationException($"{nameof(GetReadOnlyResource)} can only be called in the {nameof(Init)} method.");
+        }
+
+        unsafe
+        {
+            return new(_resources.GetMemoryForType<T>());
+        }
+    }
+
+    protected MutableResource<T> GetMutableResource<T>() where T : unmanaged
+    {
+        if (_initialized)
+        {
+            throw new InvalidOperationException($"{nameof(GetMutableResource)} can only be called in the {nameof(Init)} method.");
+        }
+
+        unsafe
+        {
+            return new(_resources.GetMemoryForType<T>());
+        }
     }
 
     protected Entity CreateEntity() => _world.CreateEntity();

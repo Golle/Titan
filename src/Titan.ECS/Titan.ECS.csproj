@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Systems\Resources\" />
+  </ItemGroup>
+
 </Project>

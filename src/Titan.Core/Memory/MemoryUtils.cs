@@ -26,7 +26,7 @@ public static unsafe class MemoryUtils
         {
             OutOfMemoryException();
         }
-        return new MemoryChunk(ptr);
+        return new MemoryChunk(ptr, size);
     }
 
         

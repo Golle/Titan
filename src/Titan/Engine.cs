@@ -10,6 +10,7 @@ using Titan.Core.Services;
 using Titan.Core.Threading;
 using Titan.ECS;
 using Titan.ECS.Components;
+using Titan.ECS.Systems.Resources;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -144,7 +145,9 @@ public class Engine
             .Register(new FontManager())
             .Register(new AtlasManager(100))
             .Register(new TextManager(200))
-            .Register(new SoundManager());
+            .Register(new SoundManager())
+            .Register<ISharedResources>(new SharedResourceManager(10 * 1024 * 1024)) // NOTE(Jens): 10mb for now
+            ;
             
         var assetsManager = new AssetsManager()
             .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
