@@ -1,9 +1,8 @@
-namespace Titan.ECS.Components
+namespace Titan.ECS.Components;
+
+public enum ComponentPoolTypes
 {
-    public enum ComponentPoolTypes
-    {
-        Packed,
-        DynamicPacked,
-        Sparse
-    }
+    Packed,
+    DynamicPacked,
+    Sparse
 }

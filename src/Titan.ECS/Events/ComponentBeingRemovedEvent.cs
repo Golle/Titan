@@ -3,18 +3,17 @@ using Titan.Core.Messaging;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 
-namespace Titan.ECS.Events
+namespace Titan.ECS.Events;
+
+[StructLayout(LayoutKind.Sequential, Pack = 4)]
+public readonly struct ComponentBeingRemovedEvent
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public readonly struct ComponentBeingRemovedEvent
+    public static readonly short Id = EventId<ComponentBeingRemovedEvent>.Value;
+    public readonly ComponentId Component;
+    public readonly Entity Entity;
+    public ComponentBeingRemovedEvent(in Entity entity, in ComponentId component)
     {
-        public static readonly short Id = EventId<ComponentBeingRemovedEvent>.Value;
-        public readonly ComponentId Component;
-        public readonly Entity Entity;
-        public ComponentBeingRemovedEvent(in Entity entity, in ComponentId component)
-        {
-            Component = component;
-            Entity = entity;
-        }
+        Component = component;
+        Entity = entity;
     }
 }
