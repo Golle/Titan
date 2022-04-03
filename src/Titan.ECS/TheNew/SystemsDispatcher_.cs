@@ -19,6 +19,7 @@ public sealed class SystemsDispatcher_
         _status = new NodeStatus[nodes.Length];
         _handles = new Handle<WorkerPool>[nodes.Length];
     }
+
     public void Execute()
     {
         _progress.Reset();

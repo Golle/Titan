@@ -6,7 +6,7 @@ namespace Titan.ECS.TheNew;
 
 public class DispatchTreeFactory
 {
-    public Node[] Construct(BaseSystem_[] systems)
+    public Node[] Construct(BaseSystem[] systems)
     {
         //DebugPrint1(systems);
         var nodes = new Node[systems.Length];

@@ -1,10 +1,10 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 
 namespace Titan.ECS.TheNew;
 
-public abstract class EntitySystem_ : BaseSystem_
+public abstract class EntitySystem_ : BaseSystem
 {
     public sealed override void OnUpdate()
     {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Titan.ECS.Systems;
@@ -6,7 +6,7 @@ using Titan.ECS.Systems.Resources;
 
 namespace Titan.ECS.TheNew;
 
-public abstract unsafe class BaseSystem_
+public abstract unsafe class BaseSystem
 {
     private ISharedResources _sharedResources = new SharedResourceManager(100000);
 
@@ -50,7 +50,7 @@ public abstract unsafe class BaseSystem_
         }
     }
 
-    protected void DependsOn<T>() where T : BaseSystem_
+    protected void DependsOn<T>() where T : BaseSystem
     {
         if (!_dependsOn.Contains(typeof(T)))
         {
