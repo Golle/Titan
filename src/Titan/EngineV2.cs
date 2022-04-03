@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Messaging;
@@ -139,25 +139,14 @@ public class EngineV2
             typeof(TestSystem4),
         };
 
-        var worlds = _app.ConfigureWorlds()
-            .ToDictionary(w => w.Name);
+        var worlds = _app.ConfigureWorlds();
+        var runner = new WorldRunner(baseSystems, worlds.ToArray(), services);
+        runner.Start("Menu");
 
-        var starterWorld = worlds.First().Value;
-
-        var systems = starterWorld
-            .Systems
-            .Select(s => s.Type)
-            .Concat(baseSystems)
-            .Select(Activator.CreateInstance)
-            .Cast<BaseSystem>()
-            .ToArray();
-
-        var runner = new WorldRunner();
-        runner.Start(systems);
-        Logger.Info("Start windows poll on main thred");
+        Logger.Info("Start windows poll on main thread");
         while (_window.Update())
         {
-
+         // Noop   
         }
 
         Logger.Info("Window returned false, exiting.");
@@ -195,41 +184,3 @@ public class EngineV2
 }
 
 
-// NOTE(Jens): this is a bad name, rename it when we know what it does
-internal class WorldRunner
-{
-    private Thread _worldThread;
-    private volatile bool _active;
-
-    public void Start(BaseSystem[] systems)
-    {
-        _worldThread = new Thread(Run);
-        _worldThread.Start(systems);
-    }
-
-    public void Stop()
-    {
-        _active = false;
-        _worldThread.Join();
-        // Add stop function
-    }
-
-    public void Run(object obj)
-    {
-        _active = true;
-        Node[] nodes;
-        {
-            nodes = new DispatchTreeFactory()
-                .Construct((BaseSystem[])obj);
-        }
-
-
-        var dispatcher = new SystemsDispatcher_(nodes);
-
-        while (_active)
-        {
-            dispatcher.Execute();
-        }
-        Logger.Info("Exiting the World Thread");
-    }
-}

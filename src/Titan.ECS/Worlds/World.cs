@@ -152,10 +152,12 @@ public class World : IDisposable
         WorldIds.Return(Id);
     }
 
-    public static World CreateWorld(WorldBuilder builder, IServiceCollection services, bool setActive)
+
+    public static World CreateWorld(WorldBuilder builder, IServiceCollection services, bool setActive) => CreateWorld(builder.Build("THIS IS NOT WORKDING"), services, setActive);
+
+    public static World CreateWorld(WorldConfiguration config, IServiceCollection services, bool setActive)
     {
-        var configuration = builder.Build("THIS IS NOT WORKDING");
-        var world = new World(configuration, services);
+        var world = new World(config, services);
 
         if (setActive)
         {
