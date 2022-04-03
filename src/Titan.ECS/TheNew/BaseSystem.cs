@@ -19,20 +19,19 @@ public abstract unsafe class BaseSystem
 
     protected ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged
     {
-        Debug.Assert(IsInitialized == false, "System has already been initialized.");
         AddReadonly<T>();
         return new(_sharedResources.GetMemoryForType<T>());
     }
 
     protected MutableResource<T> GetMutableResource<T>() where T : unmanaged
     {
-        Debug.Assert(IsInitialized == false, "System has already been initialized.");
         AddMutable<T>();
         return new(_sharedResources.GetMemoryForType<T>());
     }
 
     protected void AddMutable<T>()
     {
+        Debug.Assert(IsInitialized == false, "System has already been initialized.");
         var resourceId = ResourceId<T>.Id;
         if (!_mutable.Contains(resourceId))
         {
@@ -42,6 +41,7 @@ public abstract unsafe class BaseSystem
     }
     protected void AddReadonly<T>()
     {
+        Debug.Assert(IsInitialized == false, "System has already been initialized.");
         var resourceId = ResourceId<T>.Id;
         if (!_readOnly.Contains(resourceId))
         {

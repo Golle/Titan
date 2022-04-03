@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Titan.ECS.Components;
 using Titan.ECS.Systems;
@@ -12,6 +13,8 @@ public class WorldBuilder
     private readonly List<ComponentConfiguration> _components = new();
     private readonly List<EntitySystemConfiguration> _systems = new();
     private float _fixedTimestep = 1f/60f; // Default 60FPS
+    private Action<World> _setup = _ => {};
+    private Action<World> _teardown = _ => { };
 
     public WorldBuilder(uint defaultMaxEntities) => _maxEntities = defaultMaxEntities;
       
@@ -39,11 +42,26 @@ public class WorldBuilder
         return this;
     }
 
-    public WorldConfiguration Build() => new()
+    public WorldBuilder WithSetup(Action<World> setup)
     {
+        _setup = setup;
+        return this;
+    }
+
+    public WorldBuilder WithTeardown(Action<World> teardown)
+    {
+        _teardown = teardown;
+        return this;
+    }
+
+    public WorldConfiguration Build(string name) => new()
+    {
+        Name = name,
         MaxEntities = _maxEntities,
         Components = _components.ToArray(),
         Systems = _systems.ToArray(),
-        FixedTimeStep = _fixedTimestep
+        FixedTimeStep = _fixedTimestep,
+        Setup = _setup,
+        Teardown = _teardown
     };
 }

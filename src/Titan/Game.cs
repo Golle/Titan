@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics.D3D11;
@@ -10,6 +11,8 @@ namespace Titan;
 
 public abstract class Game
 {
+
+    public abstract IEnumerable<WorldConfiguration> ConfigureWorlds();
     public virtual void OnStart(World starterWorld, UIManager uiManager){}
     public virtual void OnTerminate() { }
     public abstract void ConfigureStarterWorld(WorldBuilder builder);

@@ -13,11 +13,14 @@ namespace Titan.ECS.Worlds;
 
 public record WorldConfiguration
 {
+    public string Name { get; init; }
     public uint Id { get; init; }
     public float FixedTimeStep { get; init; } = 1f / 60f;
     public uint MaxEntities { get; init; }
     public ComponentConfiguration[] Components { get; init; }
-    public EntitySystemConfiguration[] Systems { get; init; } 
+    public EntitySystemConfiguration[] Systems { get; init; }
+    public Action<World> Setup { get; init; }
+    public Action<World> Teardown { get; init; }
 }
 
 public record ComponentConfiguration(Type Type, ComponentPoolTypes PoolType, uint Count = 0);
@@ -151,7 +154,7 @@ public class World : IDisposable
 
     public static World CreateWorld(WorldBuilder builder, IServiceCollection services, bool setActive)
     {
-        var configuration = builder.Build();
+        var configuration = builder.Build("THIS IS NOT WORKDING");
         var world = new World(configuration, services);
 
         if (setActive)

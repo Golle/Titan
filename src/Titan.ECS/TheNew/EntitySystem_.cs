@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 
@@ -14,14 +13,12 @@ public abstract class EntitySystem_ : BaseSystem
 
     protected ReadOnlyStorage<T> GetReadOnly<T>() where T : unmanaged
     {
-        Debug.Assert(IsInitialized == false, "System has already been initialized.");
         AddReadonly<ComponentWrapper<T>>();
         return new();
     }
 
     protected MutableStorage<T> GetMutable<T>() where T : unmanaged
     {
-        Debug.Assert(IsInitialized == false, "System has already been initialized.");
         AddMutable<ComponentWrapper<T>>();
         return new();
     }

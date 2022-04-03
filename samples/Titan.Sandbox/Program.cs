@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Titan;
 using Titan.Assets;
 using Titan.Components;
 using Titan.Core.Logging;
+using Titan.Core.Threading;
 using Titan.ECS;
+using Titan.ECS.TheNew;
 using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
@@ -19,12 +22,83 @@ using Titan.UI.Common;
 
 Console.WriteLine($"Hello World!");
 
-Engine.Start(new SandboxApplication());
+
+//var nodes = new DispatchTreeFactory()
+//    .Construct(new BaseSystem[]
+//    {
+//        new TestSystem1(),
+//        new TestSystem2(),
+//        new TestSystem3(),
+//        new TestSystem4(),
+//    });
+
+
+//WorkerPool.Init(new WorkerPoolConfiguration(300, 10));
+//new SystemsDispatcher_(nodes)
+//    .Execute();
+//return 0;
+EngineV2.Start(new SandboxApplication());
+
 
 namespace Titan.Sandbox
 {
     internal class SandboxApplication : Game
     {
+        public override IEnumerable<WorldConfiguration> ConfigureWorlds()
+        {
+            yield return new WorldBuilder(100)
+                //.WithDefault2D()
+                .WithSetup(MenuWorldSetup)
+                .WithTeardown(MenuWorldTeardown)
+                .Build("Menu");
+
+            yield return new WorldBuilder(10_000)
+                .WithDefault3D()
+                .WithSystem<FirstPersonCameraSystem>()
+                .WithSetup(GameWorldSetup)
+                .WithTeardown(GameWorldTeardown)
+                .Build("Game");
+        }
+
+        private void MenuWorldSetup(World world)
+        {
+            Logger.Info("Menu world setup");
+        }
+
+        private void GameWorldSetup(World world)
+        {
+            var r = new Random();
+            for (var i = 0; i < 10; ++i)
+            {
+                for (var j = 0; j < 10; ++j)
+                {
+                    var tree = world.CreateEntity();
+                    var q = Quaternion.CreateFromAxisAngle(Vector3.UnitY, r.Next(0, 360));
+                    world.AddComponent(tree, new Transform3D
+                    {
+                        Scale = Vector3.One * (r.NextSingle() * 5),
+                        Rotation = q,
+                        Position = new Vector3(i * (r.NextSingle() * 10 + 5), 0, j * (r.NextSingle() * 10 + 5))
+                    });
+                    world.AddComponent(tree, new AssetComponent<Model>("models/pillar"));
+                }
+            }
+
+            var camera = world.CreateEntity();
+            world.AddComponent(camera, new Transform3D { Position = new Vector3(0, 10, 60), Rotation = Quaternion.Identity, Scale = Vector3.One });
+            world.AddComponent(camera, CameraComponent.CreatePerspective(2560, 1440, 0.5f, 10000f));
+        }
+
+        private void MenuWorldTeardown(World world)
+        {
+            Logger.Error("Menu world tear down");
+
+        }
+        private void GameWorldTeardown(World world)
+        {
+            Logger.Error("Game world tear down");
+        }
+
         public override void OnStart(World world, UIManager uiManager)
         {
             Logger.Info("Sandbox application starting");
@@ -161,6 +235,9 @@ namespace Titan.Sandbox
         {
             Logger.Info("Sandbox application shutting down");
         }
+
+
+        
 
         public override void ConfigureStarterWorld(WorldBuilder builder) =>
             builder

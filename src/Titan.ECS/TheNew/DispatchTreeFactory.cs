@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Titan.Core.Logging;
 
 namespace Titan.ECS.TheNew;
 
@@ -8,7 +9,6 @@ public class DispatchTreeFactory
 {
     public Node[] Construct(BaseSystem[] systems)
     {
-        //DebugPrint1(systems);
         var nodes = new Node[systems.Length];
 
         for (var i = 0; i < systems.Length; ++i)
@@ -35,7 +35,7 @@ public class DispatchTreeFactory
                     var circularDependency = nodes[j].Dependencies?.Contains(i) ?? false;
                     if (circularDependency)
                     {
-                        Console.WriteLine("Circular dependency");
+                        Logger.Warning<DispatchTreeFactory>($"Circular dependency detected between {system.GetType().Name} and {nodes[j].System.GetType().Name}");
                     }
                     else
                     {
@@ -48,7 +48,7 @@ public class DispatchTreeFactory
         foreach (var node in nodes)
         {
             var dependencies = string.Join(", ", node.Dependencies.Select(d => nodes[d].System.GetType().Name));
-            Console.WriteLine(string.IsNullOrWhiteSpace(dependencies) ?
+            Logger.Trace<DispatchTreeFactory>(string.IsNullOrWhiteSpace(dependencies) ?
                 $"{node.System.GetType().Name} has no dependencies" :
                 $"{node.System.GetType().Name} depends on {dependencies}");
         }
