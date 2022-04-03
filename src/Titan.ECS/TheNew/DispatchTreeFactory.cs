@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,11 +43,7 @@ public class DispatchTreeFactory
                     }
                 }
             }
-            nodes[i] = new Node
-            {
-                System = system,
-                Dependencies = dependencies.ToArray()
-            };
+            nodes[i] = new Node(system, dependencies.ToArray());
         }
         foreach (var node in nodes)
         {
@@ -57,17 +53,5 @@ public class DispatchTreeFactory
                 $"{node.System.GetType().Name} depends on {dependencies}");
         }
         return nodes;
-    }
-
-    private static void DebugPrint1(BaseSystem_[] systems)
-    {
-        foreach (var system in systems)
-        {
-            Console.WriteLine(system.GetType().Name);
-            var (readOnly, mutable, _dependsOn) = system.GetDependencies();
-            Console.WriteLine($"Depends on(Read): {string.Join(", ", readOnly)}");
-            Console.WriteLine($"Depends on(Mutable): {string.Join(", ", mutable)}");
-            Console.WriteLine($"Depends on(System): {string.Join(", ", _dependsOn.Select(t => t.Name))}");
-        }
     }
 }

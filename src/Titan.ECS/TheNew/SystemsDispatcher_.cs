@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Threading;
@@ -56,7 +56,7 @@ public sealed class SystemsDispatcher_
                 if (isReady)
                 {
                     status[i] = NodeStatus.Running;
-                    handles[i] = WorkerPool.Enqueue(new JobDescription(node.System.OnUpdate, autoReset: false), _progress);
+                    handles[i] = WorkerPool.Enqueue(new JobDescription(node.OnUpdate, autoReset: false), _progress);
                 }
             }
             ResetHandles();
