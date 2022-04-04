@@ -13,8 +13,6 @@ using Titan.Graphics.D3D11;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Rendering.Text;
 using Titan.Graphics.Windows;
-using Titan.Old;
-using Titan.Old.Components;
 using Titan.Sandbox;
 using Titan.UI;
 using Titan.UI.Common;

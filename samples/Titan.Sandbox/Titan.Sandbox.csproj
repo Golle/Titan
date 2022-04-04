@@ -12,6 +12,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' != 'Shipping|AnyCPU'">
     <OutputType>Exe</OutputType>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="FirstPersonCameraSystemTEMP.cs" />
+    <Compile Remove="Program.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\Titan\Titan.csproj" />
