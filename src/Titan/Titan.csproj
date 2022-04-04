@@ -10,6 +10,11 @@
     <DefineConstants></DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Old\**" />
+    <EmbeddedResource Remove="Old\**" />
+    <None Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Titan.Assets\Titan.Assets.csproj" />
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
     <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />

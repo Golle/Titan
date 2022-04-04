@@ -3,12 +3,13 @@ using System.Numerics;
 using Breakout;
 using Titan;
 using Titan.Assets;
-using Titan.Components;
 using Titan.Core.Logging;
 using Titan.ECS;
 using Titan.ECS.Worlds;
 using Titan.Graphics.Loaders.Models;
 using Titan.Graphics.Windows;
+using Titan.Old;
+using Titan.Old.Components;
 using Titan.UI;
 
 Console.WriteLine($"Hello World!");
