@@ -1,6 +1,16 @@
 {
     "Assets": [
         {
+
+            "Id":"shaders/cs_sample_01",
+            "Files": [
+                "shaders/sample_01_computeshader.hlsl"
+            ],
+            "Type":"computeshader",
+            "Preload": true,
+            "Static": true
+        },
+        {
             "Id": "materials/pillar_00",
             "Files": [
                 "materials/pillar_00.json"
