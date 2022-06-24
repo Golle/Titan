@@ -10,169 +10,212 @@ using Titan.Windows.D3D11;
 using Titan.Windows.DXGI;
 using static Titan.Windows.Common;
 
-namespace Titan.Graphics.D3D11.Shaders
+namespace Titan.Graphics.D3D11.Shaders;
+
+//internal D3D11_INPUT_CLASSIFICATION Classification; // TODO: add support for instance shaders
+public record InputLayoutDescription(string Name, TextureFormats Format, uint Slot);
+public record PixelShaderCreation(MemoryChunk<byte> Buffer, string Entrypoint, string Version);
+public record VertexShaderCreation(MemoryChunk<byte> Buffer, string Entrypoint, string Version, InputLayoutDescription[] InputLayout);
+public record ComputeShaderCreation(MemoryChunk<byte> Buffer, string Entrypoint, string Version);
+
+public unsafe class ShaderManager : IDisposable
 {
-    //internal D3D11_INPUT_CLASSIFICATION Classification; // TODO: add support for instance shaders
-    public record InputLayoutDescription(string Name, TextureFormats Format, uint Slot);
-    public record PixelShaderCreation(MemoryChunk<byte> Buffer, string Entrypoint, string Version);
-    public record VertexShaderCreation(MemoryChunk<byte> Buffer, string Entrypoint, string Version, InputLayoutDescription[] InputLayout);
+    private readonly ShaderCompiler _compiler = new();
+    private const uint MaxShaders = 200;
 
-    public unsafe class ShaderManager : IDisposable
+    private readonly ID3D11Device* _device;
+
+    private ResourcePool<VertexShader> _vertexShaderPool;
+    private ResourcePool<PixelShader> _pixelShaderPool;
+    private ResourcePool<ComputeShader> _computeShaderPool;
+
+    public ShaderManager(ID3D11Device* device)
     {
-        private readonly ShaderCompiler _compiler = new();
-        private const uint MaxShaders = 200;
+        Logger.Trace<ShaderManager>($"Init with {MaxShaders} slots");
+        _device = device;
+        _vertexShaderPool.Init(MaxShaders);
+        _pixelShaderPool.Init(MaxShaders);
+        _computeShaderPool.Init(MaxShaders);
+    }
 
-        private readonly ID3D11Device* _device;
-
-        private ResourcePool<VertexShader> _vertexShaderPool;
-        private ResourcePool<PixelShader> _pixelShaderPool;
-
-        public ShaderManager(ID3D11Device* device)
+    public Handle<VertexShader> CreateVertexShader(VertexShaderCreation args)
+    {
+        if (args.InputLayout == null) throw new ArgumentNullException(nameof(VertexShaderCreation.InputLayout));
+        var handle = _vertexShaderPool.CreateResource();
+        if (!handle.IsValid())
         {
-            Logger.Trace<ShaderManager>($"Init with {MaxShaders} slots");
-            _device = device;
-            _vertexShaderPool.Init(MaxShaders);
-            _pixelShaderPool.Init(MaxShaders);
+            throw new InvalidOperationException("Failed to Create VertexShader Handle");
+        }
+        var vertexShader = _vertexShaderPool.GetResourcePointer(handle);
+        vertexShader->Handle = handle;
+
+        using var vertexShaderBytecode = ComPtr<ID3DBlob>.Wrap(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
+
+        static uint GetSize(TextureFormats format) =>
+            (uint)(format switch
+            {
+                TextureFormats.RG32F => sizeof(Vector2),
+                TextureFormats.RGB32F => sizeof(Vector3),
+                TextureFormats.RGBA32F => sizeof(Vector4),
+                TextureFormats.R32U => sizeof(uint),
+                TextureFormats.R32F => sizeof(float),
+                _ => throw new NotSupportedException($"Format {format} is not supported.")
+            });
+
+        static MemoryChunk<byte> AllocAndCopy(string value)
+        {
+            var memory = MemoryUtils.AllocateBlock<byte>((uint)(value.Length + 1), true);
+            Encoding.ASCII.GetBytes(value, memory.AsSpan());
+            return memory;
         }
 
-        public Handle<VertexShader> CreateVertexShader(VertexShaderCreation args)
+        var numberOfElements = args.InputLayout.Length;
+        var inputLayoutDescs = stackalloc D3D11_INPUT_ELEMENT_DESC[numberOfElements];
+        var size = 0u;
+        for (var i = 0; i < numberOfElements; ++i)
         {
-            if (args.InputLayout == null) throw new ArgumentNullException(nameof(VertexShaderCreation.InputLayout));
-            var handle = _vertexShaderPool.CreateResource();
-            if (!handle.IsValid())
+            var input = args.InputLayout[i];
+            inputLayoutDescs[i] = new D3D11_INPUT_ELEMENT_DESC
             {
-                throw new InvalidOperationException("Failed to Create VertexShader Handle");
-            }
-            var vertexShader = _vertexShaderPool.GetResourcePointer(handle);
-            vertexShader->Handle = handle;
-
-            using var vertexShaderBytecode = ComPtr<ID3DBlob>.Wrap(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
-
-            static uint GetSize(TextureFormats format) =>
-                (uint)(format switch
-                {
-                    TextureFormats.RG32F => sizeof(Vector2),
-                    TextureFormats.RGB32F => sizeof(Vector3),
-                    TextureFormats.RGBA32F => sizeof(Vector4),
-                    TextureFormats.R32U => sizeof(uint),
-                    TextureFormats.R32F => sizeof(float),
-                    _ => throw new NotSupportedException($"Format {format} is not supported.")
-                });
-
-            static MemoryChunk<byte> AllocAndCopy(string value)
-            {
-                var memory = MemoryUtils.AllocateBlock<byte>((uint)(value.Length + 1), true);
-                Encoding.ASCII.GetBytes(value, memory.AsSpan());
-                return memory;
-            }
-
-            var numberOfElements = args.InputLayout.Length;
-            var inputLayoutDescs = stackalloc D3D11_INPUT_ELEMENT_DESC[numberOfElements];
-            var size = 0u;
-            for (var i = 0; i < numberOfElements; ++i)
-            {
-                var input = args.InputLayout[i];
-                inputLayoutDescs[i] = new D3D11_INPUT_ELEMENT_DESC
-                {
-                    Format = (DXGI_FORMAT)input.Format,
-                    InputSlot = input.Slot,
-                    AlignedByteOffset = size,
-                    InputSlotClass = D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_VERTEX_DATA, // Only support VertexData now
-                    InstanceDataStepRate = 0,
-                    SemanticIndex = 0,
-                    SemanticName = AllocAndCopy(input.Name)
-                };
-                size += GetSize(input.Format);
-            }
-
-            CheckAndThrow(_device->CreateInputLayout(inputLayoutDescs, (uint)numberOfElements, vertexShaderBytecode.Get()->GetBufferPointer(), vertexShaderBytecode.Get()->GetBufferSize(), &vertexShader->InputLayout), nameof(ID3D11Device.CreateInputLayout));
-            for (var i = 0; i < numberOfElements; ++i)
-            {
-                ((MemoryChunk<byte>)inputLayoutDescs[i].SemanticName).Free();
-            }
-
-            CheckAndThrow(_device->CreateVertexShader(vertexShaderBytecode.Get()->GetBufferPointer(), vertexShaderBytecode.Get()->GetBufferSize(), null, &vertexShader->Shader), nameof(ID3D11Device.CreateVertexShader));
-            
-            return handle;
+                Format = (DXGI_FORMAT)input.Format,
+                InputSlot = input.Slot,
+                AlignedByteOffset = size,
+                InputSlotClass = D3D11_INPUT_CLASSIFICATION.D3D11_INPUT_PER_VERTEX_DATA, // Only support VertexData now
+                InstanceDataStepRate = 0,
+                SemanticIndex = 0,
+                SemanticName = AllocAndCopy(input.Name)
+            };
+            size += GetSize(input.Format);
         }
 
-
-        public Handle<PixelShader> CreatePixelShader(PixelShaderCreation args)
+        CheckAndThrow(_device->CreateInputLayout(inputLayoutDescs, (uint)numberOfElements, vertexShaderBytecode.Get()->GetBufferPointer(), vertexShaderBytecode.Get()->GetBufferSize(), &vertexShader->InputLayout), nameof(ID3D11Device.CreateInputLayout));
+        for (var i = 0; i < numberOfElements; ++i)
         {
-            var handle = _pixelShaderPool.CreateResource();
-            if (!handle.IsValid())
-            {
-                throw new InvalidOperationException("Failed to Create VertexShader Handle");
-            }
-            var pixelShader = _pixelShaderPool.GetResourcePointer(handle);
-            pixelShader->Handle = handle;
-            
-            using var pixelShaderBytecode = ComPtr<ID3DBlob>.Wrap(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
-            CheckAndThrow(_device->CreatePixelShader(pixelShaderBytecode.Get()->GetBufferPointer(), pixelShaderBytecode.Get()->GetBufferSize(), null, &pixelShader->Shader), nameof(ID3D11Device.CreatePixelShader));
-            
-            return handle;
+            ((MemoryChunk<byte>)inputLayoutDescs[i].SemanticName).Free();
         }
 
+        CheckAndThrow(_device->CreateVertexShader(vertexShaderBytecode.Get()->GetBufferPointer(), vertexShaderBytecode.Get()->GetBufferSize(), null, &vertexShader->Shader), nameof(ID3D11Device.CreateVertexShader));
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ref readonly PixelShader Access(in Handle<PixelShader> handle) => ref _pixelShaderPool.GetResourceReference(handle);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ref readonly VertexShader Access(in Handle<VertexShader> handle) => ref _vertexShaderPool.GetResourceReference(handle);
+        return handle;
+    }
 
 
-        public void Release(in Handle<PixelShader> handle)
+    public Handle<PixelShader> CreatePixelShader(PixelShaderCreation args)
+    {
+        var handle = _pixelShaderPool.CreateResource();
+        if (!handle.IsValid())
         {
+            throw new InvalidOperationException("Failed to Create VertexShader Handle");
+        }
+        var pixelShader = _pixelShaderPool.GetResourcePointer(handle);
+        pixelShader->Handle = handle;
+
+        using var pixelShaderBytecode = ComPtr<ID3DBlob>.Wrap(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
+        CheckAndThrow(_device->CreatePixelShader(pixelShaderBytecode.Get()->GetBufferPointer(), pixelShaderBytecode.Get()->GetBufferSize(), null, &pixelShader->Shader), nameof(ID3D11Device.CreatePixelShader));
+
+        return handle;
+    }
+
+    public Handle<ComputeShader> CreateComputeShader(ComputeShaderCreation args)
+    {
+        var handle = _computeShaderPool.CreateResource();
+        if (handle.IsInvalid())
+        {
+            throw new InvalidOperationException("Failed to Create ComputeShader Handle");
+        }
+
+        var computeShader = _computeShaderPool.GetResourcePointer(handle);
+        computeShader->Handle = handle;
+
+        using var computeShaderBytecode = ComPtr<ID3DBlob>.Wrap(_compiler.Compile(args.Buffer, args.Entrypoint, args.Version));
+        CheckAndThrow(_device->CreateComputeShader(computeShaderBytecode.Get()->GetBufferPointer(), computeShaderBytecode.Get()->GetBufferSize(), null, &computeShader->Shader), nameof(ID3D11Device.CreateComputeShader));
+
+        return handle;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal ref readonly PixelShader Access(in Handle<PixelShader> handle) => ref _pixelShaderPool.GetResourceReference(handle);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal ref readonly VertexShader Access(in Handle<VertexShader> handle) => ref _vertexShaderPool.GetResourceReference(handle);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal ref readonly ComputeShader Access(in Handle<ComputeShader> handle) => ref _computeShaderPool.GetResourceReference(handle);
+
+    public void Release(in Handle<PixelShader> handle)
+    {
+        ReleaseInternal(handle);
+        _pixelShaderPool.ReleaseResource(handle);
+    }
+
+    private void ReleaseInternal(in Handle<PixelShader> handle)
+    {
+        var shader = _pixelShaderPool.GetResourcePointer(handle);
+        if (shader->Shader != null)
+        {
+            shader->Shader->Release();
+        }
+        *shader = default;
+    }
+
+    public void Release(in Handle<VertexShader> handle)
+    {
+        ReleaseInternal(handle);
+        _vertexShaderPool.ReleaseResource(handle);
+    }
+
+    private void ReleaseInternal(in Handle<VertexShader> handle)
+    {
+        var shader = _vertexShaderPool.GetResourcePointer(handle);
+        if (shader->Shader != null)
+        {
+            shader->Shader->Release();
+        }
+
+        if (shader->InputLayout != null)
+        {
+            shader->InputLayout->Release();
+        }
+        *shader = default;
+    }
+
+    public void Release(in Handle<ComputeShader> handle)
+    {
+        ReleaseInternal(handle);
+        _computeShaderPool.ReleaseResource(handle);
+    }
+
+    private void ReleaseInternal(in Handle<ComputeShader> handle)
+    {
+        var shader = _computeShaderPool.GetResourcePointer(handle);
+        if (shader->Shader != null)
+        {
+            shader->Shader->Release();
+        }
+        *shader = default;
+    }
+
+    public void Dispose()
+    {
+        foreach (var handle in _vertexShaderPool.EnumerateUsedResources())
+        {
+            Logger.Warning<ShaderManager>($"Releasing a unreleased Vertex Shader with handle {handle.Value}");
             ReleaseInternal(handle);
-            _pixelShaderPool.ReleaseResource(handle);
         }
 
-        private void ReleaseInternal(in Handle<PixelShader> handle)
+        foreach (var handle in _pixelShaderPool.EnumerateUsedResources())
         {
-            var shader = _pixelShaderPool.GetResourcePointer(handle);
-            if (shader->Shader != null)
-            {
-                shader->Shader->Release();
-            }
-            *shader = default;
-        }
-
-        public void Release(in Handle<VertexShader> handle)
-        {
+            Logger.Warning<ShaderManager>($"Releasing a unreleased Pixel Shader with handle {handle.Value}");
             ReleaseInternal(handle);
-            _vertexShaderPool.ReleaseResource(handle);
         }
 
-        private void ReleaseInternal(in Handle<VertexShader> handle)
+        foreach (var handle in _computeShaderPool.EnumerateUsedResources())
         {
-            var shader = _vertexShaderPool.GetResourcePointer(handle);
-            if (shader->Shader != null)
-            {
-                shader->Shader->Release();
-            }
-
-            if (shader->InputLayout != null)
-            {
-                shader->InputLayout->Release();
-            }
-            *shader = default;
+            Logger.Warning<ShaderManager>($"Releasing a unreleased Compute Shader with handle {handle.Value}");
+            ReleaseInternal(handle);
         }
-
-        public void Dispose()
-        {
-            foreach (var handle in _vertexShaderPool.EnumerateUsedResources())
-            {
-                Logger.Warning<ShaderManager>($"Releasing a unreleased Vertex Shader with handle {handle.Value}");
-                ReleaseInternal(handle);
-            }
-
-            foreach (var handle in _pixelShaderPool.EnumerateUsedResources())
-            {
-                Logger.Warning<ShaderManager>($"Releasing a unreleased Pixel Shader with handle {handle.Value}");
-                ReleaseInternal(handle);
-            }
-            Logger.Trace<ShaderManager>("Terminate resource pools");
-            _vertexShaderPool.Terminate();
-            _pixelShaderPool.Terminate();
-        }
+        Logger.Trace<ShaderManager>("Terminate resource pools");
+        _vertexShaderPool.Terminate();
+        _pixelShaderPool.Terminate();
+        _computeShaderPool.Terminate();
     }
 }

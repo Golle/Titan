@@ -151,6 +151,7 @@ public class Engine
             .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
             .Register(AssetTypes.VertexShader, new VertexShaderLoader())
             .Register(AssetTypes.PixelShader, new PixelShaderLoader())
+            .Register(AssetTypes.ComputeShader, new ComputeShaderLoader())
             .Register(AssetTypes.Material, new MaterialsLoader())
             .Register(AssetTypes.Atlas, new AtlasLoader(services.Get<AtlasManager>()))
             .Register(AssetTypes.Font, new FontLoader(services.Get<FontManager>()))

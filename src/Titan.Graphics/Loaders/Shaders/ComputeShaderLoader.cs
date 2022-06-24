@@ -10,23 +10,23 @@ using Titan.Graphics.D3D11.Shaders;
 
 namespace Titan.Graphics.Loaders.Shaders;
 
-public class PixelShaderLoader : IAssetLoader
+public class ComputeShaderLoader : IAssetLoader
 {
     public int OnLoad(in MemoryChunk<byte>[] buffers, in ReadOnlySpan<Dependency> dependencies)
     {
-        Debug.Assert(buffers.Length == 1, $"{nameof(PixelShaderLoader)} only supports single files");
+        Debug.Assert(buffers.Length == 1, $"{nameof(ComputeShaderLoader)} only supports single files");
 
-        return GraphicsDevice.ShaderManager.CreatePixelShader(new PixelShaderCreation(buffers[0], "main", "ps_5_0"));
+        return GraphicsDevice.ShaderManager.CreateComputeShader(new ComputeShaderCreation(buffers[0], "main", "cs_5_0"));
     }
 
     public void OnRelease(int handle)
     {
-        Logger.Info<PixelShaderLoader>($"OnRelease {handle}");
-        GraphicsDevice.ShaderManager.Release((Handle<PixelShader>)handle);
+        Logger.Info<ComputeShaderLoader>($"OnRelease {handle}");
+        GraphicsDevice.ShaderManager.Release((Handle<ComputeShader>)handle);
     }
 
     public void Dispose()
     {
-        Logger.Info<PixelShaderLoader>("Dispose");
+        Logger.Info<ComputeShaderLoader>("Dispose");
     }
 }

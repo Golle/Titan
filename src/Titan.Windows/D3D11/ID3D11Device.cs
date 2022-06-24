@@ -16,7 +16,7 @@ public unsafe struct ID3D11Device
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint Release() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[2])(Unsafe.AsPointer(ref this));
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateBuffer(D3D11_BUFFER_DESC* pDesc, D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Buffer** ppBuffer) => ((delegate* unmanaged[Stdcall]<void*, D3D11_BUFFER_DESC*, D3D11_SUBRESOURCE_DATA*, ID3D11Buffer**, HRESULT>)_vtbl[3])(Unsafe.AsPointer(ref this), pDesc, pInitialData, ppBuffer);
 
@@ -51,19 +51,19 @@ public unsafe struct ID3D11Device
     // _In_opt_  const D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc,
     // /* [annotation] */
     // _COM_Outptr_opt_  ID3D11UnorderedAccessView** ppUAView);
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateRenderTargetView(ID3D11Resource* pResource, D3D11_RENDER_TARGET_VIEW_DESC* pDesc, ID3D11RenderTargetView** ppRTView) => ((delegate* unmanaged[Stdcall]<void*, ID3D11Resource*, D3D11_RENDER_TARGET_VIEW_DESC*, ID3D11RenderTargetView**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), pResource, pDesc, ppRTView);
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateDepthStencilView(ID3D11Resource* pResource, D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc, ID3D11DepthStencilView** ppDepthStencilView) => ((delegate* unmanaged[Stdcall]<void*, ID3D11Resource*, D3D11_DEPTH_STENCIL_VIEW_DESC*, ID3D11DepthStencilView**, HRESULT>)_vtbl[10])(Unsafe.AsPointer(ref this), pResource, pDesc, ppDepthStencilView);
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateInputLayout(D3D11_INPUT_ELEMENT_DESC* pInputElementDescs, uint numElements, void* pShaderBytecodeWithInputSignature, nuint bytecodeLength, ID3D11InputLayout** ppInputLayout)
         => ((delegate* unmanaged[Stdcall]<void*, D3D11_INPUT_ELEMENT_DESC*, uint, void*, nuint, ID3D11InputLayout**, HRESULT>)_vtbl[11])(Unsafe.AsPointer(ref this), pInputElementDescs, numElements, pShaderBytecodeWithInputSignature, bytecodeLength, ppInputLayout);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT CreateVertexShader(void* pShaderBytecode, nuint bytecodeLength, ID3D11ClassLinkage* pClassLinkage, ID3D11VertexShader** ppVertexShader) 
+    public HRESULT CreateVertexShader(void* pShaderBytecode, nuint bytecodeLength, ID3D11ClassLinkage* pClassLinkage, ID3D11VertexShader** ppVertexShader)
         => ((delegate* unmanaged[Stdcall]<void*, void*, nuint, ID3D11ClassLinkage*, ID3D11VertexShader**, HRESULT>)_vtbl[12])(Unsafe.AsPointer(ref this), pShaderBytecode, bytecodeLength, pClassLinkage, ppVertexShader);
 
     ////HRESULT(STDMETHODCALLTYPE* CreateGeometryShader)(
@@ -123,16 +123,9 @@ public unsafe struct ID3D11Device
     /////* [annotation] */
     ////_COM_Outptr_opt_  ID3D11DomainShader** ppDomainShader);
 
-    ////HRESULT(STDMETHODCALLTYPE* CreateComputeShader)(
-    //// ID3D11Device* This,
-    //// /* [annotation] */
-    //// _In_reads_(BytecodeLength) const void* pShaderBytecode,
-    /////* [annotation] */
-    ////_In_  SIZE_T BytecodeLength,
-    /////* [annotation] */
-    ////_In_opt_  ID3D11ClassLinkage* pClassLinkage,
-    /////* [annotation] */
-    ////_COM_Outptr_opt_  ID3D11ComputeShader** ppComputeShader);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT CreateComputeShader(void* pShaderBytecode, nuint bytecodeLength, ID3D11ClassLinkage* pClassLinkage, ID3D11ComputeShader** ppComputeShader) 
+        => ((delegate* unmanaged[Stdcall]<void*, void*, nuint, ID3D11ClassLinkage*, ID3D11ComputeShader**, HRESULT>)_vtbl[18])(Unsafe.AsPointer(ref this), pShaderBytecode, bytecodeLength, pClassLinkage, ppComputeShader);
 
     ////HRESULT(STDMETHODCALLTYPE* CreateClassLinkage)(
     //// ID3D11Device* This,
@@ -141,13 +134,13 @@ public unsafe struct ID3D11Device
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateBlendState(D3D11_BLEND_DESC* pBlendStateDesc, ID3D11BlendState** ppBlendState) => ((delegate* unmanaged[Stdcall]<void*, D3D11_BLEND_DESC*, ID3D11BlendState**, HRESULT>)_vtbl[20])(Unsafe.AsPointer(ref this), pBlendStateDesc, ppBlendState);
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateDepthStencilState(D3D11_DEPTH_STENCIL_DESC* pDepthStencilDesc, ID3D11DepthStencilState** ppDepthStencilState) => ((delegate* unmanaged[Stdcall]<void*, D3D11_DEPTH_STENCIL_DESC*, ID3D11DepthStencilState**, HRESULT>)_vtbl[21])(Unsafe.AsPointer(ref this), pDepthStencilDesc, ppDepthStencilState);
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateRasterizerState(D3D11_RASTERIZER_DESC* pRasterizerDesc, ID3D11RasterizerState** ppRasterizerState) => ((delegate* unmanaged[Stdcall]<void*, D3D11_RASTERIZER_DESC*, ID3D11RasterizerState**, HRESULT>)_vtbl[22])(Unsafe.AsPointer(ref this), pRasterizerDesc, ppRasterizerState);
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateSamplerState(D3D11_SAMPLER_DESC* pSamplerDesc, ID3D11SamplerState** ppSamplerState) => ((delegate* unmanaged[Stdcall]<void*, D3D11_SAMPLER_DESC*, ID3D11SamplerState**, HRESULT>)_vtbl[23])(Unsafe.AsPointer(ref this), pSamplerDesc, ppSamplerState);
 
@@ -172,7 +165,7 @@ public unsafe struct ID3D11Device
     //// /* [annotation] */
     //// _COM_Outptr_opt_  ID3D11Counter** ppCounter);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT CreateDeferredContext(uint contextFlags, ID3D11DeviceContext ** ppDeferredContext) => ((delegate* unmanaged[Stdcall]<void*, uint, ID3D11DeviceContext**, HRESULT>)_vtbl[27])(Unsafe.AsPointer(ref this), contextFlags, ppDeferredContext);
+    public HRESULT CreateDeferredContext(uint contextFlags, ID3D11DeviceContext** ppDeferredContext) => ((delegate* unmanaged[Stdcall]<void*, uint, ID3D11DeviceContext**, HRESULT>)_vtbl[27])(Unsafe.AsPointer(ref this), contextFlags, ppDeferredContext);
 
     ////HRESULT(STDMETHODCALLTYPE* OpenSharedResource)(
     //// ID3D11Device* This,
