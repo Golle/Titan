@@ -1,12 +1,12 @@
 using System;
 using System.Numerics;
 using Titan;
+using Titan.Components;
 using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Input;
 using Titan.Old;
-using Titan.Old.Components;
 
 namespace Breakout
 {
@@ -16,7 +16,7 @@ namespace Breakout
     {
         private GameWindow _window;
 
-        private MutableStorage<Transform3D> _transform;
+        private MutableStorage<Transform3DComponent> _transform;
         private bool _firstPerson;
         private Vector2 _rotation = Vector2.Zero;
         private EntityFilter _filter;
@@ -41,9 +41,9 @@ namespace Breakout
 
         protected override void Init(IServiceCollection services)
         {
-            _filter = CreateFilter(new EntityFilterConfiguration().With<CameraComponent>().With<Transform3D>());
+            _filter = CreateFilter(new EntityFilterConfiguration().With<CameraComponent>().With<Transform3DComponent>());
             _camera = GetMutable<CameraComponent>();
-            _transform = GetMutable<Transform3D>();
+            _transform = GetMutable<Transform3DComponent>();
 
             _window = services.Get<GameWindow>();
         }

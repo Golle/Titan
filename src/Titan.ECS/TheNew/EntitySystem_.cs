@@ -1,15 +1,23 @@
 using Titan.ECS.Systems;
-using Titan.ECS.Worlds;
 
 namespace Titan.ECS.TheNew;
 
 public abstract class EntitySystem_ : BaseSystem
 {
-    public sealed override void OnUpdate()
+    internal sealed override void Init(World_ world)
     {
-        // Execute system for the active world ?
-        OnUpdate(null);
+        base.Init(world);
+        OnWorldInit(world);
     }
+
+    internal sealed override void Teardown(World_ world)
+    {
+        base.Teardown(world);
+        OnWorldTeardown(world);
+    }
+
+    protected virtual void OnWorldInit(World_ world){}
+    protected virtual void OnWorldTeardown(World_ world){}
 
     protected ReadOnlyStorage<T> GetReadOnly<T>() where T : unmanaged
     {
@@ -22,8 +30,6 @@ public abstract class EntitySystem_ : BaseSystem
         AddMutable<ComponentWrapper<T>>();
         return new();
     }
-
-    public abstract void OnUpdate(World world);
 
     //NOTE(Jens): This is a wrapper to generate a unique ID for component types.
     private struct ComponentWrapper<T> where T : unmanaged { }

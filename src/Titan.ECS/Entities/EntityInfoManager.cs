@@ -12,7 +12,7 @@ internal class EntityInfoManager
     private readonly MemoryChunk<EntityInfo> _entityInfos;
     private readonly uint _worldId;
 
-    public EntityInfoManager(WorldConfiguration config)
+    public EntityInfoManager(WorldConfigurationOld config)
     {
         Logger.Trace<EntityInfoManager>($"Creating entity info for {config.MaxEntities} entities.");
         _entityInfos = MemoryUtils.AllocateBlock<EntityInfo>(config.MaxEntities, true);

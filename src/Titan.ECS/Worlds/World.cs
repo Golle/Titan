@@ -11,7 +11,7 @@ using Titan.ECS.Systems.Dispatcher;
 
 namespace Titan.ECS.Worlds;
 
-public record WorldConfiguration
+public record WorldConfigurationOld
 {
     public string Name { get; init; }
     public uint Id { get; init; }
@@ -63,7 +63,7 @@ public class World : IDisposable
     internal EntityManager Manager { get; }
     internal EntityInfoManager InfoManager { get; }
     internal ComponentRegistry Registry { get; }
-    internal WorldConfiguration Config { get; }
+    internal WorldConfigurationOld Config { get; }
     internal EntityFilterManager FilterManager { get; }
         
 
@@ -72,7 +72,7 @@ public class World : IDisposable
     private static uint ActiveWorldId;
 
     private readonly SystemsManager _systems;
-    private World(WorldConfiguration config, IServiceCollection services)
+    private World(WorldConfigurationOld config, IServiceCollection services)
     {
         Config = config with {Id = WorldIds.Next() };
         Logger.Info<World>($"Creating world {Id}");
@@ -153,9 +153,9 @@ public class World : IDisposable
     }
 
 
-    public static World CreateWorld(WorldBuilder builder, IServiceCollection services, bool setActive) => CreateWorld(builder.Build("THIS IS NOT WORKDING"), services, setActive);
+    public static World CreateWorld(WorldBuilderOld builder, IServiceCollection services, bool setActive) => CreateWorld(builder.Build("THIS IS NOT WORKDING"), services, setActive);
 
-    public static World CreateWorld(WorldConfiguration config, IServiceCollection services, bool setActive)
+    public static World CreateWorld(WorldConfigurationOld config, IServiceCollection services, bool setActive)
     {
         var world = new World(config, services);
 

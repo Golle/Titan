@@ -57,7 +57,7 @@ public sealed class SystemsDispatcher_
                 if (isReady)
                 {
                     status[i] = NodeStatus.Running;
-                    handles[i] = WorkerPool.Enqueue(new JobDescription(node.OnUpdate, autoReset: false), _progress);
+                    handles[i] = WorkerPool.Enqueue(new JobDescription(node.Update, autoReset: false), _progress);
                 }
             }
             ResetHandles();
@@ -87,5 +87,23 @@ public sealed class SystemsDispatcher_
         Waiting,
         Running,
         Completed
+    }
+
+    public void Init(World_ world)
+    {
+        // NOTE(Jens): Should Init and Teardown use the same execution tree as Execute?
+        foreach (var node in _nodes)
+        {
+            node.System.Init(world);
+        }
+    }
+
+    public void Teardown(World_ world)
+    {
+        // NOTE(Jens): Should Init and Teardown use the same execution tree as Execute?
+        foreach (var node in _nodes)
+        {
+            node.System.Teardown(world);
+        }
     }
 }

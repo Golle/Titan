@@ -6,7 +6,7 @@ using Titan.ECS.Worlds;
 
 namespace Titan.ECS;
 
-public class WorldBuilder
+public class WorldBuilderOld
 {
     private uint _maxEntities;
 
@@ -16,45 +16,45 @@ public class WorldBuilder
     private Action<World> _setup = _ => {};
     private Action<World> _teardown = _ => { };
 
-    public WorldBuilder(uint defaultMaxEntities) => _maxEntities = defaultMaxEntities;
+    public WorldBuilderOld(uint defaultMaxEntities) => _maxEntities = defaultMaxEntities;
       
-    public WorldBuilder MaxEntities(uint maxEntities)
+    public WorldBuilderOld MaxEntities(uint maxEntities)
     {
         _maxEntities = maxEntities;
         return this;
     }
 
-    public WorldBuilder WithFixedtimestep(float fixedUpdateTime)
+    public WorldBuilderOld WithFixedtimestep(float fixedUpdateTime)
     {
         _fixedTimestep = fixedUpdateTime;
         return this;
     }
 
-    public WorldBuilder WithComponent<T>(ComponentPoolTypes type = ComponentPoolTypes.Packed, uint count = 0) where T : unmanaged
+    public WorldBuilderOld WithComponent<T>(ComponentPoolTypes type = ComponentPoolTypes.Packed, uint count = 0) where T : unmanaged
     {
         _components.Add(new ComponentConfiguration(typeof(T), type, count == 0 ? _maxEntities : count));
         return this;
     }
         
-    public WorldBuilder WithSystem<T>() where T : EntitySystem, new()
+    public WorldBuilderOld WithSystem<T>() where T : EntitySystem, new()
     {
         _systems.Add(new(typeof(T)));
         return this;
     }
 
-    public WorldBuilder WithSetup(Action<World> setup)
+    public WorldBuilderOld WithSetup(Action<World> setup)
     {
         _setup = setup;
         return this;
     }
 
-    public WorldBuilder WithTeardown(Action<World> teardown)
+    public WorldBuilderOld WithTeardown(Action<World> teardown)
     {
         _teardown = teardown;
         return this;
     }
 
-    public WorldConfiguration Build(string name) => new()
+    public WorldConfigurationOld Build(string name) => new()
     {
         Name = name,
         MaxEntities = _maxEntities,

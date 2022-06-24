@@ -6,12 +6,12 @@ public readonly struct Node
 {
     public readonly BaseSystem System;
     public readonly int[] Dependencies;
-    public readonly Action OnUpdate;
+    public readonly Action Update;
 
     public Node(BaseSystem system, int[] dependencies)
     {
         System = system;
-        OnUpdate = System.OnUpdate;
+        Update = System.Update;
         Dependencies = dependencies;
     }
 }

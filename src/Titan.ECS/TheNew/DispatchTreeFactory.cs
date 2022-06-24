@@ -2,13 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Titan.Core.Logging;
+using Titan.ECS.Worlds;
 
 namespace Titan.ECS.TheNew;
 
-public class DispatchTreeFactory
+public static class DispatchTreeFactory
 {
-    public Node[] Construct(BaseSystem[] systems)
+    public static Node[] Construct(EntitySystemConfiguration[] entitySystems, SystemsConfiguration config)
     {
+        var systems = entitySystems
+            .Select(e => e.Type)
+            .Concat(config.Types)
+            .Select(Activator.CreateInstance)
+            .Cast<BaseSystem>()
+            .ToArray();
+
+    
         var nodes = new Node[systems.Length];
 
         for (var i = 0; i < systems.Length; ++i)
@@ -35,7 +44,7 @@ public class DispatchTreeFactory
                     var circularDependency = nodes[j].Dependencies?.Contains(i) ?? false;
                     if (circularDependency)
                     {
-                        Logger.Warning<DispatchTreeFactory>($"Circular dependency detected between {system.GetType().Name} and {nodes[j].System.GetType().Name}");
+                        Logger.Warning($"Circular dependency detected between {system.GetType().Name} and {nodes[j].System.GetType().Name}", typeof(DispatchTreeFactory));
                     }
                     else
                     {
@@ -48,9 +57,9 @@ public class DispatchTreeFactory
         foreach (var node in nodes)
         {
             var dependencies = string.Join(", ", node.Dependencies.Select(d => nodes[d].System.GetType().Name));
-            Logger.Trace<DispatchTreeFactory>(string.IsNullOrWhiteSpace(dependencies) ?
+            Logger.Trace(string.IsNullOrWhiteSpace(dependencies) ?
                 $"{node.System.GetType().Name} has no dependencies" :
-                $"{node.System.GetType().Name} depends on {dependencies}");
+                $"{node.System.GetType().Name} depends on {dependencies}", typeof(DispatchTreeFactory));
         }
         return nodes;
     }

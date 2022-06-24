@@ -18,7 +18,7 @@ public class EntityManager : IDisposable
 
     private const int MaxEntityDepth = 64;
 
-    public EntityManager(WorldConfiguration config)
+    public EntityManager(WorldConfigurationOld config)
     {
         _worldId = config.Id;
         _entityIds = new IdContainer(config.MaxEntities);

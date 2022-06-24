@@ -10,14 +10,14 @@ namespace Titan.ECS.Components;
 
 internal class ComponentRegistry : IDisposable
 {
-    private readonly WorldConfiguration _config;
+    private readonly WorldConfigurationOld _config;
     private readonly Dictionary<Type, IComponentPool> _pools = new();
 
     private static readonly Type SparseType = typeof(SparseComponentPool<>);
     private static readonly Type PackedType = typeof(PackedComponentPool<>);
     private static readonly Type DynamicPackedType = typeof(DynamicPackedComponentPool<>);
     private readonly uint _worldId;
-    public ComponentRegistry(WorldConfiguration config)
+    public ComponentRegistry(WorldConfigurationOld config)
     {
         _config = config;
         _worldId = config.Id;

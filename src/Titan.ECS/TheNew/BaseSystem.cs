@@ -15,7 +15,28 @@ public abstract unsafe class BaseSystem
 
     private Type[] _dependsOn = Array.Empty<Type>();
     protected bool IsInitialized { get; private set; }
-    public abstract void OnUpdate();
+
+    internal virtual void Init(World_ world)
+    {
+        OnInit();
+        IsInitialized = true;
+    }
+
+    internal virtual void Teardown(World_ world)
+    {
+        OnTeardown();
+        IsInitialized = false;
+    }
+
+    internal void Update()
+    {
+        // add stats etc
+        OnUpdate();
+    }
+
+    protected abstract void OnUpdate();
+    protected virtual void OnTeardown(){}
+    protected virtual void OnInit(){}
 
     protected ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged
     {

@@ -14,7 +14,7 @@ internal class GameTime
     public float FixedTimeStepFrequency { get; }
     public ref readonly GameTimeLoop Current => ref _timeStep;
 
-    public GameTime(WorldConfiguration config)
+    public GameTime(WorldConfigurationOld config)
     {
         if (config.FixedTimeStep is <= 0f or > 10f)
         {

@@ -1,5 +1,5 @@
 using System;
-using Titan.ECS.Worlds;
+using Titan.Core.Logging;
 
 namespace Titan.ECS.TheNew;
 
@@ -11,15 +11,15 @@ public class TestSystem1 : BaseSystem
         GetReadOnlyResource<ushort>();
     }
 
-    public override void OnUpdate()
+    protected override void OnUpdate()
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: Start: {GetType().Name}");
+        Logger.Info($"{DateTime.Now.ToLongTimeString()}: Start: {GetType().Name}");
         ulong a = 0;
         for (var i = 0; i < 100_000_000; ++i)
         {
             a += (ulong)(i % 31);
         }
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: Stop: {GetType().Name}");
+        Logger.Info($"{DateTime.Now.ToLongTimeString()}: Stop: {GetType().Name}");
     }
 }
 
@@ -32,15 +32,15 @@ public class TestSystem2 : EntitySystem_
         GetMutable<ushort>();
     }
 
-    public override void OnUpdate(World world)
+    protected override void OnUpdate()
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: Start: {GetType().Name}");
+        Logger.Info($"{DateTime.Now.ToLongTimeString()}: Start: {GetType().Name}");
         ulong a = 0;
         for (var i = 0; i < 100_000_000; ++i)
         {
             a += (ulong)(i % 31);
         }
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: Stop: {GetType().Name}");
+        Logger.Info($"{DateTime.Now.ToLongTimeString()}: Stop: {GetType().Name}");
     }
 }
 
@@ -51,15 +51,15 @@ public class TestSystem3 : EntitySystem_
         GetReadOnly<ushort>();
     }
 
-    public override void OnUpdate(World world)
+    protected override void OnUpdate()
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: Start: {GetType().Name}");
+        Logger.Info($"{DateTime.Now.ToLongTimeString()}: Start: {GetType().Name}");
         ulong a = 0;
         for (var i = 0; i < 100_000_000; ++i)
         {
             a += (ulong)(i % 31);
         }
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: Stop: {GetType().Name}");
+        Logger.Info($"{DateTime.Now.ToLongTimeString()}: Stop: {GetType().Name}");
     }
 }
 
@@ -70,15 +70,15 @@ public class TestSystem4 : BaseSystem
         DependsOn<TestSystem2>();
     }
 
-    public override void OnUpdate()
+    protected override void OnUpdate()
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: Start: {GetType().Name}");
+        Logger.Info($"{DateTime.Now.ToLongTimeString()}: Start: {GetType().Name}");
         ulong a = 0;
         for (var i = 0; i < 100_000_000; ++i)
         {
             a += (ulong)(i % 31);
         }
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: Stop: {GetType().Name}");
+        Logger.Info($"{DateTime.Now.ToLongTimeString()}: Stop: {GetType().Name}");
     }
 }
 

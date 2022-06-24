@@ -18,7 +18,7 @@ internal class EntityFilterManager : IDisposable
     private readonly uint _maxEntities;
     private readonly uint _worldId;
 
-    public EntityFilterManager(WorldConfiguration configuration, EntityInfoManager entityInfo)
+    public EntityFilterManager(WorldConfigurationOld configuration, EntityInfoManager entityInfo)
     {
         _entityInfo = entityInfo;
         _maxEntities = configuration.MaxEntities;
