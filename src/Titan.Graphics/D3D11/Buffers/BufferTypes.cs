@@ -1,9 +1,9 @@
-namespace Titan.Graphics.D3D11.Buffers
+namespace Titan.Graphics.D3D11.Buffers;
+
+public enum BufferTypes
 {
-    public enum BufferTypes
-    {
-        VertexBuffer,
-        IndexBuffer,
-        ConstantBuffer
-    }
+    VertexBuffer,
+    IndexBuffer,
+    ConstantBuffer,
+    UnorderedAccess
 }
