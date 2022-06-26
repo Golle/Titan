@@ -67,6 +67,42 @@ public unsafe class TextureManager : IDisposable
             bindflags |= D3D11_BIND_FLAG.D3D11_BIND_DEPTH_STENCIL;
         }
 
+        if (args.Binding.HasFlag(TextureBindFlags.UnorderedAccess))
+        {
+            //D3D11_BUFFER_DESC descBuf = { };
+            //pBuffer->GetDesc(&descBuf);
+
+            //D3D11_UNORDERED_ACCESS_VIEW_DESC desc = { };
+            //desc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+            //desc.Buffer.FirstElement = 0;
+
+            //if (descBuf.MiscFlags & D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS)
+            //{
+            //    // This is a Raw Buffer
+
+            //    desc.Format = DXGI_FORMAT_R32_TYPELESS; // Format must be DXGI_FORMAT_R32_TYPELESS, when creating Raw Unordered Access View
+            //    desc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+            //    desc.Buffer.NumElements = descBuf.ByteWidth / 4;
+            //}
+            //else
+            //if (descBuf.MiscFlags & D3D11_RESOURCE_MISC_BUFFER_STRUCTURED)
+            //{
+            //    // This is a Structured Buffer
+
+            //    desc.Format = DXGI_FORMAT_UNKNOWN;      // Format must be must be DXGI_FORMAT_UNKNOWN, when creating a View of a Structured Buffer
+            //    desc.Buffer.NumElements = descBuf.ByteWidth / descBuf.StructureByteStride;
+            //}
+            //else
+            //{
+            //    return E_INVALIDARG;
+            //}
+
+            //return pDevice->CreateUnorderedAccessView(pBuffer, &desc, ppUAVOut);
+            throw new NotSupportedException("Read comments in code");
+
+            bindflags |= D3D11_BIND_FLAG.D3D11_BIND_UNORDERED_ACCESS;
+        }
+
         if (bindflags == 0)
         {
             throw new InvalidOperationException("Can't create a Texture without a binding");
