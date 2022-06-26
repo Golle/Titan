@@ -71,6 +71,54 @@ public class Engine
 
         
 
+    private void Run()
+    {
+        using var services = new ServiceCollection()
+            .Register(new GameWindow())
+            .Register(new FontManager())
+            .Register(new AtlasManager(100))
+            .Register(new TextManager(200))
+            .Register(new SoundManager());
+            
+        var assetsManager = new AssetsManager()
+            .Register(AssetTypes.Texture, new TextureLoader(new WICImageLoader()))
+            .Register(AssetTypes.Model, new ModelLoader(Resources.Models))
+            .Register(AssetTypes.VertexShader, new VertexShaderLoader())
+            .Register(AssetTypes.PixelShader, new PixelShaderLoader())
+            .Register(AssetTypes.ComputeShader, new ComputeShaderLoader())
+            .Register(AssetTypes.Material, new MaterialsLoader())
+            .Register(AssetTypes.Atlas, new AtlasLoader(services.Get<AtlasManager>()))
+            .Register(AssetTypes.Font, new FontLoader(services.Get<FontManager>()))
+            .Register(AssetTypes.Wave, new WaveLoader(services.Get<SoundManager>()))
+            .Init(new AssetManagerConfiguration(new[]
+            {
+                "manifest.json",
+                "builtin/manifest.json",
+                "builtin/debug_manifest.json"
+            }, MaxConcurrentFileReads: 2));
+
+        services
+            .Register(assetsManager)
+            //Rendering (Queues)
+            .Register(new SimpleRenderQueue(1000))
+            .Register(new SpriteRenderQueue(new UIRenderQueueConfiguration(), services.Get<TextManager>(), services.Get<FontManager>()))
+            
+            // NOTE(jens): These should be excluded by some compile flag
+            .Register(new BoundingBoxRenderQueue())
+            .Register(new BoundingBoxRenderer(services.Get<BoundingBoxRenderQueue>()))
+            .Register(new DeferredShadingRenderer())
+            // Note(jens): End note
+            
+            // Renderers
+            .Register(new FullscreenRenderer())
+            .Register(new SpriteRenderer(services.Get<SpriteRenderQueue>()))
+            .Register(new GeometryRenderer(services.Get<SimpleRenderQueue>()))
+            
+            // Sound system
+            .Register(new SoundSystem(services.Get<SoundManager>()))
+            ;
+
+        var renderingPipeline = _app.ConfigureRenderingPipeline();
 
         using var gameloop = GameLoop.InitAndStart(worlds);
         while (window.Update())

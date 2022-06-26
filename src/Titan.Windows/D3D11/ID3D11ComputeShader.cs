@@ -1,9 +1,8 @@
 using System.Runtime.CompilerServices;
 
-// ReSharper disable InconsistentNaming
 namespace Titan.Windows.D3D11;
 
-public unsafe struct ID3D11ShaderResourceView
+public unsafe struct ID3D11ComputeShader
 {
     private void** _vtbl;
 
