@@ -4,13 +4,13 @@ using Titan.Core.Services;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 
-namespace Titan.Systems;
+namespace Titan.Systems.Transforms;
 
 internal class Transform3DSystem : EntitySystem
 {
     private MutableStorage<Transform3D> _transform;
     private EntityFilter _filter;
-        
+
     protected override void Init(IServiceCollection services)
     {
         _transform = GetMutable<Transform3D>();

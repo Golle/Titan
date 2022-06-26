@@ -43,14 +43,9 @@ public unsafe struct ID3D11Device
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateShaderResourceView(ID3D11Resource* pResource, D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc, ID3D11ShaderResourceView** ppSRView) => ((delegate* unmanaged[Stdcall]<void*, ID3D11Resource*, D3D11_SHADER_RESOURCE_VIEW_DESC*, ID3D11ShaderResourceView**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), pResource, pDesc, ppSRView);
 
-    //HRESULT(STDMETHODCALLTYPE* CreateUnorderedAccessView)(
-    // ID3D11Device* This,
-    // /* [annotation] */
-    // _In_ ID3D11Resource * pResource,
-    // /* [annotation] */
-    // _In_opt_  const D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc,
-    // /* [annotation] */
-    // _COM_Outptr_opt_  ID3D11UnorderedAccessView** ppUAView);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT CreateUnorderedAccessView(ID3D11Resource* pResource, D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc, ID3D11UnorderedAccessView** ppUAView) =>
+        ((delegate* unmanaged[Stdcall]<void*, ID3D11Resource*, D3D11_UNORDERED_ACCESS_VIEW_DESC*, ID3D11UnorderedAccessView**, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this), pResource, pDesc, ppUAView);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateRenderTargetView(ID3D11Resource* pResource, D3D11_RENDER_TARGET_VIEW_DESC* pDesc, ID3D11RenderTargetView** ppRTView) => ((delegate* unmanaged[Stdcall]<void*, ID3D11Resource*, D3D11_RENDER_TARGET_VIEW_DESC*, ID3D11RenderTargetView**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), pResource, pDesc, ppRTView);
@@ -124,7 +119,7 @@ public unsafe struct ID3D11Device
     ////_COM_Outptr_opt_  ID3D11DomainShader** ppDomainShader);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT CreateComputeShader(void* pShaderBytecode, nuint bytecodeLength, ID3D11ClassLinkage* pClassLinkage, ID3D11ComputeShader** ppComputeShader) 
+    public HRESULT CreateComputeShader(void* pShaderBytecode, nuint bytecodeLength, ID3D11ClassLinkage* pClassLinkage, ID3D11ComputeShader** ppComputeShader)
         => ((delegate* unmanaged[Stdcall]<void*, void*, nuint, ID3D11ClassLinkage*, ID3D11ComputeShader**, HRESULT>)_vtbl[18])(Unsafe.AsPointer(ref this), pShaderBytecode, bytecodeLength, pClassLinkage, ppComputeShader);
 
     ////HRESULT(STDMETHODCALLTYPE* CreateClassLinkage)(

@@ -15,10 +15,7 @@ using Titan.Sandbox;
 using Titan.UI;
 using Titan.UI.Common;
 
-
-
 Console.WriteLine($"Hello World!");
-
 Engine.Start(new SandboxApplication());
 
 namespace Titan.Sandbox
