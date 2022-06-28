@@ -1,12 +1,27 @@
 using System.Collections.Generic;
 using Titan;
 using Titan.Components;
+using Titan.Core.Logging;
 using Titan.ECS;
 using Titan.ECS.TheNew;
 using Titan.Graphics.Windows;
+using Titan.Modules;
 using Titan.Systems;
 
-Engine.Start(new SandboxGame());
+//Engine.Start(new SandboxGame());
+Logger.Start();
+{
+    using var app = App.Create()
+        .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
+        .WithModule<CoreModule>()
+        .WithModule<WindowModule>();
+
+    ref readonly var desc = ref app.GetResource<WindowDescriptor>();
+}
+
+
+
+Logger.Shutdown();
 
 internal class SandboxGame : Game
 {

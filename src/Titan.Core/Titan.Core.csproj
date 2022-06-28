@@ -9,4 +9,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
     <DefineConstants></DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Events\" />
+  </ItemGroup>
 </Project>
