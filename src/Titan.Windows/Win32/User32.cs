@@ -115,10 +115,11 @@ public unsafe class User32
     );
 
     [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern int SetWindowTextA(
+    public static extern int SetWindowTextW(
         [In] HWND hWnd,
         [In] char* lpString
     );
+
 
     [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

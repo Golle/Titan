@@ -17,6 +17,7 @@ public interface IApp : IDisposable
     IApp AddResource<T>(in T resource) where T : unmanaged;
     ref readonly T GetResource<T>() where T : unmanaged;
     ref T GetMutableResource<T>() where T : unmanaged;
+    unsafe T* GetMutableResourcePointer<T>() where T : unmanaged;
     bool HasResource<T>() where T : unmanaged;
     IApp AddDisposable(IDisposable disposable);
     IApp Run();

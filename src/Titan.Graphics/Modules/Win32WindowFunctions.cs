@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
 using Titan.Windows;
@@ -12,7 +13,7 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
 {
     private const string _className = nameof(Win32WindowFunctions);
 
-    public static bool CreateWindow(ref nint handle, in WindowDescriptor descriptor)
+    public static bool CreateWindow(ref nint handle, in WindowDescriptor descriptor, WindowEventQueue* eventQueue)
     {
         var wndClassExA = new WNDCLASSEXA
         {
@@ -66,7 +67,7 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
             0,
             0,
             wndClassExA.HInstance,
-            null //(void*)GCHandle.ToIntPtr(window._instanceHandle) //TODO: add something that can be used to publish windows events that are not handled
+            eventQueue
         );
         if (handle == 0)
         {
@@ -91,7 +92,7 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
     {
         fixed (char* pTitle = title)
         {
-            return SetWindowTextA(handle, pTitle) == 0;
+            return SetWindowTextW(handle, pTitle) == 0;
         }
     }
 
@@ -122,6 +123,22 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
         return true;
     }
 
+    public static bool GetRelativeCursorPosition(nint handle, out Point position)
+    {
+        Unsafe.SkipInit(out position);
+        
+        POINT point;
+        if (GetCursorPos(&point))
+        {
+            if (ScreenToClient(handle, &point))
+            {
+                position = new Point(point.X, point.Y);
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     [UnmanagedCallersOnly]
     private static nint WndProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
@@ -140,19 +157,39 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
             }
         }
 
-        //var ptr = GetWindowLongPtrA(hWnd, GWLP_USERDATA);
-        //if (ptr == 0)
-        //{
-        //    Logger.Warning($"Message handler not found, {message} dropped.");
-        //    return DefWindowProcA(hWnd, message, wParam, lParam);
-        //}
+        var eventQueue = (WindowEventQueue*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
+        if (eventQueue == null)
+        {
+            Logger.Warning($"Message handler not found, {message} dropped.");
+            return DefWindowProcA(hWnd, message, wParam, lParam);
+        }
 
         switch (message)
         {
             case WM_CLOSE:
                 PostQuitMessage(0); //NOTE(Jens): This should be handled in some other way, so we can do a proper exit from the engine.
                 break;
+
+            case WM_KEYDOWN:
+            case WM_SYSKEYDOWN:
+                eventQueue->Push(new KeyDownEvent());
+                //WindowEventHandler.OnKeyDown(wParam, lParam);
+                break;
+            case WM_KEYUP:
+            case WM_SYSKEYUP:
+                eventQueue->Push(new KeyUpEvent());
+                //WindowEventHandler.OnKeyUp(wParam);
+                break;
         }
         return DefWindowProcA(hWnd, message, wParam, lParam);
     }
+}
+
+public struct KeyDownEvent : IWindowEvent
+{
+    public static uint Id => 14;
+}
+public struct KeyUpEvent : IWindowEvent
+{
+    public static uint Id => 16;
 }

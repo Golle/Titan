@@ -102,7 +102,7 @@ public sealed unsafe class Window : IDisposable
 
         //if (result == 0)
         //{
-            
+
         //    return false;
         //}
 
@@ -149,12 +149,12 @@ public sealed unsafe class Window : IDisposable
             Logger.Warning($"Message handler not found, {message} dropped.");
             return DefWindowProcA(hWnd, message, wParam, lParam);
         }
-        
+
         var window = (Window)GCHandle.FromIntPtr(ptr).Target;
         // NOTE(Jens): Handle relevant messages here
         switch (message)
         {
-            
+
 
             case WM_CLOSE:
                 PostQuitMessage(0); //NOTE(Jens): This should be handled in some other way, so we can do a proper exit from the engine.

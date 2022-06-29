@@ -55,6 +55,16 @@ internal unsafe class UnmanagedResources : IDisposable
         return ref *(T*)_indices[id];
     }
 
+    public T* GetResourcePointer<T>() where T : unmanaged
+    {
+        ref readonly var ptr = ref _indices[ResourceId.Id<T>()];
+        if (ptr == null)
+        {
+            InitResource<T>();
+        }
+        return (T*)ptr;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasResource<T>() => _indices[ResourceId.Id<T>()] != null;
 

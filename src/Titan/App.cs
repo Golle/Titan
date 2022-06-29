@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using System.Threading;
 using Titan.Core;
 using Titan.Core.App;
 using Titan.Core.Events;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.Systems;
-using Titan.ECS.TheNew;
 using Titan.Graphics.Modules;
 using Titan.NewStuff;
-using Titan.Windows.Win32;
 
 namespace Titan;
 
@@ -114,7 +111,6 @@ public class App : IApp
         return this;
     }
 
-
     public IApp AddEvent<T>(uint maxEvents = 10) where T : unmanaged
     {
         var events = new Events<T>(maxEvents, _persistentMemoryAllocator);
@@ -122,6 +118,7 @@ public class App : IApp
 
         return this;
     }
+
     public IApp AddResource<T>(in T resource) where T : unmanaged
     {
         _resources.InitResource(resource);
@@ -134,6 +131,7 @@ public class App : IApp
 
     public ref readonly T GetResource<T>() where T : unmanaged => ref _resources.GetResource<T>();
     public ref T GetMutableResource<T>() where T : unmanaged => ref _resources.GetResource<T>();
+    public unsafe T* GetMutableResourcePointer<T>() where T : unmanaged => _resources.GetResourcePointer<T>();
     public bool HasResource<T>() where T : unmanaged => _resources.HasResource<T>();
     public IApp AddDisposable(IDisposable disposable)
     {
@@ -159,8 +157,6 @@ public class App : IApp
 
     public IApp Run()
     {
-
-        
         // Init systems, create execution grapt
         // call startup systems
         
@@ -170,17 +166,23 @@ public class App : IApp
 
         // call terminate systems 
 
-        ref var window = ref _resources.GetResource<Window>();
-
-
-        Logger.Info("Start window update");
-        while (window.Update())
+        if (HasResource<Window>())
         {
-            
+            ref var window = ref _resources.GetResource<Window>();
+            Logger.Info<App>("Start window update");
+            window.SetTitle("Apskit");
+            while (window.Update())
+            {
+
+                // noop
+            }
         }
-        Logger.Info("Exiting");
+        else
+        {
+            Logger.Info<App>("No window has been created.");
+        }
 
-
+        Logger.Info<App>("Exiting");
 
         return this;
     }
@@ -197,21 +199,3 @@ public class App : IApp
         (_persistentMemoryAllocator as IDisposable)?.Dispose();
     }
 }
-
-
-internal class EventSystem : EntitySystem_
-{
-    public EventSystem()
-    {
-
-    }
-    protected override void OnUpdate()
-    {
-        throw new System.NotImplementedException();
-    }
-}
-
-
-
-
-

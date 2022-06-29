@@ -2,39 +2,23 @@ using System;
 
 namespace Titan.Graphics.Modules;
 
+public record struct Point(int X, int Y);
 public unsafe struct Window
 {
     public nint Handle;
     private readonly WindowFunctions _functions;
-    internal Window(WindowFunctions functions)
+    private readonly WindowEventQueue* _eventQueue;
+    internal Window(WindowFunctions functions, WindowEventQueue* eventQueue)
     {
         _functions = functions;
+        _eventQueue = eventQueue;
     }
 
     public void SetTitle(ReadOnlySpan<char> title) => _functions.SetTitle(Handle, title);
-    public bool CreateWindow(WindowDescriptor descriptor) => _functions.CreateWindow(ref Handle, descriptor);
+    public bool CreateWindow(WindowDescriptor descriptor) => _functions.CreateWindow(ref Handle, descriptor, _eventQueue);
     public bool DestroyWindow() => _functions.DestroyWindow(ref Handle);
     public bool Show() => _functions.Show(Handle);
     public bool Hide() => _functions.Hide(Handle);
     public bool Update() => _functions.Update(Handle);
-}
-
-internal unsafe struct WindowFunctions
-{
-    public delegate*<ref nint, in WindowDescriptor, bool> CreateWindow;
-    public delegate*<ref nint, bool> DestroyWindow;
-    public delegate*<nint, bool> Show;
-    public delegate*<nint, bool> Hide;
-    public delegate*<nint, ReadOnlySpan<char>, bool> SetTitle;
-    public delegate*<nint, bool> Update;
-    public static WindowFunctions Create<T>() where T : IWindowFunctions =>
-        new()
-        {
-            CreateWindow = &T.CreateWindow,
-            SetTitle = &T.SetTitle,
-            DestroyWindow = &T.DestroyWindow,
-            Hide = &T.Hide,
-            Show = &T.Show,
-            Update = &T.Update
-        };
+    public bool GetRelativeCursorPosition(out Point position) => _functions.GetRelativeCursorPosition(Handle, out position);
 }
