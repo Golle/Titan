@@ -25,6 +25,7 @@
     <ProjectReference Include="..\Titan.UI\Titan.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Modules\" />
     <Folder Include="NewStuff\" />
   </ItemGroup>
 </Project>

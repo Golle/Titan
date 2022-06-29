@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Core.Memory;
 
 namespace Titan.Core.Events;
 
@@ -17,10 +18,11 @@ public unsafe struct Events<T> where T : unmanaged
     private readonly int* _count;
     private readonly int _maxEvents;
 
-    public Events(uint count)
+    public Events(uint count, IMemoryAllocator allocator)
     {
         // NOTE(Jens): this should be allocated on a common events pool
-        _mem = (byte*)NativeMemory.Alloc((nuint)(sizeof(int) * 2 + count * 2 * sizeof(T)));
+        var size = (sizeof(int) * 2 + count * 2 * sizeof(T));
+        _mem = allocator.GetBlock((uint)size).AsPointer();
 
         _eventsLastFrame = (int*)_mem;
         _count = _eventsLastFrame + 1;

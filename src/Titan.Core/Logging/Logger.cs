@@ -11,7 +11,6 @@ namespace Titan.Core.Logging
         public static void Start() => BackgroundLogger.Start();
         public static void Shutdown() => BackgroundLogger.Shutdown();
 
-
         [Conditional("DEBUG")]
         public static void Debug(string message) => Log(LogLevel.Debug, message);
 

@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using Titan.Core;
+using Titan.Core.App;
 using Titan.Core.Events;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.Systems;
 using Titan.ECS.TheNew;
+using Titan.Graphics.Modules;
 using Titan.NewStuff;
-using Titan.Windows.D3D11;
+using Titan.Windows.Win32;
 
 namespace Titan;
 
@@ -30,7 +31,6 @@ public class EventSystem<T> : ResourceSystem where T : unmanaged
 
 public class TheWorld
 {
-    private ManagedResources _managedResources;
     private UnmanagedResources _unmanagedResources;
 
     public TheWorld()
@@ -45,7 +45,6 @@ public abstract class EntitySystem : ResourceSystem
 {
 
 }
-
 public abstract class ResourceSystem : ISystem
 {
     protected ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged
@@ -64,34 +63,66 @@ public abstract class ResourceSystem : ISystem
     public abstract void OnUpdate();
 }
 
-public class App : IDisposable
+
+public class SystemsDescriptorCollection
+{
+    private readonly List<SystemDescriptor> _descriptors = new();
+    public void Add(in SystemDescriptor descriptor)
+    {
+        if (descriptor.Creator == null)
+        {
+            throw new InvalidOperationException("The System property on the descriptor has not been set.");
+        }
+
+        var type = descriptor.GetType();
+        if (_descriptors.Any(d => d.Creator.GetType() == type))
+        {
+            // NOTE(Jens): maybe allow the same system but in different stages?
+            throw new InvalidOperationException($"A system of type {type} has already been added.");
+        }
+        _descriptors.Add(descriptor);
+    }
+    public IEnumerable<SystemDescriptor> Enumerate(Stage stage) => _descriptors.Where(d => d.Stage == stage);
+}
+
+public class App : IApp
 {
     private readonly UnmanagedResources _resources;
-    private readonly ManagedResources _managedResources;
-
     private readonly IPersistentMemoryAllocator _persistentMemoryAllocator;
-
     private readonly List<IDisposable> _disposables = new();
+    private readonly SystemsDescriptorCollection _systems = new();
+
     public static App Create()
     {
-        return new();
+        var persistentMemoryAllocator = new NativeMemoryAllocator(1 * 1024 * 1024 * 1024); // allocate 1GB, this should be configurable, and maybe auto adjust when needed.
+
+        return new(persistentMemoryAllocator);
     }
 
-    private App()
+    private App(IPersistentMemoryAllocator persistentMemoryAllocator)
     {
         const int maxResourceTypes = 300;
-        _persistentMemoryAllocator = new NativeMemoryAllocator(1 * 1024 * 1024 * 1024); // allocate 1GB, this should be configurable, and maybe auto adjust when needed.
-        _resources = new UnmanagedResources(32 * 1024 * 1024, maxResourceTypes, _persistentMemoryAllocator);
-        _managedResources = new ManagedResources(maxResourceTypes);
+        _persistentMemoryAllocator = persistentMemoryAllocator;
+        _resources = new UnmanagedResources(32 * 1024 * 1024, maxResourceTypes, persistentMemoryAllocator);
     }
 
+    public IApp AddSystem<T>() where T : ISystem, new() => AddSystemToStage<T>(Stage.Update);
 
-    public App AddEvent<T>(uint maxEvents = 10) where T : unmanaged
+    public IApp AddSystemToStage<T>(Stage stage) where T : ISystem, new()
     {
-        var events = new Events<T>(maxEvents);
+        _systems.Add(new SystemDescriptor(() => new T(), stage));
         return this;
     }
-    public App AddResource<T>(in T resource) where T : unmanaged
+
+
+    public IApp AddEvent<T>(uint maxEvents = 10) where T : unmanaged
+    {
+        var events = new Events<T>(maxEvents, _persistentMemoryAllocator);
+        AddResource(events);
+
+        return this;
+    }
+    public IApp AddResource<T>(in T resource) where T : unmanaged
     {
         _resources.InitResource(resource);
         if (resource is IDisposable disposable)
@@ -101,42 +132,67 @@ public class App : IDisposable
         return this;
     }
 
-    public App AddResource<T>(T resource = null) where T : class, new()
-    {
-        _managedResources.InitResource(resource);
-        return this;
-    }
     public ref readonly T GetResource<T>() where T : unmanaged => ref _resources.GetResource<T>();
+    public ref T GetMutableResource<T>() where T : unmanaged => ref _resources.GetResource<T>();
     public bool HasResource<T>() where T : unmanaged => _resources.HasResource<T>();
-    public bool HasManagedResource<T>() where T : class, new() => _managedResources.HasResource<T>();
-    /// <summary>
-    /// Managed resource can be modified from any thread and are not thread safe (which means that systems will not look at readonly/mutable for managed types)
-    /// </summary>
-    /// <typeparam name="T">The managed resource type</typeparam>
-    /// <returns>The instance</returns>
-    public T GetManagedResource<T>() where T : class, new() => _managedResources.GetResource<T>();
-
-    public App WithModule<T>() where T : IModule
+    public IApp AddDisposable(IDisposable disposable)
     {
-        // NOTE():this enforces the order of resources
-        T.Build(this);
+        _disposables.Add(disposable);
+        return this;
+    }
+
+    public IApp AddModule<T>() where T : IModule
+    {
+        try
+        {
+            T.Build(this);
+        }
+        catch (Exception e)
+        {
+            // NOTE(Jens): should we have a results type or just exit?
+            Logger.Error<App>($"Build Module {typeof(T).Name} failed with {e.GetType().Name}: {e.Message}");
+        }
+
         return this;
     }
 
 
-    public App Run()
+    public IApp Run()
     {
+
+        
+        // Init systems, create execution grapt
+        // call startup systems
+        
+        // start main loop (on a different thread)
+
+        // start polling platform events
+
+        // call terminate systems 
+
+        ref var window = ref _resources.GetResource<Window>();
+
+
+        Logger.Info("Start window update");
+        while (window.Update())
+        {
+            
+        }
+        Logger.Info("Exiting");
+
+
 
         return this;
     }
 
     public void Dispose()
     {
-        foreach (var disposable in _disposables)
+        // Dispose in reverse order
+        for (var i = _disposables.Count - 1; i >= 0; --i)
         {
-            disposable.Dispose();
+            _disposables[i].Dispose();
         }
-
+        
         _resources.Dispose();
         (_persistentMemoryAllocator as IDisposable)?.Dispose();
     }
@@ -155,70 +211,7 @@ internal class EventSystem : EntitySystem_
     }
 }
 
-public struct WindowDescriptor : IDefault<WindowDescriptor>
-{
-    private const int DefaultHeight = 768;
-    private const int DefaultWidth = 1024;
-    private const int MaxTitleLength = 128;
 
-    public uint Width;
-    public uint Height;
-    public bool Resizable;
-    private unsafe fixed char _title[MaxTitleLength];
-    private int _titleLength;
-    public unsafe ReadOnlySpan<char> Title
-    {
-        readonly get
-        {
-            fixed (char* pTitle = _title)
-            {
-                return new(pTitle, _titleLength);
-            }
-        }
-        set
-        {
-            _titleLength = Math.Min(MaxTitleLength, value.Length);
-            fixed (char* pSource = value)
-            fixed (char* pDestination = _title)
-            {
-                Unsafe.CopyBlock(pDestination, pSource, (uint)_titleLength * sizeof(char));
-            }
-        }
-    }
 
-    public static WindowDescriptor Default() => new()
-    {
-        Height = DefaultHeight,
-        Width = DefaultWidth,
-        Resizable = true,
-        Title = "n/a"
-    };
-}
 
-public interface IDefault<out T>
-{
-    static abstract T Default();
-}
 
-public struct WindowModule : IModule
-{
-    public static void Build(App app)
-    {
-        app.AddEvent<CreateWindow>();
-
-        if (!app.HasResource<WindowDescriptor>())
-        {
-            app.AddResource(WindowDescriptor.Default());
-        }
-        var descriptor = app.GetResource<WindowDescriptor>();
-        Logger.Info<WindowModule>($"Window descriptor: {descriptor.Title} - Size: {descriptor.Width}x{descriptor.Height}. Can resize: {descriptor.Resizable}");
-    }
-}
-
-public struct CreateWindow
-{
-}
-public interface IModule
-{
-    static abstract void Build(App app);
-}

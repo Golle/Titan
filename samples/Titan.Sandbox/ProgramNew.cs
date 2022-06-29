@@ -1,27 +1,22 @@
 using System.Collections.Generic;
 using Titan;
 using Titan.Components;
-using Titan.Core.Logging;
+using Titan.Core.Modules;
 using Titan.ECS;
-using Titan.ECS.TheNew;
+using Titan.Graphics;
+using Titan.Graphics.Modules;
 using Titan.Graphics.Windows;
-using Titan.Modules;
 using Titan.Systems;
 
-//Engine.Start(new SandboxGame());
-Logger.Start();
-{
-    using var app = App.Create()
-        .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
-        .WithModule<CoreModule>()
-        .WithModule<WindowModule>();
 
-    ref readonly var desc = ref app.GetResource<WindowDescriptor>();
-}
-
-
-
-Logger.Shutdown();
+using var app = App
+    .Create()
+    .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
+    .AddModule<CoreModule>()
+    .AddModule<WindowModule>()
+    .AddModule<RenderModule>()
+    .Run()
+    ;
 
 internal class SandboxGame : Game
 {
@@ -43,7 +38,6 @@ internal class SandboxGame : Game
 
     public override SystemsConfiguration ConfigureSystems(SystemsBuilder builder) =>
         builder
-            .WithSystem<SandboxTestSystem>()
             .Build();
 
     public override IEnumerable<WorldConfiguration> ConfigureWorlds()
@@ -53,15 +47,5 @@ internal class SandboxGame : Game
             .WithSystem<Transform3DSystem>()
             .Build("Game");
 
-    }
-}
-
-
-
-internal class SandboxTestSystem : BaseSystem
-{
-    protected override void OnUpdate()
-    {
-        // noop
     }
 }
