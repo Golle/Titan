@@ -20,5 +20,5 @@ public unsafe struct Window
     public bool Show() => _functions.Show(Handle);
     public bool Hide() => _functions.Hide(Handle);
     public bool Update() => _functions.Update(Handle);
-    public bool GetRelativeCursorPosition(out Point position) => _functions.GetRelativeCursorPosition(Handle, out position);
+    public readonly bool GetRelativeCursorPosition(out Point position) => _functions.GetRelativeCursorPosition(Handle, out position);
 }

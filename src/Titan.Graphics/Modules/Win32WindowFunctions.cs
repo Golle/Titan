@@ -172,12 +172,12 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
 
             case WM_KEYDOWN:
             case WM_SYSKEYDOWN:
-                eventQueue->Push(new KeyDownEvent());
+                eventQueue->Push(new KeyPressed());
                 //WindowEventHandler.OnKeyDown(wParam, lParam);
                 break;
             case WM_KEYUP:
             case WM_SYSKEYUP:
-                eventQueue->Push(new KeyUpEvent());
+                eventQueue->Push(new KeyReleased());
                 //WindowEventHandler.OnKeyUp(wParam);
                 break;
         }
@@ -185,11 +185,22 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
     }
 }
 
-public struct KeyDownEvent : IWindowEvent
+public struct KeyPressed : IWindowEvent
 {
     public static uint Id => 14;
 }
-public struct KeyUpEvent : IWindowEvent
+public struct KeyReleased : IWindowEvent
 {
     public static uint Id => 16;
+}
+
+
+public struct WindowLostFocus : IWindowEvent
+{
+    public static uint Id => 11;
+}
+
+public struct WindowGainedFocus : IWindowEvent
+{
+    public static uint Id => 12;
 }

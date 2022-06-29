@@ -1,6 +1,7 @@
 using System;
+using Titan.Core.App;
 
-namespace Titan.Core.App;
+namespace Titan.ECS.SystemsV2;
 
 public readonly struct SystemDescriptor
 {

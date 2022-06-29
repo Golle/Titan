@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Titan.Core;
 using Titan.Core.App;
 using Titan.Core.Events;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.Systems;
+using Titan.ECS.SystemsV2;
 using Titan.Graphics.Modules;
 using Titan.NewStuff;
 
@@ -17,11 +17,11 @@ namespace Titan;
 public class EventSystem<T> : ResourceSystem where T : unmanaged
 {
     private readonly MutableResource<Events<T>> _events;
-
     public EventSystem()
     {
         _events = GetMutableResource<Events<T>>();
     }
+
     public override void OnUpdate() => _events.Get().Swap();
 }
 
@@ -38,27 +38,7 @@ public class TheWorld
 
 }
 
-public abstract class EntitySystem : ResourceSystem
-{
 
-}
-public abstract class ResourceSystem : ISystem
-{
-    protected ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged
-    {
-        return new ReadOnlyResource<T>();
-    }
-    protected MutableResource<T> GetMutableResource<T>() where T : unmanaged
-    {
-        return new MutableResource<T>();
-    }
-
-    protected T GetManagedResource<T>() where T : class, new()
-    {
-        return new T();
-    }
-    public abstract void OnUpdate();
-}
 
 
 public class SystemsDescriptorCollection
@@ -111,13 +91,9 @@ public class App : IApp
         return this;
     }
 
-    public IApp AddEvent<T>(uint maxEvents = 10) where T : unmanaged
-    {
-        var events = new Events<T>(maxEvents, _persistentMemoryAllocator);
-        AddResource(events);
-
-        return this;
-    }
+    public IApp AddEvent<T>(uint maxEvents = 10) where T : unmanaged =>
+        AddResource(new Events<T>(maxEvents, _persistentMemoryAllocator))
+            .AddSystemToStage<EventSystem<T>>(Stage.PreUpdate);
 
     public IApp AddResource<T>(in T resource) where T : unmanaged
     {
@@ -159,7 +135,7 @@ public class App : IApp
     {
         // Init systems, create execution grapt
         // call startup systems
-        
+
         // start main loop (on a different thread)
 
         // start polling platform events
@@ -194,7 +170,7 @@ public class App : IApp
         {
             _disposables[i].Dispose();
         }
-        
+
         _resources.Dispose();
         (_persistentMemoryAllocator as IDisposable)?.Dispose();
     }

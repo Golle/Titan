@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
     <ProjectReference Include="..\Titan.Graphics\Titan.Graphics.csproj" />
   </ItemGroup>
 

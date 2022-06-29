@@ -13,9 +13,21 @@ public enum Stage
     Startup,
 
     /// <summary>
-    /// Default stage for all systems
+    /// Systems that should be executed before the start of the "frame".
+    /// Only use if you know what you're doing, this wont create an execution tree based on dependencies, it will run everything in parallel
+    /// </summary>
+    PreUpdate,
+
+    /// <summary>
+    /// Default stage for all systems.
     /// </summary>
     Update,
+
+    /// <summary>
+    /// Systems that should be executed at the end of the "frame".
+    /// Only use if you know what you're doing, this wont create an execution tree based on dependencies, it will run everything in parallel
+    /// </summary>
+    PostUpdate,
 
     /// <summary>
     /// When the game exits
