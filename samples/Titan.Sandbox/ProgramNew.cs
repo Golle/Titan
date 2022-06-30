@@ -11,6 +11,7 @@ using Titan.Systems;
 
 using var app = App
     .Create()
+    .AddComponent<Transform3DComponent>(100)
     .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
     .AddModule<CoreModule>()
     .AddModule<WindowModule>()

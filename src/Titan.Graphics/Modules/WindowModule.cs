@@ -51,7 +51,7 @@ public struct WindowModule : IModule
         }
 
         // NOTE(Jens): Add the Window translation system at the end of the frame so all Window events are available in the next frame to reduce the "lag" between an event and when it actually gets processed by the game loop.
-        app
-            .AddSystemToStage<WindowMessageSystem>(Stage.PostUpdate);
+        //app
+        //    .AddSystemToStage<WindowMessageSystem>(Stage.PostUpdate);
     }
 }

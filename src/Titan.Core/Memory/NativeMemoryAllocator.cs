@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Titan.Core.Logging;
 
 namespace Titan.Core.Memory;
 
@@ -17,7 +18,7 @@ public readonly unsafe struct MemoryBlock<T> where T : unmanaged
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlySpan<T> AsSpan() => new(_ptr, (int)_count);
+    public Span<T> AsSpan() => new(_ptr, (int)_count);
 }
 
 public readonly unsafe struct MemoryBlock
@@ -32,8 +33,9 @@ public readonly unsafe struct MemoryBlock
         _size = size;
     }
 
-    public ReadOnlySpan<byte> AsSpan() => new(_ptr, (int)_size);
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Span<byte> AsSpan() => new(_ptr, (int)_size);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte* AsPointer() => (byte*)_ptr;
 }
 
@@ -78,6 +80,11 @@ public unsafe class NativeMemoryAllocator : IMemoryAllocator, IPersistentMemoryA
     }
 
     public MemoryBlock GetBlock(uint size, bool zeroMemory = false) => new(GetOffset(size, zeroMemory), size);
+    public void PrintStats()
+    {
+        Logger.Info<NativeMemoryAllocator>($"{_next}/{_size} bytes allocated.");
+    }
+
     public MemoryBlock<T> GetBlock<T>(uint count, bool zeroMemory = false) where T : unmanaged => new((T*)GetOffset((uint)(sizeof(T) * count), zeroMemory), count);
 
     public void Reset() => _next = 0;

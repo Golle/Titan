@@ -67,9 +67,9 @@ internal unsafe class UnmanagedResources : IDisposable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasResource<T>() => _indices[ResourceId.Id<T>()] != null;
-
     public void Dispose()
     {
+        
         // TODO: handle memory cleanup? it should be persistent, means that it will live for the applications lifecycle.
     }
 }

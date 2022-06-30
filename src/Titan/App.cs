@@ -6,13 +6,14 @@ using Titan.Core.App;
 using Titan.Core.Events;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
+using Titan.ECS.Components;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
+using Titan.ECS.SystemsV2.Components;
 using Titan.Graphics.Modules;
 using Titan.NewStuff;
 
 namespace Titan;
-
 
 public class EventSystem<T> : ResourceSystem where T : unmanaged
 {
@@ -24,21 +25,6 @@ public class EventSystem<T> : ResourceSystem where T : unmanaged
 
     public override void OnUpdate() => _events.Get().Swap();
 }
-
-
-public class TheWorld
-{
-    private UnmanagedResources _unmanagedResources;
-
-    public TheWorld()
-    {
-
-    }
-    //private Dictionary<>
-
-}
-
-
 
 
 public class SystemsDescriptorCollection
@@ -84,7 +70,6 @@ public class App : IApp
     }
 
     public IApp AddSystem<T>() where T : ISystem, new() => AddSystemToStage<T>(Stage.Update);
-
     public IApp AddSystemToStage<T>(Stage stage) where T : ISystem, new()
     {
         _systems.Add(new SystemDescriptor(() => new T(), stage));
@@ -94,6 +79,18 @@ public class App : IApp
     public IApp AddEvent<T>(uint maxEvents = 10) where T : unmanaged =>
         AddResource(new Events<T>(maxEvents, _persistentMemoryAllocator))
             .AddSystemToStage<EventSystem<T>>(Stage.PreUpdate);
+
+    public IApp AddComponent<T>(uint maxComponents = 100, ComponentPoolTypes type = ComponentPoolTypes.Packed) where T : unmanaged
+    {
+        // Register a factory for this as a "module" ?
+        var components = type switch
+        {
+            ComponentPoolTypes.Packed => PackedComponentPool<T>.CreatePool(_persistentMemoryAllocator, 10_000, maxComponents),
+            _ => throw new NotSupportedException()
+        };
+        _resources.InitResource(components);
+        return this;
+    }
 
     public IApp AddResource<T>(in T resource) where T : unmanaged
     {
@@ -133,6 +130,9 @@ public class App : IApp
 
     public IApp Run()
     {
+        var preUpdate = _systems.Enumerate(Stage.PreUpdate).Select(s => s.Creator()).ToArray();
+        var update = _systems.Enumerate(Stage.Update).Select(s => s.Creator()).ToArray();
+        var postUpdate = _systems.Enumerate(Stage.PostUpdate).Select(s => s.Creator()).ToArray();
         // Init systems, create execution grapt
         // call startup systems
 
@@ -142,11 +142,37 @@ public class App : IApp
 
         // call terminate systems 
 
+        var active = true;
+
+        //var t = new Thread(() =>
+        //{
+        //    while (active)
+        //    {
+        //        foreach (var system in preUpdate)
+        //        {
+        //            system.OnUpdate();
+        //        }
+
+        //        foreach (var system in update)
+        //        {
+        //            system.OnUpdate();
+        //        }
+
+        //        foreach (var system in postUpdate)
+        //        {
+        //            system.OnUpdate();
+        //        }
+
+        //        Thread.Sleep(100);
+        //    }
+        //});
+
+        //t.Start();
+
         if (HasResource<Window>())
         {
             ref var window = ref _resources.GetResource<Window>();
             Logger.Info<App>("Start window update");
-            window.SetTitle("Apskit");
             while (window.Update())
             {
 
@@ -158,8 +184,10 @@ public class App : IApp
             Logger.Info<App>("No window has been created.");
         }
 
-        Logger.Info<App>("Exiting");
 
+        Logger.Info<App>("Exiting");
+        active = false;
+        //t.Join();
         return this;
     }
 
