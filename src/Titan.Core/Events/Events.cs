@@ -18,6 +18,7 @@ public unsafe struct Events<T> where T : unmanaged
     private readonly int* _count;
     private readonly int _maxEvents;
 
+    public int Count => *_count;
     public Events(uint count, IMemoryAllocator allocator)
     {
         // NOTE(Jens): this should be allocated on a common events pool

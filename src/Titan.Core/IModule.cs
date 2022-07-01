@@ -15,6 +15,7 @@ public interface IApp : IDisposable
     IApp AddSystem<T>() where T : ISystem, new();
     IApp AddSystemToStage<T>(Stage stage) where T : ISystem, new();
     IApp AddResource<T>(in T resource) where T : unmanaged;
+    IApp AddComponent<T>(uint maxComponents = 100) where T : unmanaged;
     ref readonly T GetResource<T>() where T : unmanaged;
     ref T GetMutableResource<T>() where T : unmanaged;
     unsafe T* GetMutableResourcePointer<T>() where T : unmanaged;

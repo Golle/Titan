@@ -59,7 +59,7 @@ public class App : IApp
     {
         var persistentMemoryAllocator = new NativeMemoryAllocator(1 * 1024 * 1024 * 1024); // allocate 1GB, this should be configurable, and maybe auto adjust when needed.
 
-        return new(persistentMemoryAllocator);
+        return new App(persistentMemoryAllocator);
     }
 
     private App(IPersistentMemoryAllocator persistentMemoryAllocator)
@@ -80,15 +80,19 @@ public class App : IApp
         AddResource(new Events<T>(maxEvents, _persistentMemoryAllocator))
             .AddSystemToStage<EventSystem<T>>(Stage.PreUpdate);
 
-    public IApp AddComponent<T>(uint maxComponents = 100, ComponentPoolTypes type = ComponentPoolTypes.Packed) where T : unmanaged
+    public IApp AddComponent<T>(uint maxComponents = 100/*, ComponentPoolTypes type = ComponentPoolTypes.Packed*/) where T : unmanaged
     {
+        //NOTE(Jens): Components and Systems belong in the "World". Should we support multiple worlds in the same "App" or a single World per app?
         // Register a factory for this as a "module" ?
+        var type = ComponentPoolTypes.Packed;
         var components = type switch
         {
             ComponentPoolTypes.Packed => PackedComponentPool<T>.CreatePool(_persistentMemoryAllocator, 10_000, maxComponents),
             _ => throw new NotSupportedException()
         };
         _resources.InitResource(components);
+        // NOTE(Jens): implement this when we support it
+        //AddSystemToStage<ComponentSystem<T>>(Stage.PreUpdate);
         return this;
     }
 

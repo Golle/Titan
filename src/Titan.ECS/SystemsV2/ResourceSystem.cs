@@ -54,18 +54,19 @@ public readonly unsafe struct MutableStorage2<T> where T : unmanaged
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Destroy(in Entity entity) => _writer->Send(new ComponentDestroyed(ComponentId, entity));
+
+
+    /// <summary>
+    /// This method should only be called by internal systems since it will bypass any other delete mechanic.
+    /// </summary>
+    /// <param name="entity"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void DestroyImmediately(in Entity entity) => _pool->Destroy(entity);
 }
 
-public readonly struct ComponentDestroyed
-{
-    public readonly ComponentId Id;
-    public readonly Entity Entity;
-    public ComponentDestroyed(ComponentId id, in Entity entity)
-    {
-        Id = id;
-        Entity = entity;
-    }
-}
+
+public readonly record struct EntityDestroyed(Entity Entity);
+public readonly record struct ComponentDestroyed(ComponentId Id, Entity Entity);
 
 
 
@@ -83,6 +84,9 @@ public interface ISystemsInitializer
 
     MutableStorage2<T> GetMutableStorage<T>() where T : unmanaged;
     MutableStorage2<T> GetReadOnlyStorage<T>() where T : unmanaged;
+
+    EventsReader<T> GetEventsReader<T>() where T : unmanaged;
+    EventsWriter<T> GetEventsWriter<T>() where T : unmanaged;
 
     EntityFilter CreateEntityFilter(EntityFilterConfiguration config);
     MemoryBlock<T> AllocateMemory<T>(int size) where T : unmanaged;

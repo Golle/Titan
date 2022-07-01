@@ -40,6 +40,8 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
             CreateFunc = &Create,
             CreateOrReplaceFunc = &CreateOrReplace,
             GetFunc = &Get,
+            DestroyFunc = &Destroy,
+            ContainsFunc = &Contains,
             Data = data
         };
     }
@@ -62,6 +64,6 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
     public static bool Contains(void* data, in Entity entity) =>
         ((PackedComponentPool<T>*)data)->_indices[entity.Id] != 0;
 
-    public static void Destroy(void* data, in Entity entity) => 
+    public static void Destroy(void* data, in Entity entity) =>
         ((PackedComponentPool<T>*)data)->_indices[entity.Id] = 0;
 }
