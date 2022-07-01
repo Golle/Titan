@@ -59,9 +59,9 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
     }
 
     public static ref T CreateOrReplace(void* data, in Entity entity, in T value) => ref Create(data, entity, value);
-    public static void Destroy(void* data, in Entity entity)
-    {
-        var pool = (PackedComponentPool<T>*)data;
-        pool->_indices[entity.Id] = 0;
-    }
+    public static bool Contains(void* data, in Entity entity) =>
+        ((PackedComponentPool<T>*)data)->_indices[entity.Id] != 0;
+
+    public static void Destroy(void* data, in Entity entity) => 
+        ((PackedComponentPool<T>*)data)->_indices[entity.Id] = 0;
 }

@@ -13,6 +13,7 @@ public unsafe struct Components<T> where T : unmanaged
     internal delegate*<void*, in Entity, ref T> GetFunc;
     internal delegate*<void*, in Entity, in T, ref T> CreateFunc;
     internal delegate*<void*, in Entity, in T, ref T> CreateOrReplaceFunc;
+    internal delegate*<void*, in Entity, bool> ContainsFunc;
     internal void* Data;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -21,4 +22,6 @@ public unsafe struct Components<T> where T : unmanaged
     public ref T Create(in Entity entity, in T value = default) => ref CreateFunc(Data, entity, value);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref T CreateOrReplace(in Entity entity, in T value = default) => ref CreateOrReplaceFunc(Data, entity, value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Contains(in Entity entity) => ContainsFunc(Data, entity);
 }

@@ -26,6 +26,11 @@ public unsafe struct SparseComponentPool<T> : IComponentPool<T> where T : unmana
         throw new NotImplementedException();
     }
 
+    public static bool Contains(void* data, in Entity entity)
+    {
+        throw new NotImplementedException();
+    }
+
     public static void Destroy(void* data, in Entity entity)
     {
         throw new NotImplementedException();
