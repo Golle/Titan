@@ -2,6 +2,7 @@ using System;
 using Titan.Core.Logging;
 using Titan.Core;
 using Titan.Core.App;
+using Titan.ECS.SystemsV2;
 using Titan.Graphics.Windows.Events;
 
 namespace Titan.Graphics.Modules;

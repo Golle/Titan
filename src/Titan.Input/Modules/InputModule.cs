@@ -1,8 +1,5 @@
 using System;
 using System.Runtime.CompilerServices;
-using Titan.Core;
-using Titan.Core.App;
-using Titan.Core.Events;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 using Titan.Graphics.Modules;
@@ -17,12 +14,11 @@ public readonly struct InputModule : IModule
         {
             throw new InvalidOperationException($"{nameof(InputModule)} requires the {nameof(Window)} resource to be added.");
         }
+        throw new NotImplementedException("These systems must be reworked");
 
         app
             .AddModule<KeyboardInputModule>()
             .AddModule<MouseInputModule>()
-
-
             ;
     }
 }
@@ -36,14 +32,14 @@ public readonly struct MouseInputModule : IModule
             throw new InvalidOperationException($"{nameof(InputModule)} requires the {nameof(Window)} resource to be added.");
         }
 
-        app.AddSystem<MouseInputSystem>();
+        throw new NotImplementedException("These systems must be reworked");
+        //app.AddSystem<MouseInputSystem>();
     }
 }
 public readonly struct KeyboardInputModule : IModule
 {
     public static void Build(IApp app)
     {
-        throw new NotImplementedException();
     }
 }
 

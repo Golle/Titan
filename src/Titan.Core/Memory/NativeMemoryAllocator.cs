@@ -51,10 +51,11 @@ public interface IPersistentMemoryAllocator : IMemoryAllocator
 {
 }
 
-
-public interface IMemoryAllocator
+public unsafe interface IMemoryAllocator
 {
     MemoryBlock GetBlock(uint size, bool zeroMemory = false);
+    T* GetPointer<T>(bool initialize) where T : unmanaged;
+    void* GetPointer(uint size, bool zeroMemory);
 }
 
 public unsafe class NativeMemoryAllocator : IMemoryAllocator, IPersistentMemoryAllocator, ITransientMemoryAllocator, IDisposable
@@ -74,16 +75,13 @@ public unsafe class NativeMemoryAllocator : IMemoryAllocator, IPersistentMemoryA
     }
 
     public ref T Get<T>(bool initialize) where T : unmanaged
-    {
-        var offset = (T*)GetOffset((uint)sizeof(T), initialize);
-        return ref *offset;
-    }
+        => ref *GetPointer<T>(initialize);
+    public T* GetPointer<T>(bool initialize) where T : unmanaged
+        => (T*)GetOffset((uint)sizeof(T), initialize);
+    public void* GetPointer(uint size, bool zeroMemory = false)
+        => GetOffset(size, zeroMemory);
 
     public MemoryBlock GetBlock(uint size, bool zeroMemory = false) => new(GetOffset(size, zeroMemory), size);
-    public void PrintStats()
-    {
-        Logger.Info<NativeMemoryAllocator>($"{_next}/{_size} bytes allocated.");
-    }
 
     public MemoryBlock<T> GetBlock<T>(uint count, bool zeroMemory = false) where T : unmanaged => new((T*)GetOffset((uint)(sizeof(T) * count), zeroMemory), count);
 

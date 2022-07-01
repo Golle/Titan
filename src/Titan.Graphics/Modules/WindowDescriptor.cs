@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
+using Titan.ECS.SystemsV2;
 
 namespace Titan.Graphics.Modules;
 

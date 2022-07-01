@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Titan.Core;
-using Titan.Core.Modules;
+using Titan.ECS.SystemsV2;
 using Titan.Windows.D3D11;
 
 namespace Titan.Graphics;
-
-
 
 public struct AdapterInfo
 {

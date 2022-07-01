@@ -12,5 +12,5 @@ public readonly unsafe struct ReadOnlyResource<T> where T : unmanaged
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly ref T Get() => ref *_resource;
+    public ref readonly T Get() => ref *_resource;
 }

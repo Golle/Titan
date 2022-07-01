@@ -1,4 +1,7 @@
-namespace Titan.Core.Modules;
+using Titan.Core;
+using Titan.ECS.SystemsV2;
+
+namespace Titan.Modules;
 
 public readonly struct CoreModule : IModule
 {

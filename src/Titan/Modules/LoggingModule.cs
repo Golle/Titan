@@ -1,8 +1,8 @@
-using System;
-using Titan.Core.Events;
+using Titan.Core;
 using Titan.Core.Logging;
+using Titan.ECS.SystemsV2;
 
-namespace Titan.Core.Modules;
+namespace Titan.Modules;
 public record struct LoggingStarted;
 public record struct LoggingStopped;
 
@@ -32,12 +32,4 @@ public struct LoggingModule : IModule
             app.AddDisposable(new DisposableAction(Logger.Shutdown));
         }
     }
-}
-
-
-public class DisposableAction : IDisposable
-{
-    private readonly Action _action;
-    public DisposableAction(Action action) => _action = action;
-    public void Dispose() => _action?.Invoke();
 }

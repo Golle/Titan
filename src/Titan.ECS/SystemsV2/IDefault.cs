@@ -1,4 +1,4 @@
-namespace Titan.Core;
+namespace Titan.ECS.SystemsV2;
 
 public interface IDefault<out T>
 {

@@ -10,23 +10,18 @@ namespace Titan.ECS.SystemsV2.Components;
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct Components<T> where T : unmanaged
 {
-    internal delegate*<void*, in Entity, ref T> GetFunc;
-    internal delegate*<void*, in Entity, in T, ref T> CreateFunc;
-    internal delegate*<void*, in Entity, in T, ref T> CreateOrReplaceFunc;
-    internal delegate*<void*, in Entity, bool> ContainsFunc;
-    internal delegate*<void*, in Entity, void> DestroyFunc;
-
+    internal ComponentPoolVTable<T> Vtbl;
     internal void* Data;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref T Get(in Entity entity) => ref GetFunc(Data, entity);
+    public ref T Get(in Entity entity) => ref Vtbl.Get(Data, entity);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref T Create(in Entity entity, in T value = default) => ref CreateFunc(Data, entity, value);
+    public ref T Create(in Entity entity, in T value = default) => ref Vtbl.Create(Data, entity, value);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref T CreateOrReplace(in Entity entity, in T value = default) => ref CreateOrReplaceFunc(Data, entity, value);
+    public ref T CreateOrReplace(in Entity entity, in T value = default) => ref Vtbl.CreateOrReplace(Data, entity, value);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Contains(in Entity entity) => ContainsFunc(Data, entity);
+    public bool Contains(in Entity entity) => Vtbl.Contains(Data, entity);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Destroy(in Entity entity) => DestroyFunc(Data, entity);
+    public void Destroy(in Entity entity) => Vtbl.Destroy(Data, entity);
 }

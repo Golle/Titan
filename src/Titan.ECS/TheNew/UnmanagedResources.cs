@@ -4,18 +4,17 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.ECS.TheNew;
 
-namespace Titan.NewStuff;
+namespace Titan.ECS.TheNew;
 
-internal unsafe class UnmanagedResources : IDisposable
+public unsafe class UnmanagedResources : IDisposable
 {
     private readonly MemoryBlock _memory;
     private readonly void* _memoryPtr;
     private volatile int _currentOffset;
     private readonly void*[] _indices;
 
-    public UnmanagedResources(uint maxSize, uint maxResourceTypes, IPersistentMemoryAllocator allocator)
+    public UnmanagedResources(uint maxSize, uint maxResourceTypes, IMemoryAllocator allocator)
     {
         _memory = allocator.GetBlock(maxSize, true);
         _memoryPtr = _memory.AsPointer();

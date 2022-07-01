@@ -92,11 +92,6 @@ public interface ISystemsInitializer
     MemoryBlock<T> AllocateMemory<T>(int size) where T : unmanaged;
 }
 
-static unsafe class SystemHelpers<T> where T : unmanaged, IStructSystem<T>
-{
-    public static void Init(void* system, ISystemsInitializer init) => T.Init(ref *(T*)system, init);
-    public static void Update(void* system) => T.Update(*(T*)system);
-}
 
 public interface IStructSystem<T> where T : unmanaged
 {
