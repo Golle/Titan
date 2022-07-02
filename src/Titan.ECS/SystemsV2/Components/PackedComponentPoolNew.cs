@@ -6,7 +6,7 @@ namespace Titan.ECS.SystemsV2.Components;
 
 public unsafe struct ComponentPoolVTable<T> where T : unmanaged
 {
-    public delegate*<IMemoryAllocator, uint, uint, void*> Init;
+    public delegate*<in PermanentMemory, uint, uint, void*> Init;
     public delegate*<void*, in Entity, ref T> Get;
     public delegate*<void*, in Entity, in T, ref T> Create;
     public delegate*<void*, in Entity, in T, ref T> CreateOrReplace;
@@ -48,7 +48,7 @@ public unsafe struct PackedComponentPoolNew<T> : IComponentPool<T> where T : unm
         _componentCount = 0;
     }
 
-    public static void* Init(IMemoryAllocator allocator, uint maxEntities, uint maxComponents)
+    public static void* Init(in PermanentMemory allocator, uint maxEntities, uint maxComponents)
     {
         var poolSize = sizeof(PackedComponentPoolNew<T>);
         var componentCount = maxComponents == 0 ? maxEntities : maxComponents;

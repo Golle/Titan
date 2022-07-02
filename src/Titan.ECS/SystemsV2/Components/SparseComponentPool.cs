@@ -6,7 +6,7 @@ namespace Titan.ECS.SystemsV2.Components;
 
 public unsafe struct SparseComponentPool<T> : IComponentPool<T> where T : unmanaged
 {
-    public static Components<T> CreatePool(IMemoryAllocator allocator, uint maxEntities, uint maxComponents = 0)
+    public static Components<T> CreatePool(in PermanentMemory allocator, uint maxEntities, uint maxComponents = 0)
     {
         throw new NotImplementedException();
     }

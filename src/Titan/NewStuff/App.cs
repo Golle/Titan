@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using Titan.Core.App;
@@ -31,9 +32,10 @@ public record AppCreationArgs
 
 public class App : IApp
 {
-    private readonly IMemoryAllocator _allocator;
-
+    private readonly NativeMemoryPool _pool;
     private readonly UnmanagedResources _resources;
+    private readonly PermanentMemory _resourceAllocator;
+
 
     private readonly List<WorldConfig> _worldConfigs = new();
     private readonly SystemDescriptorCollection _systems = new();
@@ -41,16 +43,13 @@ public class App : IApp
     private readonly List<IDisposable> _disposables = new();
 
     public static App Create(AppCreationArgs args)
-    {
-        var allocator = new NativeMemoryAllocator(args.UnmanagedMemory);
-        var resources = new UnmanagedResources(args.GlobalResourcesMemory, args.GlobalResourcesTypes, allocator);
-        return new App(allocator, resources);
-    }
+        => new(args);
 
-    private App(IMemoryAllocator allocator, UnmanagedResources resources)
+    private App(AppCreationArgs args)
     {
-        _allocator = allocator;
-        _resources = resources;
+        _pool = new NativeMemoryPool(args.UnmanagedMemory);
+        _resourceAllocator = _pool.CreateAllocator<PermanentMemory>(args.GlobalResourcesMemory);
+        _resources = new UnmanagedResources(args.GlobalResourcesTypes, _resourceAllocator);
     }
 
     public IApp AddSystem<T>() where T : unmanaged, IStructSystem<T> => AddSystemToStage<T>(Stage.Update);
@@ -61,7 +60,7 @@ public class App : IApp
     }
 
     public IApp AddEvent<T>(uint maxEvents = 10) where T : unmanaged =>
-        AddResource(new Events<T>(maxEvents, _allocator))
+        AddResource(new Events<T>(maxEvents, _resourceAllocator))
             .AddSystemToStage<EventSystem<T>>(Stage.PreUpdate);
 
     public IApp AddWorld<T>() where T : IWorldModule => AddWorld(T.Build);
@@ -196,8 +195,6 @@ public class App : IApp
         {
             _disposables[i].Dispose();
         }
-
-        _resources.Dispose();
-        (_allocator as IDisposable)?.Dispose();
+        _pool.Dispose();
     }
 }

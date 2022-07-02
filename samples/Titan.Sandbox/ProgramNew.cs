@@ -1,3 +1,4 @@
+using System;
 using Titan.Components;
 using Titan.Core.Logging;
 using Titan.ECS.Systems;
@@ -6,6 +7,7 @@ using Titan.Graphics;
 using Titan.Graphics.Modules;
 using Titan.Modules;
 using Titan.NewStuff;
+
 
 using var app = App
     .Create(AppCreationArgs.Default)
@@ -70,6 +72,7 @@ struct GlobalFrameCounter
 {
     public long FrameCounter;
 }
+
 
 //internal class SandboxGame : Game
 //{

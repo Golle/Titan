@@ -1,26 +1,20 @@
 using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 
 namespace Titan.ECS.TheNew;
 
-public unsafe class UnmanagedResources : IDisposable
+public unsafe class UnmanagedResources
 {
-    private readonly MemoryBlock _memory;
-    private readonly void* _memoryPtr;
-    private volatile int _currentOffset;
-    private readonly void*[] _indices;
+    private readonly PermanentMemory _allocator;
+    private readonly void** _indices;
 
-    public UnmanagedResources(uint maxSize, uint maxResourceTypes, IMemoryAllocator allocator)
+    public UnmanagedResources(uint resourceTypes, PermanentMemory allocator)
     {
-        _memory = allocator.GetBlock(maxSize, true);
-        _memoryPtr = _memory.AsPointer();
-        _indices = new void*[maxResourceTypes];
+        _allocator = allocator;
+        _indices = (void**)allocator.GetPointer((uint)(sizeof(void*) * resourceTypes), true);
     }
-
 
     public void InitResource<T>(in T value = default) where T : unmanaged
     {
@@ -28,18 +22,13 @@ public unsafe class UnmanagedResources : IDisposable
         if (_indices[id] == null)
         {
             Logger.Trace<UnmanagedResources>($"Resource type: {typeof(T).Name} with Id {id} does not exist, creating.");
-            var size = sizeof(T);
-            Debug.Assert(_currentOffset + size < _memory.Size);
-
-            var offset = Interlocked.Add(ref _currentOffset, size) - size;
-            _indices[id] = (byte*)_memoryPtr + offset;
+            _indices[id] = _allocator.GetPointer<T>();
             *(T*)_indices[id] = value;
         }
         else
         {
             throw new InvalidOperationException($"Resource type {typeof(T)} has already been registered.");
         }
-
     }
 
     public ref T GetResource<T>() where T : unmanaged
@@ -66,9 +55,4 @@ public unsafe class UnmanagedResources : IDisposable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasResource<T>() => _indices[ResourceId.Id<T>()] != null;
-    public void Dispose()
-    {
-        
-        // TODO: handle memory cleanup? it should be persistent, means that it will live for the applications lifecycle.
-    }
 }

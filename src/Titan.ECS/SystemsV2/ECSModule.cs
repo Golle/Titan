@@ -24,10 +24,10 @@ public struct TheWorld
 
     }
 
-    public static TheWorld CreateWorld(IMemoryAllocator allocator, CreateWorldArgs args)
-    {
-        var resources = new UnmanagedResources(32 * 1024 * 1024, 200, allocator);
+    //public static TheWorld CreateWorld(IMemoryAllocator allocator, CreateWorldArgs args)
+    //{
+    //    var resources = new UnmanagedResources(32 * 1024 * 1024, 200, allocator);
 
-        return new TheWorld(args.Config.MaxEntities, resources);
-    }
+    //    return new TheWorld(args.Config.MaxEntities, resources);
+    //}
 }

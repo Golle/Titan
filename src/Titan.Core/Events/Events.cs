@@ -19,7 +19,7 @@ public unsafe struct Events<T> where T : unmanaged
     private readonly int _maxEvents;
 
     public int Count => *_count;
-    public Events(uint count, IMemoryAllocator allocator)
+    public Events(uint count, in PermanentMemory allocator)
     {
         // NOTE(Jens): this should be allocated on a common events pool
         var size = (sizeof(int) * 2 + count * 2 * sizeof(T));
