@@ -11,15 +11,16 @@ namespace Titan.Core
         {
             Value = value;
         }
+        public Handle() => Value = -1;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator int(in Handle<T> handle) => handle.Value;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Handle<T>(in int handle) => new(handle);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValid() => Value > 0;
-        public bool IsInvalid() => Value == 0;
+        public bool IsValid() => Value >= 0;
+        public bool IsInvalid() => Value < 0;
 
-        public static readonly Handle<T> Null = 0;
+        public static readonly Handle<T> Null = -1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => IsValid() ? Value.ToString() : "INVALID";
