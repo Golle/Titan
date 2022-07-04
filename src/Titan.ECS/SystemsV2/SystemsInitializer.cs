@@ -4,6 +4,7 @@ using Titan.ECS.Components;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2.Components;
 using Titan.ECS.TheNew;
+using Titan.ECS.Worlds;
 
 namespace Titan.ECS.SystemsV2;
 
@@ -37,6 +38,7 @@ public readonly unsafe ref struct SystemsInitializer
 
     public ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged
     {
+        //NOTE(Jens): should there be a destiction between local and global resources? 
         _state->ReadOnlyResources.Add<T>();
         return new(_app.GetMutableResourcePointer<T>());
     }
@@ -44,12 +46,14 @@ public readonly unsafe ref struct SystemsInitializer
     public MutableStorage2<T> GetMutableStorage<T>() where T : unmanaged
     {
         _state->MutableComponents |= ComponentId<T>.Id;
-        return new(_app.GetMutableResourcePointer<Components<T>>());
+        throw new NotSupportedException("Storage is not supported yet, we need a \"World\" to support it.");
+        //return new(_app.GetMutableResourcePointer<Components<T>>());
     }
 
     public ReadOnlyStorage2<T> GetReadOnlyStorage<T>() where T : unmanaged
     {
         _state->ReadOnlyComponents |= ComponentId<T>.Id;
+        throw new NotSupportedException("Storage is not supported yet, we need a \"World\" to support it.");
         return new(_app.GetMutableResourcePointer<Components<T>>());
     }
 
