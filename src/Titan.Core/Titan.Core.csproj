@@ -10,7 +10,6 @@
     <DefineConstants></DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Events\" />
     <Folder Include="App\" />
   </ItemGroup>
 </Project>

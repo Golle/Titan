@@ -30,7 +30,7 @@ internal struct FrameCounter : IStructSystem<FrameCounter>
 {
     private MutableResource<GlobalFrameCounter> _global;
 
-    public static void Init(ref FrameCounter system, ISystemsInitializer init)
+    public static void Init(ref FrameCounter system, in SystemsInitializer init)
     {
         system._global = init.GetMutableResource<GlobalFrameCounter>();
     }
@@ -44,7 +44,7 @@ internal struct FrameCounter : IStructSystem<FrameCounter>
 internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
 {
     private ReadOnlyResource<GlobalFrameCounter> _global;
-    public static void Init(ref PrintFrameCounter system, ISystemsInitializer init)
+    public static void Init(ref PrintFrameCounter system, in SystemsInitializer init)
     {
         system._global = init.GetReadOnlyResource<GlobalFrameCounter>();
     }

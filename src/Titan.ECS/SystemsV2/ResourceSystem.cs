@@ -35,6 +35,19 @@ public abstract class ResourceSystem : ISystem
     public abstract void OnUpdate();
 }
 
+public readonly unsafe struct ReadOnlyStorage2<T> where T : unmanaged
+{
+    private readonly Components<T>* _pool;
+    internal ReadOnlyStorage2(Components<T>*  pool) => _pool = pool;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ref readonly T Get(in Entity entity) => ref _pool->Get(entity);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Contains(in Entity entity) => _pool->Contains(entity);
+}
+
+
 public readonly unsafe struct MutableStorage2<T> where T : unmanaged
 {
     private static readonly ComponentId ComponentId = ComponentId<T>.Id;
@@ -77,25 +90,26 @@ public struct EntityFilter
 }
 
 // Initializer functions that will set up the resources, filters, buffers etc.
-public interface ISystemsInitializer
-{
-    MutableResource<T> GetMutableResource<T>() where T : unmanaged;
-    ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged;
+//[Obsolete("We might want to replace this with a struct?")]
+//public interface ISystemsInitializer
+//{
+//    MutableResource<T> GetMutableResource<T>() where T : unmanaged;
+//    ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged;
 
-    MutableStorage2<T> GetMutableStorage<T>() where T : unmanaged;
-    MutableStorage2<T> GetReadOnlyStorage<T>() where T : unmanaged;
+//    MutableStorage2<T> GetMutableStorage<T>() where T : unmanaged;
+//    MutableStorage2<T> GetReadOnlyStorage<T>() where T : unmanaged;
 
-    EventsReader<T> GetEventsReader<T>() where T : unmanaged;
-    EventsWriter<T> GetEventsWriter<T>() where T : unmanaged;
+//    EventsReader<T> GetEventsReader<T>() where T : unmanaged;
+//    EventsWriter<T> GetEventsWriter<T>() where T : unmanaged;
 
-    EntityFilter CreateEntityFilter(EntityFilterConfiguration config);
-    MemoryBlock<T> AllocateMemory<T>(int size) where T : unmanaged;
-}
+//    EntityFilter CreateEntityFilter(EntityFilterConfiguration config);
+//    MemoryBlock<T> AllocateMemory<T>(int size) where T : unmanaged;
+//}
 
 
 public interface IStructSystem<T> where T : unmanaged
 {
-    static abstract void Init(ref T system, ISystemsInitializer init);
+    static abstract void Init(ref T system, in SystemsInitializer init);
     static abstract void Update(in T system);
     static bool ShouldRun(in T system) => true;
 }
@@ -106,13 +120,13 @@ public struct TestSystem : IStructSystem<TestSystem>
     private EntityFilter _filter;
     //private MemoryBlock<byte> Buffer;
 
-    public static void Init(ref TestSystem system, ISystemsInitializer init)
+    public static void Init(ref TestSystem system, in SystemsInitializer init)
     {
         //system.Transforms = init.GetMutableResource<Transform3D>();
         //system.Filter = init.CreateEntityFilter(new EntityFilterConfiguration().With<Transform3D>());
         //system.Buffer = init.AllocateMemory<byte>(100 * 1024);
 
-        system._filter = init.CreateEntityFilter(new EntityFilterConfiguration());
+        //system._filter = init.CreateEntityFilter(new EntityFilterConfiguration());
         system._transforms = init.GetMutableStorage<uint>();
         
     }

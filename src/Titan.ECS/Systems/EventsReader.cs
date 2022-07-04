@@ -6,8 +6,8 @@ namespace Titan.ECS.Systems;
 
 public readonly unsafe struct EventsReader<T> where T : unmanaged
 {
-    private readonly Events<T>* _events;
-    internal EventsReader(Events<T>* events)
+    private readonly EventCollection<T>* _events;
+    internal EventsReader(EventCollection<T>* events)
     {
         _events = events;
 

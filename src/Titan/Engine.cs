@@ -140,11 +140,7 @@ public class Engine
     }
 
     private static SystemsBuilder SetupSystemsBuilder() =>
-        new SystemsBuilder()
-            .WithSystem<TestSystem1>()
-            .WithSystem<TestSystem2>()
-            .WithSystem<TestSystem3>()
-            .WithSystem<TestSystem4>();
+        new SystemsBuilder();
 
     private static void SetupCoreSystems()
     {

@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using Titan.Core.App;
@@ -11,24 +10,6 @@ using Titan.ECS.TheNew;
 using Titan.Graphics.Modules;
 
 namespace Titan.NewStuff;
-
-public record AppCreationArgs
-{
-    public const uint DefaultUnmanagedMemory = 1 * 1024 * 1024 * 1024;  //1Gb
-    public const uint DefaultGlobalResourcesMemory = 32 * 1024 * 1024;  // 32Mb
-    public const uint DefaultGlobalResourceTypes = 100;
-
-    public uint UnmanagedMemory { get; init; }
-    public uint GlobalResourcesMemory { get; init; }
-    public uint GlobalResourcesTypes { get; init; }
-
-    public static AppCreationArgs Default => new()
-    {
-        GlobalResourcesMemory = DefaultGlobalResourcesMemory,
-        GlobalResourcesTypes = DefaultGlobalResourceTypes,
-        UnmanagedMemory = DefaultUnmanagedMemory
-    };
-}
 
 public class App : IApp
 {
@@ -60,7 +41,7 @@ public class App : IApp
     }
 
     public IApp AddEvent<T>(uint maxEvents = 10) where T : unmanaged =>
-        AddResource(new Events<T>(maxEvents, _resourceAllocator))
+        AddResource(new EventCollection<T>(maxEvents, _resourceAllocator))
             .AddSystemToStage<EventSystem<T>>(Stage.PreUpdate);
 
     public IApp AddWorld<T>() where T : IWorldModule => AddWorld(T.Build);
@@ -113,8 +94,7 @@ public class App : IApp
         var initialWorld = _worldConfigs.FirstOrDefault();
         if (initialWorld != null)
         {
-
-
+            SystemSchedulerFactory.TestTHis(this, _resourceAllocator, initialWorld);
             // Create and init memory pool
             // Create and init world
             // Init components
@@ -128,9 +108,7 @@ public class App : IApp
             Logger.Warning<App>($"No worlds have been added, systems will not be executed.");
         }
 
-        //var preUpdate = _systems.Enumerate(Stage.PreUpdate).Select(s => s.Creator()).ToArray();
-        //var update = _systems.Enumerate(Stage.Update).Select(s => s.Creator()).ToArray();
-        //var postUpdate = _systems.Enumerate(Stage.PostUpdate).Select(s => s.Creator()).ToArray();
+       
         // Init systems, create execution grapt
         // call startup systems
 

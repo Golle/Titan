@@ -9,7 +9,7 @@ public struct ComponentSystem<T> : IStructSystem<ComponentSystem<T>> where T : u
     private MutableStorage2<T> _components;
 
     // Init is called when the system is created, setting up the dependencies to helpt with the execution graph
-    public static void Init(ref ComponentSystem<T> system, ISystemsInitializer init)
+    public static void Init(ref ComponentSystem<T> system, in SystemsInitializer init)
     {
         system._componentDestroyed = init.GetEventsReader<ComponentDestroyed>();
         system._entityDestroyed = init.GetEventsReader<EntityDestroyed>();

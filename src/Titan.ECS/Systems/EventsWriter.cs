@@ -4,8 +4,8 @@ namespace Titan.ECS.Systems;
 
 public readonly unsafe struct EventsWriter<T> where T : unmanaged
 {
-    private readonly Events<T>* _resource;
-    internal EventsWriter(Events<T>* resource)
+    private readonly EventCollection<T>* _resource;
+    internal EventsWriter(EventCollection<T>* resource)
     {
         _resource = resource;
     }
