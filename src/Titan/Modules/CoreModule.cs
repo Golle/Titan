@@ -8,6 +8,7 @@ public readonly struct CoreModule : IModule
     {
         app
             .AddModule<LoggingModule>()
+            .AddModule<ThreadingModule>()
             ;
     }
 }

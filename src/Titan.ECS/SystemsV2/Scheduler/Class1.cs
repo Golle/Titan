@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Titan.Core.Logging;
-using Titan.ECS.TheNew;
 
 namespace Titan.ECS.SystemsV2.Scheduler;
 
@@ -158,19 +157,19 @@ public static unsafe class SchedulerTest
 struct SystemA : IStructSystem<SystemA>
 {
     public static void Init(ref SystemA system, in SystemsInitializer init) => throw new System.NotImplementedException();
-    public static void Update(in SystemA system) => throw new System.NotImplementedException();
+    public static void Update(ref SystemA system) => throw new System.NotImplementedException();
 }
 
 struct SystemB : IStructSystem<SystemB>
 {
     public static void Init(ref SystemB system, in SystemsInitializer init) => throw new System.NotImplementedException();
-    public static void Update(in SystemB system) => throw new System.NotImplementedException();
+    public static void Update(ref SystemB system) => throw new System.NotImplementedException();
 }
 
 struct SystemC : IStructSystem<SystemC>
 {
     public static void Init(ref SystemC system, in SystemsInitializer init) => throw new System.NotImplementedException();
-    public static void Update(in SystemC system) => throw new System.NotImplementedException();
+    public static void Update(ref SystemC system) => throw new System.NotImplementedException();
 }
 
 

@@ -13,7 +13,7 @@ public static unsafe class SystemSchedulerFactory
     {
         foreach (var desc in descriptors)
         {
-            SystemDependencyState state;
+            SystemDependencyState state = default;
             var node = SystemNode.CreateAndInit(memory, desc, new SystemsInitializer(app, &state));
         }
     }

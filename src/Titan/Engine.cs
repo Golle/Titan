@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Titan.Assets;
 using Titan.Core.Logging;

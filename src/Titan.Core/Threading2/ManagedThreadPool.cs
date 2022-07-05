@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Logging;
@@ -20,6 +20,16 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
 
     private static readonly TimeSpan DefaultThreadWaitTime = TimeSpan.FromMilliseconds(100);
 
+    public static void Reset(ref Handle<JobApi> handle)
+    {
+        ref var job = ref _jobQueue[handle];
+        if (job.State == JobState.Completed)
+        {
+            job.State = JobState.Available;
+        }
+        handle = Handle<JobApi>.Null;
+    }
+
     public static void Init(in ThreadPoolConfiguration config)
     {
         _maxJobs = (int)config.MaxJobs;
@@ -39,6 +49,12 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             _workers[i].State = WorkerState.Waiting;
             _threads[i].Start(i);
         }
+    }
+
+    public static bool IsCompleted(in Handle<JobApi> handle)
+    {
+        ref readonly var job = ref _jobQueue[handle];
+        return job.State is JobState.Completed;
     }
 
     private static void RunWorker(object obj)

@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using Titan.Core.Logging;
 using Titan.ECS.TheNew;

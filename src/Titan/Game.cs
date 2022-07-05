@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Titan.ECS;
 using Titan.Graphics.Windows;
 

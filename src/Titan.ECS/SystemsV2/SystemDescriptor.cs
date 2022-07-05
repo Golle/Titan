@@ -28,6 +28,6 @@ internal readonly unsafe struct SystemDescriptor
     private struct FunctionWrapper<T> where T : unmanaged, IStructSystem<T>
     {
         public static void Init(void* system, SystemsInitializer init) => T.Init(ref *(T*)system, init);
-        public static void Update(void* system) => T.Update(*(T*)system);
+        public static void Update(void* system) => T.Update(ref *(T*)system);
     }
 }

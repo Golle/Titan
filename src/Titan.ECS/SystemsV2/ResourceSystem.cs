@@ -110,7 +110,7 @@ public struct EntityFilter
 public interface IStructSystem<T> where T : unmanaged
 {
     static abstract void Init(ref T system, in SystemsInitializer init);
-    static abstract void Update(in T system);
+    static abstract void Update(ref T system);
     static bool ShouldRun(in T system) => true;
 }
 
@@ -131,7 +131,7 @@ public struct TestSystem : IStructSystem<TestSystem>
         
     }
 
-    public static void Update(in TestSystem system)
+    public static void Update(ref TestSystem system)
     {
         //var buffer = system.Buffer.AsSpan();
         ref readonly var transforms = ref system._transforms;

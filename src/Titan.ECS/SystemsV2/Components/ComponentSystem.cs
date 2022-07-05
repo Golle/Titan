@@ -20,7 +20,7 @@ public struct ComponentSystem<T> : IStructSystem<ComponentSystem<T>> where T : u
     static bool ShouldRun(in ComponentSystem<T> system) => system._componentDestroyed.HasEvents() || system._entityDestroyed.HasEvents();
 
     // Update is executed on the thread pool
-    public static void Update(in ComponentSystem<T> system)
+    public static void Update(ref ComponentSystem<T> system)
     {
         foreach (ref readonly var @event in system._componentDestroyed.GetEvents())
         {
