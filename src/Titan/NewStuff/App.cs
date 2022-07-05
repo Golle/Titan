@@ -68,6 +68,7 @@ public class App : IApp
     public bool HasResource<T>() where T : unmanaged => _resources.HasResource<T>();
     public IApp AddDisposable(IDisposable disposable)
     {
+        // NOTE(Jens): this is something we should change. not a nice way to dispose/shutdown things. I think the modules should have a teardown function (or be able to regsiter a teardown function)
         _disposables.Add(disposable);
         return this;
     }
@@ -144,11 +145,12 @@ public class App : IApp
         //t.Start();
 
 
-        if (HasResource<Window>())
+        if (HasResource<Window>() && HasResource<WindowApi>())
         {
             ref var window = ref _resources.GetResource<Window>();
+            ref var windowApi = ref _resources.GetResource<WindowApi>();
             Logger.Info<App>("Start window update");
-            while (window.Update())
+            while (windowApi.Update(window))
             {
 
                 // noop

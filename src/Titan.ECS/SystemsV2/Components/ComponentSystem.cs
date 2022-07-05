@@ -1,8 +1,9 @@
+using Titan.Core;
 using Titan.ECS.Systems;
 
 namespace Titan.ECS.SystemsV2.Components;
 
-public struct ComponentSystem<T> : IStructSystem<ComponentSystem<T>> where T : unmanaged
+public struct ComponentSystem<T> : IStructSystem<ComponentSystem<T>> where T : unmanaged, IComponent
 {
     private EventsReader<EntityDestroyed> _entityDestroyed;
     private EventsReader<ComponentDestroyed> _componentDestroyed;
@@ -17,7 +18,7 @@ public struct ComponentSystem<T> : IStructSystem<ComponentSystem<T>> where T : u
     }
 
     // ShouldRun will be called by the scheduler and if the system doesn't have to run it wont schedule it.
-    static bool ShouldRun(in ComponentSystem<T> system) => system._componentDestroyed.HasEvents() || system._entityDestroyed.HasEvents();
+    public static bool ShouldRun(in ComponentSystem<T> system) => system._componentDestroyed.HasEvents() || system._entityDestroyed.HasEvents();
 
     // Update is executed on the thread pool
     public static void Update(ref ComponentSystem<T> system)

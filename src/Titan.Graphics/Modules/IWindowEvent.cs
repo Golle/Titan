@@ -1,6 +1,8 @@
-﻿namespace Titan.Graphics.Modules;
+using Titan.Core;
 
-public interface IWindowEvent
+namespace Titan.Graphics.Modules;
+
+public interface IWindowEvent : IEvent
 {
     static abstract uint Id { get; }
 }

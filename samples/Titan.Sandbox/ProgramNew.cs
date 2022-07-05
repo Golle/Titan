@@ -1,5 +1,6 @@
 using System.Threading;
 using Titan.Components;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
@@ -53,6 +54,8 @@ internal struct FrameCounter : IStructSystem<FrameCounter>
     {
         system._global.Get().FrameCounter++;
     }
+
+    public static bool ShouldRun(in FrameCounter system) => true;
 }
 
 internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
@@ -69,6 +72,8 @@ internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
 
         Logger.Trace<PrintFrameCounter>($"Current frame count: {count}");
     }
+
+    public static bool ShouldRun(in PrintFrameCounter system) => true;
 }
 
 
@@ -82,7 +87,7 @@ public readonly struct StartupWorld : IWorldModule
     }
 }
 
-struct GlobalFrameCounter
+struct GlobalFrameCounter : IResource
 {
     public long FrameCounter;
 }

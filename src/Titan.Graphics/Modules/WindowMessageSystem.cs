@@ -4,23 +4,22 @@ using Titan.ECS.SystemsV2;
 
 namespace Titan.Graphics.Modules;
 
-public class WindowMessageSystem : ResourceSystem
+internal struct WindowMessageSystem : IStructSystem<WindowMessageSystem>
 {
-    private readonly MutableResource<WindowEventQueue> _eventQueue;
-    
-    private readonly EventsWriter<WindowLostFocus> _lostFocusEvents;
-    private readonly EventsWriter<WindowGainedFocus> _gainedFocusEvents;
+    private ApiResource<WindowEventQueue> EventQueue;
+    private EventsWriter<WindowLostFocus> LostFocus;
+    private EventsWriter<WindowGainedFocus> GainedFocus;
 
-    public WindowMessageSystem()
+    public static void Init(ref WindowMessageSystem system, in SystemsInitializer init)
     {
-        _eventQueue = GetMutableResource<WindowEventQueue>();
-        _lostFocusEvents = GetEventsWriter<WindowLostFocus>();
-        _gainedFocusEvents = GetEventsWriter<WindowGainedFocus>();
+        system.EventQueue = init.GetApi<WindowEventQueue>();
+        system.LostFocus = init.GetEventsWriter<WindowLostFocus>();
+        system.GainedFocus = init.GetEventsWriter<WindowGainedFocus>();
     }
 
-    public override void OnUpdate()
+    public static void Update(ref WindowMessageSystem system)
     {
-        ref var eventQueue = ref _eventQueue.Get();
+        ref var eventQueue = ref system.EventQueue.Get();
         var eventCount = eventQueue.EventCount;
         for (var i = 0; i < eventCount; ++i)
         {
@@ -31,11 +30,11 @@ public class WindowMessageSystem : ResourceSystem
 
             if (@event.Is<WindowLostFocus>())
             {
-                _lostFocusEvents.Send(@event.As<WindowLostFocus>());
+                system.LostFocus.Send(@event.As<WindowLostFocus>());
             }
             else if (@event.Is<WindowGainedFocus>())
             {
-                _gainedFocusEvents.Send(@event.As<WindowGainedFocus>());
+                system.GainedFocus.Send(@event.As<WindowGainedFocus>());
             }
             else
             {
@@ -43,4 +42,7 @@ public class WindowMessageSystem : ResourceSystem
             }
         }
     }
+
+    public static bool ShouldRun(in WindowMessageSystem system) 
+        => system.EventQueue.Get().HasEvents();
 }

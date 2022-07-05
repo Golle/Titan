@@ -1,24 +1,36 @@
 using System;
+using System.Runtime.CompilerServices;
+using Titan.Core;
 
 namespace Titan.Graphics.Modules;
 
 public record struct Point(int X, int Y);
-public unsafe struct Window
+
+public struct Window : IResource
 {
     public nint Handle;
+}
+
+public readonly unsafe struct WindowApi : IApi
+{ 
     private readonly WindowFunctions _functions;
-    private readonly WindowEventQueue* _eventQueue;
-    internal Window(WindowFunctions functions, WindowEventQueue* eventQueue)
+    internal WindowApi(WindowFunctions functions) => _functions = functions;
+    public  bool GetRelativeCursorPosition(in Window window, out Point point) => _functions.GetRelativeCursorPosition(window.Handle, out point);
+    public void SetTitle(in Window window, ReadOnlySpan<char> title) => _functions.SetTitle(window.Handle, title);
+    public bool CreateWindow(WindowDescriptor descriptor, WindowEventQueue* eventQueue, out Window window)
     {
-        _functions = functions;
-        _eventQueue = eventQueue;
+        Unsafe.SkipInit(out window);
+        nint handle = default;
+        if (_functions.CreateWindow(ref handle, descriptor, eventQueue))
+        {
+            window = new Window();
+            return true;
+        }
+        return false;
     }
 
-    public void SetTitle(ReadOnlySpan<char> title) => _functions.SetTitle(Handle, title);
-    public bool CreateWindow(WindowDescriptor descriptor) => _functions.CreateWindow(ref Handle, descriptor, _eventQueue);
-    public bool DestroyWindow() => _functions.DestroyWindow(ref Handle);
-    public bool Show() => _functions.Show(Handle);
-    public bool Hide() => _functions.Hide(Handle);
-    public bool Update() => _functions.Update(Handle);
-    public readonly bool GetRelativeCursorPosition(out Point position) => _functions.GetRelativeCursorPosition(Handle, out position);
+    public bool DestroyWindow(ref Window window) => _functions.DestroyWindow(ref window.Handle);
+    public bool Show(in Window window) => _functions.Show(window.Handle);
+    public bool Hide(in Window window) => _functions.Hide(window.Handle);
+    public bool Update(in Window window) => _functions.Update(window.Handle);
 }

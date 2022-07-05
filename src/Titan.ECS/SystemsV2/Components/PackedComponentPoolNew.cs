@@ -1,10 +1,11 @@
 using System.Runtime.CompilerServices;
+using Titan.Core;
 using Titan.Core.Memory;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.SystemsV2.Components;
 
-public unsafe struct ComponentPoolVTable<T> where T : unmanaged
+public unsafe struct ComponentPoolVTable<T> where T : unmanaged, IComponent
 {
     public delegate*<in PermanentMemory, uint, uint, void*> Init;
     public delegate*<void*, in Entity, ref T> Get;
@@ -14,7 +15,7 @@ public unsafe struct ComponentPoolVTable<T> where T : unmanaged
     public delegate*<void*, in Entity, void> Destroy;
 }
 
-public unsafe struct PackedComponentPoolNew<T> : IComponentPool<T> where T : unmanaged
+public unsafe struct PackedComponentPoolNew<T> : IComponentPool<T> where T : unmanaged, IComponent
 {
     public static readonly ComponentPoolVTable<T>* Vtbl;
     private readonly uint _maxEntities;

@@ -158,18 +158,21 @@ struct SystemA : IStructSystem<SystemA>
 {
     public static void Init(ref SystemA system, in SystemsInitializer init) => throw new System.NotImplementedException();
     public static void Update(ref SystemA system) => throw new System.NotImplementedException();
+    public static bool ShouldRun(in SystemA system) => true;
 }
 
 struct SystemB : IStructSystem<SystemB>
 {
     public static void Init(ref SystemB system, in SystemsInitializer init) => throw new System.NotImplementedException();
     public static void Update(ref SystemB system) => throw new System.NotImplementedException();
+    public static bool ShouldRun(in SystemB system) => true;
 }
 
 struct SystemC : IStructSystem<SystemC>
 {
     public static void Init(ref SystemC system, in SystemsInitializer init) => throw new System.NotImplementedException();
     public static void Update(ref SystemC system) => throw new System.NotImplementedException();
+    public static bool ShouldRun(in SystemC system) => true;
 }
 
 

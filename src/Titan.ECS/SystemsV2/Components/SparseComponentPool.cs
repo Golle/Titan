@@ -1,10 +1,11 @@
 using System;
+using Titan.Core;
 using Titan.Core.Memory;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.SystemsV2.Components;
 
-public unsafe struct SparseComponentPool<T> : IComponentPool<T> where T : unmanaged
+public unsafe struct SparseComponentPool<T> : IComponentPool<T> where T : unmanaged, IComponent
 {
     public static Components<T> CreatePool(in PermanentMemory allocator, uint maxEntities, uint maxComponents = 0)
     {

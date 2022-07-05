@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Titan.Core;
 using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.ECS.Components;
@@ -42,7 +43,7 @@ public class WorldConfig
         return this;
     }
 
-    public WorldConfig AddComponent<T>(uint maxComponents = 0u, ComponentPoolTypes type = ComponentPoolTypes.Packed) where T : unmanaged
+    public WorldConfig AddComponent<T>(uint maxComponents = 0u, ComponentPoolTypes type = ComponentPoolTypes.Packed) where T : unmanaged, IComponent
     {
         _components.Add(ComponentDescriptor.Create<T>(type, maxComponents));
         AddSystemToStage<ComponentSystem<T>>(Stage.PreUpdate);

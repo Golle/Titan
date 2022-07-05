@@ -1,4 +1,5 @@
 using System;
+using Titan.Core;
 using Titan.ECS.Components;
 using Titan.ECS.SystemsV2.Components;
 using Titan.ECS.TheNew;
@@ -19,7 +20,7 @@ internal readonly unsafe struct ComponentDescriptor
         MaxComponents = maxComponents;
     }
 
-    public static ComponentDescriptor Create<T>(ComponentPoolTypes type, uint maxComponents = 0) where T : unmanaged =>
+    public static ComponentDescriptor Create<T>(ComponentPoolTypes type, uint maxComponents = 0) where T : unmanaged, IComponent =>
         new(
             ResourceId.Id<T>(),
             ComponentId<T>.Id,

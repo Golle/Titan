@@ -2,11 +2,12 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Titan.Core;
 using Titan.Core.Logging;
 
 namespace Titan.Graphics.Modules;
 
-public unsafe struct WindowEventQueue
+public unsafe struct WindowEventQueue : IApi
 {
     public const int EventMaxSize = 32; // The max size in bytes for a single event. We pack all events in the same size so it's easy to read
     public const int MaxEvents = 1024;

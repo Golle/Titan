@@ -6,7 +6,7 @@ using Titan.Core.Memory;
 
 namespace Titan.Core.Events;
 
-public unsafe struct EventCollection<T> where T : unmanaged
+public unsafe struct EventCollection<T> : IResource where T : unmanaged
 {
     private byte* _mem;
 

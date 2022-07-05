@@ -1,6 +1,6 @@
 namespace Titan.Core.Threading2;
 
-public readonly unsafe struct JobApi
+public readonly unsafe struct JobApi : IApi
 {
     private readonly delegate*<in JobItem, out Handle<JobApi>, bool> _enqueue;
     private readonly delegate*<void> _shutdown;

@@ -1,10 +1,11 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Titan.Core;
 
 namespace Titan.Components;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Transform3DComponent
+public struct Transform3DComponent : IComponent
 {
     public Vector3 Position;
     public Vector3 Scale;
