@@ -103,7 +103,6 @@ public class App : IApp
 
         // call terminate systems 
 
-
         if (HasResource<Window>() && HasResource<WindowApi>())
         {
             ref var window = ref _resourceCollection.GetResource<Window>();

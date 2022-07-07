@@ -126,7 +126,7 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
     public static bool GetRelativeCursorPosition(nint handle, out Point position)
     {
         Unsafe.SkipInit(out position);
-        
+
         POINT point;
         if (GetCursorPos(&point))
         {
@@ -172,26 +172,38 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
 
             case WM_KEYDOWN:
             case WM_SYSKEYDOWN:
-                eventQueue->Push(new KeyPressed());
-                //WindowEventHandler.OnKeyDown(wParam, lParam);
+                var repeat = (lParam & 0x40000000) > 0;
+                var code = (int)wParam;
+                eventQueue->Push(new KeyPressed(code, repeat));
                 break;
             case WM_KEYUP:
             case WM_SYSKEYUP:
-                eventQueue->Push(new KeyReleased());
-                //WindowEventHandler.OnKeyUp(wParam);
+                eventQueue->Push(new KeyReleased((int)wParam));
                 break;
         }
         return DefWindowProcA(hWnd, message, wParam, lParam);
     }
 }
 
-public struct KeyPressed : IWindowEvent
+public readonly struct KeyPressed : IWindowEvent
 {
     public static uint Id => 14;
+    public readonly int Code;
+    public readonly bool Repeat;
+    public KeyPressed(int code, bool repeat)
+    {
+        Code = code;
+        Repeat = repeat;
+    }
 }
-public struct KeyReleased : IWindowEvent
+public readonly struct KeyReleased : IWindowEvent
 {
     public static uint Id => 16;
+    public readonly int Code;
+    public KeyReleased(int code)
+    {
+        Code = code;
+    }
 }
 
 
