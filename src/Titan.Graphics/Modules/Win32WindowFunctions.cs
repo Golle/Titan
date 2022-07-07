@@ -160,7 +160,7 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
         var eventQueue = (WindowEventQueue*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
         if (eventQueue == null)
         {
-            Logger.Warning($"Message handler not found, {message} dropped.");
+            Logger.Warning<Win32WindowFunctions>($"Message handler not found, {message} dropped.");
             return DefWindowProcA(hWnd, message, wParam, lParam);
         }
 

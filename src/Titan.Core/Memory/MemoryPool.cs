@@ -44,7 +44,7 @@ public readonly unsafe struct MemoryPool : IDisposable
     }
 
     public T* GetPointer<T>(uint count = 1, bool initialize = false) where T : unmanaged
-        => (T*)GetOffset((uint)sizeof(T), initialize);
+        => (T*)GetOffset((uint)sizeof(T) * count, initialize);
 
     public void* GetPointer(uint size, bool initialize = false)
         => GetOffset(size, initialize);

@@ -16,13 +16,15 @@ public class App : IApp
     private readonly ResourceCollection _resourceCollection;
     private readonly SystemDescriptorCollection _systems;
 
-    public static App Create(AppCreationArgs args)
+    public static IApp Create(AppCreationArgs args)
     {
         var memoryPool = MemoryPool.Create(args.UnmanagedMemory);
         var resources = ResourceCollection.Create(args.GlobalResourcesMemory, args.GlobalResourcesTypes, memoryPool);
         var systems = SystemDescriptorCollection.Create(args.GlobalSystemTypes, memoryPool);
 
-        return new(memoryPool, resources, systems);
+        return new App(memoryPool, resources, systems)
+                .AddResource(memoryPool)
+            ;
     }
 
     private App(MemoryPool pool, ResourceCollection resourceCollection, SystemDescriptorCollection systems)
@@ -61,7 +63,7 @@ public class App : IApp
     public ref T GetMutableResource<T>() where T : unmanaged => ref _resourceCollection.GetResource<T>();
     public unsafe T* GetMutableResourcePointer<T>() where T : unmanaged => _resourceCollection.GetResourcePointer<T>();
     public bool HasResource<T>() where T : unmanaged => _resourceCollection.HasResource<T>();
-    
+
     public IApp AddModule<T>() where T : IModule
     {
         try
@@ -78,18 +80,18 @@ public class App : IApp
 
     public IApp Run()
     {
-    
-            
-            //var graph = SystemSchedulerFactory.Create(_worldMemory.As<PermanentMemory>(), _worldTransientMemory, initialWorld, this);
 
-            //SystemSchedulerFactory.TestTHis(this, _resourceAllocator, initialWorld);
-            // Create and init memory pool
-            // Create and init world
-            // Init components
-            // Init the systems
+        SystemSchedulerFactory.CreateTest(_pool.CreateAllocator<PermanentMemory>(100 * 1024 * 1024), _pool.CreateAllocator<TransientMemory>(100 * 1024 * 1024), _systems, this);
+        //var graph = SystemSchedulerFactory.Create(_worldMemory.As<PermanentMemory>(), _worldTransientMemory, initialWorld, this);
+
+        //SystemSchedulerFactory.TestTHis(this, _resourceAllocator, initialWorld);
+        // Create and init memory pool
+        // Create and init world
+        // Init components
+        // Init the systems
 
 
-            // Schedule world for running. Event?
+        // Schedule world for running. Event?
 
 
         // Init systems, create execution grapt

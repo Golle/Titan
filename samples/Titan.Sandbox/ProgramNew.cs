@@ -1,18 +1,23 @@
 using Titan.Core;
+using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
+using Titan.Graphics;
+using Titan.Graphics.Modules;
 using Titan.Modules;
 using Titan.NewStuff;
 
 using var app = App
     .Create(AppCreationArgs.Default)
     .AddModule<CoreModule>()
-
-    //.AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
-    //.AddModule<WindowModule>()
-    //.AddModule<RenderModule>()
-    //.AddResource(new GlobalFrameCounter())
+    .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
+    .AddModule<WindowModule>()
+    .AddModule<RenderModule>()
+    .AddSystemToStage<FrameCounter>(Stage.PreUpdate)
+    .AddSystem<PrintFrameCounter>()
+    .AddSystemToStage<FrameCounter>(Stage.PostUpdate)
+    .AddResource(new GlobalFrameCounter())
     .Run()
     ;
 

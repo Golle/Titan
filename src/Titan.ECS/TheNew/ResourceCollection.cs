@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 
@@ -27,13 +28,13 @@ public readonly unsafe struct ResourceCollection
         var id = ResourceId.Id<T>();
         if (_indices[id] == null)
         {
-            Logger.Trace<ResourceCollection>($"Resource type: {typeof(T).Name} with Id {id} does not exist, creating.");
+            Logger.Trace<ResourceCollection>($"Resource type: {typeof(T).FormattedName()} with Id {id} does not exist, creating.");
             _indices[id] = _allocator.GetPointer<T>();
             *(T*)_indices[id] = value;
         }
         else
         {
-            throw new InvalidOperationException($"Resource type {typeof(T)} has already been registered.");
+            throw new InvalidOperationException($"Resource type {typeof(T).FormattedName()} has already been registered.");
         }
     }
 

@@ -14,6 +14,7 @@ public readonly unsafe struct SystemDescriptorCollection
         _descriptors = descriptors;
         _maxCount = maxCount;
         _count = count;
+        *_count = 0;
     }
 
     public void AddSystem<T>(Stage stage) where T : unmanaged, IStructSystem<T>
@@ -29,4 +30,7 @@ public readonly unsafe struct SystemDescriptorCollection
     
     public static SystemDescriptorCollection Create(uint maxSystems, in MemoryPool pool) 
         => new(pool.GetPointer<SystemDescriptor>(maxSystems), pool.GetPointer<uint>(), maxSystems);
+
+    internal ReadOnlySpan<SystemDescriptor> GetDescriptors() 
+        => new(_descriptors, (int)*_count);
 }

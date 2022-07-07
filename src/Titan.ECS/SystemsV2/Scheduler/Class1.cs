@@ -1,13 +1,25 @@
-using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Threading;
 using Titan.Core;
-using Titan.Core.Logging;
 using Titan.Core.Threading2;
-using Titan.ECS.SystemsV2;
 
 namespace Titan.ECS.SystemsV2.Scheduler;
+
+
+
+
+public class Runner
+{
+
+}
+
+public class Scheduler // this is the graph
+{
+    public SystemExecutionGraph Graph;
+
+    public void Test()
+    {
+
+    }
+}
 
 
 

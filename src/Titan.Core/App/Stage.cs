@@ -37,5 +37,10 @@ public enum Stage
     /// <summary>
     /// The last thing to shutdown (turn off logging for example)
     /// </summary>
-    PostShutdown
+    PostShutdown,
+
+    /// <summary>
+    /// The number of stages
+    /// </summary>
+    Count
 }

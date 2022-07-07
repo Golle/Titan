@@ -8,6 +8,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
     <DefineConstants></DefineConstants>
     <OutputType>WinExe</OutputType>
+    <Optimize>True</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' != 'Shipping|AnyCPU'">
     <OutputType>Exe</OutputType>
