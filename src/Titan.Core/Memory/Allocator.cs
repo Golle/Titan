@@ -12,6 +12,9 @@ public unsafe struct Allocator
     private readonly byte* _memory;
     private readonly uint _size;
     private volatile int _next;
+    
+    public uint Size => _size;
+    public uint Used => (uint)_next;
     public Allocator(void* memory, uint size)
     {
         _memory = (byte*)memory;

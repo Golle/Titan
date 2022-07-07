@@ -1,45 +1,20 @@
-using System.Threading;
-using Titan.Components;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
-using Titan.Graphics;
-using Titan.Graphics.Modules;
 using Titan.Modules;
 using Titan.NewStuff;
 
 using var app = App
     .Create(AppCreationArgs.Default)
-
-    .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
     .AddModule<CoreModule>()
-    .AddModule<WindowModule>()
-    .AddModule<RenderModule>()
-    .AddResource(new GlobalFrameCounter())
-    .AddWorld<StartupWorld>()
-    .AddWorld(config => config
-        .AddComponent<Transform3DComponent>()
-        .AddStartupSystem<FrameCounter>()
-        .AddSystem<FrameCounter>()
-        .AddSystem<PrintFrameCounter>())
+
+    //.AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
+    //.AddModule<WindowModule>()
+    //.AddModule<RenderModule>()
+    //.AddResource(new GlobalFrameCounter())
     .Run()
     ;
-
-public struct TheContext
-{
-    public int B;
-}
-
-public static class A
-{
-    public static void B(ref TheContext context)
-    {
-        var newValue = Interlocked.Increment(ref context.B);
-        Thread.Sleep(10);
-        //Logger.Error($"New value: {newValue}");
-    }
-}
 
 internal struct FrameCounter : IStructSystem<FrameCounter>
 {

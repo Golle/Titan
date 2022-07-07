@@ -1,4 +1,4 @@
-using Titan.Core;
+using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.ECS.SystemsV2;
 
@@ -28,8 +28,15 @@ public struct LoggingModule : IModule
         if (desc.Enabled)
         {
             Logger.Start();
-
-            app.AddDisposable(new DisposableAction(Logger.Shutdown));
+            
+            app.AddSystemToStage<LoggerTeardown>(Stage.PostShutdown);
         }
+    }
+
+    private struct LoggerTeardown : IStructSystem<LoggerTeardown>
+    {
+        public static void Init(ref LoggerTeardown system, in SystemsInitializer init){}
+        public static void Update(ref LoggerTeardown system) => Logger.Shutdown();
+        public static bool ShouldRun(in LoggerTeardown system) => true;
     }
 }

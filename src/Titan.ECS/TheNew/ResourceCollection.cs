@@ -5,15 +5,21 @@ using Titan.Core.Memory;
 
 namespace Titan.ECS.TheNew;
 
-public unsafe class UnmanagedResources
+public readonly unsafe struct ResourceCollection
 {
     private readonly PermanentMemory _allocator;
     private readonly void** _indices;
-
-    public UnmanagedResources(uint resourceTypes, PermanentMemory allocator)
+    private ResourceCollection(PermanentMemory allocator, void** indices)
     {
+        _indices = indices;
         _allocator = allocator;
-        _indices = (void**)allocator.GetPointer((uint)(sizeof(void*) * resourceTypes), true);
+    }
+
+    public static ResourceCollection Create(uint size, uint maxTypes, in MemoryPool memoryPool)
+    {
+        var allocator = memoryPool.CreateAllocator<PermanentMemory>(size, true);
+        var indices = memoryPool.GetPointer((uint)(sizeof(void*) * maxTypes));
+        return new ResourceCollection(allocator, (void**)indices);
     }
 
     public void InitResource<T>(in T value = default) where T : unmanaged
@@ -21,7 +27,7 @@ public unsafe class UnmanagedResources
         var id = ResourceId.Id<T>();
         if (_indices[id] == null)
         {
-            Logger.Trace<UnmanagedResources>($"Resource type: {typeof(T).Name} with Id {id} does not exist, creating.");
+            Logger.Trace<ResourceCollection>($"Resource type: {typeof(T).Name} with Id {id} does not exist, creating.");
             _indices[id] = _allocator.GetPointer<T>();
             *(T*)_indices[id] = value;
         }

@@ -7,24 +7,26 @@ namespace Titan.ECS.SystemsV2;
 
 internal readonly unsafe struct SystemNode
 {
-    private readonly void* _instance;
-    private readonly delegate*<void*, void> _update;
-    public readonly ResourceId Id;
+    public readonly int NodeId;
+    public readonly void* Instance;
+    public readonly delegate*<void*, void> Update;
     public readonly Stage Stage;
+    public readonly ResourceId ReourceId;
 
-    public static SystemNode CreateAndInit(in PermanentMemory allocator, in SystemDescriptor descriptor, in SystemsInitializer systemsInitializer)
+    public static SystemNode CreateAndInit(int nodeId, in PermanentMemory allocator, in SystemDescriptor descriptor, in SystemsInitializer systemsInitializer)
     {
         var ptr = allocator.GetPointer(descriptor.Size, true);
         Debug.Assert(ptr != null, $"Failed to allocate memory for system with Id: {descriptor.Id}");
         descriptor.Init(ptr, systemsInitializer);
-        return new SystemNode(ptr, descriptor);
+        return new SystemNode(nodeId, ptr, descriptor);
     }
 
-    private SystemNode(void* instance, in SystemDescriptor descriptor)
+    private SystemNode(int nodeId, void* instance, in SystemDescriptor descriptor)
     {
-        Id = descriptor.Id;
-        _instance = instance;
-        _update = descriptor.Update;
+        NodeId = nodeId;
+        ReourceId = descriptor.Id;
+        Instance = instance;
+        Update = descriptor.Update;
         Stage = descriptor.Stage;
     }
 }

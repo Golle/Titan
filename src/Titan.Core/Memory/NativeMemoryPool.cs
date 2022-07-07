@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Titan.Core.Memory;
 
-public unsafe class NativeMemoryPool : IDisposable
+public unsafe class NativeMemoryPool : IMemoryPool
 {
     // NOTE(Jens): align all allocations to 8 bytes. (We should measure this at some point)
     private const int Alignment = 8;

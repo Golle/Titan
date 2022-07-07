@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace Titan.ECS.TheNew;
 
@@ -21,12 +20,9 @@ public readonly struct ResourceId
     public override int GetHashCode() => (int)_id;
     public override string ToString() => _id.ToString();
 }
-internal static class ResourceId<T>
+
+internal readonly struct ResourceId<T>
 {
-    public static readonly ResourceId Id = new(ResourceIdGenerator.Next());
+    public static readonly ResourceId Id = new(IdGenerator<ResourceId>.Next());
 }
-internal static class ResourceIdGenerator
-{
-    private static volatile uint _id = 1;
-    public static uint Next() => Interlocked.Increment(ref _id);
-}
+

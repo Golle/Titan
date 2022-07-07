@@ -1,4 +1,4 @@
-using Titan.Core;
+using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.Core.Threading2;
 using Titan.ECS.SystemsV2;
@@ -19,10 +19,14 @@ public readonly struct ThreadingModule : IModule
         
         app
             .AddResource(JobApi.CreateAndInitJobApi<ManagedThreadPool>(config))
-            .AddDisposable(new DisposableAction(() =>
-            {
-                app.GetResource<JobApi>()
-                    .Shutdown();
-            }));
+            .AddSystemToStage<JobApiTeardown>(Stage.PostShutdown);
+    }
+
+    private struct JobApiTeardown : IStructSystem<JobApiTeardown>
+    {
+        private ApiResource<JobApi> _jobApi;
+        public static void Init(ref JobApiTeardown system, in SystemsInitializer init) => system._jobApi = init.GetApi<JobApi>();
+        public static void Update(ref JobApiTeardown system) => system._jobApi.Get().Shutdown();
+        public static bool ShouldRun(in JobApiTeardown _) => true;
     }
 }

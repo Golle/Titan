@@ -1,23 +1,14 @@
 using System.Runtime.InteropServices;
 using Titan.Core;
+using Titan.Core.App;
+using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 using Titan.Windows.D3D11;
 
 namespace Titan.Graphics;
 
-public struct AdapterInfo
-{
-
-}
-
-public unsafe struct VulkanDevice 
-{
-    
-}
-
-
 [StructLayout(LayoutKind.Explicit)]
-public unsafe struct RenderDevice
+public unsafe struct RenderDevice : IResource
 {
     [FieldOffset(0)]
     public RenderAPI API;
@@ -27,13 +18,6 @@ public unsafe struct RenderDevice
     // NOTE(Jens): not implemented, just for show :)
     [FieldOffset(sizeof(RenderAPI))]
     public uint* VulkanDevice;
-    [FieldOffset(sizeof(RenderAPI))]
-
-    public int* a;
-
-
-    public void Add(in int b) => a[10] = b;
-
 }
 
 public enum RenderAPI
@@ -52,18 +36,14 @@ public struct RenderModule : IModule
             API = RenderAPI.D3D11,
             D3DDevice = devicePtr
         });
-
-
-        app.AddDisposable(new DisposableAction(() => NativeMemory.Free(devicePtr)));
-
+        app.AddSystemToStage<RenderDeviceTeardown>(Stage.Shutdown);
     }
-}
 
-
-public static unsafe class D3D11Device
-{
-    public static ID3D11Device* CreateDevice()
+    private struct RenderDeviceTeardown : IStructSystem<RenderDeviceTeardown>
     {
-        return null;
+        private MutableResource<RenderDevice> _renderDevice;
+        public static void Init(ref RenderDeviceTeardown system, in SystemsInitializer init) => system._renderDevice = init.GetMutableGlobalResource<RenderDevice>();
+        public static unsafe void Update(ref RenderDeviceTeardown system) => NativeMemory.Free(system._renderDevice.Get().D3DDevice);
+        public static bool ShouldRun(in RenderDeviceTeardown system) => true;
     }
 }

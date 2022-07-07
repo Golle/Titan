@@ -5,11 +5,12 @@ namespace Titan.ECS.SystemsV2;
 
 internal readonly unsafe struct SystemDescriptor
 {
-    public readonly ResourceId Id;
     public readonly delegate*<void*, SystemsInitializer, void> Init;
     public readonly delegate*<void*, void> Update;
     public readonly uint Size;
     public readonly Stage Stage;
+    public readonly ResourceId Id;
+
     public static SystemDescriptor Create<T>(Stage stage = Stage.Update) where T : unmanaged, IStructSystem<T>
         => new(ResourceId.Id<T>(), (uint)sizeof(T), stage, &FunctionWrapper<T>.Init, &FunctionWrapper<T>.Update);
 

@@ -19,4 +19,8 @@
     <Folder Include="Systems\Resources\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Metadata" Version="5.0.0" />
+  </ItemGroup>
+
 </Project>

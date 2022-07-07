@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Events;
 using Titan.ECS.Components;
@@ -8,16 +7,6 @@ using Titan.ECS.SystemsV2.Components;
 using Titan.ECS.TheNew;
 
 namespace Titan.ECS.SystemsV2;
-
-
-public readonly unsafe struct ApiResource<T> where T : unmanaged
-{
-    private readonly T* _api;
-    internal ApiResource(T* api) => _api = api;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref T Get() => ref *_api;
-}
 
 public readonly unsafe ref struct SystemsInitializer
 {
