@@ -10,6 +10,7 @@ internal readonly unsafe struct SystemNode
     public readonly int NodeId;
     public readonly void* Instance;
     public readonly delegate*<void*, void> Update;
+    public readonly delegate*<void*, bool> ShouldRun;
     public readonly Stage Stage;
     public readonly ResourceId ReourceId;
 
@@ -27,6 +28,7 @@ internal readonly unsafe struct SystemNode
         ReourceId = descriptor.Id;
         Instance = instance;
         Update = descriptor.Update;
+        ShouldRun = descriptor.ShouldRun;
         Stage = descriptor.Stage;
     }
 }

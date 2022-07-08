@@ -8,19 +8,22 @@ namespace Titan.ECS.TheNew;
 
 public readonly unsafe struct ResourceCollection
 {
-    private readonly PermanentMemory _allocator;
+    private readonly TransientMemory _allocator;
     private readonly void** _indices;
-    private ResourceCollection(PermanentMemory allocator, void** indices)
+    private readonly uint _indicesCount;
+
+    private ResourceCollection(TransientMemory allocator, void** indices, uint indicesCount)
     {
-        _indices = indices;
         _allocator = allocator;
+        _indices = indices;
+        _indicesCount = indicesCount;
     }
 
     public static ResourceCollection Create(uint size, uint maxTypes, in MemoryPool memoryPool)
     {
-        var allocator = memoryPool.CreateAllocator<PermanentMemory>(size, true);
+        var allocator = memoryPool.CreateAllocator<TransientMemory>(size, true);
         var indices = memoryPool.GetPointer((uint)(sizeof(void*) * maxTypes));
-        return new ResourceCollection(allocator, (void**)indices);
+        return new ResourceCollection(allocator, (void**)indices, maxTypes);
     }
 
     public void InitResource<T>(in T value = default) where T : unmanaged
@@ -62,4 +65,11 @@ public readonly unsafe struct ResourceCollection
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasResource<T>() => _indices[ResourceId.Id<T>()] != null;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Reset(bool clearMemory = false)
+    {
+        Unsafe.InitBlockUnaligned(_indices, 0, (uint)(sizeof(void*)*_indicesCount));
+        _allocator.Reset(clearMemory);
+    }
 }

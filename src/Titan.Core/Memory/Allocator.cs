@@ -40,6 +40,12 @@ public unsafe struct Allocator
         }
         return location;
     }
-    public void Reset()
-        => _next = 0;
+    public void Reset(bool initialize = false)
+    {
+        _next = 0;
+        if (initialize)
+        {
+            Unsafe.InitBlock(_memory, 0, _size);
+        }
+    }
 }

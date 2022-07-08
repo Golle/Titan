@@ -50,7 +50,7 @@ internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
     {
         var count = system._global.Get().FrameCounter;
 
-        Logger.Trace<PrintFrameCounter>($"Current frame count: {count}");
+        //Logger.Trace<PrintFrameCounter>($"Current frame count: {count}");
     }
 
     public static bool ShouldRun(in PrintFrameCounter system) => true;

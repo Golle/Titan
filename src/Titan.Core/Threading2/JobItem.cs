@@ -7,11 +7,15 @@ public unsafe struct JobItem
     internal delegate*<void*, void> Function;
     internal void* Context;
     internal bool AutoReset;
-    public static JobItem Create<T>(ref T context, delegate*<ref T, void> callback, bool autoReset = true) where T : unmanaged =>
-        new()
+
+    public static JobItem Create<T>(ref T context, delegate*<ref T, void> callback, bool autoReset = true) where T : unmanaged
+        => Create(Unsafe.AsPointer(ref context), (delegate*<void*, void>)callback, autoReset);
+
+    public static JobItem Create(void* context, delegate*<void*, void> callback, bool autoReset = true)
+        => new()
         {
-            Context = Unsafe.AsPointer(ref context),
+            Context = context,
             AutoReset = autoReset,
-            Function = (delegate*<void*, void>)callback
+            Function = callback
         };
 }

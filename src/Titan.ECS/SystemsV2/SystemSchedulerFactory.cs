@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
+using Titan.Core.Threading2;
+using Titan.ECS.SystemsV2.Scheduler;
 
 namespace Titan.ECS.SystemsV2;
 
@@ -12,14 +14,38 @@ public static unsafe class SystemSchedulerFactory
     public static void CreateTest(in PermanentMemory memory, in TransientMemory transientMemory, in SystemDescriptorCollection systems, IApp app)
     {
         var graph = Create(memory, transientMemory, systems.GetDescriptors(), app);
+        ref readonly var jobApi = ref app.GetResource<JobApi>();
 
-        for (var i = 0; i < (int)Stage.Count; ++i)
+        SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
+        SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
+        var count = 1000;
+        
+        var preUpdate = graph.GetGraph(Stage.PreUpdate);
+        var update = graph.GetGraph(Stage.Update);
+        var postUpdate = graph.GetGraph(Stage.PostUpdate);
+        for (var i = 0; i < count; ++i)
         {
-            var nodes = graph.GetNodes((Stage)i);
-            Logger.Info($"Running {nodes.Length} systems in stage {(Stage)i}.", typeof(SystemSchedulerFactory));
+            ParallelExecutor.RunSystems(preUpdate, jobApi);
+            OrderedExecutor.RunSystems(update, jobApi);
+            ParallelExecutor.RunSystems(postUpdate, jobApi);
         }
+        
+        var timer = Stopwatch.StartNew();
+        for (var i = 0; i < count; ++i)
+        {
+            ParallelExecutor.RunSystems(preUpdate, jobApi);
+            //SynchronousExecutor.RunSystems(update, jobApi);
+            //ParallelExecutor.RunSystems(update, jobApi);
+            //OrderedExecutor.RunSystems(update, jobApi);
+            //ParallelExecutor.RunSystems(postUpdate, jobApi);
+        }
+        
+        timer.Stop();
+        Logger.Trace($"{timer.Elapsed.TotalMilliseconds} ms. {timer.Elapsed.TotalMilliseconds/1000.0} ms/iteration", typeof(SystemSchedulerFactory));
+        SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
+        //SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PostShutdown), jobApi);
     }
-    
+
     [SkipLocalsInit]
     internal static SystemExecutionStages Create(in PermanentMemory memory, in TransientMemory transientMemory, ReadOnlySpan<SystemDescriptor> descriptors, IApp app)
     {
@@ -44,6 +70,7 @@ public static unsafe class SystemSchedulerFactory
         {
             var systemNode = SystemNode.CreateAndInit(i, memory, sortedDescriptors[i], new SystemsInitializer(app, &states[i]));
             nodes[i].System = systemNode;
+            // Count the number of systems in each state
             stageCounter[(int)systemNode.Stage]++;
         }
 
@@ -89,7 +116,7 @@ public static unsafe class SystemSchedulerFactory
         }
         return new SystemExecutionStages(graphs, stageCount);
 
-        static int CompareDescriptor(SystemDescriptor l, SystemDescriptor r) 
+        static int CompareDescriptor(SystemDescriptor l, SystemDescriptor r)
             => l.Stage - r.Stage;
     }
 
@@ -120,12 +147,9 @@ internal readonly unsafe struct SystemExecutionStages
         _count = count;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)] 
-    public ReadOnlySpan<SystemExecutionGraphNode> GetNodes(Stage stage) => _graphs[(int)stage].GetNodes();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ref readonly SystemExecutionGraph GetGraph(Stage stage) => ref _graphs[(int)stage];
 }
-
-// stages -> tree -> nodes
-//
 
 public unsafe struct SystemExecutionGraph
 {
@@ -137,8 +161,9 @@ public unsafe struct SystemExecutionGraph
         _nodes = nodes;
         _count = count;
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal ReadOnlySpan<SystemExecutionGraphNode> GetNodes() => new(_nodes, _count);
+    internal readonly ReadOnlySpan<SystemExecutionGraphNode> GetNodes() => new(_nodes, _count);
 }
 
 internal unsafe struct SystemExecutionGraphNode
@@ -146,5 +171,11 @@ internal unsafe struct SystemExecutionGraphNode
     public SystemNode System;
     public int* Dependencies;
     public int DependenciesCount;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly bool ShouldRun() => System.ShouldRun(System.Instance);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly void Update() => System.Update(System.Instance);
 }
 

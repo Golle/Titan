@@ -14,16 +14,16 @@ public readonly unsafe struct TransientMemory : IMemoryAllocator<TransientMemory
     public MemoryBlock<T> GetBlock<T>(uint count, bool initialize = false) where T : unmanaged
         => new(_allocator->GetPointer<T>(initialize), count);
 
-    public T* GetPointer<T>(bool initialize) where T : unmanaged
+    public T* GetPointer<T>(bool initialize = false) where T : unmanaged
         => _allocator->GetPointer<T>(initialize);
 
-    public T* GetPointer<T>(uint count, bool initialize) where T : unmanaged 
+    public T* GetPointer<T>(uint count, bool initialize = false) where T : unmanaged 
         => (T*)GetPointer((uint)(sizeof(T) * count), initialize);
 
-    public void* GetPointer(uint size, bool initialize)
+    public void* GetPointer(uint size, bool initialize = false)
         => _allocator->GetPointer(size, initialize);
 
-    public ref T Get<T>(bool initialize) where T : unmanaged
+    public ref T Get<T>(bool initialize = false) where T : unmanaged
         => ref *_allocator->GetPointer<T>(initialize);
 
     public T CreateSubAllocator<T>(uint size) where T : unmanaged, IMemoryAllocator<T>
@@ -33,14 +33,12 @@ public readonly unsafe struct TransientMemory : IMemoryAllocator<TransientMemory
         return T.CreateAllocator(allocator);
     }
 
-    public T As<T>() where T : unmanaged, IMemoryAllocator<T>
-    {
-        return T.CreateAllocator(_allocator);
-    }
+    public T As<T>() where T : unmanaged, IMemoryAllocator<T> 
+        => T.CreateAllocator(_allocator);
 
     public static TransientMemory CreateAllocator(Allocator* allocator) 
         => new(allocator);
 
-    public void Reset()
-        => _allocator->Reset();
+    public void Reset(bool initialize = false)
+        => _allocator->Reset(initialize);
 }

@@ -80,13 +80,13 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             {
                 continue;
             }
-            Logger.Info($"Starting job: {jobIndex} - {index}");
+            //Logger.Info($"Starting job: {jobIndex} - {index}", typeof(ManagedThreadPool));
             Interlocked.Decrement(ref _count);
             ref var job = ref _jobQueue[jobIndex];
             job.Execute();
             Volatile.Write(ref job.State, job.JobItem.AutoReset ? JobState.Available : JobState.Completed);
         }
-        Logger.Trace($"{thread.Name} stopped.", typeof(ManagedThreadPool));
+        //Logger.Trace($"{thread.Name} stopped.", typeof(ManagedThreadPool));
     }
 
 
@@ -131,7 +131,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             }
             return index;
         }
-        Logger.Error($"Failed to get a job ID after {_maxJobs} iterations.");
+        Logger.Error($"Failed to get a job ID after {_maxJobs} iterations.", typeof(ManagedThreadPool));
         return -1;
     }
     // NOTE(Jens): the _nextJob and _nextQueuedJob are volatile fields, we can't create a single method for this unfortunately
@@ -156,7 +156,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             }
             return index;
         }
-        Logger.Error($"Failed to get a job ID after {_maxJobs} iterations.");
+        Logger.Error($"Failed to get a job ID after {_maxJobs} iterations.", typeof(ManagedThreadPool));
         return -1;
     }
 
