@@ -4,7 +4,7 @@ public record AppCreationArgs
 {
     public const uint DefaultUnmanagedMemory = 1 * 1024 * 1024 * 1024;      // 1Gb
     public const uint DefaultGlobalResourcesMemory = 32 * 1024 * 1024;      // 32Mb
-    public const uint DefaultGlobalSystemTypes = 100;
+    public const uint DefaultGlobalSystemTypes = 1000;
 
 
     // These should be used somwewhere else

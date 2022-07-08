@@ -8,7 +8,7 @@ namespace Titan.Core.Threading2;
 public readonly struct ManagedThreadPool : IThreadPoolApi
 {
     private static Thread[] _threads;
-    private static Semaphore _notifier;
+    private static SemaphoreSlim _notifier;
 
     private static volatile int _nextJob;
     private static volatile int _nextQueuedJob;
@@ -34,7 +34,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
     {
         _maxJobs = (int)config.MaxJobs;
         _threads = new Thread[config.WorkerThreads];
-        _notifier = new Semaphore(0, _maxJobs);
+        _notifier = new SemaphoreSlim(0, _maxJobs);
 
         _workers = new WorkerInfo[config.WorkerThreads];
         _jobQueue = new Job[config.MaxJobs];
@@ -43,7 +43,9 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         {
             _threads[i] = new Thread(RunWorker)
             {
-                Name = $"Worker thread #{i}"
+                Name = $"Worker thread #{i}",
+                IsBackground = true,
+                Priority = ThreadPriority.AboveNormal
             };
             _workers[i].Active = true;
             _workers[i].State = WorkerState.Waiting;
@@ -65,7 +67,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         Logger.Trace($"{thread.Name} started.", typeof(ManagedThreadPool));
         while (info.Active)
         {
-            if (!_notifier.WaitOne(DefaultThreadWaitTime))
+            if (!_notifier.Wait(DefaultThreadWaitTime))
             {
                 continue;
             }
@@ -74,17 +76,18 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             {
                 continue;
             }
-
+            
             var jobIndex = GetNextQueuedJob();
             if (jobIndex == -1)
             {
+                // With the way jobs are signaled, this will never happen. 
                 continue;
             }
-            //Logger.Info($"Starting job: {jobIndex} - {index}", typeof(ManagedThreadPool));
+
             Interlocked.Decrement(ref _count);
             ref var job = ref _jobQueue[jobIndex];
             job.Execute();
-            Volatile.Write(ref job.State, job.JobItem.AutoReset ? JobState.Available : JobState.Completed);
+            job.State = job.JobItem.AutoReset ? JobState.Available : JobState.Completed;
         }
         //Logger.Trace($"{thread.Name} stopped.", typeof(ManagedThreadPool));
     }
@@ -100,11 +103,11 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         }
         ref var job = ref _jobQueue[index];
         job.JobItem = item;
-        Volatile.Write(ref _jobQueue[index].State, JobState.Waiting);
+        _jobQueue[index].State = JobState.Waiting;
         Interlocked.Increment(ref _count);
         _notifier.Release();
 
-        handle = index; // handle 0 is invalid
+        handle = index;
         return true;
     }
 
@@ -134,6 +137,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         Logger.Error($"Failed to get a job ID after {_maxJobs} iterations.", typeof(ManagedThreadPool));
         return -1;
     }
+
     // NOTE(Jens): the _nextJob and _nextQueuedJob are volatile fields, we can't create a single method for this unfortunately
     private static int GetNextQueuedJob()
     {

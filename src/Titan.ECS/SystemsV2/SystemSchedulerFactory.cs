@@ -15,34 +15,45 @@ public static unsafe class SystemSchedulerFactory
     {
         var graph = Create(memory, transientMemory, systems.GetDescriptors(), app);
         ref readonly var jobApi = ref app.GetResource<JobApi>();
-
         SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
         SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
-        var count = 1000;
-        
-        var preUpdate = graph.GetGraph(Stage.PreUpdate);
-        var update = graph.GetGraph(Stage.Update);
-        var postUpdate = graph.GetGraph(Stage.PostUpdate);
-        for (var i = 0; i < count; ++i)
-        {
-            ParallelExecutor.RunSystems(preUpdate, jobApi);
-            OrderedExecutor.RunSystems(update, jobApi);
-            ParallelExecutor.RunSystems(postUpdate, jobApi);
-        }
-        
-        var timer = Stopwatch.StartNew();
-        for (var i = 0; i < count; ++i)
-        {
-            ParallelExecutor.RunSystems(preUpdate, jobApi);
-            //SynchronousExecutor.RunSystems(update, jobApi);
-            //ParallelExecutor.RunSystems(update, jobApi);
-            //OrderedExecutor.RunSystems(update, jobApi);
-            //ParallelExecutor.RunSystems(postUpdate, jobApi);
-        }
-        
-        timer.Stop();
-        Logger.Trace($"{timer.Elapsed.TotalMilliseconds} ms. {timer.Elapsed.TotalMilliseconds/1000.0} ms/iteration", typeof(SystemSchedulerFactory));
+        ParallelExecutor.RunSystems(graph.GetGraph(Stage.PreUpdate), jobApi);
+        OrderedExecutor.RunSystems(graph.GetGraph(Stage.Update), jobApi);
+        ParallelExecutor.RunSystems(graph.GetGraph(Stage.PostUpdate), jobApi);
         SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
+
+        Logger.Error("Run systems in parallel with dependencies", typeof(SystemSchedulerFactory));
+        for (var j = 0; j < 10; ++j)
+        {
+            var timer = Stopwatch.StartNew();
+            for (var i = 0; i < 1000; ++i)
+            {
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
+                ParallelExecutor.RunSystems(graph.GetGraph(Stage.PreUpdate), jobApi);
+                OrderedExecutor.RunSystems(graph.GetGraph(Stage.Update), jobApi);
+                ParallelExecutor.RunSystems(graph.GetGraph(Stage.PostUpdate), jobApi);
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
+            }
+            timer.Stop();
+            Logger.Error($"Total system execution time(1000 iterations): {timer.Elapsed.TotalMilliseconds} ms. Per iteration: {timer.Elapsed.TotalMilliseconds / 1000.0} ms", typeof(SystemSchedulerFactory));
+        }
+        Logger.Error("Run all systems on main thread", typeof(SystemSchedulerFactory));
+        for (var j = 0; j < 10; ++j)
+        {
+            var timer = Stopwatch.StartNew();
+            for (var i = 0; i < 1000; ++i)
+            {
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreUpdate), jobApi);
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Update), jobApi);
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PostUpdate), jobApi);
+                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
+            }
+            timer.Stop();
+            Logger.Error($"Total system execution time(1000 iterations): {timer.Elapsed.TotalMilliseconds} ms. Per iteration: {timer.Elapsed.TotalMilliseconds / 1000.0} ms", typeof(SystemSchedulerFactory));
+        }
         //SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PostShutdown), jobApi);
     }
 

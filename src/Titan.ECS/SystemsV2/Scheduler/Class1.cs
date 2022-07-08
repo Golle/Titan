@@ -34,6 +34,7 @@ internal struct SynchronousExecutor : IExecutor
 
 internal struct ParallelExecutor : IExecutor
 {
+    [SkipLocalsInit]
     public static unsafe void RunSystems(in SystemExecutionGraph graph, in JobApi jobApi)
     {
         var nodes = graph.GetNodes();
@@ -54,7 +55,6 @@ internal struct ParallelExecutor : IExecutor
                 handles[i] = jobApi.Enqueue(JobItem.Create(node.System.Instance, node.System.Update, false));
             }
         }
-
 
         while (systemsLeft > 0)
         {
@@ -79,6 +79,7 @@ internal struct ParallelExecutor : IExecutor
 public unsafe struct OrderedExecutor : IExecutor
 {
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    [SkipLocalsInit]
     public static void RunSystems(in SystemExecutionGraph graph, in JobApi jobApi)
     {
         var nodes = graph.GetNodes();
