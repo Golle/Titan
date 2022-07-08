@@ -180,9 +180,23 @@ internal unsafe struct Win32WindowFunctions : IWindowFunctions
             case WM_SYSKEYUP:
                 eventQueue->Push(new KeyReleased((int)wParam));
                 break;
+            case WM_SIZE:
+                var width = (uint)(lParam & 0xffff);
+                var height = (uint)((lParam >> 16) & 0xffff);
+                eventQueue->Push(new WindowSize(width, height));
+                break;
+
+            case WM_EXITSIZEMOVE:
+                eventQueue->Push(new WindowResizeComplete());
+                break;
         }
         return DefWindowProcA(hWnd, message, wParam, lParam);
     }
+}
+
+public readonly struct WindowResizeComplete : IWindowEvent
+{
+    public static uint Id => 234;
 }
 
 public readonly struct KeyPressed : IWindowEvent
@@ -203,6 +217,18 @@ public readonly struct KeyReleased : IWindowEvent
     public KeyReleased(int code)
     {
         Code = code;
+    }
+}
+
+public readonly struct WindowSize : IWindowEvent
+{
+    public static uint Id => 48;
+    public readonly uint Width;
+    public readonly uint Height;
+    public WindowSize(uint width, uint height)
+    {
+        Width = width;
+        Height = height;
     }
 }
 

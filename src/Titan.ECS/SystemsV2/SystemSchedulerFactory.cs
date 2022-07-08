@@ -11,7 +11,6 @@ public static unsafe class SystemSchedulerFactory
 {
     public static void CreateTest(in PermanentMemory memory, in TransientMemory transientMemory, in SystemDescriptorCollection systems, IApp app)
     {
-
         var graph = Create(memory, transientMemory, systems.GetDescriptors(), app);
 
         for (var i = 0; i < (int)Stage.Count; ++i)
@@ -20,7 +19,6 @@ public static unsafe class SystemSchedulerFactory
             Logger.Info($"Running {nodes.Length} systems in stage {(Stage)i}.", typeof(SystemSchedulerFactory));
         }
     }
-
     
     [SkipLocalsInit]
     internal static SystemExecutionStages Create(in PermanentMemory memory, in TransientMemory transientMemory, ReadOnlySpan<SystemDescriptor> descriptors, IApp app)

@@ -9,6 +9,8 @@ public record struct Point(int X, int Y);
 public struct Window : IResource
 {
     public nint Handle;
+    public uint Height;
+    public uint Width;
 }
 
 public readonly unsafe struct WindowApi : IApi
@@ -23,7 +25,12 @@ public readonly unsafe struct WindowApi : IApi
         nint handle = default;
         if (_functions.CreateWindow(ref handle, descriptor, eventQueue))
         {
-            window = new Window();
+            window = new Window
+            {
+                Handle = handle,
+                Width = descriptor.Width,
+                Height = descriptor.Height
+            };
             return true;
         }
         return false;

@@ -23,6 +23,8 @@ public struct WindowModule : IModule
             .AddEvent<KeyPressed>()
             .AddEvent<WindowLostFocus>()
             .AddEvent<WindowGainedFocus>()
+            .AddEvent<WindowResizeComplete>()
+            .AddEvent<WindowSize>(20)
             ;
 
         // Get the window descriptor and create the window
