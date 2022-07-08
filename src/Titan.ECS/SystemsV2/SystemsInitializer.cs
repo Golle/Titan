@@ -20,7 +20,7 @@ public readonly unsafe ref struct SystemsInitializer
     }
     public MutableResource<T> GetMutableGlobalResource<T>() where T : unmanaged, IResource
     {
-        _state->MutableGlobalResources.Add(ResourceId<T>.Id);
+        _state->MutableGlobalResources.Add(ResourceId.Id<T>());
         return new(_app.GetMutableResourcePointer<T>());
     }
 

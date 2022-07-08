@@ -53,7 +53,7 @@ public abstract unsafe class BaseSystem
     protected void AddMutable<T>()
     {
         Debug.Assert(IsInitialized == false, "System has already been initialized.");
-        var resourceId = ResourceId<T>.Id;
+        var resourceId = ResourceId.Id<T>();
         if (!_mutable.Contains(resourceId))
         {
             Array.Resize(ref _mutable, _mutable.Length + 1);
@@ -63,7 +63,7 @@ public abstract unsafe class BaseSystem
     protected void AddReadonly<T>()
     {
         Debug.Assert(IsInitialized == false, "System has already been initialized.");
-        var resourceId = ResourceId<T>.Id;
+        var resourceId = ResourceId.Id<T>();
         if (!_readOnly.Contains(resourceId))
         {
             Array.Resize(ref _readOnly, _readOnly.Length + 1);
