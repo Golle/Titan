@@ -53,6 +53,24 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         }
     }
 
+    public static void SignalReady(ReadOnlySpan<Handle<JobApi>> handles)
+    {
+        var signalCount = 0;
+        foreach (var handle in handles)
+        {
+            if (!handle.IsInvalid())
+            {
+                ref var job = ref _jobQueue[handle];
+                if (job.State == JobState.Waiting)
+                {
+                    job.State = JobState.Ready;
+                    signalCount++;
+                }
+            }
+        }
+        _notifier.Release(signalCount);
+    }
+
     public static bool IsCompleted(in Handle<JobApi> handle)
     {
         ref readonly var job = ref _jobQueue[handle];
@@ -103,9 +121,12 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         }
         ref var job = ref _jobQueue[index];
         job.JobItem = item;
-        _jobQueue[index].State = JobState.Waiting;
+        _jobQueue[index].State = item.IsReady ? JobState.Ready : JobState.Waiting;
         Interlocked.Increment(ref _count);
-        _notifier.Release();
+        if (item.IsReady)
+        {
+            _notifier.Release();
+        }
 
         handle = index;
         return true;
@@ -134,7 +155,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             }
             return index;
         }
-        Logger.Error($"Failed to get a job ID after {_maxJobs} iterations.", typeof(ManagedThreadPool));
+        Logger.Error($"Failed to get the next job ID after {_maxJobs} iterations.", typeof(ManagedThreadPool));
         return -1;
     }
 
@@ -152,15 +173,15 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
                 continue;
             }
 
-            var previousStatus = Interlocked.CompareExchange(ref _jobQueue[index].State, JobState.Running, JobState.Waiting);
+            var previousStatus = Interlocked.CompareExchange(ref _jobQueue[index].State, JobState.Running, JobState.Ready);
             // If the job is busy, loop again and try to find a new spot
-            if (previousStatus != JobState.Waiting)
+            if (previousStatus != JobState.Ready)
             {
                 continue;
             }
             return index;
         }
-        Logger.Error($"Failed to get a job ID after {_maxJobs} iterations.", typeof(ManagedThreadPool));
+        Logger.Error($"Failed to get the queued job ID after {_maxJobs} iterations.", typeof(ManagedThreadPool));
         return -1;
     }
 

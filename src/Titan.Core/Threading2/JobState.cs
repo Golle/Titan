@@ -1,10 +1,11 @@
-﻿namespace Titan.Core.Threading2;
+namespace Titan.Core.Threading2;
 
 public static class JobState
 {
     public const int Available = 0;
     public const int Claimed = 1;
     public const int Waiting = 2;
-    public const int Running = 3;
-    public const int Completed = 4;
+    public const int Ready = 3;
+    public const int Running = 4;
+    public const int Completed = 5;
 }

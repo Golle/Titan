@@ -2,7 +2,6 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core;
-using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;
 using static Titan.ECS.SystemsV2.Scheduler.SchedulerTest;
@@ -40,6 +39,7 @@ internal struct ParallelExecutor : IExecutor
         var nodes = graph.GetNodes();
         var length = nodes.Length;
         var systemsLeft = length;
+        var executingJobCount = 0;
         Span<Handle<JobApi>> handles = stackalloc Handle<JobApi>[nodes.Length];
         for (var i = 0; i < length; ++i)
         {
@@ -47,23 +47,23 @@ internal struct ParallelExecutor : IExecutor
             if (!node.ShouldRun())
             {
                 systemsLeft--;
-                handles[i] = Handle<JobApi>.Null;
             }
             else
             {
                 //Logger.Trace<ParallelExecutor>($"Start system with index {i}");
-                handles[i] = jobApi.Enqueue(JobItem.Create(node.System.Instance, node.System.Update, false));
+                handles[executingJobCount++] = jobApi.Enqueue(JobItem.Create(node.System.Instance, node.System.Update, isReady: false, autoReset: false));
             }
         }
 
+        jobApi.SignalReady(handles[..executingJobCount]);
         while (systemsLeft > 0)
         {
-            for (var i = 0; i < length; ++i)
+            for (var i = 0; i < executingJobCount; ++i)
             {
                 ref var handle = ref handles[i];
                 if (handle.IsValid())
                 {
-                    if(jobApi.IsCompleted(handle))
+                    if (jobApi.IsCompleted(handle))
                     {
                         jobApi.Reset(ref handle);
                         systemsLeft--;
@@ -104,7 +104,7 @@ public unsafe struct OrderedExecutor : IExecutor
                 if (node.DependenciesCount == 0)
                 {
                     ref readonly var system = ref node.System;
-                    handles[index] = jobApi.Enqueue(JobItem.Create(system.Instance, system.Update, false));
+                    handles[index] = jobApi.Enqueue(JobItem.Create(system.Instance, system.Update, autoReset: false));
                     states[index] = SystemState.Running;
                     //Logger.Trace<OrderedExecutor>($"System with index {index} started");
                 }
@@ -152,7 +152,7 @@ public unsafe struct OrderedExecutor : IExecutor
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static Handle<JobApi> RunSystem(in JobApi jobApi, in SystemNode system)
-            => jobApi.Enqueue(JobItem.Create(system.Instance, system.Update, false));
+            => jobApi.Enqueue(JobItem.Create(system.Instance, system.Update, autoReset: false));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static void UpdateJobStates(in JobApi jobApi, in Handle<JobApi>* handles, in SystemState* states, int nodeCount, ref int systemsLeft)
