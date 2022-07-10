@@ -15,6 +15,7 @@ public interface IApp : IDisposable
     bool HasResource<T>() where T : unmanaged;
     IApp Run();
 
+    ref readonly T GetResourceOrDefault<T>() where T : unmanaged, IDefault<T>;
 
     // Global systems?
     IApp AddSystem<T>() where T : unmanaged, IStructSystem<T>;

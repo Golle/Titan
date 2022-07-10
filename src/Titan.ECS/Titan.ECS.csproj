@@ -16,6 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Modules\" />
+    <Folder Include="SystemsV2\Scheduler\Executors\" />
     <Folder Include="Systems\Resources\" />
   </ItemGroup>
 

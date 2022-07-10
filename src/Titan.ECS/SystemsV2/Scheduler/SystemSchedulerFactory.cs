@@ -5,9 +5,9 @@ using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;
-using Titan.ECS.SystemsV2.Scheduler;
+using Titan.ECS.SystemsV2.Scheduler.Executors;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.SystemsV2.Scheduler;
 
 public static unsafe class SystemSchedulerFactory
 {
@@ -15,46 +15,13 @@ public static unsafe class SystemSchedulerFactory
     {
         var graph = Create(memory, transientMemory, systems.GetDescriptors(), app);
         ref readonly var jobApi = ref app.GetResource<JobApi>();
-        SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
-        SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
+        Logger.Error($"Run systems in parallel with dependencies {graph.GetGraph(Stage.PreUpdate).GetNodes().Length}", typeof(SystemSchedulerFactory));
+        SequentialExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
+        SequentialExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
         ParallelExecutor.RunSystems(graph.GetGraph(Stage.PreUpdate), jobApi);
-        OrderedExecutor.RunSystems(graph.GetGraph(Stage.Update), jobApi);
-        ParallelExecutor.RunSystems(graph.GetGraph(Stage.PostUpdate), jobApi);
-        SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
-
-        Logger.Error("Run systems in parallel with dependencies", typeof(SystemSchedulerFactory));
-        for (var j = 0; j < 10; ++j)
-        {
-            var timer = Stopwatch.StartNew();
-            for (var i = 0; i < 1000; ++i)
-            {
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
-                ParallelExecutor.RunSystems(graph.GetGraph(Stage.PreUpdate), jobApi);
-                OrderedExecutor.RunSystems(graph.GetGraph(Stage.Update), jobApi);
-                ParallelExecutor.RunSystems(graph.GetGraph(Stage.PostUpdate), jobApi);
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
-            }
-            timer.Stop();
-            Logger.Error($"Total system execution time(1000 iterations): {timer.Elapsed.TotalMilliseconds} ms. Per iteration: {timer.Elapsed.TotalMilliseconds / 1000.0} ms", typeof(SystemSchedulerFactory));
-        }
-        Logger.Error("Run all systems on main thread", typeof(SystemSchedulerFactory));
-        for (var j = 0; j < 10; ++j)
-        {
-            var timer = Stopwatch.StartNew();
-            for (var i = 0; i < 1000; ++i)
-            {
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PreUpdate), jobApi);
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Update), jobApi);
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PostUpdate), jobApi);
-                SynchronousExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
-            }
-            timer.Stop();
-            Logger.Error($"Total system execution time(1000 iterations): {timer.Elapsed.TotalMilliseconds} ms. Per iteration: {timer.Elapsed.TotalMilliseconds / 1000.0} ms", typeof(SystemSchedulerFactory));
-        }
-        //SynchronousExecutor.RunSystems(graph.GetGraph(Stage.PostShutdown), jobApi);
+        //OrderedExecutor.RunSystems(graph.GetGraph(Stage.Update), jobApi);
+        //ParallelExecutor.RunSystems(graph.GetGraph(Stage.PostUpdate), jobApi);
+        //SequentialExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
     }
 
     [SkipLocalsInit]
@@ -146,47 +113,3 @@ public static unsafe class SystemSchedulerFactory
         }
     }
 }
-
-internal readonly unsafe struct SystemExecutionStages
-{
-    private readonly SystemExecutionGraph* _graphs;
-    private readonly uint _count;
-
-    public SystemExecutionStages(SystemExecutionGraph* graphs, uint count)
-    {
-        _graphs = graphs;
-        _count = count;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref readonly SystemExecutionGraph GetGraph(Stage stage) => ref _graphs[(int)stage];
-}
-
-public unsafe struct SystemExecutionGraph
-{
-    private readonly SystemExecutionGraphNode* _nodes;
-    private readonly int _count;
-    private fixed int _stages[(int)Stage.Count];
-    internal SystemExecutionGraph(SystemExecutionGraphNode* nodes, int count)
-    {
-        _nodes = nodes;
-        _count = count;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal readonly ReadOnlySpan<SystemExecutionGraphNode> GetNodes() => new(_nodes, _count);
-}
-
-internal unsafe struct SystemExecutionGraphNode
-{
-    public SystemNode System;
-    public int* Dependencies;
-    public int DependenciesCount;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool ShouldRun() => System.ShouldRun(System.Instance);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly void Update() => System.Update(System.Instance);
-}
-

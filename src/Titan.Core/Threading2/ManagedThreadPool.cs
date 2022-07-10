@@ -71,11 +71,8 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         _notifier.Release(signalCount);
     }
 
-    public static bool IsCompleted(in Handle<JobApi> handle)
-    {
-        ref readonly var job = ref _jobQueue[handle];
-        return job.State is JobState.Completed;
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsCompleted(in Handle<JobApi> handle) => _jobQueue[handle].State == JobState.Completed;
 
     private static void RunWorker(object obj)
     {
@@ -89,12 +86,10 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             {
                 continue;
             }
-
             if (_count <= 0)
             {
                 continue;
             }
-            
             var jobIndex = GetNextQueuedJob();
             if (jobIndex == -1)
             {
@@ -121,13 +116,12 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         }
         ref var job = ref _jobQueue[index];
         job.JobItem = item;
-        _jobQueue[index].State = item.IsReady ? JobState.Ready : JobState.Waiting;
+        job.State = item.IsReady ? JobState.Ready : JobState.Waiting;
         Interlocked.Increment(ref _count);
         if (item.IsReady)
         {
             _notifier.Release();
         }
-
         handle = index;
         return true;
     }
@@ -146,8 +140,9 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             {
                 continue;
             }
-
-            var previousStatus = Interlocked.CompareExchange(ref _jobQueue[index].State, JobState.Claimed, JobState.Available);
+            // NOTE(Jens): maybe we can skip this CompareExchange and just assume we got the job?
+            ref var job = ref _jobQueue[index];
+            var previousStatus = Interlocked.CompareExchange(ref job.State, JobState.Claimed, JobState.Available);
             // If the job is busy, loop again and try to find a new spot
             if (previousStatus != JobState.Available)
             {

@@ -6,18 +6,6 @@ using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2.Components;
 
 namespace Titan.ECS.SystemsV2;
-public readonly unsafe struct ReadOnlyStorage2<T> where T : unmanaged, IComponent
-{
-    private readonly Components<T>* _pool;
-    internal ReadOnlyStorage2(Components<T>*  pool) => _pool = pool;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ref readonly T Get(in Entity entity) => ref _pool->Get(entity);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Contains(in Entity entity) => _pool->Contains(entity);
-}
-
 
 public readonly unsafe struct MutableStorage2<T> where T : unmanaged, IComponent
 {
@@ -50,15 +38,4 @@ public readonly unsafe struct MutableStorage2<T> where T : unmanaged, IComponent
     /// <param name="entity"></param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void DestroyImmediately(in Entity entity) => _pool->Destroy(entity);
-}
-
-
-public readonly record struct EntityDestroyed(Entity Entity) : IEvent;
-public readonly record struct ComponentDestroyed(ComponentId Id, Entity Entity) : IEvent;
-
-public interface IStructSystem<T> where T : unmanaged
-{
-    static abstract void Init(ref T system, in SystemsInitializer init);
-    static abstract void Update(ref T system);
-    static abstract bool ShouldRun(in T system);
 }

@@ -4,6 +4,7 @@ using Titan.Core.Events;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.SystemsV2;
+using Titan.ECS.SystemsV2.Scheduler;
 using Titan.ECS.TheNew;
 using Titan.Graphics.Modules;
 using Titan.Modules;
@@ -32,6 +33,15 @@ public class App : IApp
         _pool = pool;
         _resourceCollection = resourceCollection;
         _systems = systems;
+    }
+
+    public ref readonly T GetResourceOrDefault<T>() where T : unmanaged, IDefault<T>
+    {
+        if (!_resourceCollection.HasResource<T>())
+        {
+            _resourceCollection.InitResource(T.Default());
+        }
+        return ref _resourceCollection.GetResource<T>();
     }
 
     public IApp AddSystem<T>() where T : unmanaged, IStructSystem<T> => AddSystemToStage<T>(Stage.Update);

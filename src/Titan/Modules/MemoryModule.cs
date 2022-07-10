@@ -21,13 +21,7 @@ public readonly struct MemoryModule : IModule
 {
     public static void Build(IApp app)
     {
-        if (!app.HasResource<MemoryDescriptor>())
-        {
-            Logger.Trace<MemoryModule>($"Using default values for {nameof(TransientMemory)} and {nameof(PermanentMemory)}");
-            app.AddResource(MemoryDescriptor.Default());
-        }
-
-        ref readonly var descriptor = ref app.GetResource<MemoryDescriptor>();
+        ref readonly var descriptor = ref app.GetResourceOrDefault<MemoryDescriptor>();
         Logger.Trace<MemoryModule>($"Perment memory: {descriptor.PermanentMemory} bytes. Transient memory: {descriptor.TransientMemory}");
         var memoryPool = app.GetResource<MemoryPool>();
         app.AddResource(memoryPool.CreateAllocator<PermanentMemory>(descriptor.PermanentMemory))
