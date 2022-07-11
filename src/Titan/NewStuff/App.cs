@@ -3,6 +3,8 @@ using Titan.Core.App;
 using Titan.Core.Events;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
+using Titan.Core.Threading2;
+using Titan.ECS.Modules;
 using Titan.ECS.SystemsV2;
 using Titan.ECS.SystemsV2.Scheduler;
 using Titan.ECS.TheNew;
@@ -59,7 +61,8 @@ public class App : IApp
         }
         ref readonly var mem = ref GetResource<PermanentMemory>();
         return AddResource(new EventCollection<T>(maxEvents, mem))
-            .AddSystemToStage<EventSystem<T>>(Stage.PreUpdate);
+            .AddSystemToStage<EventSystem<T>>(Stage.PreUpdate)
+            ;
     }
 
     public IApp AddResource<T>(in T resource) where T : unmanaged
@@ -91,7 +94,20 @@ public class App : IApp
     public IApp Run()
     {
 
-        SystemSchedulerFactory.CreateTest(_pool.CreateAllocator<PermanentMemory>(100 * 1024 * 1024), _pool.CreateAllocator<TransientMemory>(100 * 1024 * 1024), _systems, this);
+
+        ref readonly var schedulerApi = ref GetResource<SchedulerApi>();
+        ref readonly var schedulerConfig = ref GetResource<SchedulerConfiguration>();
+
+        
+        var scheduler = schedulerApi.CreateScheduler(_pool.CreateAllocator<TransientMemory>(100 * 1024 * 1024), _pool.CreateAllocator<PermanentMemory>(100 * 1024 * 1024), _systems, SystemDescriptorCollection.Create(0, _pool), schedulerConfig, this);
+
+        ref readonly var jobApi = ref GetResource<JobApi>();
+        scheduler.Startup(jobApi);
+
+        scheduler.RunOnce(jobApi);
+        
+
+        //SystemSchedulerFactory.CreateTest(_pool.CreateAllocator<PermanentMemory>(100 * 1024 * 1024), _pool.CreateAllocator<TransientMemory>(100 * 1024 * 1024), _systems, this);
         //var graph = SystemSchedulerFactory.Create(_worldMemory.As<PermanentMemory>(), _worldTransientMemory, initialWorld, this);
 
         //SystemSchedulerFactory.TestTHis(this, _resourceAllocator, initialWorld);
@@ -131,6 +147,7 @@ public class App : IApp
 
 
         Logger.Info<App>("Exiting");
+        scheduler.Shutdown(jobApi);
         //t.Join();
         return this;
     }

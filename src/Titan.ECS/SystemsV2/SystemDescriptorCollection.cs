@@ -33,4 +33,6 @@ public readonly unsafe struct SystemDescriptorCollection
 
     internal ReadOnlySpan<SystemDescriptor> GetDescriptors() 
         => new(_descriptors, (int)*_count);
+
 }
+

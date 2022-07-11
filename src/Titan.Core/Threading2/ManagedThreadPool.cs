@@ -102,7 +102,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             job.Execute();
             job.State = job.JobItem.AutoReset ? JobState.Available : JobState.Completed;
         }
-        //Logger.Trace($"{thread.Name} stopped.", typeof(ManagedThreadPool));
+        Logger.Trace($"{thread.Name} stopped.", typeof(ManagedThreadPool));
     }
 
 
@@ -140,7 +140,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
             {
                 continue;
             }
-            // NOTE(Jens): maybe we can skip this CompareExchange and just assume we got the job?
+            // NOTE(Jens): maybe we can skip this CompareExchange and just assume we got the job? The risk is that the same job can be executed twice in some cases?
             ref var job = ref _jobQueue[index];
             var previousStatus = Interlocked.CompareExchange(ref job.State, JobState.Claimed, JobState.Available);
             // If the job is busy, loop again and try to find a new spot

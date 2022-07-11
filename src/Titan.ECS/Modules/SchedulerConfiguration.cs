@@ -20,8 +20,8 @@ public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>
         config.SetExecutor<ParallelExecutor>(Stage.PreUpdate);
         config.SetExecutor<OrderedExecutor>(Stage.Update);
         config.SetExecutor<ParallelExecutor>(Stage.PostUpdate);
-        config.SetExecutor<SequentialExecutor>(Stage.Shutdown);
-        config.SetExecutor<SequentialExecutor>(Stage.PostShutdown);
+        config.SetExecutor<ReversedSequentialExecutor>(Stage.Shutdown);
+        config.SetExecutor<ReversedSequentialExecutor>(Stage.PostShutdown);
         return config;
     }
 
@@ -32,5 +32,11 @@ public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>
         pData[(int)stage] = new StageExecutor { RunFunc = &T.RunSystems };
     }
 
-    public ReadOnlySpan<StageExecutor> Get() => new(Unsafe.AsPointer(ref this), (int)Stage.Count);
+    public readonly ReadOnlySpan<StageExecutor> Get()
+    {
+        fixed (void* ptr = &this)
+        {
+            return new(ptr, (int)Stage.Count);
+        }
+    }
 }

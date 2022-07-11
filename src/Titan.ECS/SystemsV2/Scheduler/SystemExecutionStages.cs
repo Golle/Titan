@@ -3,7 +3,7 @@ using Titan.Core.App;
 
 namespace Titan.ECS.SystemsV2.Scheduler;
 
-internal readonly unsafe struct SystemExecutionStages
+public readonly unsafe struct SystemExecutionStages
 {
     private readonly SystemExecutionGraph* _graphs;
     private readonly uint _count;

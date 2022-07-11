@@ -2,28 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core.App;
-using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.Core.Threading2;
-using Titan.ECS.SystemsV2.Scheduler.Executors;
 
 namespace Titan.ECS.SystemsV2.Scheduler;
 
 public static unsafe class SystemSchedulerFactory
 {
-    public static void CreateTest(in PermanentMemory memory, in TransientMemory transientMemory, in SystemDescriptorCollection systems, IApp app)
-    {
-        var graph = Create(memory, transientMemory, systems.GetDescriptors(), app);
-        ref readonly var jobApi = ref app.GetResource<JobApi>();
-        Logger.Error($"Run systems in parallel with dependencies {graph.GetGraph(Stage.PreUpdate).GetNodes().Length}", typeof(SystemSchedulerFactory));
-        SequentialExecutor.RunSystems(graph.GetGraph(Stage.PreStartup), jobApi);
-        SequentialExecutor.RunSystems(graph.GetGraph(Stage.Startup), jobApi);
-        ParallelExecutor.RunSystems(graph.GetGraph(Stage.PreUpdate), jobApi);
-        //OrderedExecutor.RunSystems(graph.GetGraph(Stage.Update), jobApi);
-        //ParallelExecutor.RunSystems(graph.GetGraph(Stage.PostUpdate), jobApi);
-        //SequentialExecutor.RunSystems(graph.GetGraph(Stage.Shutdown), jobApi);
-    }
-
     [SkipLocalsInit]
     internal static SystemExecutionStages Create(in PermanentMemory memory, in TransientMemory transientMemory, ReadOnlySpan<SystemDescriptor> descriptors, IApp app)
     {

@@ -3,8 +3,6 @@ using Titan.Core.Logging;
 using Titan.ECS.SystemsV2;
 
 namespace Titan.Modules;
-public record struct LoggingStarted;
-public record struct LoggingStopped;
 
 public struct LoggingDescriptor : IDefault<LoggingDescriptor>
 {
@@ -28,15 +26,20 @@ public struct LoggingModule : IModule
         if (desc.Enabled)
         {
             Logger.Start();
-            
+
             app.AddSystemToStage<LoggerTeardown>(Stage.PostShutdown);
         }
     }
 
     private struct LoggerTeardown : IStructSystem<LoggerTeardown>
     {
-        public static void Init(ref LoggerTeardown system, in SystemsInitializer init){}
-        public static void Update(ref LoggerTeardown system) => Logger.Shutdown();
+        public static void Init(ref LoggerTeardown system, in SystemsInitializer init) { }
+        public static void Update(ref LoggerTeardown system)
+        {
+            Logger.Trace<LoggerTeardown>("Shutting down logger");
+            Logger.Shutdown();
+        }
+
         public static bool ShouldRun(in LoggerTeardown system) => true;
     }
 }
