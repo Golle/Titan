@@ -47,7 +47,12 @@ namespace Titan.Core.Logging
         private static void Log(LogLevel level, string message, string scope = null)
         {
             var result = Writer.TryWrite(new LogMessage(level, message, scope));
-            System.Diagnostics.Debug.Assert(result, "Failed to write to channel.");
+
+            if (!result)
+            {
+                Console.Error.WriteLine("Failed to write to log channel because it's been closed. (Use Assert later.)");
+            }
+            //System.Diagnostics.Debug.Assert(result, "Failed to write to channel.");
         }
     }
 }
