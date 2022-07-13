@@ -21,7 +21,7 @@ public struct MouseInputSystem : IStructSystem<MouseInputSystem>
         ref readonly var window = ref system._window.Get();
         if (system._api.Get().GetRelativeCursorPosition(window, out var p))
         {
-            Logger.Info<MouseInputSystem>($"[{p.X}, {p.Y}]");
+            //Logger.Info<MouseInputSystem>($"[{p.X}, {p.Y}]");
         }
     }
 

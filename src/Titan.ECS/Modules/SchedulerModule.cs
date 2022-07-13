@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Titan.Core;
 using Titan.Core.App;
 using Titan.Core.Logging;
@@ -10,23 +11,102 @@ using Titan.ECS.SystemsV2.Scheduler;
 
 namespace Titan.ECS.Modules;
 
-
-//public struct GameLoop : IRunner
-//{
-//    public static void Run(in SystemExecutionGraph graph)
-//    {
-//        // Update Time ?
-
-
-
-
-//    }
-//}
-
-
-public interface IRunner
+public unsafe struct GameLoopThread : IRunner
 {
-    static abstract void Run();
+    private static Thread _thread;
+    private static delegate*<Runner*, void> _update;
+    private static delegate*<Runner*, void> _start;
+    private static delegate*<Runner*, void> _stop;
+    private static bool _active;
+    private static Runner* _context;
+
+    public static void Init(delegate*<Runner*, void> start, delegate*<Runner*, void> stop, delegate*<Runner*, void> update)
+    {
+        _update = update;
+        _start = start;
+        _stop = stop;
+        _thread = new Thread(RunWorker)
+        {
+            IsBackground = true,
+            Name = "Game Loop Thread",
+            Priority = ThreadPriority.Normal
+        };
+    }
+
+    public static void Start(Runner* context)
+    {
+        _context = context;
+        _active = true;
+        _thread.Start();
+    }
+
+    private static void RunWorker(object _)
+    {
+        Logger.Trace<GameLoopThread>("Game loop thread started");
+        _start(_context);
+        while (_active)
+        {
+            _update(_context);
+        }
+        Logger.Trace<GameLoopThread>("Game loop thread stopped");
+        _stop(_context);
+    }
+
+    public static void Stop()
+    {
+        _active = false;
+        _thread.Join();
+    }
+}
+
+
+public unsafe struct Runner : IApi
+{
+    private delegate*<delegate*<Runner*, void>, delegate*<Runner*, void>, delegate*<Runner*, void>, void> _init;
+    private delegate*<Runner*, void> _start;
+    private delegate*<void> _stop;
+
+    private Scheduler* _scheduler;
+    private JobApi* _jobApi;
+
+    public static Runner Create<T>() where T : IRunner =>
+        new()
+        {
+            _init = &T.Init,
+            _start = &T.Start,
+            _stop = &T.Stop,
+        };
+
+
+    public void Run(Scheduler* scheduler, JobApi* jobApi)
+    {
+        //NOTE(Jens): What should we do if it's already running?
+        _scheduler = scheduler;
+        _jobApi = jobApi;
+        _init(&OnStart, &OnShutdown, &OnUpdate);
+        _start((Runner*)Unsafe.AsPointer(ref this));
+    }
+
+    public void Stop()
+    {
+        _stop();
+    }
+
+    private static void OnStart(Runner* runner)
+        => runner->_scheduler->Startup(*runner->_jobApi);
+
+    private static void OnShutdown(Runner* runner)
+        => runner->_scheduler->Shutdown(*runner->_jobApi);
+
+    private static void OnUpdate(Runner* runner) 
+        => runner->_scheduler->RunOnce(*runner->_jobApi);
+}
+
+public unsafe interface IRunner
+{
+    static abstract void Init(delegate*<Runner*, void> start, delegate*<Runner*, void> stop, delegate*<Runner*, void> update);
+    static abstract void Start(Runner* context);
+    static abstract void Stop();
 }
 
 public struct RunnerApi : IApi
@@ -114,6 +194,7 @@ public readonly struct SchedulerModule : IModule
 
         Logger.Warning<SchedulerModule>("Not using the scheduler config for anything yet");
 
-        app.AddResource(SchedulerApi.Default());
+        app.AddResource(SchedulerApi.Default())
+            .AddResource(Runner.Create<GameLoopThread>());
     }
 }

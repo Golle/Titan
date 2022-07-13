@@ -6,6 +6,7 @@ namespace Titan.ECS.SystemsV2;
 internal readonly unsafe struct SystemDescriptor
 {
     public readonly delegate*<void*, SystemsInitializer, void> Init;
+    public readonly delegate*unmanaged<void*, SystemsInitializer, void> Init2;
     public readonly delegate*<void*, void> Update;
     public readonly delegate*<void*, bool> ShouldRun;
 

@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 
@@ -22,10 +21,16 @@ public struct D3D11_BLEND_DESC
         public D3D11_RENDER_TARGET_BLEND_DESC desc6;
         public D3D11_RENDER_TARGET_BLEND_DESC desc7;
 
-        public ref D3D11_RENDER_TARGET_BLEND_DESC this[int index]
+        public unsafe ref D3D11_RENDER_TARGET_BLEND_DESC this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ref MemoryMarshal.CreateSpan(ref desc0, 8)[index];
+            get
+            {
+                fixed (D3D11_RENDER_TARGET_BLEND_DESC* pDesc0 = &desc0)
+                {
+                    return ref *(pDesc0 + index);
+                }
+            }
         }
     }
 }

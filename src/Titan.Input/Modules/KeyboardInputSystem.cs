@@ -36,12 +36,12 @@ public struct KeyboardInputSystem : IStructSystem<KeyboardInputSystem>
 
         foreach (ref readonly var @event in system._keyPressed.GetEvents())
         {
-            state->Current[1] = true;
+            state->Current[@event.Code] = true;
         }
 
         foreach (ref readonly var @event in system._keyReleased.GetEvents())
         {
-            state->Current[1] = false;
+            state->Current[@event.Code] = false;
         }
     }
 

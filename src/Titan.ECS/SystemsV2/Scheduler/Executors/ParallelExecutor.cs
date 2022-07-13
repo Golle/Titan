@@ -11,7 +11,7 @@ public struct ParallelExecutor : IExecutor
     [SkipLocalsInit]
     public static unsafe void RunSystems(in SystemExecutionGraph graph, in JobApi jobApi)
     {
-        var nodes = graph.GetNodes().Slice(0, 1);
+        var nodes = graph.GetNodes();
 
         //var s = nodes[0].System.ReourceId.ToString();
         var length = nodes.Length;

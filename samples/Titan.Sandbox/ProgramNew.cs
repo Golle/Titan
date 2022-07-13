@@ -5,6 +5,8 @@ using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 using Titan.Graphics;
 using Titan.Graphics.Modules;
+using Titan.Input;
+using Titan.Input.Modules;
 using Titan.Modules;
 using Titan.NewStuff;
 
@@ -13,6 +15,7 @@ using var app = App
     .AddModule<CoreModule>()
     .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
     .AddModule<WindowModule>()
+    .AddModule<InputModule>()
     .AddModule<RenderModule>()
     .AddSystemToStage<FrameCounter>(Stage.PreUpdate)
     .AddSystem<PrintFrameCounter>()
@@ -41,16 +44,36 @@ internal struct FrameCounter : IStructSystem<FrameCounter>
 internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
 {
     private ReadOnlyResource<GlobalFrameCounter> _global;
+    private ReadOnlyResource<KeyboardState> _keyState;
+    private int _counter;
+
     public static void Init(ref PrintFrameCounter system, in SystemsInitializer init)
     {
         system._global = init.GetReadOnlyResource<GlobalFrameCounter>();
+        system._keyState = init.GetReadOnlyResource<KeyboardState>();
+        system._counter = 0;
     }
 
     public static void Update(ref PrintFrameCounter system)
     {
-        var count = system._global.Get().FrameCounter;
+        ref readonly var keyboardState = ref system._keyState.Get();
+        if (keyboardState.IsKeyReleased(KeyCode.A))
+        {
+            Logger.Warning<PrintFrameCounter>("Key released");
+        }
+        if (keyboardState.IsKeyPressed(KeyCode.A))
+        {
+            Logger.Warning<PrintFrameCounter>("Key pressed");
+        }
 
-        //Logger.Trace<PrintFrameCounter>($"Current frame count: {count}");
+        if (keyboardState.IsKeyDown(KeyCode.S))
+        {
+            system._counter++;
+        }
+        else if (keyboardState.IsKeyReleased(KeyCode.S))
+        {
+            Logger.Trace<PrintFrameCounter>($"Keycount: {system._counter}");
+        }
     }
 
     public static bool ShouldRun(in PrintFrameCounter system) => true;

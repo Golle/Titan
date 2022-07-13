@@ -11,7 +11,17 @@ public struct D3D11_SHADER_RESOURCE_VIEW_DESC
     public DXGI_FORMAT Format;
     public D3D_SRV_DIMENSION ViewDimension;
     private D3D11_SHADER_RESOURCE_VIEW_DESC_UNION UnionMembers;
-    public ref D3D11_TEX2D_SRV Texture2D => ref MemoryMarshal.GetReference(MemoryMarshal.CreateSpan(ref UnionMembers.Texture2D, 1));
+    public unsafe ref D3D11_TEX2D_SRV Texture2D
+    {
+        get
+        {
+            fixed (D3D11_SHADER_RESOURCE_VIEW_DESC_UNION* ptr = &UnionMembers)
+            {
+                return ref ptr->Texture2D;
+            }
+        }
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     internal struct D3D11_SHADER_RESOURCE_VIEW_DESC_UNION
     {
