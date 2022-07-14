@@ -17,8 +17,9 @@ public unsafe struct EventCollection<T> : IResource where T : unmanaged
     private readonly int* _eventsLastFrame;
     private readonly int* _count;
     private readonly int _maxEvents;
-
     public int Count => *_count;
+
+    [Obsolete("Dont use this")]
     public EventCollection(uint count, in PermanentMemory allocator)
     {
         // NOTE(Jens): this should be allocated on a common events pool
@@ -33,6 +34,7 @@ public unsafe struct EventCollection<T> : IResource where T : unmanaged
         *_eventsLastFrame = 0;
         *_count = 0;
     }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Send(in T @event)

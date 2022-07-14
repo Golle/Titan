@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using Titan.Core;
 using Titan.Core.App;
+using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.Components;
+using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 using Titan.ECS.SystemsV2.Components;
 using Titan.ECS.TheNew;
@@ -20,6 +22,7 @@ public struct Runner
 public unsafe struct App
 {
     private MemoryPool _pool;
+    private ResourceCollection _resources;
     private World _world;
     private Scheduler _scheduler;
     private Runner _runner;
@@ -27,8 +30,9 @@ public unsafe struct App
     internal void Init(in MemoryPool pool, ReadOnlySpan<SystemDescriptor> systemDescriptors, in ResourceCollection resources)
     {
         _pool = pool;
+        _resources = resources;
         //_runner.Init();
-        //_scheduler.Init(pool);
+        _scheduler.Init(pool, systemDescriptors);
         _world.Init(pool, resources);
     }
 
@@ -46,22 +50,26 @@ public unsafe struct World
         _resources = resources;
     }
 
-    public Components<T> GetComponents<T>() where T : unmanaged, IComponent => 
+    public Components<T> GetComponents<T>() where T : unmanaged, IComponent =>
         _resources
         .GetResource<ComponentRegistry>()
         .Access<T>();
-}
 
-public unsafe struct ComponentCollection
+    public Events<T> GetEvents<T>() where T : unmanaged, IEvent => 
+        _resources
+        .GetResource<EventsRegistry>()
+        .GetEvents<T>();
+
+}
+internal struct Scheduler
 {
+    public void Init(in MemoryPool pool, ReadOnlySpan<SystemDescriptor> systemDescriptors)
+    {
+        Logger.Trace<Scheduler>($"Init Scheduler with {systemDescriptors.Length} systems.");
 
+    }
 }
 
-public struct EntityManager { }
-public struct Scheduler
-{
-
-}
 
 /*
  * State (This would be the Scene management in Titan)
@@ -86,6 +94,19 @@ public struct Scheduler
  *
  */
 
+public struct EventSystem : IStructSystem<EventSystem>
+{
+    private MutableResource<EventsRegistry> _registry;
+    public static void Init(ref EventSystem system, in SystemsInitializer init) => system._registry = init.GetMutableResource<EventsRegistry>();
+
+    public static void Update(ref EventSystem system) => system._registry.Get().Swap();
+
+    public static bool ShouldRun(in EventSystem system)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 public unsafe class AppBuilder
 {
     private readonly MemoryPool _pool;
@@ -93,6 +114,8 @@ public unsafe class AppBuilder
 
     private readonly List<SystemDescriptor> _systems = new();
     private readonly List<ComponentDescriptor> _components = new();
+    private readonly List<EventsDescriptor> _events = new();
+
     private readonly App* _app;
 
     private AppBuilder(AppCreationArgs args)
@@ -135,6 +158,12 @@ public unsafe class AppBuilder
         return this;
     }
 
+    public AppBuilder AddEvent<T>(uint maxEventsPerFrame = 1) where T : unmanaged, IEvent
+    {
+        _events.Add(EventsDescriptor.Create<T>(maxEventsPerFrame));
+        return this;
+    }
+
     public AppBuilder AddModule<T>() where T : IModule2
     {
         T.Build(this);
@@ -150,6 +179,9 @@ public unsafe class AppBuilder
         return ref _resourceCollection.GetResource<T>();
     }
 
+    public T* GetResourcePointer<T>() where T : unmanaged 
+        => _resourceCollection.GetResourcePointer<T>();
+
     public ref App Build()
     {
         if (!_resourceCollection.HasResource<EntityConfiguration>())
@@ -158,8 +190,13 @@ public unsafe class AppBuilder
         }
         // Initialize the Compoenent pools (this is done at build because we want all components to be in the same place)
         ref readonly var config = ref _resourceCollection.GetResource<EntityConfiguration>();
-        ref var registry = ref _resourceCollection.GetResource<ComponentRegistry>();
-        registry.Init(_pool, config.MaxEntities, _components.ToArray());
+        _resourceCollection
+            .GetResource<ComponentRegistry>()
+            .Init(_pool, config.MaxEntities, _components.ToArray());
+
+        _resourceCollection
+            .GetResource<EventsRegistry>()
+            .Init(_pool, _events.ToArray());
 
         _app->Init(_pool, _systems.ToArray(), _resourceCollection);
 

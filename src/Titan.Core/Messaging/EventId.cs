@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace Titan.Core.Messaging
 {
+    [Obsolete("Dont use this")]
     internal static class EventId
     {
         private static int _eventId;

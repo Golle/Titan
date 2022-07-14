@@ -2,13 +2,11 @@ using System;
 using Titan.Core;
 using Titan.ECS.Components;
 using Titan.ECS.SystemsV2.Components;
-using Titan.ECS.TheNew;
 
 namespace Titan.ECS.SystemsV2;
 
 internal readonly unsafe struct ComponentDescriptor
 {
-    public readonly ResourceId ResourceId;
     public readonly ComponentId ComponentId;
     public readonly void* ComponentPoolVtbl;
     public readonly uint MaxComponents;
@@ -16,9 +14,8 @@ internal readonly unsafe struct ComponentDescriptor
     private readonly delegate*<uint, uint, uint> _calculateSize;
     internal uint CalculateSize(uint maxEntities) => _calculateSize(maxEntities, MaxComponents);
     internal void* Init(void* mem, uint maxEntities) => _init(mem, maxEntities, MaxComponents);
-    public ComponentDescriptor(ResourceId resourceId, ComponentId componentId, void* componentPoolVtbl, uint maxComponents, delegate*<void*, uint, uint, void*> init, delegate*<uint, uint, uint> calculateSize)
+    public ComponentDescriptor(ComponentId componentId, void* componentPoolVtbl, uint maxComponents, delegate*<void*, uint, uint, void*> init, delegate*<uint, uint, uint> calculateSize)
     {
-        ResourceId = resourceId;
         ComponentId = componentId;
         ComponentPoolVtbl = componentPoolVtbl;
         MaxComponents = maxComponents;
@@ -35,7 +32,6 @@ internal readonly unsafe struct ComponentDescriptor
         };
 
         return new(
-            ResourceId.Id<T>(),
             ComponentId<T>.Id,
             vtbl,
             maxComponents,

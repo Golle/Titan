@@ -41,5 +41,3 @@ public readonly struct ResourceId
         }
     }
 }
-
-
