@@ -1,3 +1,4 @@
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.SystemsV2;
@@ -10,7 +11,7 @@ public struct MemoryDescriptor : IDefault<MemoryDescriptor>
 
     public uint TransientMemory;
     public uint PermanentMemory;
-    public static MemoryDescriptor Default() =>
+    public static MemoryDescriptor Default =>
         new()
         {
             PermanentMemory = DefaultPermanentMemory,

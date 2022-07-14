@@ -1,13 +1,15 @@
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.Core.Memory;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.SystemsV2.Components;
 
-public unsafe struct ComponentPoolVTable<T> where T : unmanaged, IComponent
+
+
+public unsafe struct ComponentPoolVTable<T> where T : unmanaged
 {
-    public delegate*<in PermanentMemory, uint, uint, void*> Init;
+    public delegate*<void*, uint, uint, void*> Init;
+    public delegate*<uint, uint, uint> CalculateSize;
     public delegate*<void*, in Entity, ref T> Get;
     public delegate*<void*, in Entity, in T, ref T> Create;
     public delegate*<void*, in Entity, in T, ref T> CreateOrReplace;
@@ -31,6 +33,7 @@ public unsafe struct PackedComponentPoolNew<T> : IComponentPool<T> where T : unm
         Vtbl = (ComponentPoolVTable<T>*)RuntimeHelpers.AllocateTypeAssociatedMemory(typeof(T), sizeof(ComponentPoolVTable<T>));
         *Vtbl = new ComponentPoolVTable<T>
         {
+            CalculateSize = &CalculateSize,
             Init = &Init,
             Contains = &Contains,
             Create = &Create,
@@ -49,21 +52,26 @@ public unsafe struct PackedComponentPoolNew<T> : IComponentPool<T> where T : unm
         _componentCount = 0;
     }
 
-    public static void* Init(in PermanentMemory allocator, uint maxEntities, uint maxComponents)
+    private static uint CalculateSize(uint maxEntities, uint maxComponents)
     {
         var poolSize = sizeof(PackedComponentPoolNew<T>);
         var componentCount = maxComponents == 0 ? maxEntities : maxComponents;
         var entitiesSize = sizeof(uint) * maxEntities;
         var dataSize = poolSize + entitiesSize + sizeof(T) * componentCount;
+        return (uint)dataSize;
+    }
 
-        var data = allocator.GetPointer((uint)dataSize, true);
-        var pool = (PackedComponentPoolNew<T>*)data;
+    private static void* Init(void* mem, uint maxEntities, uint maxComponents)
+    {
+        var size = CalculateSize(maxEntities, maxComponents);
+        Unsafe.InitBlockUnaligned(mem,0, size);
+        var pool = (PackedComponentPoolNew<T>*)mem;
         var indices = (int*)(pool + 1);
         var components = (T*)(indices + maxEntities);
         *pool = new PackedComponentPoolNew<T>(maxEntities, maxComponents, indices, components);
-
         return pool;
     }
+
 
     public static ref T Get(void* data, in Entity entity)
     {

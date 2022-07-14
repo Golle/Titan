@@ -1,4 +1,5 @@
 using System;
+using Titan.Core;
 using Titan.Core.App;
 using Titan.Core.Events;
 using Titan.Core.Logging;
@@ -40,7 +41,7 @@ public class App : IApp
     {
         if (!_resourceCollection.HasResource<T>())
         {
-            _resourceCollection.InitResource(T.Default());
+            _resourceCollection.InitResource(T.Default);
         }
         return ref _resourceCollection.GetResource<T>();
     }

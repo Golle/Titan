@@ -2,8 +2,8 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Core;
 using Titan.Core.App;
-using Titan.ECS.SystemsV2;
 using Titan.ECS.SystemsV2.Scheduler;
 using Titan.ECS.SystemsV2.Scheduler.Executors;
 
@@ -12,17 +12,20 @@ namespace Titan.ECS.Modules;
 [StructLayout(LayoutKind.Explicit, Size = sizeof(long) * (int)Stage.Count)]
 public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>
 {
-    public static SchedulerConfiguration Default()
+    public static SchedulerConfiguration Default
     {
-        var config = new SchedulerConfiguration();
-        config.SetExecutor<SequentialExecutor>(Stage.PreStartup);
-        config.SetExecutor<SequentialExecutor>(Stage.Startup);
-        config.SetExecutor<ParallelExecutor>(Stage.PreUpdate);
-        config.SetExecutor<OrderedExecutor>(Stage.Update);
-        config.SetExecutor<ParallelExecutor>(Stage.PostUpdate);
-        config.SetExecutor<ReversedSequentialExecutor>(Stage.Shutdown);
-        config.SetExecutor<ReversedSequentialExecutor>(Stage.PostShutdown);
-        return config;
+        get
+        {
+            var config = new SchedulerConfiguration();
+            config.SetExecutor<SequentialExecutor>(Stage.PreStartup);
+            config.SetExecutor<SequentialExecutor>(Stage.Startup);
+            config.SetExecutor<ParallelExecutor>(Stage.PreUpdate);
+            config.SetExecutor<OrderedExecutor>(Stage.Update);
+            config.SetExecutor<ParallelExecutor>(Stage.PostUpdate);
+            config.SetExecutor<ReversedSequentialExecutor>(Stage.Shutdown);
+            config.SetExecutor<ReversedSequentialExecutor>(Stage.PostShutdown);
+            return config;
+        }
     }
 
     public void SetExecutor<T>(Stage stage) where T : IExecutor

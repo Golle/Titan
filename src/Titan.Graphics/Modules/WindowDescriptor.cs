@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.ECS.SystemsV2;
@@ -36,7 +36,7 @@ public struct WindowDescriptor : IDefault<WindowDescriptor>
         }
     }
 
-    public static WindowDescriptor Default() => new()
+    public static WindowDescriptor Default => new()
     {
         Height = DefaultHeight,
         Width = DefaultWidth,

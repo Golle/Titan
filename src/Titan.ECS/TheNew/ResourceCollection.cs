@@ -63,6 +63,7 @@ public readonly unsafe struct ResourceCollection
         return (T*)ptr;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasResource<T>() => _indices[ResourceId.Id<T>()] != null;
     

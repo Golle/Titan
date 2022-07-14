@@ -1,28 +1,34 @@
 using Titan.Core;
-using Titan.Core.App;
 using Titan.Core.Logging;
+using Titan.ECS.AnotherTry;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
-using Titan.Graphics;
-using Titan.Graphics.Modules;
 using Titan.Input;
 using Titan.Input.Modules;
-using Titan.Modules;
-using Titan.NewStuff;
 
-using var app = App
-    .Create(AppCreationArgs.Default)
+
+AppBuilder
+    .Create()
     .AddModule<CoreModule>()
-    .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
-    .AddModule<WindowModule>()
-    .AddModule<InputModule>()
-    .AddModule<RenderModule>()
-    .AddSystemToStage<FrameCounter>(Stage.PreUpdate)
+    .AddSystem<FrameCounter>()
     .AddSystem<PrintFrameCounter>()
-    .AddSystemToStage<FrameCounter>(Stage.PostUpdate)
-    .AddResource(new GlobalFrameCounter())
-    .Run()
-    ;
+    .Build()
+    .Run();
+
+
+//using var app = App
+//    .Create(AppCreationArgs.Default)
+//    .AddModule<CoreModule>()
+//    .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
+//    .AddModule<WindowModule>()
+//    .AddModule<InputModule>()
+//    .AddModule<RenderModule>()
+//    .AddSystemToStage<FrameCounter>(Stage.PreUpdate)
+//    .AddSystem<PrintFrameCounter>()
+//    .AddSystemToStage<FrameCounter>(Stage.PostUpdate)
+//    .AddResource(new GlobalFrameCounter())
+//    .Run()
+//    ;
 
 internal struct FrameCounter : IStructSystem<FrameCounter>
 {
@@ -79,16 +85,6 @@ internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
     public static bool ShouldRun(in PrintFrameCounter system) => true;
 }
 
-
-public readonly struct StartupWorld : IWorldModule
-{
-    public static void Build(WorldConfig config)
-    {
-        config
-            .AddSystem<PrintFrameCounter>()
-            .AddSystem<FrameCounter>();
-    }
-}
 
 struct GlobalFrameCounter : IResource
 {

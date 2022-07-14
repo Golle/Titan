@@ -4,6 +4,7 @@ using Titan.Core.Memory;
 
 namespace Titan.ECS.SystemsV2;
 
+
 public readonly unsafe struct SystemDescriptorCollection
 {
     private readonly SystemDescriptor* _descriptors;
@@ -17,6 +18,7 @@ public readonly unsafe struct SystemDescriptorCollection
         *_count = 0;
     }
 
+    [Obsolete("Remove")]
     public void AddSystem<T>(Stage stage) where T : unmanaged, IStructSystem<T>
     {
         var next = *_count;
@@ -27,7 +29,8 @@ public readonly unsafe struct SystemDescriptorCollection
         _descriptors[next] = SystemDescriptor.Create<T>(stage);
         *_count += 1;
     }
-    
+
+    [Obsolete("Remove")]
     public static SystemDescriptorCollection Create(uint maxSystems, in MemoryPool pool) 
         => new(pool.GetPointer<SystemDescriptor>(maxSystems), pool.GetPointer<uint>(), maxSystems);
 

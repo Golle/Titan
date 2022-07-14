@@ -1,6 +1,7 @@
 using System;
 using Titan.Core;
 using Titan.Core.Events;
+using Titan.ECS.AnotherTry;
 using Titan.ECS.Components;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2.Components;
@@ -13,11 +14,19 @@ public readonly unsafe ref struct SystemsInitializer
     private readonly SystemDependencyState* _state;
     private readonly IApp _app;
 
-    internal SystemsInitializer(IApp app, SystemDependencyState * state)
+    private readonly ref World _world;
+
+    internal SystemsInitializer(IApp app, SystemDependencyState* state)
     {
         _app = app;
         _state = state;
     }
+
+    internal SystemsInitializer(ref World world)
+    {
+        _world = world;
+    }
+
     public MutableResource<T> GetMutableGlobalResource<T>() where T : unmanaged, IResource
     {
         _state->MutableGlobalResources.Add(ResourceId.Id<T>());
@@ -43,18 +52,17 @@ public readonly unsafe ref struct SystemsInitializer
         return new(_app.GetMutableResourcePointer<T>());
     }
 
-    public MutableStorage2<T> GetMutableStorage<T>() where T : unmanaged, IComponent
+    public MutableStorage3<T> GetMutableStorage<T>() where T : unmanaged, IComponent
     {
         _state->MutableComponents |= ComponentId<T>.Id;
-        throw new NotSupportedException("Storage is not supported yet, we need a \"World\" to support it.");
-        //return new(_app.GetMutableResourcePointer<Components<T>>());
+        return new(_world.GetComponents<T>(), _app.GetMutableResource<EventsWriter<ComponentDestroyed>>());
     }
 
-    public ReadOnlyStorage2<T> GetReadOnlyStorage<T>() where T : unmanaged, IComponent
+    public ReadOnlyStorage3<T> GetReadOnlyStorage<T>() where T : unmanaged, IComponent
     {
         _state->ReadOnlyComponents |= ComponentId<T>.Id;
-        throw new NotSupportedException("Storage is not supported yet, we need a \"World\" to support it.");
-        return new(_app.GetMutableResourcePointer<Components<T>>());
+
+        return new(_world.GetComponents<T>());
     }
 
     public EventsReader<T> GetEventsReader<T>() where T : unmanaged, IEvent

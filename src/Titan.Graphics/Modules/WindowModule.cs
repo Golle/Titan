@@ -28,12 +28,7 @@ public struct WindowModule : IModule
             ;
 
         // Get the window descriptor and create the window
-        if (!app.HasResource<WindowDescriptor>())
-        {
-            app.AddResource(WindowDescriptor.Default());
-        }
-
-        var descriptor = app.GetResource<WindowDescriptor>();
+        var descriptor = app.GetResourceOrDefault<WindowDescriptor>();
         Logger.Trace<WindowModule>($"Window descriptor: {descriptor.Title} - Size: {descriptor.Width}x{descriptor.Height}. Can resize: {descriptor.Resizable}");
 
         var eventQueue = app.GetMutableResourcePointer<WindowEventQueue>();

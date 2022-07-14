@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Titan.Core.Threading2;
 
-public struct ThreadPoolConfiguration
+public struct ThreadPoolConfiguration : IDefault<ThreadPoolConfiguration>
 {
     public uint WorkerThreads;
     public uint IOThreads;

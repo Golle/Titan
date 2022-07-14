@@ -7,7 +7,7 @@ public struct ComponentSystem<T> : IStructSystem<ComponentSystem<T>> where T : u
 {
     private EventsReader<EntityDestroyed> _entityDestroyed;
     private EventsReader<ComponentDestroyed> _componentDestroyed;
-    private MutableStorage2<T> _components;
+    private MutableStorage3<T> _components;
 
     // Init is called when the system is created, setting up the dependencies to helpt with the execution graph
     public static void Init(ref ComponentSystem<T> system, in SystemsInitializer init)

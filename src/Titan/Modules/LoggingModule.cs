@@ -1,3 +1,4 @@
+using Titan.Core;
 using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.ECS.SystemsV2;
@@ -7,7 +8,7 @@ namespace Titan.Modules;
 public struct LoggingDescriptor : IDefault<LoggingDescriptor>
 {
     public bool Enabled;
-    public static LoggingDescriptor Default() =>
+    public static LoggingDescriptor Default =>
         new()
         {
             Enabled = true
@@ -19,7 +20,7 @@ public struct LoggingModule : IModule
     {
         if (!app.HasResource<LoggingDescriptor>())
         {
-            app.AddResource(LoggingDescriptor.Default());
+            app.AddResource(LoggingDescriptor.Default);
         }
 
         ref readonly var desc = ref app.GetResource<LoggingDescriptor>();

@@ -138,7 +138,7 @@ public struct SchedulerApi : IApi, IDefault<SchedulerApi>
 
         return Scheduler.Create(stages, config.Get());
     }
-    public static SchedulerApi Default() => new();
+    public static SchedulerApi Default => new();
 }
 
 
@@ -194,7 +194,7 @@ public readonly struct SchedulerModule : IModule
 
         Logger.Warning<SchedulerModule>("Not using the scheduler config for anything yet");
 
-        app.AddResource(SchedulerApi.Default())
+        app.AddResource(SchedulerApi.Default)
             .AddResource(Runner.Create<GameLoopThread>());
     }
 }
