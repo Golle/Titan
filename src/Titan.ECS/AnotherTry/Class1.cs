@@ -2,24 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.Components;
-using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 using Titan.ECS.SystemsV2.Components;
 using Titan.ECS.TheNew;
 
 namespace Titan.ECS.AnotherTry;
 
-public struct Runner
+public struct HeadlessRunner : IRunner
 {
-
+    // NOTE(Jens): just a sample, might be able to use something like this for a server.
+    public static void Run(ref Scheduler scheduler, ref World world) => throw new NotImplementedException();
 }
 
-public unsafe struct App
+public interface IRunner
+{
+    static abstract void Run(ref Scheduler scheduler, ref World world);
+}
+
+internal unsafe struct Runner : IApi
+{
+    private delegate*<ref Scheduler, ref World, void> _run;
+    public static Runner Create<T>() where T : IRunner =>
+        new()
+        {
+            _run = &T.Run
+        };
+    public void Run(ref Scheduler scheduler, ref World world) => _run(ref scheduler, ref world);
+}
+
+public struct App
 {
     private MemoryPool _pool;
     private ResourceCollection _resources;
@@ -27,22 +44,29 @@ public unsafe struct App
     private Scheduler _scheduler;
     private Runner _runner;
 
-    internal void Init(in MemoryPool pool, ReadOnlySpan<SystemDescriptor> systemDescriptors, in ResourceCollection resources)
+    internal void Init(in MemoryPool pool, in ResourceCollection resources)
     {
         _pool = pool;
         _resources = resources;
-        //_runner.Init();
-        _scheduler.Init(pool, systemDescriptors);
+        _runner = resources.GetResource<Runner>();
+        _scheduler = resources.GetResource<Scheduler>();
+
         _world.Init(pool, resources);
     }
 
     public void Run()
     {
+        _runner.Run(ref _scheduler, ref _world);
+        Cleanup();
+    }
 
+    private void Cleanup()
+    {
+        _pool.Dispose();
     }
 }
 
-public unsafe struct World
+public struct World
 {
     private ResourceCollection _resources;
     internal void Init(in MemoryPool pool, in ResourceCollection resources)
@@ -55,21 +79,20 @@ public unsafe struct World
         .GetResource<ComponentRegistry>()
         .Access<T>();
 
-    public Events<T> GetEvents<T>() where T : unmanaged, IEvent => 
+    public Events<T> GetEvents<T>() where T : unmanaged, IEvent =>
         _resources
         .GetResource<EventsRegistry>()
         .GetEvents<T>();
 
-}
-internal struct Scheduler
-{
-    public void Init(in MemoryPool pool, ReadOnlySpan<SystemDescriptor> systemDescriptors)
-    {
-        Logger.Trace<Scheduler>($"Init Scheduler with {systemDescriptors.Length} systems.");
+    public ref T GetResource<T>() where T : unmanaged, IResource =>
+        ref _resources.GetResource<T>();
 
-    }
-}
+    public ref T GetApi<T>() where T : unmanaged, IApi =>
+        ref _resources.GetResource<T>();
 
+    public bool HasResource<T>() where T : unmanaged
+        => _resources.HasResource<T>();
+}
 
 /*
  * State (This would be the Scene management in Titan)
@@ -94,19 +117,6 @@ internal struct Scheduler
  *
  */
 
-public struct EventSystem : IStructSystem<EventSystem>
-{
-    private MutableResource<EventsRegistry> _registry;
-    public static void Init(ref EventSystem system, in SystemsInitializer init) => system._registry = init.GetMutableResource<EventsRegistry>();
-
-    public static void Update(ref EventSystem system) => system._registry.Get().Swap();
-
-    public static bool ShouldRun(in EventSystem system)
-    {
-        throw new NotImplementedException();
-    }
-}
-
 public unsafe class AppBuilder
 {
     private readonly MemoryPool _pool;
@@ -129,19 +139,34 @@ public unsafe class AppBuilder
         // Resources must be allocated at the start because they are used when modules are built. (configs etc)
         // We might want to change this at some point to allow for better memory alignment. For example configs used for startup/construction might never be used again, but they'll be mixed with other game related resources.
         _resourceCollection = ResourceCollection.Create(args.ResourcesMemory, args.MaxResourceTypes, _pool);
+
+        // Add the pool as a resource so we can use it when setting up the modules
+        AddResource(_pool);
     }
 
     public static AppBuilder Create() => new(AppCreationArgs.Default);
     public static AppBuilder Create(AppCreationArgs args) => new(args);
-    public AppBuilder AddSystem<T>() where T : unmanaged, IStructSystem<T>
+
+    public AppBuilder AddStartupSystem<T>() where T : unmanaged, IStructSystem<T>
     {
-        AddSystemToStage<T>(Stage.Update);
+        AddSystemToStage<T>(Stage.Startup, RunCriteria.Once);
+        return this;
+    }
+    public AppBuilder AddShutdownSystem<T>() where T : unmanaged, IStructSystem<T>
+    {
+        AddSystemToStage<T>(Stage.Shutdown, RunCriteria.Once);
         return this;
     }
 
-    public AppBuilder AddSystemToStage<T>(Stage stage) where T : unmanaged, IStructSystem<T>
+    public AppBuilder AddSystem<T>(RunCriteria criteria = RunCriteria.Check) where T : unmanaged, IStructSystem<T>
     {
-        _systems.Add(SystemDescriptor.Create<T>(stage));
+        AddSystemToStage<T>(Stage.Update, criteria);
+        return this;
+    }
+
+    public AppBuilder AddSystemToStage<T>(Stage stage, RunCriteria criteria = RunCriteria.Check) where T : unmanaged, IStructSystem<T>
+    {
+        _systems.Add(SystemDescriptor.Create<T>(stage, criteria));
         return this;
     }
 
@@ -164,11 +189,22 @@ public unsafe class AppBuilder
         return this;
     }
 
+    public AppBuilder UseRunner<T>() where T : unmanaged, IRunner
+    {
+        if (_resourceCollection.HasResource<Runner>())
+        {
+            throw new InvalidOperationException("A runner has already been set.");
+        }
+        _resourceCollection.InitResource(Runner.Create<T>());
+        return this;
+    }
+
     public AppBuilder AddModule<T>() where T : IModule2
     {
         T.Build(this);
         return this;
     }
+
 
     public ref T GetResourceOrDefault<T>() where T : unmanaged, IDefault<T>
     {
@@ -179,11 +215,16 @@ public unsafe class AppBuilder
         return ref _resourceCollection.GetResource<T>();
     }
 
-    public T* GetResourcePointer<T>() where T : unmanaged 
+    public T* GetResourcePointer<T>() where T : unmanaged
         => _resourceCollection.GetResourcePointer<T>();
 
     public ref App Build()
     {
+        if (!_resourceCollection.HasResource<Runner>())
+        {
+            throw new InvalidOperationException($"Failed to find {nameof(Runner)} resource. Make sure you've set a Runner using the {nameof(UseRunner)}<T>() method.");
+        }
+
         if (!_resourceCollection.HasResource<EntityConfiguration>())
         {
             throw new InvalidOperationException($"Failed to find {nameof(EntityConfiguration)} resource. Make sure you've added the CoreModule before calling build.");
@@ -198,21 +239,25 @@ public unsafe class AppBuilder
             .GetResource<EventsRegistry>()
             .Init(_pool, _events.ToArray());
 
-        _app->Init(_pool, _systems.ToArray(), _resourceCollection);
+        _resourceCollection
+            .GetResource<SystemsRegistry>()
+            .Init(_pool, _systems.ToArray());
+        
+        _app->Init(_pool, _resourceCollection);
 
         return ref *_app;
     }
 }
 
-public struct ResourceDescriptor
+internal unsafe struct SystemsRegistry
 {
-    private readonly ResourceId _id;
-    private readonly uint _size;
-    private ResourceDescriptor(ResourceId id, uint size)
+    private SystemDescriptor* _systems;
+    private int _count;
+
+    public void Init(in MemoryPool pool, ReadOnlySpan<SystemDescriptor> systems)
     {
-        _id = id;
-        _size = size;
+        _count = systems.Length;
+        _systems = pool.GetPointer<SystemDescriptor>((uint)_count);
+        systems.CopyTo(new Span<SystemDescriptor>(_systems, _count));
     }
-    internal static unsafe ResourceDescriptor Create<T>() where T : unmanaged
-        => new(ResourceId.Id<T>(), (uint)sizeof(T));
 }

@@ -39,6 +39,11 @@ public readonly unsafe struct TransientMemory : IMemoryAllocator<TransientMemory
     public static TransientMemory CreateAllocator(Allocator* allocator) 
         => new(allocator);
 
+    public static TransientMemory CreateAllocator2(Allocator allocator)
+    {
+        throw new System.NotImplementedException();
+    }
+
     public void Reset(bool initialize = false)
         => _allocator->Reset(initialize);
 }

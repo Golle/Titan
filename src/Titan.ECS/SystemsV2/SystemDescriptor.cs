@@ -3,6 +3,14 @@ using Titan.ECS.TheNew;
 
 namespace Titan.ECS.SystemsV2;
 
+
+public enum RunCriteria
+{
+    Check,
+    Always,
+    Once
+}
+
 internal readonly unsafe struct SystemDescriptor
 {
     public readonly delegate*<void*, SystemsInitializer, void> Init;
@@ -12,15 +20,17 @@ internal readonly unsafe struct SystemDescriptor
     public readonly uint Size;
     public readonly Stage Stage;
     public readonly ResourceId Id;
+    public readonly RunCriteria Criteria;
 
-    public static SystemDescriptor Create<T>(Stage stage = Stage.Update) where T : unmanaged, IStructSystem<T>
-        => new(ResourceId.Id<T>(), (uint)sizeof(T), stage, &FunctionWrapper<T>.Init, &FunctionWrapper<T>.Update, &FunctionWrapper<T>.ShouldRun);
+    public static SystemDescriptor Create<T>(Stage stage = Stage.Update, RunCriteria criteria = RunCriteria.Always) where T : unmanaged, IStructSystem<T>
+        => new(ResourceId.Id<T>(), criteria, (uint)sizeof(T), stage, &FunctionWrapper<T>.Init, &FunctionWrapper<T>.Update, &FunctionWrapper<T>.ShouldRun);
 
-    private SystemDescriptor(ResourceId id, uint size, Stage stage, delegate*<void*, SystemsInitializer, void> init, delegate*<void*, void> update, delegate*<void*, bool> shouldRun)
+    private SystemDescriptor(ResourceId id, RunCriteria criteria, uint size, Stage stage, delegate*<void*, SystemsInitializer, void> init, delegate*<void*, void> update, delegate*<void*, bool> shouldRun)
     {
         Id = id;
         Size = size;
         Stage = stage;
+        Criteria = criteria;
         Init = init;
         Update = update;
         ShouldRun = shouldRun;

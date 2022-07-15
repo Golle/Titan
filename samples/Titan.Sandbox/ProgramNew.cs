@@ -3,6 +3,7 @@ using Titan.Core.Logging;
 using Titan.ECS.AnotherTry;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
+using Titan.EventNewer;
 using Titan.Graphics.Modules;
 using Titan.Input;
 using Titan.Input.Modules;
@@ -12,6 +13,8 @@ AppBuilder
     .Create()
     .AddModule<CoreModule>()
     .AddModule<WindowModule>()
+    .UseRunner<WindowRunner>()
+
     .AddSystem<FrameCounter>()
     .AddSystem<PrintFrameCounter>()
     .Build()

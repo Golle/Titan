@@ -22,4 +22,8 @@ public readonly unsafe struct PermanentMemory : IMemoryAllocator<PermanentMemory
         => ref _memory.Get<T>(initialize);
 
     public static PermanentMemory CreateAllocator(Allocator* allocator) => new(allocator);
+    public static PermanentMemory CreateAllocator2(Allocator allocator)
+    {
+        throw new System.NotImplementedException();
+    }
 }

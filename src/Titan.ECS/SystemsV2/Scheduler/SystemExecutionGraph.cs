@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.CompilerServices;
-using Titan.Core.App;
 
 namespace Titan.ECS.SystemsV2.Scheduler;
 
@@ -8,7 +7,6 @@ public unsafe struct SystemExecutionGraph
 {
     private readonly SystemExecutionGraphNode* _nodes;
     private readonly int _count;
-    private fixed int _stages[(int)Stage.Count];
     internal SystemExecutionGraph(SystemExecutionGraphNode* nodes, int count)
     {
         _nodes = nodes;

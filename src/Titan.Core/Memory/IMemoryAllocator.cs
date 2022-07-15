@@ -9,4 +9,6 @@ public unsafe interface IMemoryAllocator<out TAllocator> where TAllocator : unma
     void* GetPointer(uint size, bool initialize = false);
     ref T Get<T>(bool initialize) where T : unmanaged;
     static abstract TAllocator CreateAllocator(Allocator* allocator);
+
+    static abstract TAllocator CreateAllocator2(Allocator allocator);
 }
