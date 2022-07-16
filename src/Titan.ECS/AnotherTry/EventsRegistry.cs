@@ -49,6 +49,7 @@ internal unsafe struct EventsRegistry : IResource
         private int _count;
         private int _eventsLastFrame;
 
+        public uint Count => (uint)_count;
         public void Init(in MemoryPool pool, in EventsDescriptor descriptor)
         {
             var size = descriptor.Size * descriptor.MaxEvents * 2;

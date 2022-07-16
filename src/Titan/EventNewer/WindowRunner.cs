@@ -15,7 +15,7 @@ public struct WindowRunner : IRunner
         }
 
         ref readonly var window = ref world.GetResource<Window>();
-        ref var windowApi = ref world.GetApi<WindowApi>();
+        ref readonly var windowApi = ref world.GetApi<WindowApi>();
         ref var jobApi = ref world.GetApi<JobApi>();
 
         scheduler.Startup(ref jobApi, ref world);

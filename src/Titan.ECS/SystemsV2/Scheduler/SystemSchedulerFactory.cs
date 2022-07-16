@@ -30,10 +30,11 @@ public static unsafe class SystemSchedulerFactory
         // Create and init the system node
         for (var i = 0; i < nodeCount; i++)
         {
-            var systemNode = SystemNode.CreateAndInit(i, memory, sortedDescriptors[i], new SystemsInitializer(app, &states[i]));
-            nodes[i].System = systemNode;
-            // Count the number of systems in each state
-            stageCounter[(int)systemNode.Stage]++;
+            throw new NotImplementedException("This has been removed, use the new one.");
+            //var systemNode = SystemNode.CreateAndInit(i, memory, sortedDescriptors[i], new SystemsInitializer(app, &states[i]));
+            //nodes[i].System = systemNode;
+            //// Count the number of systems in each state
+            //stageCounter[(int)systemNode.Stage]++;
         }
 
         // Calculate the dependencies

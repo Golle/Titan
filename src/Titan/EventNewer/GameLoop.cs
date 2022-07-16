@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Threading2;
@@ -6,14 +5,13 @@ using Titan.ECS.AnotherTry;
 
 namespace Titan.EventNewer;
 
-public unsafe struct GameLoop : IDisposable
+public readonly unsafe struct GameLoop
 {
     private readonly Scheduler* _scheduler;
     private readonly World* _world;
     private readonly JobApi* _jobApi;
     private readonly Thread _thread;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private bool _active;
     public GameLoop(ref Scheduler scheduler, ref World world, ref JobApi jobApi)
     {
         fixed (Scheduler* pScheduler = &scheduler)
@@ -57,10 +55,5 @@ public unsafe struct GameLoop : IDisposable
             scheduler.Update(ref jobApi, ref world);
         }
         Logger.Trace<Titan.GameLoop>("Ending the game loop");
-    }
-
-    public void Dispose()
-    {
-        Stop();
     }
 }

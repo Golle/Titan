@@ -12,7 +12,7 @@ internal struct SystemDependencyState
     public SystemDependency ReadOnlyGlobalResources;
     public SystemDependency MutableGlobalResources;
 
-    public bool DependsOn(in SystemDependencyState state)
+    public readonly bool DependsOn(in SystemDependencyState state)
     {
         return false;
         // do the stuff

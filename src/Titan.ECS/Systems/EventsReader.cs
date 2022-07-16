@@ -1,20 +1,18 @@
 using System;
 using System.Runtime.CompilerServices;
-using Titan.Core.Events;
+using Titan.Core;
+using Titan.ECS.AnotherTry;
 
 namespace Titan.ECS.Systems;
 
-public readonly unsafe struct EventsReader<T> where T : unmanaged
+public readonly struct EventsReader<T> where T : unmanaged, IEvent
 {
-    private readonly EventCollection<T>* _events;
-    internal EventsReader(EventCollection<T>* events)
-    {
-        _events = events;
-
-    }
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly ReadOnlySpan<T> GetEvents() => _events->GetEvents();
+    private readonly Events<T> _events;
+    internal EventsReader(Events<T> events) => _events = events;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasEvents() => _events->Count > 0;
+    public ReadOnlySpan<T> GetEvents() => _events.GetEvents();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool HasEvents() => _events.HasEvents();
 }

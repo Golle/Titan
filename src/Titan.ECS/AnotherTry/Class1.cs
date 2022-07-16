@@ -41,22 +41,26 @@ public struct App
     private MemoryPool _pool;
     private ResourceCollection _resources;
     private World _world;
-    private Scheduler _scheduler;
-    private Runner _runner;
 
     internal void Init(in MemoryPool pool, in ResourceCollection resources)
     {
         _pool = pool;
         _resources = resources;
-        _runner = resources.GetResource<Runner>();
-        _scheduler = resources.GetResource<Scheduler>();
-
         _world.Init(pool, resources);
+        
+        resources
+            .GetResource<Scheduler>()
+            .Init(_resources, ref _world);
     }
 
     public void Run()
     {
-        _runner.Run(ref _scheduler, ref _world);
+        ref var scheduler = ref _resources.GetResource<Scheduler>();
+
+        _resources
+            .GetResource<Runner>()
+            .Run(ref scheduler, ref _world);
+
         Cleanup();
     }
 
@@ -92,6 +96,10 @@ public struct World
 
     public bool HasResource<T>() where T : unmanaged
         => _resources.HasResource<T>();
+
+
+    public unsafe T* GetResourcePointer<T>() where T : unmanaged =>
+        _resources.GetResourcePointer<T>();
 }
 
 /*
@@ -242,7 +250,7 @@ public unsafe class AppBuilder
         _resourceCollection
             .GetResource<SystemsRegistry>()
             .Init(_pool, _systems.ToArray());
-        
+
         _app->Init(_pool, _resourceCollection);
 
         return ref *_app;
@@ -260,4 +268,5 @@ internal unsafe struct SystemsRegistry
         _systems = pool.GetPointer<SystemDescriptor>((uint)_count);
         systems.CopyTo(new Span<SystemDescriptor>(_systems, _count));
     }
+    public readonly ReadOnlySpan<SystemDescriptor> GetDescriptors() => new(_systems, _count);
 }

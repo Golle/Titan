@@ -1,13 +1,14 @@
-using Titan.Core.Events;
+using System.Runtime.CompilerServices;
+using Titan.Core;
+using Titan.ECS.AnotherTry;
 
 namespace Titan.ECS.Systems;
 
-public readonly unsafe struct EventsWriter<T> where T : unmanaged
+public readonly struct EventsWriter<T> where T : unmanaged, IEvent
 {
-    private readonly EventCollection<T>* _resource;
-    internal EventsWriter(EventCollection<T>* resource)
-    {
-        _resource = resource;
-    }
-    public void Send(in T @event) => _resource->Send(@event);
+    private readonly Events<T> _events;
+    internal EventsWriter(Events<T> events) => _events = events;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Send(in T @event) => _events.Send(@event);
 }
