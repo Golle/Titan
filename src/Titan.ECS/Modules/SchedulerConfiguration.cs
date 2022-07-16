@@ -28,6 +28,22 @@ public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>
         }
     }
 
+    public static SchedulerConfiguration SingleThreaded
+    {
+        get
+        {
+            var config = new SchedulerConfiguration();
+            config.SetExecutor<SequentialExecutor>(Stage.PreStartup);
+            config.SetExecutor<SequentialExecutor>(Stage.Startup);
+            config.SetExecutor<SequentialExecutor>(Stage.PreUpdate);
+            config.SetExecutor<SequentialExecutor>(Stage.Update);
+            config.SetExecutor<SequentialExecutor>(Stage.PostUpdate);
+            config.SetExecutor<SequentialExecutor>(Stage.Shutdown);
+            config.SetExecutor<SequentialExecutor>(Stage.PostShutdown);
+            return config;
+        }
+    }
+
     public void SetExecutor<T>(Stage stage) where T : IExecutor
     {
         Debug.Assert(stage != Stage.Count);

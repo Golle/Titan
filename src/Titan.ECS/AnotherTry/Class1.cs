@@ -150,6 +150,9 @@ public unsafe class AppBuilder
 
         // Add the pool as a resource so we can use it when setting up the modules
         AddResource(_pool);
+        
+        // The event system should always be added.
+        AddSystemToStage<EventSystem>(Stage.PreUpdate, RunCriteria.Always);
     }
 
     public static AppBuilder Create() => new(AppCreationArgs.Default);
@@ -243,10 +246,12 @@ public unsafe class AppBuilder
             .GetResource<ComponentRegistry>()
             .Init(_pool, config.MaxEntities, _components.ToArray());
 
+        
+
         _resourceCollection
             .GetResource<EventsRegistry>()
             .Init(_pool, _events.ToArray());
-
+        
         _resourceCollection
             .GetResource<SystemsRegistry>()
             .Init(_pool, _systems.ToArray());

@@ -1,14 +1,27 @@
+using System;
+using System.Runtime.CompilerServices;
 using Titan.Core.Threading2;
+using Titan.ECS.AnotherTry;
 
 namespace Titan.ECS.SystemsV2.Scheduler.Executors;
 
 public struct SequentialExecutor : IExecutor
 {
-    public static void RunSystems(in SystemExecutionGraph graph, in JobApi _)
+    [SkipLocalsInit]
+    public static unsafe void RunSystems(in NodeStage stage, in JobApi jobApi)
     {
-        foreach (ref readonly var node in graph.GetNodes())
+        var nodes = stage.Nodes;
+        var count = stage.Count;
+        for (var i = 0; i < count; ++i)
         {
-            if (node.ShouldRun())
+            ref readonly var node = ref nodes[i];
+            var shouldRun = node.Criteria switch
+            {
+                RunCriteria.Always => true,
+                RunCriteria.Check => node.ShouldRun(),
+                RunCriteria.Once or _ => throw new NotImplementedException($"{nameof(RunCriteria)}.{nameof(RunCriteria.Once)} has not been implemented yet. Use Check or Always.")
+            };
+            if (shouldRun)
             {
                 node.Update();
             }

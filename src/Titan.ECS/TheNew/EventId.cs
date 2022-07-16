@@ -28,6 +28,8 @@ public readonly struct EventId
 #else
     public override string ToString() => _id.ToString();
 #endif
+
+    public static uint Count => IdGenerator<EventId>.Count;
     private readonly struct EventIdInternal<T> where T : unmanaged, IEvent
     {
         public static readonly EventId Id = CreateNew();

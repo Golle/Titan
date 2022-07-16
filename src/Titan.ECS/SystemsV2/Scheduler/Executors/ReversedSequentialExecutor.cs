@@ -1,17 +1,29 @@
+using System;
+using System.Runtime.CompilerServices;
 using Titan.Core.Threading2;
+using Titan.ECS.AnotherTry;
 
 namespace Titan.ECS.SystemsV2.Scheduler.Executors;
 
 public struct ReversedSequentialExecutor : IExecutor
 {
-    public static void RunSystems(in SystemExecutionGraph graph, in JobApi _)
+    [SkipLocalsInit]
+    public static unsafe void RunSystems(in NodeStage stage, in JobApi jobApi)
     {
-        var nodes = graph.GetNodes();
-        for (var i = nodes.Length - 1; i >= 0; --i)
+        var nodes = stage.Nodes;
+        var count = stage.Count;
+        for (var i = count-1; i >=0; --i)
         {
-            if (nodes[i].ShouldRun())
+            ref readonly var node = ref nodes[i];
+            var shouldRun = node.Criteria switch
             {
-                nodes[i].Update();
+                RunCriteria.Always => true,
+                RunCriteria.Check => node.ShouldRun(),
+                RunCriteria.Once or _ => throw new NotImplementedException($"{nameof(RunCriteria)}.{nameof(RunCriteria.Once)} has not been implemented yet. Use Check or Always.")
+            };
+            if (shouldRun)
+            {
+                node.Update();
             }
         }
     }

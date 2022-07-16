@@ -1,6 +1,9 @@
+using System;
+using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Threading2;
+using Titan.ECS.AnotherTry;
 
 namespace Titan.ECS.SystemsV2.Scheduler.Executors;
 
@@ -8,10 +11,11 @@ public unsafe struct OrderedExecutor : IExecutor
 {
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     [SkipLocalsInit]
-    public static void RunSystems(in SystemExecutionGraph graph, in JobApi jobApi)
+    public static void RunSystems(in NodeStage stage, in JobApi jobApi)
     {
-        var nodes = graph.GetNodes();
-        var nodeCount = nodes.Length;
+        var nodes = stage.Nodes;
+        var nodeCount = stage.Count;
+
         var systemsLeft = nodeCount;
 
         var states = stackalloc SystemState[nodeCount];
@@ -21,18 +25,18 @@ public unsafe struct OrderedExecutor : IExecutor
         for (var index = 0; index < nodeCount; index++)
         {
             ref readonly var node = ref nodes[index];
-            if (!node.ShouldRun())
+            var shouldRun = node.Criteria switch
             {
-                systemsLeft--;
-                states[index] = SystemState.Completed;
-                handles[index] = Handle<JobApi>.Null;
-            }
-            else
+                RunCriteria.Always => true,
+                RunCriteria.Check => node.ShouldRun(),
+                RunCriteria.Once or _ => throw new NotImplementedException($"{nameof(RunCriteria)}.{nameof(RunCriteria.Once)} has not been implemented yet. Use Check or Always.")
+            };
+
+            if (shouldRun)
             {
                 if (node.DependenciesCount == 0)
                 {
-                    ref readonly var system = ref node.System;
-                    handles[index] = jobApi.Enqueue(JobItem.Create(system.Instance, system.Update, autoReset: false));
+                    handles[index] = RunSystem(jobApi, node);
                     states[index] = SystemState.Running;
                     //Logger.Trace<OrderedExecutor>($"System with index {index} started");
                 }
@@ -41,6 +45,12 @@ public unsafe struct OrderedExecutor : IExecutor
                     states[index] = SystemState.Waiting;
                     handles[index] = Handle<JobApi>.Null;
                 }
+            }
+            else
+            {
+                systemsLeft--;
+                states[index] = SystemState.Completed;
+                handles[index] = Handle<JobApi>.Null;
             }
         }
 
@@ -57,7 +67,7 @@ public unsafe struct OrderedExecutor : IExecutor
 
                 if (IsReady(nodes[i], states))
                 {
-                    handles[i] = RunSystem(jobApi, nodes[i].System);
+                    handles[i] = RunSystem(jobApi, nodes[i]);
                     states[i] = SystemState.Running;
                     //Logger.Trace<OrderedExecutor>($"System with index {i} started");
                 }
@@ -66,7 +76,7 @@ public unsafe struct OrderedExecutor : IExecutor
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static bool IsReady(in SystemExecutionGraphNode node, SystemState* states)
+        static bool IsReady(in Node node, SystemState* states)
         {
             for (var i = 0; i < node.DependenciesCount; ++i)
             {
@@ -79,8 +89,8 @@ public unsafe struct OrderedExecutor : IExecutor
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static Handle<JobApi> RunSystem(in JobApi jobApi, in SystemNode system)
-            => jobApi.Enqueue(JobItem.Create(system.Instance, system.Update, autoReset: false));
+        static Handle<JobApi> RunSystem(in JobApi jobApi, in Node system)
+            => jobApi.Enqueue(JobItem.Create(system.Context, system.UpdateFunc, autoReset: false));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static void UpdateJobStates(in JobApi jobApi, in Handle<JobApi>* handles, in SystemState* states, int nodeCount, ref int systemsLeft)

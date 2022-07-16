@@ -1,6 +1,7 @@
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.ECS.AnotherTry;
+using Titan.ECS.Modules;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 using Titan.EventNewer;
@@ -11,8 +12,10 @@ using Titan.Input.Modules;
 
 AppBuilder
     .Create()
+    .AddResource(SchedulerConfiguration.Default)
     .AddModule<CoreModule>()
     .AddModule<WindowModule>()
+    .AddModule<InputModule>()
     .UseRunner<WindowRunner>()
 
     .AddSystem<FrameCounter>()

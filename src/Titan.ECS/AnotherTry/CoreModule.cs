@@ -2,23 +2,20 @@ using Titan.Core;
 using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.ECS.Systems;
+using Titan.ECS.Modules;
 using Titan.ECS.SystemsV2;
 
 namespace Titan.ECS.AnotherTry;
 
 public struct CoreModule : IModule2
 {
-    public static void Build(AppBuilder app)
-    {
+    public static void Build(AppBuilder app) =>
         app
             .AddModule<MemoryModule>()
             .AddModule<LoggingModule>()
             .AddModule<ThreadingModule>()
             .AddModule<ECSModule>()
-            ;
-
-    }
+            .AddModule<SchedulerModule>();
 }
 
 public struct EntityConfiguration : IDefault<EntityConfiguration>
@@ -67,7 +64,7 @@ public unsafe struct MemoryModule : IModule2
             Logger.Trace<MemoryModule>($"Creating transient {nameof(MemoryAllocator)} with size {config.TransientMemory} bytes.");
             var pool = builder.GetResourcePointer<MemoryPool>();
             var allocator = pool->CreateAllocator2<MemoryAllocator>(config.TransientMemory);
-            
+
             builder
                 .AddResource(allocator)
                 .AddSystemToStage<TransientMemorySystem>(Stage.PreUpdate);

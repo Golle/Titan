@@ -6,6 +6,7 @@ using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;
+using Titan.ECS.AnotherTry;
 using Titan.ECS.SystemsV2;
 using Titan.ECS.SystemsV2.Scheduler;
 
@@ -98,7 +99,7 @@ public unsafe struct Runner : IApi
     private static void OnShutdown(Runner* runner)
         => runner->_scheduler->Shutdown(*runner->_jobApi);
 
-    private static void OnUpdate(Runner* runner) 
+    private static void OnUpdate(Runner* runner)
         => runner->_scheduler->RunOnce(*runner->_jobApi);
 }
 
@@ -158,21 +159,21 @@ public struct Scheduler
 
     public void Startup(in JobApi jobApi)
     {
-        _preStartup.Run(_stages.GetGraph(Stage.PreStartup), jobApi);
-        _startup.Run(_stages.GetGraph(Stage.Startup), jobApi);
+        //_preStartup.Run(_stages.GetGraph(Stage.PreStartup), jobApi);
+        //_startup.Run(_stages.GetGraph(Stage.Startup), jobApi);
     }
 
     public void Shutdown(in JobApi jobApi)
     {
-        _shutdown.Run(_stages.GetGraph(Stage.Shutdown), jobApi);
-        _postShutdown.Run(_stages.GetGraph(Stage.PostShutdown), jobApi);
+        //_shutdown.Run(_stages.GetGraph(Stage.Shutdown), jobApi);
+        //_postShutdown.Run(_stages.GetGraph(Stage.PostShutdown), jobApi);
     }
 
     public void RunOnce(in JobApi jobApi)
     {
-        _preUpdate.Run(_stages.GetGraph(Stage.PreUpdate), jobApi);
-        _update.Run(_stages.GetGraph(Stage.Update), jobApi);
-        _postUpdate.Run(_stages.GetGraph(Stage.PostUpdate), jobApi);
+        //    _preUpdate.Run(_stages.GetGraph(Stage.PreUpdate), jobApi);
+        //    _update.Run(_stages.GetGraph(Stage.Update), jobApi);
+        //    _postUpdate.Run(_stages.GetGraph(Stage.PostUpdate), jobApi);
     }
 
     public static Scheduler Create(in SystemExecutionStages stages, ReadOnlySpan<StageExecutor> stageExecutors) =>
@@ -189,7 +190,7 @@ public struct Scheduler
         };
 }
 
-public readonly struct SchedulerModule : IModule
+public readonly struct SchedulerModule : IModule, IModule2
 {
     public static void Build(IApp app)
     {
@@ -199,5 +200,10 @@ public readonly struct SchedulerModule : IModule
 
         app.AddResource(SchedulerApi.Default)
             .AddResource(Runner.Create<GameLoopThread>());
+    }
+
+    public static void Build(AppBuilder builder)
+    {
+        var _ = builder.GetResourceOrDefault<SchedulerConfiguration>();
     }
 }

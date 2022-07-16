@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Threading2;
@@ -49,10 +50,18 @@ public readonly unsafe struct GameLoop
         ref var scheduler = ref *_scheduler;
         ref var world = ref *_world;
         ref var jobApi = ref *_jobApi;
-
+        var timer = Stopwatch.StartNew();
+        var frames = 0;
         while (!token.IsCancellationRequested)
         {
             scheduler.Update(ref jobApi, ref world);
+            frames++;
+            if (timer.Elapsed.TotalSeconds >= 1.0f)
+            {
+                Logger.Trace<Titan.GameLoop>($"FPS: {frames}. Render time: {timer.Elapsed.TotalMilliseconds/frames} ms");
+                timer.Restart();;
+                frames = 0;
+            }
         }
         Logger.Trace<Titan.GameLoop>("Ending the game loop");
     }
