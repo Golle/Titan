@@ -55,8 +55,9 @@ public unsafe struct Scheduler
         var sortedDescriptors = new Span<SystemDescriptor>(transient.GetPointer<SystemDescriptor>((uint)_count), _count);
         descriptors.CopyTo(sortedDescriptors);
         sortedDescriptors.Sort(CompareDescriptor);
-        
+
         // allocate memory for the nodes
+        _stages = pool.GetPointer<NodeStage>((uint)Stage.Count);
         var nodes = pool.GetPointer<Node>((uint)_count, true);
         var states = transient.GetPointer<SystemDependencyState>((uint)_count, true);
         var stageCounter = stackalloc int[stageCount];
@@ -100,7 +101,7 @@ public unsafe struct Scheduler
         }
 
         // Group the systems in Stages so they can easily be executed
-        _stages = pool.GetPointer<NodeStage>((uint)Stage.Count);
+        
         var node = nodes;
         for (var i = 0; i < stageCount; ++i)
         {
