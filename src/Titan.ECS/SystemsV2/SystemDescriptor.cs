@@ -1,4 +1,5 @@
 using Titan.Core.App;
+using Titan.Core.Logging;
 using Titan.ECS.TheNew;
 
 namespace Titan.ECS.SystemsV2;
@@ -41,7 +42,16 @@ internal readonly unsafe struct SystemDescriptor
     /// </summary>
     private struct FunctionWrapper<T> where T : unmanaged, IStructSystem<T>
     {
+        // NOTE(Jens): this is a sample of how we can wrap the function pointers with things that record stats like execution time etc.
+#if DEBUG
+        public static void Init(void* system, SystemsInitializer init)
+        {
+            Logger.Trace<T>("Init System");
+            T.Init(ref *(T*)system, init);
+        }
+#else
         public static void Init(void* system, SystemsInitializer init) => T.Init(ref *(T*)system, init);
+#endif
         public static void Update(void* system) => T.Update(ref *(T*)system);
         public static bool ShouldRun(void* system) => T.ShouldRun(*(T*)system);
     }
