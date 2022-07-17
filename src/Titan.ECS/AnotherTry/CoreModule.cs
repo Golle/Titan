@@ -63,7 +63,7 @@ public unsafe struct MemoryModule : IModule2
         {
             Logger.Trace<MemoryModule>($"Creating transient {nameof(MemoryAllocator)} with size {config.TransientMemory} bytes.");
             var pool = builder.GetResourcePointer<MemoryPool>();
-            var allocator = pool->CreateAllocator2<MemoryAllocator>(config.TransientMemory);
+            var allocator = pool->CreateAllocator<MemoryAllocator>(config.TransientMemory);
 
             builder
                 .AddResource(allocator)

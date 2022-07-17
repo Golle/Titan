@@ -4,14 +4,6 @@ using Titan.ECS.TheNew;
 
 namespace Titan.ECS.SystemsV2;
 
-
-public enum RunCriteria
-{
-    Check,
-    Always,
-    Once
-}
-
 internal readonly unsafe struct SystemDescriptor
 {
     public readonly delegate*<void*, SystemsInitializer, void> Init;

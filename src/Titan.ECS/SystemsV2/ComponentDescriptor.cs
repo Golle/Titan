@@ -27,7 +27,7 @@ internal readonly unsafe struct ComponentDescriptor
     {
         var vtbl = type switch
         {
-            ComponentPoolTypes.Packed => PackedComponentPoolNew<T>.Vtbl,
+            ComponentPoolTypes.Packed => Components.PackedComponentPool<T>.Vtbl,
             _ => throw new NotImplementedException($"Component pool for type {type} has not been implemented.")
         };
 

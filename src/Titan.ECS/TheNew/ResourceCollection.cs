@@ -3,16 +3,17 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
+using Titan.ECS.AnotherTry;
 
 namespace Titan.ECS.TheNew;
 
 public readonly unsafe struct ResourceCollection
 {
-    private readonly TransientMemory _allocator;
+    private readonly MemoryAllocator _allocator;
     private readonly void** _indices;
     private readonly uint _indicesCount;
 
-    private ResourceCollection(TransientMemory allocator, void** indices, uint indicesCount)
+    private ResourceCollection(MemoryAllocator allocator, void** indices, uint indicesCount)
     {
         _allocator = allocator;
         _indices = indices;
@@ -21,7 +22,7 @@ public readonly unsafe struct ResourceCollection
 
     public static ResourceCollection Create(uint size, uint maxTypes, in MemoryPool memoryPool)
     {
-        var allocator = memoryPool.CreateAllocator<TransientMemory>(size, true);
+        var allocator = memoryPool.CreateAllocator<MemoryAllocator>(size, true);
         var indices = memoryPool.GetPointer((uint)(sizeof(void*) * maxTypes));
         return new ResourceCollection(allocator, (void**)indices, maxTypes);
     }

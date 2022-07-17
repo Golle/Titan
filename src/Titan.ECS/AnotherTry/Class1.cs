@@ -127,8 +127,7 @@ public struct World
 
 public unsafe class AppBuilder
 {
-    private readonly MemoryPool _pool;
-    private readonly ResourceCollection _resourceCollection;
+    private ResourceCollection _resourceCollection;
 
     private readonly List<SystemDescriptor> _systems = new();
     private readonly List<ComponentDescriptor> _components = new();
@@ -139,17 +138,17 @@ public unsafe class AppBuilder
     private AppBuilder(AppCreationArgs args)
     {
         // allocate the memory needed for the App instance. This will ensure that only unmanaged/blittable types are used.
-        _pool = MemoryPool.Create(args.UnmanagedMemory);
+        var pool = MemoryPool.Create(args.UnmanagedMemory);
 
         // The App will be the first entry in the memory block
-        _app = _pool.GetPointer<App>(initialize: true);
+        _app = pool.GetPointer<App>(initialize: true);
 
         // Resources must be allocated at the start because they are used when modules are built. (configs etc)
         // We might want to change this at some point to allow for better memory alignment. For example configs used for startup/construction might never be used again, but they'll be mixed with other game related resources.
-        _resourceCollection = ResourceCollection.Create(args.ResourcesMemory, args.MaxResourceTypes, _pool);
+        _resourceCollection = ResourceCollection.Create(args.ResourcesMemory, args.MaxResourceTypes, pool);
 
-        // Add the pool as a resource so we can use it when setting up the modules
-        AddResource(_pool);
+        // Add the pool as a resource so we can use it when setting up the modules (This must be done after it's been used to create the resource collection or the _next in the pool will be wrong.
+        AddResource(pool);
         
         // The event system should always be added.
         AddSystemToStage<EventSystem>(Stage.PreUpdate, RunCriteria.Always);
@@ -240,23 +239,25 @@ public unsafe class AppBuilder
         {
             throw new InvalidOperationException($"Failed to find {nameof(EntityConfiguration)} resource. Make sure you've added the CoreModule before calling build.");
         }
+
+        ref readonly var pool = ref _resourceCollection.GetResource<MemoryPool>();
         // Initialize the Compoenent pools (this is done at build because we want all components to be in the same place)
         ref readonly var config = ref _resourceCollection.GetResource<EntityConfiguration>();
         _resourceCollection
             .GetResource<ComponentRegistry>()
-            .Init(_pool, config.MaxEntities, _components.ToArray());
+            .Init(pool, config.MaxEntities, _components.ToArray());
 
         
 
         _resourceCollection
             .GetResource<EventsRegistry>()
-            .Init(_pool, _events.ToArray());
+            .Init(pool, _events.ToArray());
         
         _resourceCollection
             .GetResource<SystemsRegistry>()
-            .Init(_pool, _systems.ToArray());
+            .Init(pool, _systems.ToArray());
 
-        _app->Init(_pool, _resourceCollection);
+        _app->Init(pool, _resourceCollection);
 
         return ref *_app;
     }

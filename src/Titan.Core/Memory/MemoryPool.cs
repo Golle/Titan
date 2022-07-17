@@ -36,18 +36,12 @@ public readonly unsafe struct MemoryPool : IDisposable
         return new MemoryPool(mem, (int)bytes);
     }
 
-    [Obsolete("This is old, dont use this.")]
     public T CreateAllocator<T>(uint size, bool initialize = false) where T : unmanaged, IMemoryAllocator<T>
     {
-        var allocator = GetPointer<Allocator>();
-        *allocator = new Allocator(GetPointer(size, initialize), size);
-        return T.CreateAllocator(allocator);
-    }
-
-    public T CreateAllocator2<T>(uint size, bool initialize = false) where T : unmanaged, IMemoryAllocator<T>
-    {
         var memory = GetPointer(size, initialize);
-        return T.CreateAllocator2(new Allocator(memory, size));
+        var allocator = GetPointer<Allocator>();
+        *allocator = new Allocator(memory, size);
+        return T.CreateAllocator(allocator);
     }
 
     public T* GetPointer<T>(uint count = 1, bool initialize = false) where T : unmanaged
