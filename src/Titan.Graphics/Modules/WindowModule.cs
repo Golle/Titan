@@ -1,8 +1,8 @@
 using System;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Core.App;
-using Titan.ECS.AnotherTry;
+using Titan.ECS;
+using Titan.ECS.App;
 using Titan.ECS.SystemsV2;
 
 namespace Titan.Graphics.Modules;

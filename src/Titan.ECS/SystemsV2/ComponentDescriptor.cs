@@ -1,7 +1,6 @@
 using System;
 using Titan.Core;
 using Titan.ECS.Components;
-using Titan.ECS.SystemsV2.Components;
 
 namespace Titan.ECS.SystemsV2;
 

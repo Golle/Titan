@@ -1,6 +1,6 @@
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.ECS.AnotherTry;
+using Titan.ECS.App;
 using Titan.ECS.Modules;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
@@ -8,7 +8,8 @@ using Titan.EventNewer;
 using Titan.Graphics.Modules;
 using Titan.Input;
 using Titan.Input.Modules;
-
+using Titan.Modules;
+using Titan.Sandbox;
 
 AppBuilder
     .Create()
@@ -23,8 +24,9 @@ AppBuilder
     .Build()
     .Run();
 
-
-//using var app = App
+namespace Titan.Sandbox
+{
+    //using var app = App
 //    .Create(AppCreationArgs.Default)
 //    .AddModule<CoreModule>()
 //    .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
@@ -38,67 +40,66 @@ AppBuilder
 //    .Run()
 //    ;
 
-internal struct FrameCounter : IStructSystem<FrameCounter>
-{
-    private MutableResource<GlobalFrameCounter> _global;
-
-    public static void Init(ref FrameCounter system, in SystemsInitializer init)
+    internal struct FrameCounter : IStructSystem<FrameCounter>
     {
-        system._global = init.GetMutableResource<GlobalFrameCounter>();
-    }
+        private MutableResource<GlobalFrameCounter> _global;
 
-    public static void Update(ref FrameCounter system)
-    {
-        system._global.Get().FrameCounter++;
-    }
-
-    public static bool ShouldRun(in FrameCounter system) => true;
-}
-
-internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
-{
-    private ReadOnlyResource<GlobalFrameCounter> _global;
-    private ReadOnlyResource<KeyboardState> _keyState;
-    private int _counter;
-
-    public static void Init(ref PrintFrameCounter system, in SystemsInitializer init)
-    {
-        system._global = init.GetReadOnlyResource<GlobalFrameCounter>();
-        system._keyState = init.GetReadOnlyResource<KeyboardState>();
-        system._counter = 0;
-    }
-
-    public static void Update(ref PrintFrameCounter system)
-    {
-        ref readonly var keyboardState = ref system._keyState.Get();
-        if (keyboardState.IsKeyReleased(KeyCode.A))
+        public static void Init(ref FrameCounter system, in SystemsInitializer init)
         {
-            Logger.Warning<PrintFrameCounter>("Key released");
-        }
-        if (keyboardState.IsKeyPressed(KeyCode.A))
-        {
-            Logger.Warning<PrintFrameCounter>("Key pressed");
+            system._global = init.GetMutableResource<GlobalFrameCounter>();
         }
 
-        if (keyboardState.IsKeyDown(KeyCode.S))
+        public static void Update(ref FrameCounter system)
         {
-            system._counter++;
+            system._global.Get().FrameCounter++;
         }
-        else if (keyboardState.IsKeyReleased(KeyCode.S))
-        {
-            Logger.Trace<PrintFrameCounter>($"Keycount: {system._counter}");
-        }
+
+        public static bool ShouldRun(in FrameCounter system) => true;
     }
 
-    public static bool ShouldRun(in PrintFrameCounter system) => true;
-}
+    internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
+    {
+        private ReadOnlyResource<GlobalFrameCounter> _global;
+        private ReadOnlyResource<KeyboardState> _keyState;
+        private int _counter;
+
+        public static void Init(ref PrintFrameCounter system, in SystemsInitializer init)
+        {
+            system._global = init.GetReadOnlyResource<GlobalFrameCounter>();
+            system._keyState = init.GetReadOnlyResource<KeyboardState>();
+            system._counter = 0;
+        }
+
+        public static void Update(ref PrintFrameCounter system)
+        {
+            ref readonly var keyboardState = ref system._keyState.Get();
+            if (keyboardState.IsKeyReleased(KeyCode.A))
+            {
+                Logger.Warning<PrintFrameCounter>("Key released");
+            }
+            if (keyboardState.IsKeyPressed(KeyCode.A))
+            {
+                Logger.Warning<PrintFrameCounter>("Key pressed");
+            }
+
+            if (keyboardState.IsKeyDown(KeyCode.S))
+            {
+                system._counter++;
+            }
+            else if (keyboardState.IsKeyReleased(KeyCode.S))
+            {
+                Logger.Trace<PrintFrameCounter>($"Keycount: {system._counter}");
+            }
+        }
+
+        public static bool ShouldRun(in PrintFrameCounter system) => true;
+    }
 
 
-struct GlobalFrameCounter : IResource
-{
-    public long FrameCounter;
-}
-
+    struct GlobalFrameCounter : IResource
+    {
+        public long FrameCounter;
+    }
 
 //internal class SandboxGame : Game
 //{
@@ -131,3 +132,4 @@ struct GlobalFrameCounter : IResource
 
 //    }
 //}
+}

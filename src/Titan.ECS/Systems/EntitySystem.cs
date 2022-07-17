@@ -6,7 +6,7 @@ using Titan.Core.Services;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.Systems.Resources;
-using Titan.ECS.Worlds;
+using Titan.ECS.WorldsOld;
 
 namespace Titan.ECS.Systems;
 
@@ -16,7 +16,7 @@ public abstract class EntitySystem
     private ComponentId _read;
     private ComponentId _mutable;
     private GameTime _gameTime;
-    private World _world;
+    private WorldsOld.World _world;
     private bool _initialized;
     private readonly string _name;
     private ISharedResources _resources;
@@ -90,7 +90,7 @@ public abstract class EntitySystem
             OnPostUpdate();
         }
 #endif
-    internal void InitSystem(World world, IServiceCollection services)
+    internal void InitSystem(WorldsOld.World world, IServiceCollection services)
     {
         _world = world;
         _gameTime = world.GameTime;

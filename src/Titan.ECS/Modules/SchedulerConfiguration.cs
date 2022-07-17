@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core;
-using Titan.Core.App;
 using Titan.ECS.SystemsV2.Scheduler;
 using Titan.ECS.SystemsV2.Scheduler.Executors;
 

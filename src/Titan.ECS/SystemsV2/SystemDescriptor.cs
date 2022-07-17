@@ -1,4 +1,3 @@
-using Titan.Core.App;
 using Titan.Core.Logging;
 using Titan.ECS.TheNew;
 

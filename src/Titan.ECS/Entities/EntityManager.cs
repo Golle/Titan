@@ -5,7 +5,7 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.ECS.Events;
-using Titan.ECS.Worlds;
+using Titan.ECS.WorldsOld;
 
 namespace Titan.ECS.Entities;
 
@@ -208,9 +208,9 @@ public class EntityManager : IDisposable
     {
         foreach (ref readonly var @event in EventManager.GetEvents())
         {
-            if (@event.Type == EntityDestroyedEvent.Id)
+            if (@event.Type == EntityDestroyedEventOld.Id)
             {
-                ref readonly var e = ref @event.As<EntityDestroyedEvent>();
+                ref readonly var e = ref @event.As<EntityDestroyedEventOld>();
                 if (e.Entity.WorldId == _worldId)
                 {
                     _entityIds.Return(e.Entity.Id);
@@ -221,7 +221,7 @@ public class EntityManager : IDisposable
                 var e = @event.As<EntityBeingDestroyedEvent>();
                 if (e.Entity.WorldId == _worldId)
                 {
-                    EventManager.Push(new EntityDestroyedEvent(e.Entity));
+                    EventManager.Push(new EntityDestroyedEventOld(e.Entity));
                 }
             }
         }

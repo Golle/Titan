@@ -16,8 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\" />
+    <Folder Include="AnotherTry\" />
+    <Folder Include="Scheduler\" />
     <Folder Include="Systems\Resources\" />
+    <Folder Include="World\" />
   </ItemGroup>
 
   <ItemGroup>

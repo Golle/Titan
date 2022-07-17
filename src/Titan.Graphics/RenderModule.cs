@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Titan.Core;
-using Titan.Core.App;
-using Titan.ECS.AnotherTry;
+using Titan.ECS;
+using Titan.ECS.App;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 using Titan.Windows.D3D11;

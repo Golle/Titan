@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.ECS.AnotherTry;
 using Titan.ECS.Components;
 using Titan.ECS.Systems;
 using Titan.ECS.TheNew;
@@ -10,11 +9,11 @@ namespace Titan.ECS.SystemsV2;
 public readonly unsafe ref struct SystemsInitializer
 {
     private readonly SystemDependencyState* _state;
-    private readonly World* _world;
+    private readonly World.World* _world;
 
-    internal SystemsInitializer(ref SystemDependencyState state, ref World world)
+    internal SystemsInitializer(ref SystemDependencyState state, ref World.World world)
     {
-        _world = (World*)Unsafe.AsPointer(ref world);
+        _world = (World.World*)Unsafe.AsPointer(ref world);
         _state = (SystemDependencyState*)Unsafe.AsPointer(ref state);
     }
 

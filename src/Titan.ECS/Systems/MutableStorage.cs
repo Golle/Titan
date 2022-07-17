@@ -6,9 +6,9 @@ namespace Titan.ECS.Systems;
 
 public readonly struct MutableStorage<T> where T : unmanaged
 {
-    private readonly IComponentPool<T> _pool;
+    private readonly ComponentsOld.IComponentPool<T> _pool;
 
-    public MutableStorage(IComponentPool<T> pool) => _pool = pool;
+    public MutableStorage(ComponentsOld.IComponentPool<T> pool) => _pool = pool;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref T Get(in Entity entity) => ref _pool.Get(entity);

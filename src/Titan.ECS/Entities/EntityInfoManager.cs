@@ -3,7 +3,7 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
 using Titan.ECS.Events;
-using Titan.ECS.Worlds;
+using Titan.ECS.WorldsOld;
 
 namespace Titan.ECS.Entities;
 

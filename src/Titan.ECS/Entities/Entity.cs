@@ -1,6 +1,6 @@
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Entities;
 
@@ -23,22 +23,22 @@ public readonly struct Entity
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Attach(in Entity entity) => World.GetWorldById(WorldId).AttachEntity(this, entity);
+    public void Attach(in Entity entity) => throw new NotImplementedException();// => World.GetWorldById(WorldId).AttachEntity(this, entity);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Detach() => World.GetWorldById(WorldId).DetachEntity(this);
+    public void Detach() => throw new NotImplementedException();//=> World.GetWorldById(WorldId).DetachEntity(this);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsNull() => Id == 0u;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Destroy() => World.GetWorldById(WorldId).DestroyEntity(this);
+    public void Destroy() => throw new NotImplementedException();// => World.GetWorldById(WorldId).DestroyEntity(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Entity CreateChildEntity()
-    {
-        var entity = World.GetWorldById(WorldId).CreateEntity();
-        Attach(entity);
-        return entity;
-    }
+    public Entity CreateChildEntity() => throw new NotImplementedException();//
+    //{
+    //    var entity = World.GetWorldById(WorldId).CreateEntity();
+    //    Attach(entity);
+    //    return entity;
+    //}
 
     [Conditional("DEBUG")]
-    public void DebugPrintEntityRelationship() => World.GetWorldById(WorldId).Manager.DebugPrint(this);
+    public void DebugPrintEntityRelationship() => throw new NotImplementedException();// => World.GetWorldById(WorldId).Manager.DebugPrint(this);
 }
