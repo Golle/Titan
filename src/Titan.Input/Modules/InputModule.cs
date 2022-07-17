@@ -5,21 +5,8 @@ using Titan.Graphics.Modules;
 
 namespace Titan.Input.Modules;
 
-public readonly struct InputModule : IModule, IModule2
+public readonly struct InputModule : IModule2
 {
-    public static void Build(IApp app)
-    {
-        if (!app.HasResource<Window>() || !app.HasResource<WindowApi>())
-        {
-            throw new InvalidOperationException($"{nameof(InputModule)} requires the {nameof(Window)} and {nameof(WindowApi)} resources to be added.");
-        }
-
-        app
-            .AddModule<KeyboardInputModule>()
-            .AddModule<MouseInputModule>()
-            ;
-    }
-
     public static void Build(AppBuilder builder)
     {
         // Should we do this?

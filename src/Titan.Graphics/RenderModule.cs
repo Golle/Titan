@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Titan.Core;
 using Titan.Core.App;
+using Titan.ECS.AnotherTry;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 using Titan.Windows.D3D11;
@@ -26,17 +27,17 @@ public enum RenderAPI
     D3D12,
     Vulkan
 }
-public struct RenderModule : IModule
+public struct RenderModule : IModule2
 {
-    public static unsafe void Build(IApp app)
+    public static unsafe void Build(AppBuilder builder)
     {
         var devicePtr = (ID3D11Device*)NativeMemory.Alloc(1000);
-        app.AddResource(new RenderDevice
+        builder.AddResource(new RenderDevice
         {
             API = RenderAPI.D3D11,
             D3DDevice = devicePtr
         });
-        app.AddSystemToStage<RenderDeviceTeardown>(Stage.Shutdown);
+        builder.AddSystemToStage<RenderDeviceTeardown>(Stage.Shutdown);
     }
 
     private struct RenderDeviceTeardown : IStructSystem<RenderDeviceTeardown>
