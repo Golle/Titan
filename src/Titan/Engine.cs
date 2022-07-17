@@ -32,58 +32,29 @@ namespace Titan;
 /// </summary>
 public class Engine
 {
-    private readonly Game _game;
-    public static void Start(Game game)
-    {
-        Logger.Start();
-        try
-        {
-            Logger.Info("Engine startup up!", typeof(Engine));
-            SetupCoreSystems();
-            new Engine(game)
-                .Run();
-            
-        }
-        catch (Exception e)
-        {
-            Logger.Error($"{e.GetType().Name} was thrown in the game loop with the message: {e.Message} ", typeof(Engine));
-        }
-        finally
-        {
-            Logger.Info("Engine shutting down!", typeof(Engine));
-            TeardownCoreSystems();
-            Logger.Shutdown();
-        }
-    }
-
-    public Engine(Game game)
-    {
-        _game = game;
-    }
-
     private void Run()
     {
-        var engineConfig = _game.ConfigureEngine(new EngineConfiguration());
-        var windowConfig = _game.ConfigureWindow(new WindowConfiguration("n/a", 800, 600));
+        //var engineConfig = _game.ConfigureEngine(new EngineConfiguration());
+        //var windowConfig = _game.ConfigureWindow(new WindowConfiguration("n/a", 800, 600));
         
-        using var window = Window.Create(windowConfig);
+        //using var window = Window.Create(windowConfig);
 
-        // Setup the Window
-        {
-            if (window == null)
-            {
-                Logger.Error<Engine>("Failed to create the Window.");
-                return;
-            }
-            window.Show();
-        }
+        //// Setup the Window
+        //{
+        //    if (window == null)
+        //    {
+        //        Logger.Error<Engine>("Failed to create the Window.");
+        //        return;
+        //    }
+        //    window.Show();
+        //}
 
-        var systemsConfiguration = _game.ConfigureSystems(SetupSystemsBuilder());
-        var worldConfigurations = _game.ConfigureWorlds();
+        //var systemsConfiguration = _game.ConfigureSystems(SetupSystemsBuilder());
+        //var worldConfigurations = _game.ConfigureWorlds();
 
-        var worlds = worldConfigurations
-            .Select(config => WorldFactory.Create(config, systemsConfiguration))
-            .ToArray();
+        //var worlds = worldConfigurations
+        //    .Select(config => WorldFactory.Create(config, systemsConfiguration))
+        //    .ToArray();
 
 
         // old
@@ -133,14 +104,11 @@ public class Engine
 
         //var renderingPipeline = _game.ConfigureRenderingPipeline();
 
-        using var gameloop = GameLoop.InitAndStart(worlds);
-        while (window.Update())
-        {
-        }
+        //using var gameloop = GameLoop.InitAndStart(worlds);
+        //while (window.Update())
+        //{
+        //}
     }
-
-    private static SystemsBuilder SetupSystemsBuilder() =>
-        new SystemsBuilder();
 
     private static void SetupCoreSystems()
     {

@@ -152,9 +152,6 @@ public class World : IDisposable
         WorldIds.Return(Id);
     }
 
-
-    public static World CreateWorld(WorldBuilderOld builder, IServiceCollection services, bool setActive) => CreateWorld(builder.Build("THIS IS NOT WORKDING"), services, setActive);
-
     public static World CreateWorld(WorldConfigurationOld config, IServiceCollection services, bool setActive)
     {
         var world = new World(config, services);

@@ -46,7 +46,7 @@ public readonly unsafe struct GameLoop
     private void RunSchedule(object _)
     {
         var token = _cancellationTokenSource.Token;
-        Logger.Trace<Titan.GameLoop>("Starting the game loop");
+        Logger.Trace<GameLoop>("Starting the game loop");
         ref var scheduler = ref *_scheduler;
         ref var world = ref *_world;
         ref var jobApi = ref *_jobApi;
@@ -58,11 +58,11 @@ public readonly unsafe struct GameLoop
             frames++;
             if (timer.Elapsed.TotalSeconds >= 1.0f)
             {
-                Logger.Trace<Titan.GameLoop>($"FPS: {frames}. Render time: {timer.Elapsed.TotalMilliseconds/frames} ms");
+                Logger.Trace<GameLoop>($"FPS: {frames}. Render time: {timer.Elapsed.TotalMilliseconds/frames} ms");
                 timer.Restart();;
                 frames = 0;
             }
         }
-        Logger.Trace<Titan.GameLoop>("Ending the game loop");
+        Logger.Trace<GameLoop>("Ending the game loop");
     }
 }
