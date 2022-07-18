@@ -103,7 +103,8 @@ public unsafe class AppBuilder
         return this;
     }
 
-
+    public ref T GetResource<T>() where T : unmanaged 
+        => ref _resourceCollection.GetResource<T>();
     public ref T GetResourceOrDefault<T>() where T : unmanaged, IDefault<T>
     {
         if (!_resourceCollection.HasResource<T>())
@@ -115,6 +116,9 @@ public unsafe class AppBuilder
 
     public T* GetResourcePointer<T>() where T : unmanaged
         => _resourceCollection.GetResourcePointer<T>();
+
+    public bool HasResource<T>() where T : unmanaged 
+        => _resourceCollection.HasResource<T>();
 
     public ref App Build()
     {
@@ -134,8 +138,6 @@ public unsafe class AppBuilder
         _resourceCollection
             .GetResource<ComponentRegistry>()
             .Init(pool, config.MaxEntities, _components.ToArray());
-
-        
 
         _resourceCollection
             .GetResource<EventsRegistry>()

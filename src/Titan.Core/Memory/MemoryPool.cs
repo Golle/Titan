@@ -5,6 +5,13 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Core.Memory;
 
+/// <summary>
+/// This is just a pool of memory with no possibility for Dealloc/free.
+/// Create allocators on top of this pool for different usages.
+/// Also look into how we can use virtual address space instead of raw pointers to native memory (unless its the same thing on Windows?)
+/// The problem we're trying to solve is to have a deterministic amount of memory usage during the applications lifecycle,
+/// low fragmentation and the possiblity for dynamic allocs and frees. 
+/// </summary>
 public readonly unsafe struct MemoryPool : IDisposable
 {
     // NOTE(Jens): align all allocations to 8 bytes. (We should measure this at some point)

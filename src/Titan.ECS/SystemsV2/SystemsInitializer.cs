@@ -1,8 +1,11 @@
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.ECS.Components;
+using Titan.ECS.EntitiesNew;
+using Titan.ECS.Modules;
 using Titan.ECS.Systems;
 using Titan.ECS.TheNew;
+using EntityFilter = Titan.ECS.EntitiesNew.EntityFilter;
 
 namespace Titan.ECS.SystemsV2;
 
@@ -16,6 +19,13 @@ public readonly unsafe ref struct SystemsInitializer
         _world = (World.World*)Unsafe.AsPointer(ref world);
         _state = (SystemDependencyState*)Unsafe.AsPointer(ref state);
     }
+
+    public EntityHandler GetEntityHandler()
+        => new(
+            GetEventsWriter<EntityCreated>(),
+            GetEventsWriter<EntityBeingDestroyed>(),
+            _world->GetResourcePointer<EntityIdContainer>()
+        );
 
     public MutableResource<T> GetMutableGlobalResource<T>() where T : unmanaged, IResource
     {
@@ -63,4 +73,6 @@ public readonly unsafe ref struct SystemsInitializer
 
     public ApiResource<T> GetApi<T>() where T : unmanaged, IApi
         => new(_world->GetResourcePointer<T>());
+
+    public void GetEntities(in EntityFilter filter) => _world->CreateEntityQuery(filter);
 }

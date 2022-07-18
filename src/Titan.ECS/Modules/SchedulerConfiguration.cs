@@ -37,8 +37,8 @@ public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>
             config.SetExecutor<SequentialExecutor>(Stage.PreUpdate);
             config.SetExecutor<SequentialExecutor>(Stage.Update);
             config.SetExecutor<SequentialExecutor>(Stage.PostUpdate);
-            config.SetExecutor<SequentialExecutor>(Stage.Shutdown);
-            config.SetExecutor<SequentialExecutor>(Stage.PostShutdown);
+            config.SetExecutor<ReversedSequentialExecutor>(Stage.Shutdown);
+            config.SetExecutor<ReversedSequentialExecutor>(Stage.PostShutdown);
             return config;
         }
     }

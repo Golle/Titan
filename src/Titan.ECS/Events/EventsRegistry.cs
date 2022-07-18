@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -7,6 +8,8 @@ using Titan.ECS.TheNew;
 
 namespace Titan.ECS.Events;
 
+// NOTE(Jens): this currenlty only supports a fixed size of events. We should make it possible for this to use the TransientMemory when there are to mnay events in a single frame.
+// NOTE(Jens): We could allocate EventSize*MaxEntities as a transient buffer if there's an overflow of events. This would be detroyed the next frame.
 internal unsafe struct EventsRegistry : IResource
 {
     private EventsInternal<byte>* _mem;
@@ -22,7 +25,8 @@ internal unsafe struct EventsRegistry : IResource
         foreach (ref readonly var descriptor in descriptors)
         {
             Logger.Trace<EventsRegistry>($"Initialize event {descriptor.Id}");
-            _mem[descriptor.Id].Init(pool, descriptor);
+            // ID starts with 1, so we subtract 1 before calling the init
+            _mem[descriptor.Id - 1].Init(pool, descriptor);
         }
     }
 
@@ -40,7 +44,7 @@ internal unsafe struct EventsRegistry : IResource
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private EventsInternal<T>* GetInternal<T>() where T : unmanaged, IEvent
-        => (EventsInternal<T>*)(_mem + EventId.Id<T>() - 1);
+        => (EventsInternal<T>*)(_mem + EventId.Id<T>() - 1); // ID starts with 1, so we subtract 1 when accessing it
 
     internal struct EventsInternal<T> where T : unmanaged
     {
@@ -65,7 +69,11 @@ internal unsafe struct EventsRegistry : IResource
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Send(in T @event) => _high[_count++] = @event;
+        public void Send(in T @event)
+        {
+            Debug.Assert(_count < _maxEvents, $"Max events for type {typeof(T)} reached. ({_maxEvents})");
+            _high[_count++] = @event;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<T> GetEvents() => new(_low, _eventsLastFrame);

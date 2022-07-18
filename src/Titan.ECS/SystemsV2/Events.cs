@@ -4,5 +4,10 @@ using Titan.ECS.Entities;
 
 namespace Titan.ECS.SystemsV2;
 
+
+public readonly record struct EntityCreated(Entity Entity) : IEvent;
+public readonly record struct EntityBeingDestroyed(Entity Entity) : IEvent;
 public readonly record struct EntityDestroyed(Entity Entity) : IEvent;
+public readonly record struct ComponentBeingDestroyed(ComponentId Id, Entity Entity) : IEvent;
 public readonly record struct ComponentDestroyed(ComponentId Id, Entity Entity) : IEvent;
+public readonly record struct ComponentAdded(ComponentId Id, Entity Entity) : IEvent;
