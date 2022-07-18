@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;
@@ -23,6 +24,7 @@ public unsafe struct Scheduler
 
     public void Update(ref JobApi jobApi, ref World.World world)
     {
+        Execute((int)Stage.First, jobApi);
         Execute((int)Stage.PreUpdate, jobApi);
         Execute((int)Stage.Update, jobApi);
         Execute((int)Stage.PostUpdate, jobApi);
@@ -141,6 +143,24 @@ public unsafe struct Scheduler
         }
 
         static int CompareDescriptor(SystemDescriptor l, SystemDescriptor r)
-            => l.Stage - r.Stage;
+        {
+            var stageDiff = l.Stage - r.Stage;
+            if (stageDiff != 0)
+            {
+                return stageDiff;
+            }
+            
+            // The priority will determine which order the system will be executed. This will only affect systems that are executed with the Sequential/ReversedSequential executor.
+            if (l.Priority == r.Priority)
+            {
+                return 0;
+            }
+
+            if (l.Priority > r.Priority)
+            {
+                return -1;
+            }
+            return 1;
+        }
     }
 }

@@ -13,11 +13,12 @@ internal readonly unsafe struct SystemDescriptor
     public readonly Stage Stage;
     public readonly ResourceId Id;
     public readonly RunCriteria Criteria;
+    public readonly int Priority;
 
-    public static SystemDescriptor Create<T>(Stage stage = Stage.Update, RunCriteria criteria = RunCriteria.Always) where T : unmanaged, IStructSystem<T>
-        => new(ResourceId.Id<T>(), criteria, (uint)sizeof(T), stage, &FunctionWrapper<T>.Init, &FunctionWrapper<T>.Update, &FunctionWrapper<T>.ShouldRun);
+    public static SystemDescriptor Create<T>(Stage stage = Stage.Update, RunCriteria criteria = RunCriteria.Always, int priority = 0) where T : unmanaged, IStructSystem<T>
+        => new(ResourceId.Id<T>(), criteria, (uint)sizeof(T), stage, &FunctionWrapper<T>.Init, &FunctionWrapper<T>.Update, &FunctionWrapper<T>.ShouldRun, priority);
 
-    private SystemDescriptor(ResourceId id, RunCriteria criteria, uint size, Stage stage, delegate*<void*, SystemsInitializer, void> init, delegate*<void*, void> update, delegate*<void*, bool> shouldRun)
+    private SystemDescriptor(ResourceId id, RunCriteria criteria, uint size, Stage stage, delegate*<void*, SystemsInitializer, void> init, delegate*<void*, void> update, delegate*<void*, bool> shouldRun, int priority)
     {
         Id = id;
         Size = size;
@@ -26,6 +27,7 @@ internal readonly unsafe struct SystemDescriptor
         Init = init;
         Update = update;
         ShouldRun = shouldRun;
+        Priority = priority;
     }
 
     /// <summary>

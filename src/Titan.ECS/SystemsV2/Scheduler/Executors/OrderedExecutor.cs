@@ -1,5 +1,4 @@
 using System;
-using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Threading2;
@@ -13,6 +12,11 @@ public unsafe struct OrderedExecutor : IExecutor
     [SkipLocalsInit]
     public static void RunSystems(in NodeStage stage, in JobApi jobApi)
     {
+        if (stage.Count == 0)
+        {
+            return;
+        }
+
         var nodes = stage.Nodes;
         var nodeCount = stage.Count;
 

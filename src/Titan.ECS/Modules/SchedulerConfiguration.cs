@@ -18,9 +18,10 @@ public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>
             var config = new SchedulerConfiguration();
             config.SetExecutor<SequentialExecutor>(Stage.PreStartup);
             config.SetExecutor<SequentialExecutor>(Stage.Startup);
-            config.SetExecutor<ParallelExecutor>(Stage.PreUpdate);
+            config.SetExecutor<SequentialExecutor>(Stage.First);
+            config.SetExecutor<OrderedExecutor>(Stage.PreUpdate);
             config.SetExecutor<OrderedExecutor>(Stage.Update);
-            config.SetExecutor<ParallelExecutor>(Stage.PostUpdate);
+            config.SetExecutor<OrderedExecutor>(Stage.PostUpdate);
             config.SetExecutor<ReversedSequentialExecutor>(Stage.Shutdown);
             config.SetExecutor<ReversedSequentialExecutor>(Stage.PostShutdown);
             return config;
@@ -34,6 +35,7 @@ public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>
             var config = new SchedulerConfiguration();
             config.SetExecutor<SequentialExecutor>(Stage.PreStartup);
             config.SetExecutor<SequentialExecutor>(Stage.Startup);
+            config.SetExecutor<SequentialExecutor>(Stage.First);
             config.SetExecutor<SequentialExecutor>(Stage.PreUpdate);
             config.SetExecutor<SequentialExecutor>(Stage.Update);
             config.SetExecutor<SequentialExecutor>(Stage.PostUpdate);

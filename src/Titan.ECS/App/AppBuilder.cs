@@ -38,8 +38,8 @@ public unsafe class AppBuilder
         // Add the pool as a resource so we can use it when setting up the modules (This must be done after it's been used to create the resource collection or the _next in the pool will be wrong.
         AddResource(pool);
         
-        // The event system should always be added.
-        AddSystemToStage<EventSystem>(Stage.PreUpdate, RunCriteria.Always);
+        // The event system should always be added. Run it before anything else.
+        AddSystemToStage<EventSystem>(Stage.First, RunCriteria.Always, int.MaxValue);
     }
 
     public static AppBuilder Create() => new(AppCreationArgs.Default);
@@ -56,15 +56,15 @@ public unsafe class AppBuilder
         return this;
     }
 
-    public AppBuilder AddSystem<T>(RunCriteria criteria = RunCriteria.Check) where T : unmanaged, IStructSystem<T>
+    public AppBuilder AddSystem<T>(RunCriteria criteria = RunCriteria.Check, uint priority = 0) where T : unmanaged, IStructSystem<T>
     {
         AddSystemToStage<T>(Stage.Update, criteria);
         return this;
     }
 
-    public AppBuilder AddSystemToStage<T>(Stage stage, RunCriteria criteria = RunCriteria.Check) where T : unmanaged, IStructSystem<T>
+    public AppBuilder AddSystemToStage<T>(Stage stage, RunCriteria criteria = RunCriteria.Check, int priority = 0) where T : unmanaged, IStructSystem<T>
     {
-        _systems.Add(SystemDescriptor.Create<T>(stage, criteria));
+        _systems.Add(SystemDescriptor.Create<T>(stage, criteria, priority));
         return this;
     }
 

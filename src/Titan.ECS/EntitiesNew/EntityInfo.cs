@@ -1,3 +1,4 @@
+using Titan.Core;
 using Titan.ECS.Components;
 
 namespace Titan.ECS.EntitiesNew;

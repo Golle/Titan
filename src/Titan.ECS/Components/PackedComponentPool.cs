@@ -1,18 +1,30 @@
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.Components;
 
+public unsafe struct ComponentPoolCommonVTable
+{
+    public delegate*<void*, in Entity, bool> Contains;
+    public delegate*<void*, in Entity, void> Destroy;
+}
+
 public unsafe struct ComponentPoolVTable<T> where T : unmanaged
 {
+    public ComponentPoolCommonVTable Common;
     public delegate*<void*, uint, uint, void*> Init;
     public delegate*<uint, uint, uint> CalculateSize;
     public delegate*<void*, in Entity, ref T> Get;
-    public delegate*<void*, in Entity, in T, ref T> Create;
-    public delegate*<void*, in Entity, in T, ref T> CreateOrReplace;
-    public delegate*<void*, in Entity, bool> Contains;
-    public delegate*<void*, in Entity, void> Destroy;
+    public delegate*<void*, in Entity, in T, bool> Create;
+    public delegate*<void*, in Entity, in T, bool> CreateOrReplace;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Destroy(void* context, in Entity entity) => Common.Destroy(context, entity);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Contains(void* context, in Entity entity) => Common.Contains(context, entity);
 }
 
 public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmanaged, IComponent
@@ -24,7 +36,7 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
     private readonly int* _indices;
     private readonly T* _components;
 
-    private uint _componentCount;
+    private int _componentCount;
 
     static PackedComponentPool()
     {
@@ -33,10 +45,13 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
         {
             CalculateSize = &CalculateSize,
             Init = &Init,
-            Contains = &Contains,
+            Common = new ComponentPoolCommonVTable
+            {
+                Contains = &Contains,
+                Destroy = &Destroy
+            },
             Create = &Create,
             CreateOrReplace = &CreateOrReplace,
-            Destroy = &Destroy,
             Get = &Get
         };
     }
@@ -62,9 +77,11 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
     private static void* Init(void* mem, uint maxEntities, uint maxComponents)
     {
         var size = CalculateSize(maxEntities, maxComponents);
-        Unsafe.InitBlockUnaligned(mem,0, size);
+        Unsafe.InitBlockUnaligned(mem, 0, size);
         var pool = (PackedComponentPool<T>*)mem;
+        
         var indices = (int*)(pool + 1);
+        Unsafe.InitBlockUnaligned(indices, byte.MaxValue, sizeof(int) * maxEntities); // initialize indices with -1
         var components = (T*)(indices + maxEntities);
         *pool = new PackedComponentPool<T>(maxEntities, maxComponents, indices, components);
         return pool;
@@ -74,21 +91,47 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
     public static ref T Get(void* data, in Entity entity)
     {
         var pool = (PackedComponentPool<T>*)data;
-        return ref pool->_components[pool->_indices[entity.Id]];
+        var index = pool->_indices[entity.Id];
+        Debug.Assert(index != -1, $"Tried to get a component on entity {entity.Id} that was never added.");
+        return ref pool->_components[index];
     }
 
-    public static ref T Create(void* data, in Entity entity, in T value)
+    // NOTE(Jens): This has not been decided yet, what should Create do if the component has already been added? Right now it will just return false.
+    public static bool Create(void* data, in Entity entity, in T value)
     {
+        var created = false;
         var pool = (PackedComponentPool<T>*)data;
-        ref var component = ref pool->_components[pool->_indices[entity.Id]];
-        component = value;
-        return ref component;
+        Debug.Assert(pool->_componentCount < pool->_maxComponents, $"Max number of components for type {typeof(T).Name} has been reached. ({pool->_maxComponents})");
+        ref var index = ref pool->_indices[entity.Id];
+        if (index == -1) // does not exist
+        {
+            created = true;
+            index = pool->_componentCount++;
+            pool->_components[index] = value;
+        }
+        return created;
     }
 
-    public static ref T CreateOrReplace(void* data, in Entity entity, in T value) => ref Create(data, entity, value);
-    public static bool Contains(void* data, in Entity entity) =>
-        ((PackedComponentPool<T>*)data)->_indices[entity.Id] != 0;
+    // This method will replace the current value if it exists.
+    public static bool CreateOrReplace(void* data, in Entity entity, in T value)
+    {
+        var created = false;
+        var pool = (PackedComponentPool<T>*)data;
+        var index = pool->_indices[entity.Id];
+        if (index == -1) // does not exist
+        {
+            Debug.Assert(pool->_componentCount < pool->_maxComponents, $"Max number of components for type {typeof(T).Name} has been reached. ({pool->_maxComponents})");
+            created = true;
+            index = pool->_componentCount++;
+        }
+        pool->_components[index] = value;
+        return created;
+    }
 
-    public static void Destroy(void* data, in Entity entity) =>
-        ((PackedComponentPool<T>*)data)->_indices[entity.Id] = 0;
+    public static bool Contains(void* data, in Entity entity) => ((PackedComponentPool<T>*)data)->_indices[entity.Id] != -1;
+    public static void Destroy(void* data, in Entity entity)
+    {
+        //throw new NotImplementedException("This has not been implemented, must swap the last with the deleted one and decrement the counter");
+        ((PackedComponentPool<T>*)data)->_indices[entity.Id] = -1;
+    }
 }

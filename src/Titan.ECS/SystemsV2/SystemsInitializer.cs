@@ -55,7 +55,7 @@ public readonly unsafe ref struct SystemsInitializer
     public MutableStorage3<T> GetMutableStorage<T>() where T : unmanaged, IComponent
     {
         _state->MutableComponents |= ComponentId<T>.Id;
-        return new(_world->GetComponents<T>(), GetEventsWriter<ComponentDestroyed>());
+        return new(_world->GetComponents<T>(), GetEventsWriter<ComponentBeingDestroyed>(), GetEventsWriter<ComponentAdded>());
     }
 
     public ReadOnlyStorage3<T> GetReadOnlyStorage<T>() where T : unmanaged, IComponent
@@ -75,4 +75,7 @@ public readonly unsafe ref struct SystemsInitializer
         => new(_world->GetResourcePointer<T>());
 
     public void GetEntities(in EntityFilter filter) => _world->CreateEntityQuery(filter);
+
+    public void RunAfter<T>() where T : unmanaged, IStructSystem<T> 
+        => _state->RunAfter.Add<T>();
 }

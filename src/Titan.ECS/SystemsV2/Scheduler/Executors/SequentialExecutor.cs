@@ -10,6 +10,11 @@ public struct SequentialExecutor : IExecutor
     [SkipLocalsInit]
     public static unsafe void RunSystems(in NodeStage stage, in JobApi jobApi)
     {
+        if (stage.Count == 0)
+        {
+            return;
+        }
+
         var nodes = stage.Nodes;
         var count = stage.Count;
         for (var i = 0; i < count; ++i)

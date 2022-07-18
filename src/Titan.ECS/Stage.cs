@@ -16,6 +16,8 @@ public enum Stage
 
     //WorldLoaded,
 
+    First, // only used by events
+
     /// <summary>
     /// Systems that should be executed before the start of the "frame".
     /// Only use if you know what you're doing, this wont create an execution tree based on dependencies, it will run everything in parallel
@@ -33,6 +35,7 @@ public enum Stage
     /// </summary>
     PostUpdate,
 
+    //Last // add if needed
 
     //NOTE(Jens): Startup/Shutdown should only be used for Global systems. Add WorldLoaded/WorldUnloaded for switching worlds
     //WorldUnloaded,

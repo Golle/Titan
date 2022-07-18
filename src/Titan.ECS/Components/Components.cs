@@ -19,10 +19,22 @@ public unsafe struct Components<T> where T : unmanaged, IComponent
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly ref T Get(in Entity entity) => ref _vtbl->Get(_data, entity);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="value"></param>
+    /// <returns>Returns true if the component was Created</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly ref T Create(in Entity entity, in T value = default) => ref _vtbl->Create(_data, entity, value);
+    public readonly bool Create(in Entity entity, in T value = default) => _vtbl->Create(_data, entity, value);
+    /// <summary>
+    /// tbd
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="value"></param>
+    /// <returns>Returns true if the component was Created</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly ref T CreateOrReplace(in Entity entity, in T value = default) => ref _vtbl->CreateOrReplace(_data, entity, value);
+    public readonly bool CreateOrReplace(in Entity entity, in T value) => _vtbl->CreateOrReplace(_data, entity, value);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Contains(in Entity entity) => _vtbl->Contains(_data, entity);
 

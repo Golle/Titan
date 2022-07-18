@@ -12,6 +12,8 @@ internal struct SystemDependencyState
     public SystemDependency ReadOnlyGlobalResources;
     public SystemDependency MutableGlobalResources;
 
+    public SystemDependency RunAfter;
+
     public readonly bool DependsOn(in SystemDependencyState state)
     {
         return false;

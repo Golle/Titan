@@ -1,44 +1,43 @@
-using Titan.Core;
+using Titan.Core.Logging;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 
 namespace Titan.ECS.Components;
 
-public struct ComponentSystem<T> : IStructSystem<ComponentSystem<T>> where T : unmanaged, IComponent
+internal struct ComponentSystem : IStructSystem<ComponentSystem>
 {
-    private EventsReader<EntityDestroyed> _entityDestroyed;
-    private EventsReader<ComponentDestroyed> _componentDestroyed;
-    private MutableStorage3<T> _components;
+    private ApiResource<ComponentRegistry> _registry;
 
-    // Init is called when the system is created, setting up the dependencies to helpt with the execution graph
-    public static void Init(ref ComponentSystem<T> system, in SystemsInitializer init)
+    private EventsReader<ComponentBeingDestroyed> _componentBeingDestroyed;
+    private EventsReader<EntityBeingDestroyed> _entityDestroyed;
+    private EventsWriter<ComponentDestroyed> _componentDestroyed;
+
+    public static void Init(ref ComponentSystem system, in SystemsInitializer init)
     {
-        system._componentDestroyed = init.GetEventsReader<ComponentDestroyed>();
-        system._entityDestroyed = init.GetEventsReader<EntityDestroyed>();
-        system._components = init.GetMutableStorage<T>();
+        system._registry = init.GetApi<ComponentRegistry>();
+        system._entityDestroyed = init.GetEventsReader<EntityBeingDestroyed>();
+        system._componentBeingDestroyed = init.GetEventsReader<ComponentBeingDestroyed>();
+        system._componentDestroyed = init.GetEventsWriter<ComponentDestroyed>();
     }
 
-    // ShouldRun will be called by the scheduler and if the system doesn't have to run it wont schedule it.
-    public static bool ShouldRun(in ComponentSystem<T> system) => system._componentDestroyed.HasEvents() || system._entityDestroyed.HasEvents();
-
-    // Update is executed on the thread pool
-    public static void Update(ref ComponentSystem<T> system)
+    public static void Update(ref ComponentSystem system)
     {
-        foreach (ref readonly var @event in system._componentDestroyed.GetEvents())
+        ref var registry = ref system._registry.Get();
+        foreach (ref readonly var @event in system._componentBeingDestroyed.GetEvents())
         {
-            system._components.DestroyImmediately(@event.Entity);
+            Logger.Error<ComponentSystem>($"Component with ID: {@event.Id} and entity ID: {@event.Entity.Id} is being destroyed");
+            registry.Destroy(@event.Entity, @event.Id);
+            system._componentDestroyed.Send(new ComponentDestroyed(@event.Id, @event.Entity));
         }
 
         foreach (ref readonly var @event in system._entityDestroyed.GetEvents())
         {
-            // NOTE(Jens): we can probably call destroy even if the entity does not exist in the component pool since it will be handled by the pool
-            if (system._components.Contains(@event.Entity))
-            {
-                system._components.DestroyImmediately(@event.Entity);
-            }
+            Logger.Error<ComponentSystem>($"Entity with ID: {@event.Entity.Id} is being destroyed");
+            registry.Destroy(@event.Entity);
         }
     }
-}
 
+    public static bool ShouldRun(in ComponentSystem system) => system._componentBeingDestroyed.HasEvents() || system._entityDestroyed.HasEvents();
+}
 
 

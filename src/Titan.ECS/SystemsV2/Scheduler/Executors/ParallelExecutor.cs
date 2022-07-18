@@ -10,8 +10,14 @@ namespace Titan.ECS.SystemsV2.Scheduler.Executors;
 public struct ParallelExecutor : IExecutor
 {
     [SkipLocalsInit]
+    [Obsolete("Maybe we should not use this")]
     public static unsafe void RunSystems(in NodeStage stage, in JobApi jobApi)
     {
+        if (stage.Count == 0)
+        {
+            return;
+        }
+
         // NOTE(Jens): this is experimental. We can call the Semaphore.Release on each job or once after all jobs have been scheduled.
         const bool signalReady = false;
 
