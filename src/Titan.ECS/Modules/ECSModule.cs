@@ -5,7 +5,6 @@ using Titan.ECS.Components;
 using Titan.ECS.EntitiesNew;
 using Titan.ECS.SystemsV2;
 using Titan.ECS.World;
-using EntityInfo = Titan.ECS.EntitiesNew.EntityInfo;
 
 namespace Titan.ECS.Modules;
 
