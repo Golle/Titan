@@ -27,18 +27,6 @@ public readonly unsafe ref struct SystemsInitializer
             _world->GetResourcePointer<EntityIdContainer>()
         );
 
-    public MutableResource<T> GetMutableGlobalResource<T>() where T : unmanaged, IResource
-    {
-        _state->MutableGlobalResources.Add(ResourceId.Id<T>());
-        return new(_world->GetResourcePointer<T>());
-    }
-
-    public ReadOnlyResource<T> GetReadOnlyGlobalResource<T>() where T : unmanaged, IResource
-    {
-        _state->ReadOnlyGlobalResources.Add(ResourceId.Id<T>());
-        return new(_world->GetResourcePointer<T>());
-    }
-
     public MutableResource<T> GetMutableResource<T>() where T : unmanaged, IResource
     {
         _state->MutableResources.Add<T>();

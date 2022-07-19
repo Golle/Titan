@@ -43,7 +43,7 @@ public struct RenderModule : IModule2
     private struct RenderDeviceTeardown : IStructSystem<RenderDeviceTeardown>
     {
         private MutableResource<RenderDevice> _renderDevice;
-        public static void Init(ref RenderDeviceTeardown system, in SystemsInitializer init) => system._renderDevice = init.GetMutableGlobalResource<RenderDevice>();
+        public static void Init(ref RenderDeviceTeardown system, in SystemsInitializer init) => system._renderDevice = init.GetMutableResource<RenderDevice>();
         public static unsafe void Update(ref RenderDeviceTeardown system) => NativeMemory.Free(system._renderDevice.Get().D3DDevice);
         public static bool ShouldRun(in RenderDeviceTeardown system) => true;
     }

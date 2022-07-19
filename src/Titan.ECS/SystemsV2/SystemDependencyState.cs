@@ -9,9 +9,7 @@ internal struct SystemDependencyState
 
     public SystemDependency ReadOnlyResources;
     public SystemDependency MutableResources;
-    public SystemDependency ReadOnlyGlobalResources;
-    public SystemDependency MutableGlobalResources;
-
+    
     public SystemDependency RunAfter;
 
     public readonly bool DependsOn(in SystemDependencyState state)

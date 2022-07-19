@@ -26,7 +26,7 @@ internal struct WindowMessageSystem : IStructSystem<WindowMessageSystem>
         system._windowSize = init.GetEventsWriter<WindowSize>();
         system._windowResize = init.GetEventsWriter<WindowResizeComplete>();
 
-        system._window = init.GetMutableGlobalResource<Window>();
+        system._window = init.GetMutableResource<Window>();
     }
 
     public static void Update(ref WindowMessageSystem system)
