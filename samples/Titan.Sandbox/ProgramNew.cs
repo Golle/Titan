@@ -15,7 +15,6 @@ using Titan.Input.Modules;
 using Titan.Modules;
 using Titan.Sandbox;
 
-
 var f = new Titan.ECS.EntitiesNew.EntityFilter()
     .With<Transform3DComponent>()
     .Not<TestComponent>();
@@ -36,23 +35,23 @@ AppBuilder
     .Build()
     .Run();
 
-internal struct TestComponent : IComponent { }
-
 namespace Titan.Sandbox
 {
-    //using var app = App
-    //    .Create(AppCreationArgs.Default)
-    //    .AddModule<CoreModule>()
-    //    .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
-    //    .AddModule<WindowModule>()
-    //    .AddModule<InputModule>()
-    //    .AddModule<RenderModule>()
-    //    .AddSystemToStage<FrameCounter>(Stage.PreUpdate)
-    //    .AddSystem<PrintFrameCounter>()
-    //    .AddSystemToStage<FrameCounter>(Stage.PostUpdate)
-    //    .AddResource(new GlobalFrameCounter())
-    //    .Run()
-    //    ;
+    internal struct TestComponent : IComponent { }
+
+//using var app = App
+//    .Create(AppCreationArgs.Default)
+//    .AddModule<CoreModule>()
+//    .AddResource(new WindowDescriptor { Height = 600, Width = 800, Resizable = true, Title = "Sandbox" })
+//    .AddModule<WindowModule>()
+//    .AddModule<InputModule>()
+//    .AddModule<RenderModule>()
+//    .AddSystemToStage<FrameCounter>(Stage.PreUpdate)
+//    .AddSystem<PrintFrameCounter>()
+//    .AddSystemToStage<FrameCounter>(Stage.PostUpdate)
+//    .AddResource(new GlobalFrameCounter())
+//    .Run()
+//    ;
 
     internal struct FrameCounter : IStructSystem<FrameCounter>
     {
@@ -162,35 +161,35 @@ namespace Titan.Sandbox
         public long FrameCounter;
     }
 
-    //internal class SandboxGame : Game
-    //{
-    //    public override EngineConfiguration ConfigureEngine(EngineConfiguration config) => config with
-    //    {
-    //        AssetsPath = "assets",
-    //        BasePathSearchPattern = "Titan.Sandbox.csproj"
-    //    };
+//internal class SandboxGame : Game
+//{
+//    public override EngineConfiguration ConfigureEngine(EngineConfiguration config) => config with
+//    {
+//        AssetsPath = "assets",
+//        BasePathSearchPattern = "Titan.Sandbox.csproj"
+//    };
 
-    //    public override WindowConfiguration ConfigureWindow(WindowConfiguration config) =>
-    //        config with
-    //        {
-    //            Height = 300,
-    //            Width = 400,
-    //            RawInput = false,
-    //            Resizable = false,
-    //            Windowed = true
-    //        };
+//    public override WindowConfiguration ConfigureWindow(WindowConfiguration config) =>
+//        config with
+//        {
+//            Height = 300,
+//            Width = 400,
+//            RawInput = false,
+//            Resizable = false,
+//            Windowed = true
+//        };
 
-    //    public override SystemsConfiguration ConfigureSystems(SystemsBuilder builder) =>
-    //        builder
-    //            .Build();
+//    public override SystemsConfiguration ConfigureSystems(SystemsBuilder builder) =>
+//        builder
+//            .Build();
 
-    //    public override IEnumerable<WorldConfiguration> ConfigureWorlds()
-    //    {
-    //        yield return new WorldConfigurationBuilder(10_000)
-    //            .WithComponent<Transform3DComponent>()
-    //            .WithSystem<Transform3DSystem>()
-    //            .Build("Game");
+//    public override IEnumerable<WorldConfiguration> ConfigureWorlds()
+//    {
+//        yield return new WorldConfigurationBuilder(10_000)
+//            .WithComponent<Transform3DComponent>()
+//            .WithSystem<Transform3DSystem>()
+//            .Build("Game");
 
-    //    }
-    //}
+//    }
+//}
 }

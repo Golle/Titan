@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <Folder Include="AnotherTry\" />
-    <Folder Include="Scheduler\" />
+    <Folder Include="SystemsV2\Scheduler\" />
     <Folder Include="Systems\Resources\" />
     <Folder Include="World\" />
   </ItemGroup>

@@ -3,10 +3,9 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core;
-using Titan.ECS.SystemsV2.Scheduler;
-using Titan.ECS.SystemsV2.Scheduler.Executors;
+using Titan.ECS.Scheduler.Executors;
 
-namespace Titan.ECS.Modules;
+namespace Titan.ECS.Scheduler;
 
 [StructLayout(LayoutKind.Explicit, Size = sizeof(long) * (int)Stage.Count)]
 public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>

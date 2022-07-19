@@ -1,4 +1,4 @@
-namespace Titan.ECS.SystemsV2.Scheduler;
+namespace Titan.ECS.Scheduler;
 
 public enum SystemState
 {

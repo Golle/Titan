@@ -1,7 +1,6 @@
 using Titan.Core.Threading2;
-using Titan.ECS.Scheduler;
 
-namespace Titan.ECS.SystemsV2.Scheduler;
+namespace Titan.ECS.Scheduler;
 
 public interface IExecutor
 {

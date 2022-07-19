@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core;
 using Titan.Core.Threading2;
-using Titan.ECS.Scheduler;
+using Titan.ECS.SystemsV2;
 
-namespace Titan.ECS.SystemsV2.Scheduler.Executors;
+namespace Titan.ECS.Scheduler.Executors;
 
 public struct ParallelExecutor : IExecutor
 {

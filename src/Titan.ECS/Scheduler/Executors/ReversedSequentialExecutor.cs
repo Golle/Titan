@@ -1,23 +1,18 @@
 using System;
 using System.Runtime.CompilerServices;
 using Titan.Core.Threading2;
-using Titan.ECS.Scheduler;
+using Titan.ECS.SystemsV2;
 
-namespace Titan.ECS.SystemsV2.Scheduler.Executors;
+namespace Titan.ECS.Scheduler.Executors;
 
-public struct SequentialExecutor : IExecutor
+public struct ReversedSequentialExecutor : IExecutor
 {
     [SkipLocalsInit]
     public static unsafe void RunSystems(in NodeStage stage, in JobApi jobApi)
     {
-        if (stage.Count == 0)
-        {
-            return;
-        }
-
         var nodes = stage.Nodes;
         var count = stage.Count;
-        for (var i = 0; i < count; ++i)
+        for (var i = count-1; i >=0; --i)
         {
             ref readonly var node = ref nodes[i];
             var shouldRun = node.Criteria switch

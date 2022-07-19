@@ -1,4 +1,5 @@
 using Titan.ECS.App;
+using Titan.ECS.Scheduler;
 
 namespace Titan.ECS.Modules;
 
