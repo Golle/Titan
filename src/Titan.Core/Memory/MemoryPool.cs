@@ -15,32 +15,32 @@ namespace Titan.Core.Memory;
 public readonly unsafe struct MemoryPool : IDisposable
 {
     // NOTE(Jens): align all allocations to 8 bytes. (We should measure this at some point)
-    private const int Alignment = 8;
+    private const long Alignment = 8;
 
     private readonly byte* _mem;
-    private readonly int _size;
+    private readonly ulong _size;
     
     // Hack to allow it to be readonly.
-    private readonly int* _next;
+    private readonly ulong* _next;
 
-    private MemoryPool(byte* mem, int size)
+    private MemoryPool(byte* mem, ulong size)
     {
         _mem = mem;
         _size = size;
         // The first element in the pool is the counter
-        _next = (int*)mem;
+        _next = (ulong*)mem;
         // Set next to next aligned byte
         *_next = Alignment;
     }
 
-    public static MemoryPool Create(uint bytes)
+    public static MemoryPool Create(ulong bytes)
     {
-        var mem = (byte*)NativeMemory.Alloc(bytes);
+        var mem = (byte*)NativeMemory.Alloc((nuint)bytes);
         if (mem == null)
         {
             throw new OutOfMemoryException($"Failed to allocate {bytes} bytes of memory.");
         }
-        return new MemoryPool(mem, (int)bytes);
+        return new MemoryPool(mem, bytes);
     }
 
     public T CreateAllocator<T>(uint size, bool initialize = false) where T : unmanaged, IMemoryAllocator<T>
@@ -68,12 +68,12 @@ public readonly unsafe struct MemoryPool : IDisposable
     }
 
     // NOTE(Jens): this is a very naive solution to memory allocation. We might want to look at page size and allocate blocks instead of packing everything like this.
-    private int Increment(uint size)
+    private ulong Increment(uint size)
     {
         var current = *_next;
         // Add the aligned size
         // NOTE(Jens): this is not thread safe.
-        *_next += (int)(size + Alignment - 1) & -Alignment;
+        *_next += (ulong)(size + Alignment - 1) & unchecked((ulong)-Alignment);
         
         Debug.Assert(*_next <= _size, "The requested memory block is out of range.");
 
