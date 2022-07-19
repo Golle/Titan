@@ -1,10 +1,12 @@
 using System.Runtime.CompilerServices;
 using Titan.ECS.SystemsV2;
+using Titan.ECS.TheNew;
 
 namespace Titan.ECS.Scheduler;
 
 public unsafe struct Node
 {
+    public ResourceId Id;
     public Stage Stage;
     public delegate*<void*, void> UpdateFunc;
     public delegate*<void*, bool> ShouldRunFunc;

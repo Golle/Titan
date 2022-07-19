@@ -25,23 +25,24 @@ var f = new Titan.ECS.EntitiesNew.EntityFilterConfig()
 
 AppBuilder
     .Create()
-    //.AddResource(new ECSConfiguration { MaxEntities = 10_000_000 })
-    .AddResource(SchedulerConfiguration.SingleThreaded)
+    .AddResource(new ECSConfiguration { MaxEntities = 1_000_000 })
+    //.AddResource(SchedulerConfiguration.SingleThreaded)
     .AddModule<CoreModule>()
     .AddModule<WindowModule>()
     .AddModule<InputModule>()
     .UseRunner<WindowRunner>()
 
-    .AddSystem<FrameCounter>()
-    .AddSystem<PrintFrameCounter>()
-    .AddComponents<Transform3DComponent>(maxComponents: 100_000)
+    .AddSystem<SampleSystem1>()
+    .AddSystem<SampleSystem2>()
+    .AddComponents<Transform3DComponent>(maxComponents: 10_000)
+    .AddComponents<TestComponent>(maxComponents: 1000)
     .Build()
     .Run();
 
 namespace Titan.Sandbox
 {
     internal struct TestComponent : IComponent { }
-    internal struct FrameCounter : IStructSystem<FrameCounter>
+    internal struct SampleSystem1 : IStructSystem<SampleSystem1>
     {
         private MutableResource<GlobalFrameCounter> _global;
         private EntityHandler _entityHandler;
@@ -50,20 +51,22 @@ namespace Titan.Sandbox
         private MutableStorage3<Transform3DComponent> _transform;
         private EntityFilter _filter;
         private EntityFilter _notFilter;
+        private MutableStorage3<TestComponent> _test;
 
-        public static void Init(ref FrameCounter system, in SystemsInitializer init)
+        public static void Init(ref SampleSystem1 system, in SystemsInitializer init)
         {
             system._global = init.GetMutableResource<GlobalFrameCounter>();
             system._filter = init.CreateFilter(new EntityFilterConfig().With<Transform3DComponent>());
-            system._notFilter = init.CreateFilter(new EntityFilterConfig().Not<Transform3DComponent>());
+            system._notFilter = init.CreateFilter(new EntityFilterConfig().With<TestComponent>().Not<Transform3DComponent>());
             system._entityHandler = init.GetEntityHandler();
             system._transform = init.GetMutableStorage<Transform3DComponent>();
+            system._test = init.GetMutableStorage<TestComponent>();
 
             system._initialized = false;
         }
 
         // call an instance method if that is preferred. THe code gen "should" be the same after JIT. 
-        public static void Update(ref FrameCounter system) => system.Update();
+        public static void Update(ref SampleSystem1 system) => system.Update();
         private void Update()
         {
             _global.Get().FrameCounter++;
@@ -79,15 +82,16 @@ namespace Titan.Sandbox
                         Rotation = Quaternion.Identity,
                         Scale = Vector3.One
                     });
-                    Logger.Trace<FrameCounter>($"Creating entity with ID: {entity.Id}");
+                    _test.Create(entity);
+                    //Logger.Trace<FrameCounter>($"Creating entity with ID: {entity.Id}");
                 }
                 _initialized = true;
                 return;
             }
-            if (_counter++ == 10)
-            {
-                _transform.Destroy(new Entity(1, 0));
-            }
+            //if (_counter++ == 3)
+            //{
+            //    _transform.Destroy(new Entity(1, 0));
+            //}
 
             foreach (ref readonly var entity in _filter.GetEntities())
             {
@@ -95,44 +99,44 @@ namespace Titan.Sandbox
                 //if (_transform.Contains(entity))
                 {
                     ref readonly var t = ref _transform.Get(entity);
-                    Logger.Error<FrameCounter>($"{entity.Id} Position: {t.Position}");
+                    //_transform.Destroy(entity);
+                    //Logger.Error<FrameCounter>($"{entity.Id} Position: {t.Position}");
                 }
             }
 
-            //foreach (ref readonly var entity in _notFilter.GetEntities())
-            //{
-            //    Logger.Trace<FrameCounter>($"Entity with ID: {entity.Id} is missing a transform component. adding");
-            //    _transform.Create(entity);
-            //}
-            Thread.Sleep(1000);
+            foreach (ref readonly var entity in _notFilter.GetEntities())
+            {
+                //Logger.Trace<FrameCounter>($"Entity with ID: {entity.Id} is missing a transform component. adding");
+                //_transform.Create(entity);
+            }
         }
 
-        public static bool ShouldRun(in FrameCounter system) => true;
+        public static bool ShouldRun(in SampleSystem1 system) => true;
     }
 
-    internal struct PrintFrameCounter : IStructSystem<PrintFrameCounter>
+    internal struct SampleSystem2 : IStructSystem<SampleSystem2>
     {
         private ReadOnlyResource<GlobalFrameCounter> _global;
         private ReadOnlyResource<KeyboardState> _keyState;
         private int _counter;
 
-        public static void Init(ref PrintFrameCounter system, in SystemsInitializer init)
+        public static void Init(ref SampleSystem2 system, in SystemsInitializer init)
         {
             system._global = init.GetReadOnlyResource<GlobalFrameCounter>();
             system._keyState = init.GetReadOnlyResource<KeyboardState>();
             system._counter = 0;
         }
 
-        public static void Update(ref PrintFrameCounter system)
+        public static void Update(ref SampleSystem2 system)
         {
             ref readonly var keyboardState = ref system._keyState.Get();
             if (keyboardState.IsKeyReleased(KeyCode.A))
             {
-                Logger.Warning<PrintFrameCounter>("Key released");
+                Logger.Warning<SampleSystem2>("Key released");
             }
             if (keyboardState.IsKeyPressed(KeyCode.A))
             {
-                Logger.Warning<PrintFrameCounter>("Key pressed");
+                Logger.Warning<SampleSystem2>("Key pressed");
             }
 
             if (keyboardState.IsKeyDown(KeyCode.S))
@@ -141,11 +145,11 @@ namespace Titan.Sandbox
             }
             else if (keyboardState.IsKeyReleased(KeyCode.S))
             {
-                Logger.Trace<PrintFrameCounter>($"Keycount: {system._counter}");
+                Logger.Trace<SampleSystem2>($"Keycount: {system._counter}");
             }
         }
 
-        public static bool ShouldRun(in PrintFrameCounter system) => true;
+        public static bool ShouldRun(in SampleSystem2 system) => true;
     }
 
 

@@ -5,6 +5,7 @@ namespace Titan.ECS.SystemsV2;
 
 internal unsafe struct SystemDependency
 {
+    //NOTE(Jens): the current max is 10 dependencies, this can be increased if needed. This is only used during setup and will only be on the stack so it wont really matter.
     private const int MaxReosurceDependencies = 10;
 #pragma warning disable CS0649
     private fixed uint _dependencies[MaxReosurceDependencies];
@@ -43,5 +44,20 @@ internal unsafe struct SystemDependency
         {
             return new(pDeps, _count);
         }
+    }
+
+    public readonly bool ContainsAny(in SystemDependency system)
+    {
+        foreach (var outer in GetDependencies())
+        {
+            foreach (var inner in system.GetDependencies())
+            {
+                if (outer == inner)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

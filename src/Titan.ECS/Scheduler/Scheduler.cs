@@ -5,6 +5,7 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;
 using Titan.ECS.Modules;
+using Titan.ECS.Systems.Dispatcher;
 using Titan.ECS.SystemsV2;
 using Titan.ECS.TheNew;
 
@@ -87,19 +88,26 @@ public unsafe struct Scheduler
 
         // Calculate the dependencies
         var dependencies = transient.GetPointer<int>(count);
-        var dependenciesCount = 0;
         for (var i = 0; i < count; ++i)
         {
+            var dependenciesCount = 0;
             ref readonly var systemState = ref states[i];
             for (var j = 0; j < count; ++j)
             {
-                if (i == j)
+                if (i == j )
+                {
+                    continue;
+                }
+                if (nodes[i].Stage != nodes[j].Stage)
                 {
                     continue;
                 }
                 // NOTE(Jens): this has not been implemented yet.
-                if (systemState.DependsOn(states[j]))
+                var dependencyType = systemState.DependsOn(states[j]);
+                if (dependencyType is DependencyType.OneWay or DependencyType.TwoWay)
                 {
+                    //NOTE(Jens): We might need to handle these dependencies in some other way.
+                    //Logger.Info<Scheduler>($"System {node[i].}");
                     dependencies[dependenciesCount++] = j;
                 }
             }
@@ -110,12 +118,23 @@ public unsafe struct Scheduler
                 ref var systemNode = ref nodes[i];
                 systemNode.DependenciesCount = dependenciesCount;
                 systemNode.Dependencies = pool.GetPointer<int>((uint)dependenciesCount);
-                Unsafe.CopyBlockUnaligned(systemNode.Dependencies, dependencies, (uint)dependenciesCount);
+                Unsafe.CopyBlockUnaligned(systemNode.Dependencies, dependencies, (uint)(sizeof(int)*dependenciesCount));
+                Logger.Trace<Scheduler>($"{systemNode.Stage}: System {nodes[i].Id} has {dependenciesCount} dependencies");
+                for (var a = 0; a < systemNode.DependenciesCount; ++a)
+                {
+                    Logger.Trace<Scheduler>($"\tDependency {nodes[systemNode.Dependencies[a]].Id}");
+                }
             }
+            else
+            {
+                Logger.Trace<Scheduler>($"{nodes[i].Stage}: System {nodes[i].Id} has no dependencies");
+
+            }
+
         }
 
         // Group the systems in Stages so they can easily be executed
-        
+
         var node = nodes;
         for (var i = 0; i < _stageCount; ++i)
         {
@@ -131,6 +150,7 @@ public unsafe struct Scheduler
             descriptor.Init(context, initializer);
             return new Node
             {
+                Id = descriptor.Id,
                 Criteria = descriptor.Criteria,
                 Stage = descriptor.Stage,
                 Context = context,
