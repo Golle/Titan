@@ -62,7 +62,8 @@ public readonly unsafe ref struct SystemsInitializer
     public ApiResource<T> GetApi<T>() where T : unmanaged, IApi
         => new(_world->GetResourcePointer<T>());
 
-    public void GetEntities(in EntityFilter filter) => _world->CreateEntityQuery(filter);
+    public EntityFilter CreateFilter(in EntityFilterConfig config) => _world->CreateEntityFilter(config);
+    public void GetEntities(in EntityFilterConfig filter) => _world->CreateEntityFilter(filter);
 
     public void RunAfter<T>() where T : unmanaged, IStructSystem<T> 
         => _state->RunAfter.Add<T>();

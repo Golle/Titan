@@ -1,5 +1,4 @@
 using Titan.Core.Logging;
-using Titan.ECS.Events;
 using Titan.ECS.Systems;
 using Titan.ECS.SystemsV2;
 
@@ -13,8 +12,6 @@ internal struct EntityInfoSystem : IStructSystem<EntityInfoSystem>
 
     public static void Init(ref EntityInfoSystem system, in SystemsInitializer init)
     {
-        init.RunAfter<EventSystem>(); // the event system update(PreUpdate stage) happens at the same time, but we must run after that or the EntityInfo will be delayed 2 frames.
-
         system.Added = init.GetEventsReader<ComponentAdded>();
         system.Destroyed = init.GetEventsReader<ComponentBeingDestroyed>();
         system.EntityInfo = init.GetMutableResource<EntityInfoRegistry>();

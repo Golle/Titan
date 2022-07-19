@@ -1,20 +1,19 @@
-using Titan.Core;
-using Titan.ECS.Components;
+using System;
+using System.Runtime.CompilerServices;
+using Titan.ECS.Entities;
 
 namespace Titan.ECS.EntitiesNew;
 
-public readonly ref struct EntityFilter
+public readonly unsafe struct EntityFilter
 {
-    internal readonly ComponentId Include;
-    internal readonly ComponentId Exclude;
-    private EntityFilter(in ComponentId include, in ComponentId exclude)
+    private readonly Entity* _entities;
+    private readonly int* _count;
+    internal EntityFilter(Entity* entities, int* count)
     {
-        Include = include;
-        Exclude = exclude;
+        _entities = entities;
+        _count = count;
     }
-    public EntityFilter With<T>() where T : unmanaged, IComponent
-        => new(Include | ComponentId<T>.Id, Exclude);
 
-    public EntityFilter Not<T>() where T : unmanaged, IComponent
-        => new(Include, Exclude | ComponentId<T>.Id);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ReadOnlySpan<Entity> GetEntities() => new(_entities, *_count);
 }

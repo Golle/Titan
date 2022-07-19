@@ -9,7 +9,7 @@ namespace Titan.ECS.Entities;
 public readonly struct Entity
 {
     public static readonly Entity Null = new();
-
+    // NOTE(Jens): We can pack the EntityID into 24 bits and use 8 bits for any other data (world id or something else). 24 bits gives us 16777216 entities.
     public readonly uint Id;
     public readonly uint WorldId;
     public Entity(uint id, uint worldId)

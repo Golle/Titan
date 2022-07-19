@@ -4,7 +4,6 @@ using Titan.ECS.App;
 using Titan.ECS.Components;
 using Titan.ECS.EntitiesNew;
 using Titan.ECS.SystemsV2;
-using Titan.ECS.World;
 
 namespace Titan.ECS.Modules;
 
@@ -24,13 +23,15 @@ public struct ECSModule : IModule2
         builder
             .AddResource(EntityInfoRegistry.Create(pool, config.MaxEntities))
             .AddResource(EntityIdContainer.Create(pool, config.MaxEntities))
+            .AddResource(EntityFilterRegistry.Create(pool, 100, config.MaxEntities, 5000))
             ;
 
         Logger.Warning<ECSModule>("All events are created with a size of 1000. This is because the current memory pool implementation does not support ReAlloc/Free.");
         // These numbers probably needs tweaking.
         builder
-            .AddSystemToStage<EntityInfoSystem>(Stage.PreUpdate, RunCriteria.Always) // 
+            .AddSystemToStage<EntityInfoSystem>(Stage.PreUpdate, RunCriteria.Always)
             .AddSystemToStage<ComponentSystem>(Stage.PreUpdate)
+            .AddSystemToStage<EntityFilterSystem>(Stage.PreUpdate)
             .AddEvent<EntityCreated>(1000)
             .AddEvent<EntityBeingDestroyed>(1000)
             .AddEvent<EntityDestroyed>(1000)
