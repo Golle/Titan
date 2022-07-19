@@ -28,16 +28,17 @@ public struct ECSModule : IModule2
 
         Logger.Warning<ECSModule>("All events are created with a size of 1000. This is because the current memory pool implementation does not support ReAlloc/Free.");
         // These numbers probably needs tweaking.
+        const uint MaxEvents = 1000;
         builder
             .AddSystemToStage<EntityInfoSystem>(Stage.PreUpdate, RunCriteria.Always)
             .AddSystemToStage<ComponentSystem>(Stage.PreUpdate)
             .AddSystemToStage<EntityFilterSystem>(Stage.PreUpdate)
-            .AddEvent<EntityCreated>(1000)
-            .AddEvent<EntityBeingDestroyed>(1000)
-            .AddEvent<EntityDestroyed>(1000)
-            .AddEvent<ComponentDestroyed>(1000)
-            .AddEvent<ComponentBeingDestroyed>(1000)
-            .AddEvent<ComponentAdded>(1000)
+            .AddEvent<EntityCreated>(MaxEvents)
+            .AddEvent<EntityBeingDestroyed>(MaxEvents)
+            .AddEvent<EntityDestroyed>(MaxEvents)
+            .AddEvent<ComponentDestroyed>(MaxEvents)
+            .AddEvent<ComponentBeingDestroyed>(MaxEvents)
+            .AddEvent<ComponentAdded>(MaxEvents)
             ;
 
 

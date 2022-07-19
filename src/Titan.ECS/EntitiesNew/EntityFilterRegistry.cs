@@ -59,6 +59,7 @@ internal unsafe struct EntityFilterRegistry : IApi
 
     public EntityFilter GetOrCreate(in EntityFilterConfig entityFilter)
     {
+        Debug.Assert(!entityFilter.Include.IsEmpty(), "Defining a filter without any includes have an undefined behavior and is not allowed at the moment.");
         var index = FindExisting(entityFilter);
         if (index == -1)
         {
@@ -72,7 +73,7 @@ internal unsafe struct EntityFilterRegistry : IApi
                 FilterKey = entityFilter,
                 Count = 0
             };
-            Unsafe.InitBlockUnaligned(_filters->Indexers, byte.MaxValue, sizeof(int) * _maxEntities); // set indexers to -1
+            Unsafe.InitBlockUnaligned(_filters[index].Indexers, byte.MaxValue, sizeof(int) * _maxEntities); // set indexers to -1
         }
 
         return new EntityFilter(_filters[index].Entities, &_filters[index].Count);

@@ -42,8 +42,12 @@ public readonly struct ComponentId
     public bool MatchesAny(in ComponentId id) => (_low & id._low) != 0ul || (_high & id._high) != 0ul;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool MatchesNone(in ComponentId id) => (_low & id._low) == 0ul && (_high & id._high) == 0ul;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsEmpty() => _high == 0 && _low == 0;
 
     public override string ToString() => $"{_high}:{_low}";
+
+
 
     //public override bool Equals(object obj) => obj is ComponentId other && Equals(other);
 
