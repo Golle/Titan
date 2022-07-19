@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Threading;
 using Titan.Components;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -48,13 +49,16 @@ namespace Titan.Sandbox
         private uint _counter;
         private MutableStorage3<Transform3DComponent> _transform;
         private EntityFilter _filter;
+        private EntityFilter _notFilter;
 
         public static void Init(ref FrameCounter system, in SystemsInitializer init)
         {
             system._global = init.GetMutableResource<GlobalFrameCounter>();
             system._filter = init.CreateFilter(new EntityFilterConfig().With<Transform3DComponent>());
+            system._notFilter = init.CreateFilter(new EntityFilterConfig().Not<Transform3DComponent>());
             system._entityHandler = init.GetEntityHandler();
             system._transform = init.GetMutableStorage<Transform3DComponent>();
+
             system._initialized = false;
         }
 
@@ -66,7 +70,7 @@ namespace Titan.Sandbox
 
             if (!_initialized)
             {
-                for (var i = 0; i < 10; ++i)
+                for (var i = 0; i < 3; ++i)
                 {
                     var entity = _entityHandler.Create();
                     _transform.Create(entity, new Transform3DComponent
@@ -87,17 +91,20 @@ namespace Titan.Sandbox
 
             foreach (ref readonly var entity in _filter.GetEntities())
             {
-                if (_transform.Contains(entity))
+                // always true
+                //if (_transform.Contains(entity))
                 {
                     ref readonly var t = ref _transform.Get(entity);
-                    //Logger.Error<FrameCounter>($"Creating entity with ID: {entity.Id} Position: {t.Position}");
-                }
-                else
-                {
-                    Logger.Trace<FrameCounter>($"Entity with ID: {entity.Id} is missing a transform component. adding");
-                    _transform.Create(entity);
+                    Logger.Error<FrameCounter>($"{entity.Id} Position: {t.Position}");
                 }
             }
+
+            //foreach (ref readonly var entity in _notFilter.GetEntities())
+            //{
+            //    Logger.Trace<FrameCounter>($"Entity with ID: {entity.Id} is missing a transform component. adding");
+            //    _transform.Create(entity);
+            //}
+            Thread.Sleep(1000);
         }
 
         public static bool ShouldRun(in FrameCounter system) => true;

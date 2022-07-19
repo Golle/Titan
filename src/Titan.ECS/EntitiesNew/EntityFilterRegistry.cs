@@ -105,6 +105,7 @@ internal unsafe struct EntityFilterRegistry : IApi
             if (index != -1 && !isMatch) // remove
             {
                 DecrementAndSwap(index);
+                index = -1;
                 Logger.Trace<FilterInternal>($"Entity {entity.Id} was removed from filter.");
             }
             else if (index == -1 && isMatch) // add
