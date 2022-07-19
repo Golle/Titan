@@ -97,6 +97,9 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
     }
 
     // NOTE(Jens): This has not been decided yet, what should Create do if the component has already been added? Right now it will just return false.
+
+    // NOTE(Jens): When we have a propery allocator in place which supports realloc/resize we can start with a small set of entity indices and increase as we go. For example the max might be 10 000 000 but we only create 2000 during runtime, and a specific pool might only use the first 100.
+    // NOTE(Jens): making this dynamic would save us a lot of data. Another thing we can do is to implement a map/hashmap for entity lookup. This should not be used for Transform for example, but maybe pools that have very few components.
     public static bool Create(void* data, in Entity entity, in T value)
     {
         var created = false;

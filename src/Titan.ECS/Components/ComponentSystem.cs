@@ -25,14 +25,14 @@ internal struct ComponentSystem : IStructSystem<ComponentSystem>
         ref var registry = ref system._registry.Get();
         foreach (ref readonly var @event in system._componentBeingDestroyed.GetEvents())
         {
-            Logger.Error<ComponentSystem>($"Component with ID: {@event.Id} and entity ID: {@event.Entity.Id} is being destroyed");
+            Logger.Trace<ComponentSystem>($"Component with ID: {@event.Id} and entity ID: {@event.Entity.Id} is being destroyed");
             registry.Destroy(@event.Entity, @event.Id);
             system._componentDestroyed.Send(new ComponentDestroyed(@event.Id, @event.Entity));
         }
 
         foreach (ref readonly var @event in system._entityDestroyed.GetEvents())
         {
-            Logger.Error<ComponentSystem>($"Entity with ID: {@event.Entity.Id} is being destroyed");
+            Logger.Trace<ComponentSystem>($"Entity with ID: {@event.Entity.Id} is being destroyed");
             registry.Destroy(@event.Entity);
         }
     }

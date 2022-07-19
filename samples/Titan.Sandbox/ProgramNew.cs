@@ -21,11 +21,10 @@ var f = new Titan.ECS.EntitiesNew.EntityFilter()
     .Not<TestComponent>();
 
 
-
 AppBuilder
     .Create()
     .AddResource(new ECSConfiguration { MaxEntities = 10_000_000 })
-    .AddResource(SchedulerConfiguration.SingleThreaded)
+    //.AddResource(SchedulerConfiguration.SingleThreaded)
     .AddModule<CoreModule>()
     .AddModule<WindowModule>()
     .AddModule<InputModule>()
