@@ -1,29 +1,27 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Windows.D3D;
 using Titan.Windows.DXGI;
 
 namespace Titan.Windows.D3D11;
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 public struct D3D11_SHADER_RESOURCE_VIEW_DESC
 {
-    private const int UnionOffset = sizeof(DXGI_FORMAT) + sizeof(D3D_SRV_DIMENSION);
-    [FieldOffset(0)]
     public DXGI_FORMAT Format;
-
-    [FieldOffset(sizeof(DXGI_FORMAT))]
     public D3D_SRV_DIMENSION ViewDimension;
     private D3D11_SHADER_RESOURCE_VIEW_DESC_UNION UnionMembers;
-    public unsafe ref D3D11_TEX2D_SRV Texture2D
-    {
-        get
-        {
-            fixed (D3D11_SHADER_RESOURCE_VIEW_DESC_UNION* ptr = &UnionMembers)
-            {
-                return ref ptr->Texture2D;
-            }
-        }
-    }
+    //public unsafe ref D3D11_TEX2D_SRV Texture2D // this generates a lot more code.
+    //{
+    //    get
+    //    {
+    //        fixed (D3D11_SHADER_RESOURCE_VIEW_DESC_UNION* ptr = &UnionMembers)
+    //        {
+    //            return ref ptr->Texture2D;
+    //        }
+    //    }
+    //}
+    public unsafe ref D3D11_TEX2D_SRV Texture2D => ref ((D3D11_SHADER_RESOURCE_VIEW_DESC_UNION*)Unsafe.AsPointer(ref UnionMembers))->Texture2D;
 
     [StructLayout(LayoutKind.Explicit)]
     internal struct D3D11_SHADER_RESOURCE_VIEW_DESC_UNION
