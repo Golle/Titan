@@ -1,0 +1,1 @@
+&dotnet publish samples/Titan.Sandbox -c Shipping -o release/ -r win-x64 --self-contained true -p:PublishSingleFile=True -p:PublishTrimmed=True -p:PublishAot=True -p:DebugType=None -p:DebugSymbols=false
