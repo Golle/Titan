@@ -1,6 +1,5 @@
 using Titan.Core.Logging;
 using Titan.Core.Threading2;
-using Titan.ECS;
 using Titan.ECS.App;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;

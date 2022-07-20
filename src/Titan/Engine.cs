@@ -1,26 +1,6 @@
 using System;
-using System.Linq;
-using Titan.Assets;
 using Titan.Core.Logging;
-using Titan.Core.Services;
 using Titan.Core.Threading;
-using Titan.ECS;
-using Titan.ECS.TheNew;
-using Titan.Graphics.Images;
-using Titan.Graphics.Loaders;
-using Titan.Graphics.Loaders.Atlas;
-using Titan.Graphics.Loaders.Fonts;
-using Titan.Graphics.Loaders.Materials;
-using Titan.Graphics.Loaders.Models;
-using Titan.Graphics.Loaders.Shaders;
-using Titan.Graphics.Rendering;
-using Titan.Graphics.Rendering.Geometry;
-using Titan.Graphics.Rendering.Sprites;
-using Titan.Graphics.Rendering.Text;
-using Titan.Graphics.Windows;
-using Titan.Sound;
-using Titan.Sound.Loaders;
-using Titan.UI.Debugging;
 
 namespace Titan;
 

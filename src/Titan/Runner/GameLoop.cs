@@ -5,9 +5,9 @@ using Titan.Core.Threading2;
 using Titan.ECS.Scheduler;
 using Titan.ECS.World;
 
-namespace Titan.EventNewer;
+namespace Titan.Runner;
 
-public readonly unsafe struct GameLoop
+internal readonly unsafe struct GameLoop
 {
     private readonly Scheduler* _scheduler;
     private readonly World* _world;
@@ -59,7 +59,7 @@ public readonly unsafe struct GameLoop
             frames++;
             if (timer.Elapsed.TotalSeconds >= 1.0f)
             {
-                //Logger.Trace<GameLoop>($"FPS: {frames}. Render time: {timer.Elapsed.TotalMilliseconds/frames} ms");
+                Logger.Trace<GameLoop>($"FPS: {frames}. Render time: {timer.Elapsed.TotalMilliseconds/frames} ms");
                 timer.Restart();;
                 frames = 0;
             }

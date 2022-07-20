@@ -1,9 +1,5 @@
-using System.Numerics;
-using Titan.Assets;
 using Titan.ECS.Entities;
 using Titan.ECS.World;
-using Titan.UI.Animation;
-using Titan.UI.Components;
 
 namespace Titan.UI
 {
@@ -38,7 +34,7 @@ namespace Titan.UI
             //        Time = 0.5f
             //    }
             //});
-            Text?.OnCreate(manager, world, entity.CreateChildEntity());
+            //Text?.OnCreate(manager, world, entity.CreateChildEntity());
         }
     }
 }

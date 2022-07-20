@@ -1,5 +1,5 @@
 using Titan.Core;
-using Titan.ECS.TheNew;
+using Titan.ECS.World;
 
 namespace Titan.ECS.Events;
 

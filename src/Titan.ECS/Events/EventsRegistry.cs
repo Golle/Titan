@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.ECS.TheNew;
+using Titan.ECS.World;
 
 namespace Titan.ECS.Events;
 

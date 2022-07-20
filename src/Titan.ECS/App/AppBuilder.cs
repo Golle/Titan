@@ -9,8 +9,7 @@ using Titan.ECS.Events;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
-using Titan.ECS.TheNew;
-using ComponentRegistry = Titan.ECS.Components.ComponentRegistry;
+using Titan.ECS.World;
 
 namespace Titan.ECS.App;
 
@@ -39,7 +38,7 @@ public unsafe class AppBuilder
         AddResource(pool);
 
         // The event system should always be added. Run it before anything else.
-        AddSystemToStage<EventSystem>(Stage.First, RunCriteria.Always, int.MaxValue);
+        AddSystemToStage<EventSystem>(Stage.First, RunCriteria.Always, int.MaxValue - 1);
     }
 
     public static AppBuilder Create() => new(AppCreationArgs.Default);

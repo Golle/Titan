@@ -1,10 +1,8 @@
-using System;
 using System.Numerics;
 using Titan.ECS.Entities;
 using Titan.ECS.World;
 using Titan.Graphics;
 using Titan.UI.Common;
-using Titan.UI.Components;
 
 namespace Titan.UI
 {

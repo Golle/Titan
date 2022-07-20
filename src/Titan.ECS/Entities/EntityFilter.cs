@@ -1,8 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
-using Titan.ECS.Entities;
 
-namespace Titan.ECS.EntitiesNew;
+namespace Titan.ECS.Entities;
 
 public readonly unsafe struct EntityFilter
 {

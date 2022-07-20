@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 
-namespace Titan.ECS.TheNew;
+namespace Titan.ECS.World;
 
 public readonly struct ResourceId
 {

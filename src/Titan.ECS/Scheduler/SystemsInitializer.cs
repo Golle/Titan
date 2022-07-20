@@ -1,9 +1,9 @@
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.ECS.Components;
-using Titan.ECS.EntitiesNew;
+using Titan.ECS.Entities;
 using Titan.ECS.Systems;
-using EntityFilter = Titan.ECS.EntitiesNew.EntityFilter;
+using EntityFilter = Titan.ECS.Entities.EntityFilter;
 
 namespace Titan.ECS.Scheduler;
 

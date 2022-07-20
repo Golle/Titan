@@ -1,4 +1,4 @@
-namespace Titan.ECS;
+namespace Titan.ECS.Scheduler;
 
 public enum Stage
 {

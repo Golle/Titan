@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using Titan.ECS.Systems;
-using Titan.ECS.TheNew;
+using Titan.ECS.World;
 
 namespace Titan.ECS.Scheduler;
 

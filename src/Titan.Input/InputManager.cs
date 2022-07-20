@@ -2,7 +2,6 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Messaging;
-using Titan.Graphics.Windows;
 using Titan.Graphics.Windows.Events;
 
 namespace Titan.Input

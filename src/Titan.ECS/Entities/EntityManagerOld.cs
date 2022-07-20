@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Messaging;
-using Titan.ECS.Events;
 
 namespace Titan.ECS.Entities;
 
-public class EntityManager : IDisposable
+[Obsolete("this is only here for reference, delete when Relantionships have been ported.")]
+public class EntityManagerOld : IDisposable
 {
     private readonly MemoryChunk<Relationship> _relationship;
 
@@ -35,7 +35,7 @@ public class EntityManager : IDisposable
 
     public unsafe void Attach(in Entity parent, in Entity entity)
     {
-        Debug.Assert(!parent.IsNull() || !entity.IsNull(), "Parent or child is null");
+        //Debug.Assert(!parent.IsNull() || !entity.IsNull(), "Parent or child is null");
         ref var relationship = ref _relationship[entity.Id];
         if (relationship.ParentId != 0u)
         {
@@ -149,7 +149,8 @@ public class EntityManager : IDisposable
     public Entity GetParent(in Entity entity)
     {
         Debug.Assert(_relationship[entity.Id].ParentId != 0u, $"ParentId for entity {entity.Id} is 0. Trying to get a parent for an entity without a parent.");
-        return new(_relationship[entity.Id].ParentId, _worldId);
+        //return new(_relationship[entity.Id].ParentId, _worldId);
+        return Entity.Null;
     }
 
     public void Destroy(in Entity entity)
@@ -197,7 +198,7 @@ public class EntityManager : IDisposable
         var parentId = _relationship[entity.Id].ParentId;
         if (parentId != 0u)
         {
-            parent = new(parentId, _worldId);
+            //parent = new(parentId, _worldId);
             return true;
         }
         return false;

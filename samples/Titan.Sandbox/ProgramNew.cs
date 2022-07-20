@@ -3,19 +3,19 @@ using Titan.Components;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.ECS.App;
-using Titan.ECS.EntitiesNew;
+using Titan.ECS.Entities;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
-using Titan.EventNewer;
 using Titan.Graphics.Modules;
 using Titan.Input;
 using Titan.Input.Modules;
 using Titan.Modules;
+using Titan.Runner;
 using Titan.Sandbox;
-using EntityFilter = Titan.ECS.EntitiesNew.EntityFilter;
+using EntityFilter = Titan.ECS.Entities.EntityFilter;
 
-var f = new Titan.ECS.EntitiesNew.EntityFilterConfig()
+var f = new EntityFilterConfig()
     .With<Transform3DComponent>()
     .Not<TestComponent>();
 

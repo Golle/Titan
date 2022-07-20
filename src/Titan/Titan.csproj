@@ -5,6 +5,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Configurations>Debug;Release;Shipping</Configurations>
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
     <DefineConstants></DefineConstants>
@@ -23,8 +24,5 @@
     <ProjectReference Include="..\Titan.Physics\Titan.Physics.csproj" />
     <ProjectReference Include="..\Titan.Sound\Titan.Sound.csproj" />
     <ProjectReference Include="..\Titan.UI\Titan.UI.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Systems\" />
   </ItemGroup>
 </Project>

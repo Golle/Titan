@@ -1,6 +1,4 @@
-using System;
 using Titan.ECS.App;
-using Titan.Graphics.Modules;
 
 namespace Titan.Input.Modules;
 

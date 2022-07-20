@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace Titan.ECS.TheNew;
+namespace Titan.ECS.World;
 
 internal readonly struct IdGenerator<T>
 {

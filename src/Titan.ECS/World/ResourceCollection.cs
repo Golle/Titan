@@ -4,7 +4,7 @@ using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 
-namespace Titan.ECS.TheNew;
+namespace Titan.ECS.World;
 
 public readonly unsafe struct ResourceCollection
 {

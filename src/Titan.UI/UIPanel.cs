@@ -1,7 +1,5 @@
-using Titan.Assets;
 using Titan.ECS.Entities;
 using Titan.ECS.World;
-using Titan.UI.Components;
 
 namespace Titan.UI
 {

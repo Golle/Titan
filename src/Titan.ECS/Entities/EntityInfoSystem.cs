@@ -2,7 +2,7 @@ using Titan.Core.Logging;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 
-namespace Titan.ECS.EntitiesNew;
+namespace Titan.ECS.Entities;
 
 internal struct EntityInfoSystem : IStructSystem<EntityInfoSystem>
 {

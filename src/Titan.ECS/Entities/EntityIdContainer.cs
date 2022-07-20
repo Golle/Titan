@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Memory;
 
-namespace Titan.ECS.EntitiesNew;
+namespace Titan.ECS.Entities;
 
 /// <summary>
 /// Next and Return are not synchronized which means that they can never be called at the same time. The results of doing that are undefined.

@@ -2,7 +2,7 @@ using System;
 using Titan.Core;
 using Titan.ECS.Components;
 
-namespace Titan.ECS.EntitiesNew;
+namespace Titan.ECS.Entities;
 
 public readonly struct EntityFilterConfig
 {

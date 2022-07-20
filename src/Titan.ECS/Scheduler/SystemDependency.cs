@@ -1,5 +1,5 @@
 using System;
-using Titan.ECS.TheNew;
+using Titan.ECS.World;
 
 namespace Titan.ECS.Scheduler;
 

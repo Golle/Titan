@@ -2,9 +2,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Memory;
-using Titan.ECS.Entities;
 
-namespace Titan.ECS.EntitiesNew;
+namespace Titan.ECS.Entities;
 
 internal readonly unsafe struct EntityInfoRegistry : IResource
 {

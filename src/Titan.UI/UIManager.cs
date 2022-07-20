@@ -27,7 +27,7 @@ namespace Titan.UI
 
         private void RecursiveCreate(in Entity parent, UIComponent component)
         {
-            component.OnCreate(this, _world, parent.CreateChildEntity());
+            //component.OnCreate(this, _world, parent.CreateChildEntity());
             if (component is UIContainer container)
             {
                 foreach (var child in container.Children)

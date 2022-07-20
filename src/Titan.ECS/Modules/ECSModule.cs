@@ -2,7 +2,8 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.App;
 using Titan.ECS.Components;
-using Titan.ECS.EntitiesNew;
+using Titan.ECS.Entities;
+using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 
 namespace Titan.ECS.Modules;

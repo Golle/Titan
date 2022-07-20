@@ -1,6 +1,4 @@
 using System.Runtime.CompilerServices;
-using Titan.Core;
-using Titan.Core.Threading2;
 
 namespace Titan.ECS.Systems;
 

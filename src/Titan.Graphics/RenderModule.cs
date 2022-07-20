@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using Titan.Core;
-using Titan.ECS;
 using Titan.ECS.App;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;

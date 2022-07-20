@@ -5,7 +5,7 @@ using Titan.ECS.World;
 using Titan.Graphics.Modules;
 using Titan.Modules;
 
-namespace Titan.EventNewer;
+namespace Titan.Runner;
 
 public struct WindowRunner : IRunner
 {

@@ -2,7 +2,6 @@ using System;
 using System.Runtime.InteropServices;
 using Titan.Core.IO;
 using Titan.Windows;
-using Titan.Windows.D3D11;
 using Titan.Windows.DXGI;
 using Titan.Windows.WIC;
 using static Titan.Windows.Common;

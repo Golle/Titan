@@ -4,9 +4,8 @@ using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.Components;
-using Titan.ECS.Entities;
 
-namespace Titan.ECS.EntitiesNew;
+namespace Titan.ECS.Entities;
 
 internal unsafe struct EntityFilterRegistry : IApi
 {

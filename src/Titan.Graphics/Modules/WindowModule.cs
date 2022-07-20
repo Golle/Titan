@@ -1,8 +1,8 @@
 using System;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.ECS;
 using Titan.ECS.App;
+using Titan.ECS.Scheduler;
 
 namespace Titan.Graphics.Modules;
 

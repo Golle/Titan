@@ -1,9 +1,8 @@
 using System.Diagnostics;
 using Titan.Core;
-using Titan.ECS.Entities;
 using Titan.ECS.Systems;
 
-namespace Titan.ECS.EntitiesNew;
+namespace Titan.ECS.Entities;
 
 public readonly unsafe struct EntityHandler : IApi
 {
@@ -22,7 +21,7 @@ public readonly unsafe struct EntityHandler : IApi
     {
         var entityId = _idContainer->Next();
         Debug.Assert(entityId != 0, "Failed to create a new entity.");
-        var entity = new Entity(entityId, 0); // TODO: remove World ID
+        var entity = new Entity(entityId);
         _entityCreated.Send(new EntityCreated(entity));
         return entity;
     }

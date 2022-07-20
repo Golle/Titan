@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Titan.Windows.D3D11;
 using Titan.Windows.DXGI;
 using static Titan.Windows.DXGI.DXGI_FORMAT;
 using static Titan.Windows.WIC.WICPixelFormats;

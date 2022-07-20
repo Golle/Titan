@@ -1,6 +1,6 @@
 using Titan.Core.Memory;
 using Titan.ECS.Scheduler;
-using Titan.ECS.TheNew;
+using Titan.ECS.World;
 
 namespace Titan.ECS.App;
 

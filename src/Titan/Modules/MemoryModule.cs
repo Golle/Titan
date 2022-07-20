@@ -1,6 +1,5 @@
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.ECS;
 using Titan.ECS.App;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
@@ -21,7 +20,7 @@ public unsafe struct MemoryModule : IModule
 
             builder
                 .AddResource(allocator)
-                .AddSystemToStage<TransientMemorySystem>(Stage.PreUpdate);
+                .AddSystemToStage<TransientMemorySystem>(Stage.First, RunCriteria.Always, int.MaxValue);
         }
     }
 

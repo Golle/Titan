@@ -1,11 +1,10 @@
 using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;
 using Titan.ECS.Systems;
-using Titan.ECS.TheNew;
+using Titan.ECS.World;
 
 namespace Titan.ECS.Scheduler;
 
