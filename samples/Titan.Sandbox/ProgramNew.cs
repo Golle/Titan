@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using System.Threading;
 using Titan.Components;
@@ -34,6 +35,7 @@ AppBuilder
 
     .AddSystem<SampleSystem1>()
     .AddSystem<SampleSystem2>()
+    .AddSystemExperimental<SampleSystemInstance>()
     .AddComponents<Transform3DComponent>(maxComponents: 10_000)
     .AddComponents<TestComponent>(maxComponents: 1000)
     .Build()
@@ -41,13 +43,53 @@ AppBuilder
 
 namespace Titan.Sandbox
 {
+    internal struct SampleSystemInstance : ISystem
+    {
+        private ReadOnlyStorage3<Transform3DComponent> _transform;
+        private EntityFilter _filter;
+        public void Init(in SystemsInitializer init)
+        {
+            _transform = init.GetReadOnlyStorage<Transform3DComponent>();
+            _filter = init.CreateFilter(new EntityFilterConfig().With<Transform3DComponent>());
+        }
+
+        public void Update()
+        {
+            foreach (ref readonly var entity in _filter.GetEntities())
+            {
+                ref readonly var transform = ref _transform.Get(entity);
+                //Logger.Info<SampleSystemInstance>($"Entity: {entity.Id} position: {transform.Position}");
+            }
+        }
+        public bool ShouldRun() => _filter.HasEntities();
+    }
+
+    internal struct SampleSystemStatic : IStructSystem<SampleSystemStatic>
+    {
+        private ReadOnlyStorage3<Transform3DComponent> _transform;
+        private EntityFilter _filter;
+        public static void Init(ref SampleSystemStatic system, in SystemsInitializer init)
+        {
+            system._transform = init.GetReadOnlyStorage<Transform3DComponent>();
+            system._filter = init.CreateFilter(new EntityFilterConfig().With<Transform3DComponent>());
+        }
+        public static void Update(ref SampleSystemStatic system)
+        {
+            foreach (ref readonly var entity in system._filter.GetEntities())
+            {
+                ref readonly var transform = ref system._transform.Get(entity);
+                //Logger.Info<SampleSystemStatic>($"Entity: {entity.Id} position: {transform.Position}");
+            }
+        }
+        public static bool ShouldRun(in SampleSystemStatic system) => system._filter.HasEntities();
+    }
+
     internal struct TestComponent : IComponent { }
     internal struct SampleSystem1 : IStructSystem<SampleSystem1>
     {
         private MutableResource<GlobalFrameCounter> _global;
         private EntityHandler _entityHandler;
         private bool _initialized;
-        private uint _counter;
         private MutableStorage3<Transform3DComponent> _transform;
         private EntityFilter _filter;
         private EntityFilter _notFilter;

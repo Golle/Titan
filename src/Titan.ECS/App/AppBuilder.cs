@@ -37,7 +37,7 @@ public unsafe class AppBuilder
 
         // Add the pool as a resource so we can use it when setting up the modules (This must be done after it's been used to create the resource collection or the _next in the pool will be wrong.
         AddResource(pool);
-        
+
         // The event system should always be added. Run it before anything else.
         AddSystemToStage<EventSystem>(Stage.First, RunCriteria.Always, int.MaxValue);
     }
@@ -65,6 +65,19 @@ public unsafe class AppBuilder
     public AppBuilder AddSystemToStage<T>(Stage stage, RunCriteria criteria = RunCriteria.Check, int priority = 0) where T : unmanaged, IStructSystem<T>
     {
         _systems.Add(SystemDescriptor.Create<T>(stage, criteria, priority));
+        return this;
+    }
+
+    /// <summary>
+    /// The ISystem interface allows for implementation that act like objects instead of taking a ref parameter. Might be easier to use. (There might be a tiny overhead in call speed)
+    /// </summary>
+    /// <typeparam name="T">The struct that implements the ISystem interface</typeparam>
+    /// <param name="criteria"></param>
+    /// <param name="priority"></param>
+    /// <returns></returns>
+    public AppBuilder AddSystemExperimental<T>(RunCriteria criteria = RunCriteria.Check, int priority = 0) where T : unmanaged, ISystem
+    {
+        _systems.Add(SystemDescriptor.CreateExperimental<T>(Stage.Update, criteria, priority));
         return this;
     }
 
@@ -103,7 +116,7 @@ public unsafe class AppBuilder
         return this;
     }
 
-    public ref T GetResource<T>() where T : unmanaged 
+    public ref T GetResource<T>() where T : unmanaged
         => ref _resourceCollection.GetResource<T>();
     public ref T GetResourceOrDefault<T>() where T : unmanaged, IDefault<T>
     {
@@ -117,7 +130,7 @@ public unsafe class AppBuilder
     public T* GetResourcePointer<T>() where T : unmanaged
         => _resourceCollection.GetResourcePointer<T>();
 
-    public bool HasResource<T>() where T : unmanaged 
+    public bool HasResource<T>() where T : unmanaged
         => _resourceCollection.HasResource<T>();
 
     public ref App Build()
@@ -142,7 +155,7 @@ public unsafe class AppBuilder
         _resourceCollection
             .GetResource<EventsRegistry>()
             .Init(pool, _events.ToArray());
-        
+
         _resourceCollection
             .GetResource<SystemsRegistry>()
             .Init(pool, _systems.ToArray());

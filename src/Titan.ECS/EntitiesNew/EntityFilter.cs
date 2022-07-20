@@ -16,4 +16,6 @@ public readonly unsafe struct EntityFilter
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlySpan<Entity> GetEntities() => new(_entities, *_count);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool HasEntities() => *_count > 0;
 }
