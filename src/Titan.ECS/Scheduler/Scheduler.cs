@@ -134,15 +134,30 @@ public unsafe struct Scheduler
         }
 
         // Group the systems in Stages so they can easily be executed
-
+        var offset = 0;
         var node = nodes;
         for (var i = 0; i < _stageCount; ++i)
         {
             var numberOfNodes = stageCounter[i];
             _stages[i] = new NodeStage(node, numberOfNodes);
-            node += numberOfNodes;
-        }
+            UpdateNodeDependenciesIndex(node, numberOfNodes, offset);
 
+            node += numberOfNodes;
+            offset += numberOfNodes;
+
+        }
+        
+        static void UpdateNodeDependenciesIndex(Node* nodes, int count, int offset)
+        {
+            //NOTE(Jens): We group the nodes into stages so we need to update the offsets in the dependencies array or they'll try to access things that are out of bounds.
+            foreach (ref var node in new Span<Node>(nodes, count))
+            {
+                for (var i = 0; i < node.DependenciesCount; ++i)
+                {
+                    node.Dependencies[i] -= offset;
+                }
+            }
+        }
         static Node CreateAndInit(in MemoryPool pool, in SystemDescriptor descriptor, in SystemsInitializer initializer)
         {
             //NOTE(Jens): add try/catch since it will be calling user code?
