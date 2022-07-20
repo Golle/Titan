@@ -2,12 +2,10 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.ECS.Components;
 using Titan.ECS.EntitiesNew;
-using Titan.ECS.Modules;
 using Titan.ECS.Systems;
-using Titan.ECS.TheNew;
 using EntityFilter = Titan.ECS.EntitiesNew.EntityFilter;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Scheduler;
 
 public readonly unsafe ref struct SystemsInitializer
 {
@@ -40,13 +38,13 @@ public readonly unsafe ref struct SystemsInitializer
         return new(_world->GetResourcePointer<T>());
     }
 
-    public MutableStorage3<T> GetMutableStorage<T>() where T : unmanaged, IComponent
+    public MutableStorage<T> GetMutableStorage<T>() where T : unmanaged, IComponent
     {
         _state->MutableComponents |= ComponentId<T>.Id;
         return new(_world->GetComponents<T>(), GetEventsWriter<ComponentBeingDestroyed>(), GetEventsWriter<ComponentAdded>());
     }
 
-    public ReadOnlyStorage3<T> GetReadOnlyStorage<T>() where T : unmanaged, IComponent
+    public ReadOnlyStorage<T> GetReadOnlyStorage<T>() where T : unmanaged, IComponent
     {
         _state->ReadOnlyComponents |= ComponentId<T>.Id;
 

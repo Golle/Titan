@@ -1,4 +1,6 @@
-namespace Titan.ECS.SystemsV2;
+using Titan.ECS.Scheduler;
+
+namespace Titan.ECS.Systems;
 
 
 //NOTE(Jens): Not sure this is a good idea, might create extra calls ? The calls might be inlined, but it needs additional research.

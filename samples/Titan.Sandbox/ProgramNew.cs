@@ -1,16 +1,12 @@
-using System;
 using System.Numerics;
-using System.Threading;
 using Titan.Components;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.ECS.App;
-using Titan.ECS.Entities;
 using Titan.ECS.EntitiesNew;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
-using Titan.ECS.SystemsV2;
 using Titan.EventNewer;
 using Titan.Graphics.Modules;
 using Titan.Input;
@@ -45,7 +41,7 @@ namespace Titan.Sandbox
 {
     internal struct SampleSystemInstance : ISystem
     {
-        private ReadOnlyStorage3<Transform3DComponent> _transform;
+        private ReadOnlyStorage<Transform3DComponent> _transform;
         private EntityFilter _filter;
         public void Init(in SystemsInitializer init)
         {
@@ -66,7 +62,7 @@ namespace Titan.Sandbox
 
     internal struct SampleSystemStatic : IStructSystem<SampleSystemStatic>
     {
-        private ReadOnlyStorage3<Transform3DComponent> _transform;
+        private ReadOnlyStorage<Transform3DComponent> _transform;
         private EntityFilter _filter;
         public static void Init(ref SampleSystemStatic system, in SystemsInitializer init)
         {
@@ -90,10 +86,10 @@ namespace Titan.Sandbox
         private MutableResource<GlobalFrameCounter> _global;
         private EntityHandler _entityHandler;
         private bool _initialized;
-        private MutableStorage3<Transform3DComponent> _transform;
+        private MutableStorage<Transform3DComponent> _transform;
         private EntityFilter _filter;
         private EntityFilter _notFilter;
-        private MutableStorage3<TestComponent> _test;
+        private MutableStorage<TestComponent> _test;
 
         public static void Init(ref SampleSystem1 system, in SystemsInitializer init)
         {

@@ -2,8 +2,8 @@ using System.Runtime.InteropServices;
 using Titan.Core;
 using Titan.ECS;
 using Titan.ECS.App;
+using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
-using Titan.ECS.SystemsV2;
 using Titan.Windows.D3D11;
 
 namespace Titan.Graphics;
@@ -27,7 +27,7 @@ public enum RenderAPI
     D3D12,
     Vulkan
 }
-public struct RenderModule : IModule2
+public struct RenderModule : IModule
 {
     public static unsafe void Build(AppBuilder builder)
     {

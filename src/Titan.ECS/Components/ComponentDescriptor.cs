@@ -1,8 +1,7 @@
 using System;
 using Titan.Core;
-using Titan.ECS.Components;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Components;
 
 internal readonly unsafe struct ComponentDescriptor
 {
@@ -13,7 +12,7 @@ internal readonly unsafe struct ComponentDescriptor
     private readonly delegate*<uint, uint, uint> _calculateSize;
     internal uint CalculateSize(uint maxEntities) => _calculateSize(maxEntities, MaxComponents);
     internal void* Init(void* mem, uint maxEntities) => _init(mem, maxEntities, MaxComponents);
-    public ComponentDescriptor(ComponentId componentId, void* componentPoolVtbl, uint maxComponents, delegate*<void*, uint, uint, void*> init, delegate*<uint, uint, uint> calculateSize)
+    private ComponentDescriptor(ComponentId componentId, void* componentPoolVtbl, uint maxComponents, delegate*<void*, uint, uint, void*> init, delegate*<uint, uint, uint> calculateSize)
     {
         ComponentId = componentId;
         ComponentPoolVtbl = componentPoolVtbl;

@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
+using Titan.ECS.Scheduler;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Systems;
 
 internal struct SystemWrapper<T> : IStructSystem<T> where T : unmanaged, ISystem
 {

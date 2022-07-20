@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Systems;
 
 public readonly unsafe struct ApiResource<T> where T : unmanaged
 {

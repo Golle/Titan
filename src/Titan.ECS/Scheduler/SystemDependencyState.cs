@@ -1,6 +1,6 @@
 using Titan.ECS.Components;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Scheduler;
 
 
 internal enum DependencyType

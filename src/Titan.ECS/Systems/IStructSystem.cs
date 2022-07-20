@@ -1,4 +1,6 @@
-namespace Titan.ECS.SystemsV2;
+using Titan.ECS.Scheduler;
+
+namespace Titan.ECS.Systems;
 
 public interface IStructSystem<T> where T : unmanaged
 {

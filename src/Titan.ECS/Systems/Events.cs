@@ -2,7 +2,7 @@ using Titan.Core;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Systems;
 
 
 public readonly record struct EntityCreated(Entity Entity) : IEvent;

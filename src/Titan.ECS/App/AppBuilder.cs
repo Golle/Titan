@@ -8,7 +8,7 @@ using Titan.ECS.Components;
 using Titan.ECS.Events;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
-using Titan.ECS.SystemsV2;
+using Titan.ECS.Systems;
 using Titan.ECS.TheNew;
 using ComponentRegistry = Titan.ECS.Components.ComponentRegistry;
 
@@ -110,7 +110,7 @@ public unsafe class AppBuilder
         return this;
     }
 
-    public AppBuilder AddModule<T>() where T : IModule2
+    public AppBuilder AddModule<T>() where T : IModule
     {
         T.Build(this);
         return this;

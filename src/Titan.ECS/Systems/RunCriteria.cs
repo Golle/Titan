@@ -1,4 +1,4 @@
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Systems;
 
 public enum RunCriteria
 {

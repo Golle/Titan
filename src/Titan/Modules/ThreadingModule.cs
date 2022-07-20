@@ -2,10 +2,11 @@ using Titan.Core.Logging;
 using Titan.Core.Threading2;
 using Titan.ECS;
 using Titan.ECS.App;
-using Titan.ECS.SystemsV2;
+using Titan.ECS.Scheduler;
+using Titan.ECS.Systems;
 
 namespace Titan.Modules;
-public struct ThreadingModule : IModule2
+public struct ThreadingModule : IModule
 {
     public static void Build(AppBuilder builder)
     {

@@ -1,7 +1,7 @@
 using System;
 using Titan.Core.Memory;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Systems;
 
 internal unsafe struct SystemsRegistry
 {

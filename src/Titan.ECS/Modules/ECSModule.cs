@@ -3,11 +3,11 @@ using Titan.Core.Memory;
 using Titan.ECS.App;
 using Titan.ECS.Components;
 using Titan.ECS.EntitiesNew;
-using Titan.ECS.SystemsV2;
+using Titan.ECS.Systems;
 
 namespace Titan.ECS.Modules;
 
-public struct ECSModule : IModule2
+public struct ECSModule : IModule
 {
     public static void Build(AppBuilder builder)
     {

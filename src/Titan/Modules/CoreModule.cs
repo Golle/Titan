@@ -4,7 +4,7 @@ using Titan.ECS.Modules;
 
 namespace Titan.Modules;
 
-public struct CoreModule : IModule2
+public struct CoreModule : IModule
 {
     public static void Build(AppBuilder app) =>
         app

@@ -1,11 +1,10 @@
 using System;
 using Titan.ECS.App;
-using Titan.ECS.SystemsV2;
 using Titan.Graphics.Modules;
 
 namespace Titan.Input.Modules;
 
-public readonly struct InputModule : IModule2
+public readonly struct InputModule : IModule
 {
     public static void Build(AppBuilder builder)
     {

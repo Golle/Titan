@@ -1,12 +1,13 @@
 using Titan.Core.Logging;
 using Titan.ECS;
 using Titan.ECS.App;
-using Titan.ECS.SystemsV2;
+using Titan.ECS.Scheduler;
+using Titan.ECS.Systems;
 
 namespace Titan.Modules;
 
 //NOTE(Jens): Move this to Core
-public readonly struct LoggingModule : IModule2
+public readonly struct LoggingModule : IModule
 {
     public static void Build(AppBuilder builder)
     {

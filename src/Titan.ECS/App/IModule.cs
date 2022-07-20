@@ -1,6 +1,6 @@
 namespace Titan.ECS.App;
 
-public interface IModule2
+public interface IModule
 {
     static abstract void Build(AppBuilder builder);
 }

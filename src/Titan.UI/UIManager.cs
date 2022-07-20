@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Titan.ECS.Entities;
-using Titan.ECS.WorldsOld;
+using Titan.ECS.World;
 using Titan.Graphics.Rendering.Text;
 
 namespace Titan.UI
@@ -16,7 +16,7 @@ namespace Titan.UI
         {
             TextManager = textManager;
             _world = world;
-            _baseEntity = _world.CreateEntity();
+            //_baseEntity = _world.CreateEntity();
         }
         
         public void Add(UIComponent component)

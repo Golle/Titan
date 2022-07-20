@@ -3,14 +3,13 @@ using Titan.Core;
 using Titan.Core.Logging;
 using Titan.ECS;
 using Titan.ECS.App;
-using Titan.ECS.SystemsV2;
 
 namespace Titan.Graphics.Modules;
 
 public record struct WindowCreated : IEvent;
 public record struct WindowClosed : IEvent;
 
-public struct WindowModule : IModule2
+public struct WindowModule : IModule
 {
     public static unsafe void Build(AppBuilder builder)
     {

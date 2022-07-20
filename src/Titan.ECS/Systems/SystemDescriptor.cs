@@ -1,6 +1,7 @@
+using Titan.ECS.Scheduler;
 using Titan.ECS.TheNew;
 
-namespace Titan.ECS.SystemsV2;
+namespace Titan.ECS.Systems;
 
 internal readonly unsafe struct SystemDescriptor
 {

@@ -2,11 +2,12 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS;
 using Titan.ECS.App;
-using Titan.ECS.SystemsV2;
+using Titan.ECS.Scheduler;
+using Titan.ECS.Systems;
 
 namespace Titan.Modules;
 
-public unsafe struct MemoryModule : IModule2
+public unsafe struct MemoryModule : IModule
 {
     // NOTE(Jens): This will only add support for a transient memory allocation (resets every frame). We want a permanent memory allocator and a "buffer" where we can borrow/return memory blocks.
     public static void Build(AppBuilder builder)

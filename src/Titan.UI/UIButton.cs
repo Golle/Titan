@@ -1,7 +1,7 @@
 using System.Numerics;
 using Titan.Assets;
 using Titan.ECS.Entities;
-using Titan.ECS.WorldsOld;
+using Titan.ECS.World;
 using Titan.UI.Animation;
 using Titan.UI.Components;
 
@@ -16,19 +16,19 @@ namespace Titan.UI
         internal override unsafe void OnCreate(UIManager manager, World world, in Entity entity)
         {
             base.OnCreate(manager, world, entity);
-            if (Sprite != null)
-            {
-                world.AddComponent(entity, new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
-                {
-                    TextureIndex = (byte)Sprite.Index,
-                    Margins = Sprite.Margins,
-                    Color = Sprite.Color
-                }));
-            }
-            world.AddComponent(entity, new InteractableComponent
-            {
-                Id = Identifier
-            });
+            //if (Sprite != null)
+            //{
+            //    world.AddComponent(entity, new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
+            //    {
+            //        TextureIndex = (byte)Sprite.Index,
+            //        Margins = Sprite.Margins,
+            //        Color = Sprite.Color
+            //    }));
+            //}
+            //world.AddComponent(entity, new InteractableComponent
+            //{
+            //    Id = Identifier
+            //});
             //world.AddComponent(entity, new AnimateTranslation
             //{
             //    Start = Offset,
