@@ -2,13 +2,16 @@ using System.Runtime.InteropServices;
 using Titan.Windows.D3D;
 using Titan.Windows.DXGI;
 
-// ReSharper disable InconsistentNaming
 namespace Titan.Windows.D3D11;
 
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit)]
 public struct D3D11_SHADER_RESOURCE_VIEW_DESC
 {
+    private const int UnionOffset = sizeof(DXGI_FORMAT) + sizeof(D3D_SRV_DIMENSION);
+    [FieldOffset(0)]
     public DXGI_FORMAT Format;
+
+    [FieldOffset(sizeof(DXGI_FORMAT))]
     public D3D_SRV_DIMENSION ViewDimension;
     private D3D11_SHADER_RESOURCE_VIEW_DESC_UNION UnionMembers;
     public unsafe ref D3D11_TEX2D_SRV Texture2D

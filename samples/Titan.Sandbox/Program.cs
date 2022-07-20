@@ -17,27 +17,8 @@ using Titan.Sandbox;
 using Titan.UI;
 using Titan.UI.Common;
 
-
-
 Console.WriteLine($"Hello World!");
-
-
-//var nodes = new DispatchTreeFactory()
-//    .Construct(new BaseSystem[]
-//    {
-//        new TestSystem1(),
-//        new TestSystem2(),
-//        new TestSystem3(),
-//        new TestSystem4(),
-//    });
-
-
-//WorkerPool.Init(new WorkerPoolConfiguration(300, 10));
-//new SystemsDispatcher_(nodes)
-//    .Execute();
-//return 0;
-EngineV2.Start(new SandboxApplication());
-
+Engine.Start(new SandboxApplication());
 
 namespace Titan.Sandbox
 {

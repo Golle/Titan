@@ -10,7 +10,7 @@ internal class Transform3DSystem : EntitySystem
 {
     private MutableStorage<Transform3D> _transform;
     private EntityFilter _filter;
-        
+
     protected override void Init(IServiceCollection services)
     {
         _transform = GetMutable<Transform3D>();
