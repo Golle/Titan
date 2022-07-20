@@ -14,11 +14,17 @@ public struct D3D11_DEPTH_STENCIL_VIEW_DESC
     public uint Flags;
 
     private D3D11_DEPTH_STENCIL_VIEW_DESC_UNION UnionMembers;
-        
-    public ref D3D11_TEX2D_DSV Texture2D
+
+    public unsafe ref D3D11_TEX2D_DSV Texture2D
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => ref MemoryMarshal.GetReference(MemoryMarshal.CreateSpan(ref UnionMembers.Texture2D, 1));
+        get
+        {
+            fixed (D3D11_DEPTH_STENCIL_VIEW_DESC_UNION* ptr = &UnionMembers)
+            {
+                return ref ptr->Texture2D;
+            }
+        }
     }
 
     [StructLayout(LayoutKind.Explicit)]

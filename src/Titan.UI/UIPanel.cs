@@ -1,7 +1,5 @@
-using Titan.Assets;
 using Titan.ECS.Entities;
-using Titan.ECS.Worlds;
-using Titan.UI.Components;
+using Titan.ECS.World;
 
 namespace Titan.UI
 {
@@ -13,12 +11,12 @@ namespace Titan.UI
             base.OnCreate(manager, world, entity);
             if (Background != null)
             {
-                world.AddComponent(entity, new AssetComponent<SpriteComponent>(Background.Identifier, new SpriteComponent
-                {
-                    TextureIndex = (byte)Background.Index,
-                    Margins = Background.Margins,
-                    Color = Background.Color
-                }));
+            //    world.AddComponent(entity, new AssetComponent<SpriteComponent>(Background.Identifier, new SpriteComponent
+            //    {
+            //        TextureIndex = (byte)Background.Index,
+            //        Margins = Background.Margins,
+            //        Color = Background.Color
+            //    }));
             }
         }
     }

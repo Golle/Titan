@@ -1,4 +1,3 @@
-using Titan.Windows.D3D11;
 using Titan.Windows.DXGI;
 
 // ReSharper disable InconsistentNaming

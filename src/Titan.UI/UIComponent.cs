@@ -1,10 +1,8 @@
-using System;
 using System.Numerics;
 using Titan.ECS.Entities;
-using Titan.ECS.Worlds;
+using Titan.ECS.World;
 using Titan.Graphics;
 using Titan.UI.Common;
-using Titan.UI.Components;
 
 namespace Titan.UI
 {
@@ -22,14 +20,14 @@ namespace Titan.UI
         {
             //Debug.Assert(Pivot.X is >= 0 and <= 1.0f && Pivot.Y is >= 0 and <= 1.0f, "Pivot must be in the range of <0.0f 0.0f> to <1.0f 1.0f>");
             _entity = entity;
-            world.AddComponent(entity, new RectTransform
-            {
-                Size = Size,
-                Offset = Offset,
-                ZIndex = ZIndex,
-                AnchorPoint = AnchorPoint,
-                Pivot = Vector2.Clamp(Pivot, Vector2.Zero, Vector2.One)
-            });
+            //world.AddComponent(entity, new RectTransform
+            //{
+            //    Size = Size,
+            //    Offset = Offset,
+            //    ZIndex = ZIndex,
+            //    AnchorPoint = AnchorPoint,
+            //    Pivot = Vector2.Clamp(Pivot, Vector2.Zero, Vector2.One)
+            //});
         }
     }
 }

@@ -45,6 +45,7 @@ namespace Titan.Core.Logging
                     LogLevel.Error => ConsoleColor.Red,
                     _ => throw new ArgumentOutOfRangeException()
                 };
+                Console.ResetColor();
                 Console.Write("{0} [", DateTimeNow());
                 Console.ForegroundColor = color;
                 Console.Write(logMessage.Level);

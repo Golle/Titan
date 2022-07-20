@@ -2,7 +2,6 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Messaging;
-using Titan.Graphics.Windows;
 using Titan.Graphics.Windows.Events;
 
 namespace Titan.Input
@@ -48,8 +47,9 @@ namespace Titan.Input
                 if (@event.Type == MouseMovedEvent.Id)
                 {
                     ref readonly var movedEvent = ref @event.As<MouseMovedEvent>();
-                    var windowHeight = (int)Window.Height;
-                    _position = new Vector3(movedEvent.X,  windowHeight - movedEvent.Y, 0);
+                    throw new NotImplementedException("This has not been fixed yet with the rewrite.");
+                    //var windowHeight = (int)WindowOld.Height;
+                    //_position = new Vector3(movedEvent.X,  windowHeight - movedEvent.Y, 0);
                 }
                 else if (@event.Type == MouseButtonEvent.Id)
                 {

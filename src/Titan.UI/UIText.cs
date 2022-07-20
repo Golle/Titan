@@ -1,9 +1,7 @@
-using Titan.Assets;
 using Titan.ECS.Entities;
-using Titan.ECS.Worlds;
+using Titan.ECS.World;
 using Titan.Graphics;
 using Titan.Graphics.Rendering.Text;
-using Titan.UI.Components;
 
 namespace Titan.UI
 {
@@ -26,22 +24,22 @@ namespace Titan.UI
 
 
             var lineheight = LineHeight > 0 ? LineHeight : FontSize;
-            world.AddComponent(entity, new AssetComponent<TextComponent>(Font, new TextComponent
-            {
-                LineHeight =  (ushort)lineheight,
-                HorizontalOverflow = HorizontalOverflow,
-                VerticalOverflow = VerticalOverflow,
-                TextAlign = TextAlign,
-                VerticalAlign = VerticalAlign,
-                FontSize =  (ushort)FontSize,
-                Color = Color,
-                Handle = manager.TextManager.Create(new TextCreation
-                {
-                    MaxCharacters = MaxCharacters == 0 ? (uint)Text.Length : MaxCharacters,
-                    InitialCharacters = Text,
-                    Dynamic = false
-                })
-            }));
+            //world.AddComponent(entity, new AssetComponent<TextComponent>(Font, new TextComponent
+            //{
+            //    LineHeight =  (ushort)lineheight,
+            //    HorizontalOverflow = HorizontalOverflow,
+            //    VerticalOverflow = VerticalOverflow,
+            //    TextAlign = TextAlign,
+            //    VerticalAlign = VerticalAlign,
+            //    FontSize =  (ushort)FontSize,
+            //    Color = Color,
+            //    Handle = manager.TextManager.Create(new TextCreation
+            //    {
+            //        MaxCharacters = MaxCharacters == 0 ? (uint)Text.Length : MaxCharacters,
+            //        InitialCharacters = Text,
+            //        Dynamic = false
+            //    })
+            //}));
         }
     }
 }

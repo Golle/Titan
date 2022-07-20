@@ -8,7 +8,7 @@ namespace Titan.Windows;
 [StructLayout(LayoutKind.Sequential, Size = sizeof(uint))]
 public struct DWORD
 {
-    private uint Value;
+    public uint Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator uint(DWORD dword) => dword.Value;

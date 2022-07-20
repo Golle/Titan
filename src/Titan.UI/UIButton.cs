@@ -1,9 +1,5 @@
-using System.Numerics;
-using Titan.Assets;
 using Titan.ECS.Entities;
-using Titan.ECS.Worlds;
-using Titan.UI.Animation;
-using Titan.UI.Components;
+using Titan.ECS.World;
 
 namespace Titan.UI
 {
@@ -16,19 +12,19 @@ namespace Titan.UI
         internal override unsafe void OnCreate(UIManager manager, World world, in Entity entity)
         {
             base.OnCreate(manager, world, entity);
-            if (Sprite != null)
-            {
-                world.AddComponent(entity, new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
-                {
-                    TextureIndex = (byte)Sprite.Index,
-                    Margins = Sprite.Margins,
-                    Color = Sprite.Color
-                }));
-            }
-            world.AddComponent(entity, new InteractableComponent
-            {
-                Id = Identifier
-            });
+            //if (Sprite != null)
+            //{
+            //    world.AddComponent(entity, new AssetComponent<SpriteComponent>(Sprite.Identifier, new SpriteComponent
+            //    {
+            //        TextureIndex = (byte)Sprite.Index,
+            //        Margins = Sprite.Margins,
+            //        Color = Sprite.Color
+            //    }));
+            //}
+            //world.AddComponent(entity, new InteractableComponent
+            //{
+            //    Id = Identifier
+            //});
             //world.AddComponent(entity, new AnimateTranslation
             //{
             //    Start = Offset,
@@ -38,7 +34,7 @@ namespace Titan.UI
             //        Time = 0.5f
             //    }
             //});
-            Text?.OnCreate(manager, world, entity.CreateChildEntity());
+            //Text?.OnCreate(manager, world, entity.CreateChildEntity());
         }
     }
 }

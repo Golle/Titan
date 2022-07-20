@@ -56,6 +56,22 @@ public unsafe class User32
     );
 
     [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern int GetMessageA(
+        MSG* lpMsg,
+        HWND hWnd,
+        uint wMsgFilterMin,
+        uint wMsgFilterMax
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern int GetMessageW(
+        MSG* lpMsg,
+        HWND hWnd,
+        uint wMsgFilterMin,
+        uint wMsgFilterMax
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool TranslateMessage(
         [In] in MSG lpMsg
@@ -86,10 +102,24 @@ public unsafe class User32
 
     [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool UnregisterClassW(
+        char* LpszClassName,
+        nint hInstance
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetWindowTextA(
         [In] HWND hWnd,
         [In] string lpString
     );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern int SetWindowTextW(
+        [In] HWND hWnd,
+        [In] char* lpString
+    );
+
 
     [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -159,5 +189,46 @@ public unsafe class User32
         uint uiParam,
         void* pvParam,
         SystemParametersInfoFlags fWinIni
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool RegisterRawInputDevices(
+        RAWINPUTDEVICE* pRawInputDevices,
+        uint uiNumDevices,
+        uint cbSize
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern uint GetRawInputData(
+        HRAWINPUT hRawInput,
+        RIDCOMMAND uiCommand,
+        void* pData,
+        uint* pcbSize,
+        uint cbSizeHeader
+    );
+
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern uint GetRawInputDeviceInfoW(
+        HANDLE hDevice,
+        RIDICOMMAND uiCommand,
+        void* pData,
+        uint* pcbSize
+    );
+    
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern uint GetRawInputDeviceInfoA(
+        HANDLE hDevice,
+        RIDICOMMAND uiCommand,
+        void* pData,
+        uint* pcbSize
+    );
+
+    [DllImport(User32Dll, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern uint GetRawInputBuffer(
+        RAWINPUT* pData,
+        uint* pcbSize,
+        uint cbSizeHeader
     );
 }

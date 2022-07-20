@@ -1,299 +1,181 @@
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
-using Titan.Core.Messaging;
-using Titan.Graphics.Windows.Events;
+using Titan.Graphics.Windows.Input.Raw;
 using Titan.Windows;
 using Titan.Windows.Win32;
 using static Titan.Windows.Win32.User32;
 using static Titan.Windows.Win32.WindowsMessage;
 
-namespace Titan.Graphics.Windows
+namespace Titan.Graphics.Windows;
+
+public record WindowConfiguration(string Title, uint Width, uint Height, bool Windowed = true, bool Resizable = true, bool RawInput = true);
+public sealed unsafe class Window : IDisposable
 {
-    public record WindowConfiguration(string Title, uint Width, uint Height, bool Windowed = true, bool Resizable = true);
+    private const string _className = nameof(Window);
+    private RawInputHandler _rawInputHandler = new();
+    public HWND WindowHandle { get; private set; }
+    private GCHandle _instanceHandle;
 
-    public static unsafe class Window
+    private Window()
     {
-        private const string ClassName = "titan_game_engine";
-        private static HCURSOR _defaultCursor;
-        private static POINT _center;
-        private static POINT _mousePosition;
-        private static POINT _hideCursorPosition;
-        private static bool _cursorVisible = true;
-        private static Stopwatch _timer;
-        private static int _frames;
-        public static uint Width { get; private set; }
-        public static uint Height { get; private set; }
-        public static string Title { get; private set; }
+        _instanceHandle = GCHandle.Alloc(this, GCHandleType.Normal);
+    }
 
-        public static bool Windowed { get; }
-        public static HWND Handle { get; private set; }
-
-        public static bool Update()
+    public static Window Create(WindowConfiguration config)
+    {
+        // Create the Window Class EX
+        var wndClassExA = new WNDCLASSEXA
         {
-            _frames++;
-            if (_timer.Elapsed.TotalSeconds >= 1.0f)
-            {
-                var fps = _frames / _timer.Elapsed.TotalSeconds;
-                SetTitle($"{Title}. FPS: {(int)fps}");
-                _timer.Restart();
-                _frames = 1;
-            }
-            while (PeekMessageA(out var msg, 0, 0, 0, 1)) // pass IntPtr.Zero as HWND to detect mouse movement outside of the window
-            {
-                if (msg.Message == WM_QUIT)
-                {
-                    SetWindowLongPtrA(Handle, GWLP_USERDATA, 0);
-                    return false;
-                }
-                TranslateMessage(msg);
-                DispatchMessage(msg);
-            }
-            UpdateMousePosition();
-
-            foreach (ref readonly var @event in EventManager.GetEvents())
-            {
-                if (@event.Type == MouseStateEvent.Id)
-                {
-                    ToggleMouse(@event.As<MouseStateEvent>().Visible);
-                }
-                else if (@event.Type == ExitEvent.Id)
-                {
-                    ref readonly var e = ref @event.As<ExitEvent>();
-                    Logger.Trace($"Exit event received: {e.ExitCode}", typeof(Window));
-                    PostQuitMessage(e.ExitCode);
-                }
-            }
-            return true;
-
+            CbClsExtra = 0,
+            CbSize = (uint)Marshal.SizeOf<WNDCLASSEXA>(),
+            //HCursor = _defaultCursor,
+            HIcon = 0,
+            LpFnWndProc = &WndProc,
+            CbWndExtra = 0,
+            HIconSm = 0,
+            HInstance = Marshal.GetHINSTANCE(typeof(Window).Module),
+            HbrBackground = 0,
+            LpszClassName = _className,
+            Style = 0
+        };
+        Logger.Trace<Window>($"RegisterClass {_className}");
+        if (RegisterClassExA(wndClassExA) == 0)
+        {
+            Logger.Error<Window>($"RegisterClassExA failed with Win32Error {Marshal.GetLastWin32Error()}");
+            return null;
         }
-        private static void UpdateMousePosition()
-        {
-            POINT point;
-            if (!GetCursorPos(&point))
-            {
-                return;
-            }
 
-            if (_cursorVisible)
+        // Adjust the window size to take into account for the menu etc
+        var wsStyle = WindowStyles.OverlappedWindow | WindowStyles.Visible;
+        if (!config.Resizable)
+        {
+            wsStyle ^= WindowStyles.ThickFrame;
+        }
+        const int windowOffset = 100;
+        var windowRect = new RECT
+        {
+            Left = windowOffset,
+            Top = windowOffset,
+            Right = (int)(config.Width + windowOffset),
+            Bottom = (int)(config.Height + windowOffset)
+        };
+        AdjustWindowRect(ref windowRect, wsStyle, false);
+
+        Logger.Trace<Window>($"Create window with size Width: {config.Width} Height: {config.Height}");
+
+        // Set properties before the window is created so they are available in WM_CREATE
+        //Height = config.Height;
+        //Width = config.Width;
+        //Title = config.Title;
+
+        var window = new Window();
+
+        // Create the Window
+        window.WindowHandle = CreateWindowExA(
+            0,
+            _className,
+            config.Title,
+            wsStyle,
+            -1,
+            -1,
+            windowRect.Right - windowRect.Left,
+            windowRect.Bottom - windowRect.Top,
+            0,
+            0,
+            wndClassExA.HInstance,
+            (void*)GCHandle.ToIntPtr(window._instanceHandle)
+        );
+        window.Show();
+        return window;
+    }
+
+    public void Show() => ShowWindow(WindowHandle, ShowWindowCommand.Show);
+    public void Hide() => ShowWindow(WindowHandle, ShowWindowCommand.Hide);
+
+    public bool Update()
+    {
+        MSG msg;
+        // NOTE(Jens): Default handling of WM_CLOSE will destroy the window. we might want to handle that in a different way so the WindowHandle is not invalid.
+        //var result = GetMessageA(&msg, WindowHandle, 0, 0);
+        var result = GetMessageA(&msg, 0, 0, 0);
+
+        //if (result == 0)
+        //{
+
+        //    return false;
+        //}
+
+        if (result == -1)
+        {
+            Logger.Error<Window>($"Windows error occured when trying to get a message of the message queue: {Marshal.GetLastWin32Error()}");
+            return true;
+        }
+        if (msg.Message == WM_INPUT)
+        {
+            //Logger.Info("VM_INPUT");
+        }
+        else if (msg.Message == WM_QUIT)
+        {
+            SetWindowLongPtrA(WindowHandle, GWLP_USERDATA, 0);
+            return false;
+        }
+
+        TranslateMessage(msg);
+        DispatchMessage(msg);
+        return true;
+    }
+
+    [UnmanagedCallersOnly]
+    private static nint WndProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
+    {
+        // Set the USERDATA for this window to the Window instance.
+        if (message == WM_CREATE)
+        {
+            var pCreateStruct = (CREATESTRUCTA*)lParam;
+            if (pCreateStruct == null)
             {
-                if (!ScreenToClient(Handle, &point))
-                {
-                    return;
-                }
-                if (_mousePosition.X != point.X || _mousePosition.Y != point.Y)
-                {
-                    _mousePosition = point;
-                    WindowEventHandler.OnMouseMove(point);
-                }
+                Logger.Error<Window>("Failed to read the CreateStruct. Windows events wont be handled.");
             }
             else
             {
-                var mouseMoved = false;
-                var center = new POINT((int)(Width / 2), (int)(Height / 2));
-                var delta = point - center;
-                if (delta.X != 0 || delta.Y != 0)
-                {
-                    _mousePosition += delta; // TODO: this will cause integer overflow at some point
-                    mouseMoved = true;
-                }
-                SetCursorPos(center.X, center.Y);
-
-                if (mouseMoved)
-                {
-                    
-                    WindowEventHandler.OnMouseMove(_mousePosition);
-                }
+                SetWindowLongPtrA(hWnd, GWLP_USERDATA, (nint)pCreateStruct->lpCreateParams);
             }
         }
 
-        private static void ToggleMouse(bool visible)
+        var ptr = GetWindowLongPtrA(hWnd, GWLP_USERDATA);
+        if (ptr == 0)
         {
-            if (visible == _cursorVisible)
-            {
-                // No state change
-                return;
-            }
-
-            _cursorVisible = visible;
-            ShowCursor(_cursorVisible);
-            if (_cursorVisible)
-            {
-                SetCursorPos(_hideCursorPosition.X, _hideCursorPosition.Y);
-            }
-            else
-            {
-                POINT pos;
-                if (GetCursorPos(&pos))
-                {
-                    _hideCursorPosition = pos;
-                }
-                SetCursorPos((int)(Width / 2), (int)(Height / 2));
-            }
-        }
-
-        public static bool Init(WindowConfiguration config)
-        {
-            if (Handle.IsValid)
-            {
-                throw new InvalidOperationException("The window has already be initialized.");
-            }
-            _defaultCursor = LoadCursorW(0, StandardCursorResources.IDC_HELP);
-            _timer = Stopwatch.StartNew();
-            // Create the Window Class EX
-            var wndClassExA = new WNDCLASSEXA
-            {
-                CbClsExtra = 0,
-                CbSize = (uint)Marshal.SizeOf<WNDCLASSEXA>(),
-                HCursor = _defaultCursor,
-                HIcon = 0,
-                LpFnWndProc = &WndProc,
-                CbWndExtra = 0,
-                HIconSm = 0,
-                HInstance = Marshal.GetHINSTANCE(typeof(Window).Module),
-                HbrBackground = 0,
-                LpszClassName = ClassName,
-                Style = 0
-            };
-            Logger.Trace($"RegisterClass {ClassName}", typeof(Window));
-            if (RegisterClassExA(wndClassExA) == 0)
-            {
-                Logger.Error($"RegisterClassExA failed with Win32Error {Marshal.GetLastWin32Error()}", typeof(Window));
-                return false;
-            }
-
-            // Adjust the window size to take into account for the menu etc
-            var wsStyle = WindowStyles.OverlappedWindow | WindowStyles.Visible;
-            if (!config.Resizable)
-            {
-                wsStyle ^= WindowStyles.ThickFrame;
-            }
-            const int windowOffset = 100;
-            var windowRect = new RECT
-            {
-                Left = windowOffset,
-                Top = windowOffset,
-                Right = (int)(config.Width + windowOffset),
-                Bottom = (int)(config.Height + windowOffset)
-            };
-            AdjustWindowRect(ref windowRect, wsStyle, false);
-
-            Logger.Trace($"Create window with size Width: {config.Width} Height: {config.Height}", typeof(Window));
-
-            // Set properties before the window is created so they are available in WM_CREATE
-            Height = config.Height;
-            Width = config.Width;
-            Title = config.Title;
-
-            // Create the Window
-            Handle = CreateWindowExA(
-                0,
-                ClassName,
-                config.Title,
-                wsStyle,
-                -1,
-                -1,
-                windowRect.Right - windowRect.Left,
-                windowRect.Bottom - windowRect.Top,
-                0,
-                0,
-                wndClassExA.HInstance,
-                null
-            );
-
-            if (!Handle.IsValid)
-            {
-                Logger.Error($"CreateWindowExA failed with Win32Error {Marshal.GetLastWin32Error()}");
-                return false;
-            }
-            return true;
-        }
-
-        public static void SetTitle(string title) => SetWindowTextA(Handle, title);
-        public static void Show() => ShowWindow(Handle, ShowWindowCommand.Show);
-
-        public static void Destroy()
-        {
-            DestroyWindow(Handle);
-            UnregisterClassA(ClassName, Marshal.GetHINSTANCE(typeof(Window).Module));
-
-            Handle = default;
-        }
-
-        [UnmanagedCallersOnly]
-        private static nint WndProc(HWND hWnd, WindowsMessage message, nuint wParam, nuint lParam)
-        {
-            if (message is not WM_SETCURSOR and not WM_NCHITTEST and not WM_GETICON and not (WindowsMessage)174 and not WM_MOUSEFIRST and not WM_SETTEXT)
-            {
-                //Logger.Error($"Message: {message} ({hWnd})", typeof(Window));
-            }
-            
-            switch (message)
-            {
-                case WM_ACTIVATE:
-                    break;
-                case WM_ACTIVATEAPP:
-                    break;
-                case WM_KILLFOCUS:
-                    WindowEventHandler.OnLostFocus();
-                    break;
-                case WM_SETFOCUS:
-                    WindowEventHandler.OnSetFocus();
-                    break;
-                case WM_KEYDOWN:
-                case WM_SYSKEYDOWN:
-                    WindowEventHandler.OnKeyDown(wParam, lParam);
-                    break;
-                case WM_KEYUP:
-                case WM_SYSKEYUP:
-                    WindowEventHandler.OnKeyUp(wParam);
-                    break;
-                case WM_CHAR:
-                    WindowEventHandler.OnCharTyped(wParam);
-                    break;
-                case WM_SIZE:
-                {
-                    var width = (uint)(lParam & 0xffff);
-                    var height = (uint)((lParam >> 16) & 0xffff);
-
-                    Height = height;
-                    Width = width;
-                    _center = new POINT((int)(Width / 2), (int)(Height / 2));
-
-                    //Logger.Error($"Message: {message} ({width} x {height})", typeof(Window));
-                    }
-                    break;
-                case WM_EXITSIZEMOVE:
-                    WindowEventHandler.OnWindowResize(Width, Height);
-                    //Logger.Error($"Message: {message} ({Width} x {Height})", typeof(Window));
-                    break;
-                case WM_LBUTTONDOWN:
-                    WindowEventHandler.OnLeftMouseButtonDown();
-                    break;
-                case WM_LBUTTONUP:
-                    WindowEventHandler.OnLeftMouseButtonUp();
-                    break;
-                case WM_RBUTTONDOWN:
-                    WindowEventHandler.OnRightMouseButtonDown();
-                    break;
-                case WM_RBUTTONUP:
-                    WindowEventHandler.OnRightMouseButtonUp();
-                    break;
-                case WM_MOUSELEAVE:
-                    break;
-                case WM_MOUSEWHEEL:
-                    break;
-                case WM_CREATE:
-                    WindowEventHandler.OnCreate(Width, Height);
-                    break;
-                case WM_CLOSE:
-                    WindowEventHandler.OnClose();
-                    PostQuitMessage(0);
-                    return 0;
-            }
-
+            Logger.Warning($"Message handler not found, {message} dropped.");
             return DefWindowProcA(hWnd, message, wParam, lParam);
+        }
+
+        var window = (Window)GCHandle.FromIntPtr(ptr).Target;
+        // NOTE(Jens): Handle relevant messages here
+        switch (message)
+        {
+
+
+            case WM_CLOSE:
+                PostQuitMessage(0); //NOTE(Jens): This should be handled in some other way, so we can do a proper exit from the engine.
+                break;
+
+        }
+        return DefWindowProcA(hWnd, message, wParam, lParam);
+    }
+
+    public void Dispose()
+    {
+        if (WindowHandle != default)
+        {
+            DestroyWindow(WindowHandle);
+            UnregisterClassA(_className, Marshal.GetHINSTANCE(GetType().Module));
+            WindowHandle = default;
+        }
+
+        if (_instanceHandle.IsAllocated)
+        {
+            _instanceHandle.Free();
         }
     }
 }

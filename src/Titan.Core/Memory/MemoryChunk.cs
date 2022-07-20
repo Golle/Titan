@@ -1,5 +1,4 @@
 using System;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,7 +7,13 @@ namespace Titan.Core.Memory
     public readonly unsafe struct MemoryChunk
     {
         private readonly void* _ptr;
-        internal MemoryChunk(void* ptr) => _ptr = ptr;
+        public readonly uint Size;
+        internal MemoryChunk(void* ptr, uint size)
+        {
+            _ptr = ptr;
+            Size = size;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Free()
         {

@@ -1,7 +1,6 @@
 <Project>
     <PropertyGroup>
-    <!-- Remove this when Resharper supports it -->
-        <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports> 
+        <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     </PropertyGroup>
     <!-- STATS is used for timers and stats about the engine -->
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">

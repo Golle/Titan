@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Titan.Core.Logging;
 
 namespace Tools.FontBuilder.BitmapFonts
 {

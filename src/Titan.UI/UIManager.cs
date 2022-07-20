@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Titan.ECS.Entities;
-using Titan.ECS.Worlds;
+using Titan.ECS.World;
 using Titan.Graphics.Rendering.Text;
 
 namespace Titan.UI
@@ -16,7 +16,7 @@ namespace Titan.UI
         {
             TextManager = textManager;
             _world = world;
-            _baseEntity = _world.CreateEntity();
+            //_baseEntity = _world.CreateEntity();
         }
         
         public void Add(UIComponent component)
@@ -27,7 +27,7 @@ namespace Titan.UI
 
         private void RecursiveCreate(in Entity parent, UIComponent component)
         {
-            component.OnCreate(this, _world, parent.CreateChildEntity());
+            //component.OnCreate(this, _world, parent.CreateChildEntity());
             if (component is UIContainer container)
             {
                 foreach (var child in container.Children)
