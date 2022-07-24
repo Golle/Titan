@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Windows;
@@ -12,7 +11,7 @@ using static Titan.Windows.DXGI.DXGI_ADAPTER_FLAG;
 using static Titan.Windows.DXGI.DXGI_GPU_PREFERENCE;
 using static Titan.Windows.DXGI.DXGICommon;
 
-namespace Titan.Graphics.NewRender;
+namespace Titan.Graphics.NewRender.D3D11;
 
 internal struct D3D11Texture
 {

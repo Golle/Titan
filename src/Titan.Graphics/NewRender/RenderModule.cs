@@ -4,6 +4,7 @@ using Titan.Core;
 using Titan.Core.Memory;
 using Titan.ECS.App;
 using Titan.Graphics.Modules;
+using Titan.Graphics.NewRender.D3D11;
 
 namespace Titan.Graphics.NewRender;
 
