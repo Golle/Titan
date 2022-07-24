@@ -1,6 +1,7 @@
-// ReSharper disable InconsistentNaming
+using System;
 namespace Titan.Windows.DXGI;
 
+[Flags]
 public enum DXGI_ADAPTER_FLAG : uint
 {
     DXGI_ADAPTER_FLAG_NONE = 0,

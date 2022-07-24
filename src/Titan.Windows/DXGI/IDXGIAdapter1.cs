@@ -1,8 +1,10 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Titan.Windows.DXGI;
 // ReSharper disable InconsistentNaming
 
+[Guid("29038f61-3839-4626-91fd-086879011a05")]
 public unsafe struct IDXGIAdapter1
 {
     private void** _vtbl;

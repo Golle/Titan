@@ -33,6 +33,16 @@ public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T** ReleaseAndGetAddressOf()
+    {
+        InternalRelease();
+        fixed (T** ptr = &_ptr)
+        {
+            return ptr;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly T** GetAddressOf()
     {
         fixed (T** ptr = &_ptr)
@@ -45,10 +55,9 @@ public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
     public static ComPtr<T> Wrap(in T* ptr) => new() {_ptr = ptr}; // Use object initializer to avoid InternalAddRef
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Dispose()
-    {
-        InternalRelease();
-    }
+    public void Dispose() => InternalRelease();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Release() => InternalRelease();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void InternalAddRef() => ((IUnknown*)_ptr)->AddRef();

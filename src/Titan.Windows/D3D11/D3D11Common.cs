@@ -20,7 +20,7 @@ public static unsafe class D3D11Common
         [In] IDXGIAdapter* pAdapter,
         [In] D3D_DRIVER_TYPE driverType,
         [In] HMODULE software,
-        [In] uint flags,
+        [In] D3D11_CREATE_DEVICE_FLAG flags,
         [In] D3D_FEATURE_LEVEL* pFeatureLevels,
         [In] uint featureLevels,
         [In] uint sdkVersion,

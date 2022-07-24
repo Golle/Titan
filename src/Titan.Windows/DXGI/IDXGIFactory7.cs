@@ -1,13 +1,12 @@
 using System;
 using System.Runtime.CompilerServices;
-
-// ReSharper disable InconsistentNaming
+using System.Runtime.InteropServices;
 
 namespace Titan.Windows.DXGI;
 
-public unsafe struct IDXGIFactory2
+[Guid("a4966eed-76db-44da-84c1-ee9a7afb20a8")]
+public unsafe struct IDXGIFactory7
 {
-    public static readonly Guid UUID = new("50c83a1c-e072-4c48-87b0-3630fa36a6d0");
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -86,9 +85,9 @@ public unsafe struct IDXGIFactory2
 
     //BOOL(STDMETHODCALLTYPE* IsWindowedStereoEnabled)(
     //         IDXGIFactory2* This);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT CreateSwapChainForHwnd(IUnknown * pDevice, HWND hWnd, DXGI_SWAP_CHAIN_DESC1* pDesc, DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain) =>
+    public HRESULT CreateSwapChainForHwnd(IUnknown* pDevice, HWND hWnd, DXGI_SWAP_CHAIN_DESC1* pDesc, DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain) =>
         ((delegate* unmanaged[Stdcall]<void*, IUnknown*, HWND, DXGI_SWAP_CHAIN_DESC1*, DXGI_SWAP_CHAIN_FULLSCREEN_DESC*, IDXGIOutput*, IDXGISwapChain1**, HRESULT>)_vtbl[15])(Unsafe.AsPointer(ref this), pDevice, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput, ppSwapChain);
 
     //        HRESULT(STDMETHODCALLTYPE* CreateSwapChainForCoreWindow)(
@@ -163,5 +162,46 @@ public unsafe struct IDXGIFactory2
     //         _In_opt_  IDXGIOutput* pRestrictToOutput,
     //         /* [annotation][out] */
     //         _COM_Outptr_  IDXGISwapChain1** ppSwapChain);
+
+    //UINT(STDMETHODCALLTYPE* GetCreationFlags)(
+    //    IDXGIFactory7* This);
+
+    //HRESULT(STDMETHODCALLTYPE* EnumAdapterByLuid)(
+    //IDXGIFactory7* This,
+    ///* [annotation] */
+    //_In_ LUID AdapterLuid,
+    ///* [annotation] */
+    //_In_  REFIID riid,
+    ///* [annotation] */
+    //_COM_Outptr_  void** ppvAdapter);
+
+    //HRESULT(STDMETHODCALLTYPE* EnumWarpAdapter)(
+    //IDXGIFactory7* This,
+    ///* [annotation] */
+    //_In_ REFIID riid,
+    ///* [annotation] */
+    //_COM_Outptr_  void** ppvAdapter);
+
+    //HRESULT(STDMETHODCALLTYPE* CheckFeatureSupport)(
+    //IDXGIFactory7* This,
+    //DXGI_FEATURE Feature,
+    ///* [annotation] */
+    //_Inout_updates_bytes_(FeatureSupportDataSize) void* pFeatureSupportData,
+    //    UINT FeatureSupportDataSize);
+
+    public HRESULT EnumAdapterByGpuPreference(uint Adapter, DXGI_GPU_PREFERENCE GpuPreference, in Guid riid, void** ppvAdapter)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, DXGI_GPU_PREFERENCE, in Guid, void**, HRESULT>)_vtbl[29])(Unsafe.AsPointer(ref this), Adapter, GpuPreference, riid, ppvAdapter);
+
+    //HRESULT(STDMETHODCALLTYPE* RegisterAdaptersChangedEvent)(
+    //IDXGIFactory7* This,
+    ///* [annotation][in] */
+    //_In_ HANDLE hEvent,
+    ///* [annotation][out] */
+    //_Out_  DWORD* pdwCookie);
+
+    //HRESULT(STDMETHODCALLTYPE* UnregisterAdaptersChangedEvent)(
+    //IDXGIFactory7* This,
+    ///* [annotation][in] */
+    //_In_ DWORD dwCookie);
 
 }
