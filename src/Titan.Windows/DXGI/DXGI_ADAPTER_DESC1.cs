@@ -1,3 +1,5 @@
+using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 
@@ -16,4 +18,12 @@ public struct DXGI_ADAPTER_DESC1
     public nuint SharedSystemMemory;
     public LUID AdapterLuid;
     public DXGI_ADAPTER_FLAG Flags;
+
+    public unsafe ReadOnlySpan<char> DescriptionString()
+    {
+        fixed (char* pDesc = Description)
+        {
+            return new(pDesc, 128);
+        }
+    }
 }
