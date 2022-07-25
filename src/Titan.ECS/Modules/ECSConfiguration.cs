@@ -4,12 +4,19 @@ namespace Titan.ECS.Modules;
 
 public struct ECSConfiguration : IDefault<ECSConfiguration>
 {
-    private const uint DefaultMaxEntities = 10_000;
+    public const uint DefaultMaxEntities = 10_000;
+    public const uint DefaultMaxEventTypes = 200;
+    public const uint DefaultEventStreamSize = 2 * 1024 * 1024; // 2MB
     public uint MaxEntities;
+    public uint EventStreamSize;
+    public uint MaxEventTypes;
 
-    public static ECSConfiguration Default
-        => new()
-        {
-            MaxEntities = DefaultMaxEntities
-        };
+    public ECSConfiguration()
+    {
+        MaxEntities = DefaultMaxEntities;
+        EventStreamSize = DefaultEventStreamSize;
+        MaxEventTypes = DefaultMaxEventTypes;
+    }
+
+    public static ECSConfiguration Default => new();
 }

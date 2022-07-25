@@ -1,10 +1,11 @@
 using System;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
-using Titan.Core.Memory;
 using Titan.Core.Threading2;
+using Titan.ECS.Memory;
 using Titan.ECS.Systems;
 using Titan.ECS.World;
+using Titan.Memory;
 
 namespace Titan.ECS.Scheduler;
 
@@ -15,6 +16,7 @@ namespace Titan.ECS.Scheduler;
 /// </summary>
 public unsafe struct Scheduler
 {
+    private int Apa;
     private NodeStage* _stages;
     private StageExecutor* _executors;
     private const int _stageCount = (int)Stage.Count;
@@ -48,8 +50,11 @@ public unsafe struct Scheduler
 
     internal void Init(in ResourceCollection resources, ref World.World world)
     {
+        //NOTE(Jens): Rewrite this method to something more readable
+        //NOTE(Jens): it currently allocates new memory for each system when they are initialized, we should calculate the size needed and allocate everything in a single call. This is to prevent memory being allocated in different places.
+
         var config = resources.GetResource<SchedulerConfiguration>();
-        
+
         var descriptors = resources
             .GetResource<SystemsRegistry>()
             .GetDescriptors();
@@ -57,23 +62,23 @@ public unsafe struct Scheduler
 
         var count = (uint)descriptors.Length;
 
-        ref var pool = ref resources.GetResource<MemoryPool>();
-        ref var transient = ref resources.GetResource<MemoryAllocator>();
+        ref var pool = ref resources.GetResource<PlatformAllocator>();
+        ref var transient = ref resources.GetResource<TransientMemory>();
 
         // We sort the descriptors before we initialize them so we can easily access them in the correct Stage order
-        var sortedDescriptors = new Span<SystemDescriptor>(transient.GetPointer<SystemDescriptor>(count), (int)count);
+        var sortedDescriptors = new Span<SystemDescriptor>(transient.AllocateArray<SystemDescriptor>(count), (int)count);
         descriptors.CopyTo(sortedDescriptors);
         sortedDescriptors.Sort(CompareDescriptor);
 
         // allocate memory for the nodes
-        _stages = pool.GetPointer<NodeStage>(_stageCount);
-        _executors = pool.GetPointer<StageExecutor>(_stageCount);
+        _stages = pool.Allocate<NodeStage>(_stageCount);
+        _executors = pool.Allocate<StageExecutor>(_stageCount);
         config.Get().CopyTo(new Span<StageExecutor>(_executors, _stageCount));
 
-        var nodes = pool.GetPointer<Node>(count, true);
-        var states = transient.GetPointer<SystemDependencyState>(count, true);
-        
-        var stageCounter = stackalloc int[_stageCount];
+        var nodes = pool.Allocate<Node>(count, true);
+        var states = transient.AllocateArray<SystemDependencyState>(count, true);
+
+        var stageCounter = transient.AllocateArray<int>(_stageCount);
         
         // Create and initialize the systems (and record the dependencies)
         for (var i = 0; i < count; ++i)
@@ -84,14 +89,14 @@ public unsafe struct Scheduler
         }
 
         // Calculate the dependencies
-        var dependencies = transient.GetPointer<int>(count);
+        var dependencies = transient.AllocateArray<int>(count);
         for (var i = 0; i < count; ++i)
         {
             var dependenciesCount = 0;
             ref readonly var systemState = ref states[i];
             for (var j = 0; j < count; ++j)
             {
-                if (i == j )
+                if (i == j)
                 {
                     continue;
                 }
@@ -108,14 +113,15 @@ public unsafe struct Scheduler
                     dependencies[dependenciesCount++] = j;
                 }
             }
-            
+
             // Allocate a new array on the permanent memory pool and copy the dependencies
             if (dependenciesCount > 0)
             {
                 ref var systemNode = ref nodes[i];
                 systemNode.DependenciesCount = dependenciesCount;
-                systemNode.Dependencies = pool.GetPointer<int>((uint)dependenciesCount);
-                Unsafe.CopyBlockUnaligned(systemNode.Dependencies, dependencies, (uint)(sizeof(int)*dependenciesCount));
+                //NOTE(Jens): THIS WILL ALLOCATE MORE MEMORY, possible Fragmentation 
+                systemNode.Dependencies = pool.Allocate<int>((uint)dependenciesCount);
+                Unsafe.CopyBlockUnaligned(systemNode.Dependencies, dependencies, (uint)(sizeof(int) * dependenciesCount));
                 Logger.Trace<Scheduler>($"{systemNode.Stage}: System {nodes[i].Id} has {dependenciesCount} dependencies");
                 for (var a = 0; a < systemNode.DependenciesCount; ++a)
                 {
@@ -143,7 +149,7 @@ public unsafe struct Scheduler
             offset += numberOfNodes;
 
         }
-        
+
         static void UpdateNodeDependenciesIndex(Node* nodes, int count, int offset)
         {
             //NOTE(Jens): We group the nodes into stages so we need to update the offsets in the dependencies array or they'll try to access things that are out of bounds.
@@ -155,10 +161,11 @@ public unsafe struct Scheduler
                 }
             }
         }
-        static Node CreateAndInit(in MemoryPool pool, in SystemDescriptor descriptor, in SystemsInitializer initializer)
+        static Node CreateAndInit(in PlatformAllocator allocator, in SystemDescriptor descriptor, in SystemsInitializer initializer)
         {
+            //NOTE(Jens): THIS WILL ALLOCATE NEW  MEMORY FOR EACH SYSTEM. We dont want that. TODO: Fix this asap, it should be taken from the same memory (FixedSizeLinearArena)
             //NOTE(Jens): add try/catch since it will be calling user code?
-            var context = pool.GetPointer(descriptor.Size);
+            var context = allocator.Allocate(descriptor.Size);
             descriptor.Init(context, initializer);
             return new Node
             {
@@ -180,7 +187,7 @@ public unsafe struct Scheduler
             {
                 return stageDiff;
             }
-            
+
             // The priority will determine which order the system will be executed. This will only affect systems that are executed with the Sequential/ReversedSequential executor.
             if (l.Priority == r.Priority)
             {

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Titan.Core;
+using Titan.ECS.Events;
 using Titan.ECS.Systems;
 
 namespace Titan.ECS.Entities;

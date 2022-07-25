@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.Core.Memory;
+using Titan.Memory;
 
 namespace Titan.ECS.Entities;
 
@@ -23,9 +23,9 @@ internal readonly unsafe struct EntityInfoRegistry : IResource
         return ref _info[entity];
     }
 
-    public static EntityInfoRegistry Create(in MemoryPool pool, uint maxEntities)
+    public static EntityInfoRegistry Create(in PlatformAllocator allocator, uint maxEntities)
     {
-        var info = pool.GetPointer<EntityInfo>(maxEntities, initialize: true);
+        var info = allocator.Allocate<EntityInfo>(maxEntities, initialize: true);
         return new EntityInfoRegistry(info, maxEntities);
     }
 }

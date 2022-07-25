@@ -1,9 +1,8 @@
 using System.Diagnostics;
 using System.Threading;
-using Titan.Core.Memory2;
 using Titan.Windows.Win32;
 
-namespace Titan.Windows.Memory;
+namespace Titan.Memory.Allocators;
 
 public record struct FixedSizeArgs(nuint Size);
 public unsafe struct Win32VirtualAllocFixedSizeAllocator : IAllocator<FixedSizeArgs>

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Titan.Core.Memory2.Allocators;
+namespace Titan.Memory.Allocators;
 
 /// <summary>
 /// The most basic allocator, uses the NativeMemory class in .NET and works on all platforms.

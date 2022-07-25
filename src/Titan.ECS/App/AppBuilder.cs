@@ -3,39 +3,32 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Titan.Core;
-using Titan.Core.Memory;
 using Titan.ECS.Components;
 using Titan.ECS.Events;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 using Titan.ECS.World;
+using Titan.Memory;
 
 namespace Titan.ECS.App;
 
 public unsafe class AppBuilder
 {
-    private readonly ResourceCollection _resourceCollection;
+    private ResourceCollection _resourceCollection;
     private readonly List<SystemDescriptor> _systems = new();
     private readonly List<ComponentDescriptor> _components = new();
-    private readonly List<EventsDescriptor> _events = new();
-
-    private readonly App* _app;
 
     private AppBuilder(AppCreationArgs args)
     {
-        // allocate the memory needed for the App instance. This will ensure that only unmanaged/blittable types are used.
-        var pool = MemoryPool.Create(args.UnmanagedMemory);
-
-        // The App will be the first entry in the memory block
-        _app = pool.GetPointer<App>(initialize: true);
-
+        var allocator = PlatformAllocator.Create(args.UnmanagedMemory);
+        
         // Resources must be allocated at the start because they are used when modules are built. (configs etc)
         // We might want to change this at some point to allow for better memory alignment. For example configs used for startup/construction might never be used again, but they'll be mixed with other game related resources.
-        _resourceCollection = ResourceCollection.Create(args.ResourcesMemory, args.MaxResourceTypes, pool);
+        _resourceCollection = ResourceCollection.Create(args.ResourcesMemory, args.MaxResourceTypes, allocator);
 
-        // Add the pool as a resource so we can use it when setting up the modules (This must be done after it's been used to create the resource collection or the _next in the pool will be wrong.
-        AddResource(pool);
+        // Add the PlatformAllocator as a resource so we can use it when setting up the modules (This must be done after it's been used to create the resource collection or the _next in the pool will be wrong.
+        AddResource(allocator);
 
         // The event system should always be added. Run it before anything else.
         AddSystemToStage<EventSystem>(Stage.First, RunCriteria.Always, int.MaxValue - 1);
@@ -93,12 +86,6 @@ public unsafe class AppBuilder
         return this;
     }
 
-    public AppBuilder AddEvent<T>(uint maxEventsPerFrame = 1) where T : unmanaged, IEvent
-    {
-        _events.Add(EventsDescriptor.Create<T>(maxEventsPerFrame));
-        return this;
-    }
-
     public AppBuilder UseRunner<T>() where T : unmanaged, IRunner
     {
         if (_resourceCollection.HasResource<Runner>())
@@ -117,6 +104,7 @@ public unsafe class AppBuilder
 
     public ref T GetResource<T>() where T : unmanaged
         => ref _resourceCollection.GetResource<T>();
+
     public ref T GetResourceOrDefault<T>() where T : unmanaged, IDefault<T>
     {
         if (!_resourceCollection.HasResource<T>())
@@ -132,7 +120,7 @@ public unsafe class AppBuilder
     public bool HasResource<T>() where T : unmanaged
         => _resourceCollection.HasResource<T>();
 
-    public ref App Build()
+    public App Build()
     {
         if (!_resourceCollection.HasResource<Runner>())
         {
@@ -144,23 +132,26 @@ public unsafe class AppBuilder
             throw new InvalidOperationException($"Failed to find {nameof(ECSConfiguration)} resource. Make sure you've added the CoreModule before calling build.");
         }
 
-        ref readonly var pool = ref _resourceCollection.GetResource<MemoryPool>();
+        ref readonly var allocator = ref _resourceCollection.GetResource<PlatformAllocator>();
         // Initialize the Compoenent pools (this is done at build because we want all components to be in the same place)
         ref readonly var config = ref _resourceCollection.GetResource<ECSConfiguration>();
         _resourceCollection
-            .GetResource<ComponentRegistry>()
-            .Init(pool, config.MaxEntities, _components.ToArray());
+            .GetOrCreateResource<ComponentRegistry>()
+            .Init(allocator, config.MaxEntities, _components.ToArray());
+        //NOTE(Jens): Add a clenaup system for component registry that runs on shutdown (just for completeness, might disable it in release builds)
+
 
         _resourceCollection
-            .GetResource<EventsRegistry>()
-            .Init(pool, _events.ToArray());
+            .GetOrCreateResource<EventsRegistry>()
+            .Init(allocator, config.EventStreamSize, config.MaxEventTypes);
 
         _resourceCollection
-            .GetResource<SystemsRegistry>()
-            .Init(pool, _systems.ToArray());
+            .GetOrCreateResource<SystemsRegistry>()
+            .Init(allocator, _systems.ToArray());
 
-        _app->Init(pool, _resourceCollection);
+        _resourceCollection
+            .InitResource<Scheduler.Scheduler>();
 
-        return ref *_app;
+        return App.Create(_resourceCollection);
     }
 }

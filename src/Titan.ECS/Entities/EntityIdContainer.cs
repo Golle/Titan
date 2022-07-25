@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Titan.Core.Memory;
+using Titan.Memory;
 
 namespace Titan.ECS.Entities;
 
@@ -35,9 +35,9 @@ internal unsafe struct EntityIdContainer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Return(uint id) => _ids[Interlocked.Increment(ref _head) - 1] = id;
 
-    public static EntityIdContainer Create(in MemoryPool pool, uint maxEntities)
+    public static EntityIdContainer Create(in PlatformAllocator allocator, uint maxEntities)
     {
-        var ids = pool.GetPointer<uint>(maxEntities);
+        var ids = allocator.Allocate<uint>(maxEntities, false);
         return new EntityIdContainer(ids, maxEntities);
     }
 }

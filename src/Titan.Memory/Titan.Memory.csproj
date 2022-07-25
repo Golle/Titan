@@ -11,14 +11,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
     <DefineConstants></DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
-    <ProjectReference Include="..\Titan.Memory\Titan.Memory.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Reflection.Metadata" Version="5.0.0" />
+    <ProjectReference Include="..\Titan.Windows\Titan.Windows.csproj" />
   </ItemGroup>
 
 </Project>

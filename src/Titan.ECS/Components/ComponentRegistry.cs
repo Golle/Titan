@@ -2,8 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.Core.Memory;
+using Titan.Core.Logging;
 using Titan.ECS.Entities;
+using Titan.Memory;
 
 namespace Titan.ECS.Components;
 
@@ -11,26 +12,40 @@ internal unsafe struct ComponentRegistry : IApi
 {
     private ComponentsInternal* _components;
     private uint _count;
-    public void Init(in MemoryPool pool, uint maxEntities, ReadOnlySpan<ComponentDescriptor> descriptors)
+    public void Init(in PlatformAllocator allocator, uint maxEntities, ReadOnlySpan<ComponentDescriptor> descriptors)
     {
+        Logger.Warning<ComponentRegistry>("The allocations for the components are not memory aligned, this needs to be fixed.");
         _count = (uint)descriptors.Length;
-        _components = pool.GetPointer<ComponentsInternal>(_count);
+
+        var internalsSize = (nuint)(sizeof(ComponentsInternal) * _count);
+        var componentSize = CalculateComponentSize(descriptors, maxEntities); // TODD: Not aligned
+        var mem = allocator.Allocate(internalsSize + componentSize);
+        _components = (ComponentsInternal*)mem;
+        var components = (byte*)(_components + _count);
 
         for (var i = 0; i < _count; ++i)
         {
             ref readonly var desc = ref descriptors[i];
-            var size = desc.CalculateSize(maxEntities);
-            // Allocate memory for the pool based on the calculated size and initialize it.
-            var mem = pool.GetPointer(size);
-            desc.Init(mem, maxEntities);
+            desc.Init(components, maxEntities);
             _components[i] = new ComponentsInternal
             {
                 ComponentId = desc.ComponentId,
-                Data = mem,
+                Data = components,
                 VTable = desc.ComponentPoolVtbl
             };
+            // move the pointer to the next block
+            components += desc.CalculateSize(maxEntities); // Align this move.
         }
 
+        static nuint CalculateComponentSize(ReadOnlySpan<ComponentDescriptor> descriptors, uint maxEntities)
+        {
+            nuint size = 0u;
+            foreach (var descriptor in descriptors)
+            {
+                size += descriptor.CalculateSize(maxEntities);
+            }
+            return size;
+        }
     }
 
     public readonly Components<T> Access<T>() where T : unmanaged, IComponent
@@ -73,6 +88,11 @@ internal unsafe struct ComponentRegistry : IApi
         return null;
     }
 
+
+    public void Release(in PlatformAllocator allocator)
+    {
+        allocator.Free(_components);
+    }
     private struct ComponentsInternal
     {
         public ComponentId ComponentId;

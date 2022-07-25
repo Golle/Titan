@@ -2,37 +2,55 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Core.Memory;
 using Titan.ECS.Components;
+using Titan.Memory;
 
 namespace Titan.ECS.Entities;
 
 internal unsafe struct EntityFilterRegistry : IApi
 {
     private readonly uint _maxFilters;
-    private readonly uint _maxEntities;
-    private readonly uint _maxComponentsPerFilter;
-    private readonly MemoryPool _memoryPool;
-    private readonly FilterInternal* _filters;
+    private readonly uint _filterSize;
+    private readonly byte* _mem;
     private int _count;
 
-    private EntityFilterRegistry(FilterInternal* filters, uint maxFilters, uint maxEntities, uint maxComponentsPerFilter, in MemoryPool memoryPool)
+    private EntityFilterRegistry(byte* mem, uint filterSize, uint maxFilters, uint maxEntities, uint maxEntitiesPerFilter)
     {
-        _filters = filters;
+        _mem = mem;
+        _filterSize = filterSize;
         _maxFilters = maxFilters;
-        _maxEntities = maxEntities;
-        _maxComponentsPerFilter = maxComponentsPerFilter;
-        _memoryPool = memoryPool;
         _count = 0;
+
+        /*
+         * Memory layout
+         * -----------
+         * FilterInternal
+         * Indexers (max entities)
+         * Entities  (maxEntitiesPerFilter)
+         * -----------
+         */
+        for (var i = 0; i < maxFilters; ++i)
+        {
+            var filter = GetFilter(i);
+            filter->Count = 0;
+            filter->FilterKey = default;
+            filter->Indexers = (int*)(filter + 1);
+            filter->Entities = (Entity*)(filter->Indexers + maxEntities);
+
+            Unsafe.InitBlockUnaligned(filter->Indexers, byte.MaxValue, sizeof(int) * maxEntities); // set indexers to -1
+        }
+
     }
 
-    //NOTE(Jens): This will allocate a lot of memory up front. This should be using dynamic allocators and only expand when needed.
-    public static EntityFilterRegistry Create(in MemoryPool pool, uint maxFilters, uint maxEntities, uint maxComponentsPerFilter)
+    public static EntityFilterRegistry Create(in PlatformAllocator allocator, uint maxFilters, uint maxEntities, uint maxEntitiesPerFilter)
     {
-        Logger.Info<EntityFilterRegistry>($"Create {nameof(EntityFilterRegistry)} with max filters: {maxFilters}, max entites: {maxEntities} and max components per filter: {maxComponentsPerFilter}");
-        var size = (uint)(maxFilters * sizeof(FilterInternal));
-        var filters = pool.GetPointer<FilterInternal>(size);
-        return new EntityFilterRegistry(filters, maxFilters, maxEntities, maxComponentsPerFilter, pool);
+        Logger.Info<EntityFilterRegistry>($"Create {nameof(EntityFilterRegistry)} with max filters: {maxFilters}, max entites: {maxEntities} and max entities per filter: {maxEntitiesPerFilter}");
+        var filterSize = maxEntities * sizeof(uint) + maxEntitiesPerFilter * sizeof(Entity) + sizeof(FilterInternal);
+        var totalSize = maxFilters * filterSize;
+        Logger.Info<EntityFilterRegistry>($"Allocating {totalSize} bytes for {nameof(EntityFilter)}s");
+
+        var filters = (byte*)allocator.Allocate((nuint)totalSize, true);
+        return new EntityFilterRegistry(filters, (uint)filterSize, maxFilters, maxEntities, maxEntitiesPerFilter);
     }
 
     /// <summary>
@@ -44,7 +62,7 @@ internal unsafe struct EntityFilterRegistry : IApi
     {
         for (var i = 0; i < _count; ++i)
         {
-            _filters[i].EntityChanged(entity, components);
+            GetFilter(i)->EntityChanged(entity, components);
         }
     }
 
@@ -52,43 +70,39 @@ internal unsafe struct EntityFilterRegistry : IApi
     {
         for (var i = 0; i < _count; ++i)
         {
-            _filters[i].Remove(entity);
+            GetFilter(i)->Remove(entity);
         }
     }
 
     public EntityFilter GetOrCreate(in EntityFilterConfig entityFilter)
     {
         Debug.Assert(!entityFilter.Include.IsEmpty(), "Defining a filter without any includes have an undefined behavior and is not allowed at the moment.");
-        var index = FindExisting(entityFilter);
-        if (index == -1)
+        var filter = FindExisting(entityFilter);
+        if (filter == null)
         {
             Debug.Assert(_count < _maxFilters, $"Max number of filters has been reached: {_maxFilters}");
-            index = _count++;
-            ref var filter = ref _filters[index];
-            filter = new FilterInternal
-            {
-                Entities = _memoryPool.GetPointer<Entity>(_maxComponentsPerFilter),
-                Indexers = _memoryPool.GetPointer<int>(_maxEntities),
-                FilterKey = entityFilter,
-                Count = 0
-            };
-            Unsafe.InitBlockUnaligned(_filters[index].Indexers, byte.MaxValue, sizeof(int) * _maxEntities); // set indexers to -1
+            filter = GetFilter(_count++);
+            filter->FilterKey = entityFilter;
+            filter->Count = 0;
         }
-
-        return new EntityFilter(_filters[index].Entities, &_filters[index].Count);
+        return new EntityFilter(filter->Entities, &filter->Count);
     }
 
-    private int FindExisting(in EntityFilterConfig filter)
+    private FilterInternal* FindExisting(in EntityFilterConfig config)
     {
         for (var i = 0; i < _count; ++i)
         {
-            if (_filters[i].FilterKey == filter)
+            var filter = GetFilter(i);
+            if (filter->FilterKey == config)
             {
-                return i;
+                return filter;
             }
         }
-        return -1;
+        return null;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private FilterInternal* GetFilter(int index) => (FilterInternal*)(_mem + index * _filterSize);
 
     private struct FilterInternal
     {

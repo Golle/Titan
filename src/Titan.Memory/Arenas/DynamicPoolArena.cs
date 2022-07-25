@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Titan.Core.Memory2.Arenas;
+namespace Titan.Memory.Arenas;
 
 public static class DynamicPoolArenaExtensions
 {

@@ -1,4 +1,4 @@
-namespace Titan.Core.Memory2;
+namespace Titan.Memory;
 
 /// <summary>
 /// Allocator with a context and creation arguments. Use this when you've got a state, for example when you allocate memory upfront.

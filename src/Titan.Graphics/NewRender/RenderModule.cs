@@ -1,7 +1,5 @@
 using System;
-using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.Core.Memory;
 using Titan.ECS.App;
 using Titan.Graphics.Modules;
 using Titan.Graphics.NewRender.D3D11;
@@ -22,7 +20,7 @@ public struct TextureDescriptor { }
 
 internal interface IRenderDevice<T> where T : unmanaged
 {
-    static abstract bool Create(in MemoryPool pool, uint width, uint height, bool debug, out T device);
+    //static abstract bool Create(in MemoryPool pool, uint width, uint height, bool debug, out T device);
     
     Handle<SwapChain> CreateSwapChain(in SwapChainDescriptor descriptor);
     Handle<Texture> CreateTexture(in TextureDescriptor desc);
@@ -175,7 +173,7 @@ internal unsafe struct Renderer
 internal unsafe interface IRenderer<T> where T : unmanaged
 {
     //static abstract void Present(T* context, in SwapChain swapChain);
-    static abstract T* Create(in MemoryPool pool);
+    //static abstract T* Create(in MemoryPool pool);
 }
 
 public enum RenderAPI

@@ -2,10 +2,9 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Titan.Core.Memory2.Arenas;
+namespace Titan.Memory.Arenas;
 
-
-internal static class FixedSizeLinearArenaExtensions
+public static class FixedSizeLinearArenaExtensions
 {
     public static unsafe T* Allocate<T>(this ref FixedSizeLinearArena arena) where T : unmanaged => (T*)arena.Allocate((nuint)sizeof(T));
 }
@@ -15,7 +14,7 @@ internal static class FixedSizeLinearArenaExtensions
 /// Thread safe with the use of Interlocked.Add instead of simple increase.
 /// Does not own the memory and wont release it
 /// </summary>
-internal unsafe struct FixedSizeLinearArena
+public unsafe struct FixedSizeLinearArena
 {
     private readonly byte* _backingBuffer;
     private readonly int _size;
@@ -27,9 +26,7 @@ internal unsafe struct FixedSizeLinearArena
         var alignedSize = (int)size;
         var offset = Interlocked.Add(ref _offset, alignedSize);
         Debug.Assert(offset < _size, "Allocation overflow");
-
-        var ptr = _backingBuffer + offset - alignedSize;
-        return ptr;
+        return _backingBuffer + offset - alignedSize;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

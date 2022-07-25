@@ -1,29 +1,35 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Core.Memory;
+using Titan.Memory;
+using Titan.Memory.Arenas;
 
 namespace Titan.ECS.World;
 
-public readonly unsafe struct ResourceCollection
+public unsafe struct ResourceCollection
 {
-    private readonly MemoryAllocator _allocator;
+    private FixedSizeLinearArena _arena;
     private readonly void** _indices;
     private readonly uint _indicesCount;
 
-    private ResourceCollection(MemoryAllocator allocator, void** indices, uint indicesCount)
+    private ResourceCollection(in FixedSizeLinearArena arena, void** indices, uint indicesCount)
     {
-        _allocator = allocator;
+        _arena = arena;
         _indices = indices;
         _indicesCount = indicesCount;
     }
 
-    public static ResourceCollection Create(uint size, uint maxTypes, in MemoryPool memoryPool)
+    public static ResourceCollection Create(uint initialSize, uint maxTypes, in PlatformAllocator allocator)
     {
-        var allocator = memoryPool.CreateAllocator<MemoryAllocator>(size, true);
-        var indices = memoryPool.GetPointer((uint)(sizeof(void*) * maxTypes));
-        return new ResourceCollection(allocator, (void**)indices, maxTypes);
+        var indicesSize = (nuint)sizeof(void*) * maxTypes;
+        var totalSize = initialSize + indicesSize;
+        var backingBuffer = allocator.Allocate(totalSize);
+        Debug.Assert(backingBuffer != null, $"Failed to create the backing buffer for {nameof(ResourceCollection)}");
+        var arena = FixedSizeLinearArena.Create(backingBuffer, totalSize);
+        var indices = (void**)arena.Allocate(indicesSize);
+        return new ResourceCollection(arena, indices, maxTypes);
     }
 
     public void InitResource<T>(in T value = default) where T : unmanaged
@@ -32,7 +38,7 @@ public readonly unsafe struct ResourceCollection
         if (_indices[id] == null)
         {
             Logger.Trace<ResourceCollection>($"Resource type: {typeof(T).FormattedName()} with Id {id} does not exist, creating.");
-            _indices[id] = _allocator.GetPointer<T>();
+            _indices[id] = _arena.Allocate<T>();
             *(T*)_indices[id] = value;
         }
         else
@@ -41,36 +47,25 @@ public readonly unsafe struct ResourceCollection
         }
     }
 
-    public ref T GetResource<T>() where T : unmanaged
+    public readonly ref T GetResource<T>() where T : unmanaged
+        => ref *GetResourcePointer<T>();
+    public readonly T* GetResourcePointer<T>() where T : unmanaged
     {
-        var id = ResourceId.Id<T>();
-        ref var ptr = ref _indices[id];
-        if (ptr == null)
-        {
-            InitResource<T>();
-        }
-
-        return ref *(T*)_indices[id];
+        ref readonly var ptr = ref _indices[ResourceId.Id<T>()];
+        Debug.Assert(ptr != null, $"Resource of type {typeof(T).Name} has not been added. Please use {nameof(InitResource)}<{typeof(T).Name}>()");
+        return (T*)ptr;
     }
 
-    public T* GetResourcePointer<T>() where T : unmanaged
+    public ref T GetOrCreateResource<T>() where T : unmanaged
     {
         ref readonly var ptr = ref _indices[ResourceId.Id<T>()];
         if (ptr == null)
         {
             InitResource<T>();
         }
-        return (T*)ptr;
+        return ref *(T*)_indices[ResourceId.Id<T>()];
     }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasResource<T>() => _indices[ResourceId.Id<T>()] != null;
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Reset(bool clearMemory = false)
-    {
-        Unsafe.InitBlockUnaligned(_indices, 0, (uint)(sizeof(void*)*_indicesCount));
-        _allocator.Reset(clearMemory);
-    }
 }

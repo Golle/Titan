@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Titan.Core.Memory2;
+namespace Titan.Memory;
 
 public unsafe struct Allocator
 {

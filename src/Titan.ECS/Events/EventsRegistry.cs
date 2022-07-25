@@ -1,90 +1,118 @@
 using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Core.Memory;
 using Titan.ECS.World;
+using Titan.Memory;
+using Titan.Memory.Arenas;
 
 namespace Titan.ECS.Events;
 
-// NOTE(Jens): this currenlty only supports a fixed size of events. We should make it possible for this to use the TransientMemory when there are to mnay events in a single frame.
-// NOTE(Jens): We could allocate EventSize*MaxEntities as a transient buffer if there's an overflow of events. This would be detroyed the next frame.
 internal unsafe struct EventsRegistry : IResource
 {
-    private EventsInternal<byte>* _mem;
+    private const uint MinEventStreamSize = 1024 * 10; // 10KB
+
+    private DynamicLinearArena _arena1;
+    private DynamicLinearArena _arena2;
+
+    private DynamicLinearArena* _current;
+    private DynamicLinearArena* _previous;
+
+    private InternalState* _internal;
+
     private uint _count;
 
-    public void Init(in MemoryPool pool, ReadOnlySpan<EventsDescriptor> descriptors)
+    public void Init(in PlatformAllocator allocator, uint size, uint maxEventCount)
     {
-        Logger.Trace<EventsRegistry>($"Registering {descriptors.Length} events");
-        _count = EventId.Count; // NOTE(Jens): not sure about this yet. Investigate if we need to do this in some other way. (Maybe source gen is better?) This might add handlers for events that has not been registered.
+        Logger.Trace<EventsRegistry>($"Creating the event stream with initial size: {size} bytes and a max event count of {maxEventCount}");
 
-        _mem = pool.GetPointer<EventsInternal<byte>>(_count, initialize: true);
+        // Split the size in 2 since we just want to allocate the amount of memory that was set in the config.
+        var halfSize = Math.Max(size / 2, MinEventStreamSize);
 
-        foreach (ref readonly var descriptor in descriptors)
+        _count = maxEventCount;
+        _internal = allocator.Allocate<InternalState>(_count, true);
+
+        // Allocate 2 arenas that we'll swap between.
+        _arena1 = DynamicLinearArena.Create(allocator, halfSize);
+        _arena2 = DynamicLinearArena.Create(allocator, halfSize);
+
+        _current = (DynamicLinearArena*)Unsafe.AsPointer(ref _arena1);
+        _previous = (DynamicLinearArena*)Unsafe.AsPointer(ref _arena2);
+    }
+
+
+    public EventsReader<T> GetReader<T>() where T : unmanaged, IEvent
+    {
+        var state = _internal + EventId.Id<T>();
+        var previous = state->GetPreviousPointer();
+        return new(&previous->FirstEvent, &previous->Count);
+    }
+
+    public EventsWriter<T> GetWriter<T>() where T : unmanaged, IEvent 
+        => new((EventsRegistry*)Unsafe.AsPointer(ref this));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void Send<T>(in T @event) where T : unmanaged, IEvent 
+        => _internal[EventId.Id<T>()].Send(_current, @event);
+
+    internal void Swap()
+    {
+        var tmp = _current;
+        _current = _previous;
+        _previous = tmp;
+        _current->Reset();
+
+        for (var i = 0; i < _count; ++i)
         {
-            Logger.Trace<EventsRegistry>($"Initialize event {descriptor.Id}");
-            // ID starts with 1, so we subtract 1 before calling the init
-            _mem[descriptor.Id - 1].Init(pool, descriptor);
+            _internal[i].Swap();
         }
     }
 
-    public void Swap()
+    internal void Release(in PlatformAllocator allocator)
     {
-        // Start at 1 since 0 is "invalid".
-        for (var i = 1; i < _count; i++)
-        {
-            _mem[i].Swap();
-        }
+        _arena1.Release();
+        _arena2.Release();
+        allocator.Free(_internal);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Events<T> GetEvents<T>() where T : unmanaged, IEvent => new(GetInternal<T>());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private EventsInternal<T>* GetInternal<T>() where T : unmanaged, IEvent
-        => (EventsInternal<T>*)(_mem + EventId.Id<T>() - 1); // ID starts with 1, so we subtract 1 when accessing it
-
-    internal struct EventsInternal<T> where T : unmanaged
+    private struct InternalState
     {
-        private void* _mem;
-        private T* _low;
-        private T* _high;
-
-        private uint _maxEvents;
-        private int _count;
-        private int _eventsLastFrame;
-
-        public uint Count => (uint)_eventsLastFrame;
-        public void Init(in MemoryPool pool, in EventsDescriptor descriptor)
-        {
-            var size = descriptor.Size * descriptor.MaxEvents * 2;
-            _maxEvents = descriptor.MaxEvents;
-            _mem = pool.GetPointer<byte>(size);
-            _low = (T*)_mem;
-            _high = _low + _maxEvents;
-            _eventsLastFrame = 0;
-            _count = 0;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Send(in T @event)
-        {
-            Debug.Assert(_count < _maxEvents, $"Max events for type {typeof(T)} reached. ({_maxEvents})");
-            _high[_count++] = @event;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<T> GetEvents() => new(_low, _eventsLastFrame);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private EventState _current;
+        private EventState _previous;
         public void Swap()
         {
-            var tmp = _high;
-            _high = _low;
-            _low = tmp;
-            _eventsLastFrame = _count;
-            _count = 0;
+            _previous = _current;
+            _current = default;
+        }
+
+        public void Send<T>(DynamicLinearArena* arena, in T @event) where T : unmanaged
+        {
+            var size = sizeof(T) + sizeof(EventHeader);
+            var header = (EventHeader*)arena->Allocate((nuint)size);
+            var mem = (T*)(header + 1);
+            *mem = @event;
+            _current.Push(header);
+        }
+        public EventState* GetPreviousPointer() => (EventState*)Unsafe.AsPointer(ref _previous);
+    }
+
+    private struct EventState
+    {
+        public EventHeader* FirstEvent;
+        private EventHeader* _lastEvent;
+        public uint Count;
+        public void Push(EventHeader* @event)
+        {
+            if (FirstEvent == null)
+            {
+                _lastEvent = FirstEvent = @event;
+            }
+            else
+            {
+                _lastEvent->Next = @event;
+                _lastEvent = @event;
+            }
+            Count++;
         }
     }
 }

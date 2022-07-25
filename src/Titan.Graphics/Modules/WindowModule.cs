@@ -16,22 +16,17 @@ public struct WindowModule : IModule
         var windowFunctions = WindowFunctions.Create<Win32WindowFunctions>();
         var api = new WindowApi(windowFunctions);
         builder
+            .AddResource<WindowEventQueue>()
             .AddResource(api)
-            .AddEvent<WindowCreated>()
-            .AddEvent<WindowClosed>()
-            .AddEvent<KeyReleased>(10)
-            .AddEvent<KeyPressed>(10)
-            .AddEvent<WindowLostFocus>()
-            .AddEvent<WindowGainedFocus>()
-            .AddEvent<WindowResizeComplete>()
-            .AddEvent<WindowSize>(20)
             ;
 
         // Get the window descriptor and create the window
         var descriptor = builder.GetResourceOrDefault<WindowDescriptor>();
         Logger.Trace<WindowModule>($"Window descriptor: {descriptor.Title} - Size: {descriptor.Width}x{descriptor.Height}. Can resize: {descriptor.Resizable}");
 
-        var eventQueue = builder.GetResourcePointer<WindowEventQueue>();
+        var eventQueue = builder
+            .GetResourcePointer<WindowEventQueue>();
+
         if (!api.CreateWindow(descriptor, eventQueue, out var window))
         {
             Logger.Error<WindowModule>("Failed to create the Window.");

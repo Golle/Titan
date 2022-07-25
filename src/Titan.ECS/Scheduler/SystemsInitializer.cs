@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
+using Titan.ECS.Events;
 using Titan.ECS.Systems;
 using EntityFilter = Titan.ECS.Entities.EntityFilter;
 
@@ -52,10 +53,10 @@ public readonly unsafe ref struct SystemsInitializer
     }
 
     public EventsReader<T> GetEventsReader<T>() where T : unmanaged, IEvent
-        => new(_world->GetEvents<T>());
+        => _world->GetEventReader<T>();
 
     public EventsWriter<T> GetEventsWriter<T>() where T : unmanaged, IEvent
-        => new(_world->GetEvents<T>());
+        => _world->GetEventWriter<T>();
 
     public ApiResource<T> GetApi<T>() where T : unmanaged, IApi
         => new(_world->GetResourcePointer<T>());
@@ -63,6 +64,6 @@ public readonly unsafe ref struct SystemsInitializer
     public EntityFilter CreateFilter(in EntityFilterConfig config) => _world->CreateEntityFilter(config);
     public void GetEntities(in EntityFilterConfig filter) => _world->CreateEntityFilter(filter);
 
-    public void RunAfter<T>() where T : unmanaged, IStructSystem<T> 
+    public void RunAfter<T>() where T : unmanaged, IStructSystem<T>
         => _state->RunAfter.Add<T>();
 }

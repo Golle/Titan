@@ -1,11 +1,10 @@
 using System;
 using System.Diagnostics;
-using Titan.Core.Memory2;
 using Titan.Windows.Win32;
 
-namespace Titan.Windows.Memory;
+namespace Titan.Memory.Allocators;
 
-internal unsafe struct Win32VirtualAllocAllocator : IAllocator
+public unsafe struct Win32VirtualAllocAllocator : IAllocator
 {
     public static readonly nuint PageSize = (nuint)Environment.SystemPageSize;
     public static void* Allocate(nuint size)

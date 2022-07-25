@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Titan.ECS.Events;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 using Titan.Graphics.Modules;
@@ -7,7 +8,7 @@ namespace Titan.Input.Modules;
 
 public struct KeyboardInputSystem : IStructSystem<KeyboardInputSystem>
 {
-    private const uint KeyCodeBufferSize = (uint)KeyCode.NumberOfKeys * sizeof(int);
+    private const uint KeyCodeBufferSize = (uint)KeyCode.NumberOfKeys * sizeof(bool);
 
     private EventsReader<KeyReleased> _keyReleased;
     private EventsReader<KeyPressed> _keyPressed;
@@ -25,23 +26,27 @@ public struct KeyboardInputSystem : IStructSystem<KeyboardInputSystem>
     public static unsafe void Update(ref KeyboardInputSystem system)
     {
         var state = system._state.AsPointer();
-
-        Unsafe.CopyBlock(state->Previous, state->Current, KeyCodeBufferSize);
+        Unsafe.CopyBlockUnaligned(state->Previous, state->Current, KeyCodeBufferSize);
 
         if (system._lostFocus.HasEvents())
         {
-            Unsafe.InitBlock(state->Current, 0, KeyCodeBufferSize);
+            Unsafe.InitBlockUnaligned(state->Current, 0, KeyCodeBufferSize);
             return;
         }
 
-        foreach (ref readonly var @event in system._keyPressed.GetEvents())
+        if (system._keyPressed.HasEvents())
         {
-            state->Current[@event.Code] = true;
+            foreach (ref readonly var @event in system._keyPressed)
+            {
+                state->Current[@event.Code] = true;
+            }
         }
-
-        foreach (ref readonly var @event in system._keyReleased.GetEvents())
+        if (system._keyReleased.HasEvents())
         {
-            state->Current[@event.Code] = false;
+            foreach (ref readonly var @event in system._keyReleased)
+            {
+                state->Current[@event.Code] = false;
+            }
         }
     }
 

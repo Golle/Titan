@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Titan.Core.Memory2.Arenas;
+namespace Titan.Memory.Arenas;
 public static class DynamicLinearArenaExtensions
 {
     public static unsafe T* Allocate<T>(this ref DynamicLinearArena arena) where T : unmanaged => (T*)arena.Allocate((nuint)sizeof(T));
@@ -24,8 +24,7 @@ public unsafe struct DynamicLinearArena
             Expand();
         }
         var offset = Interlocked.Add(ref _offset, alignedSize) - alignedSize; // Increment the _offset and subtract the size to get the start of the block
-        var ptr = _current + offset;
-        return ptr;
+        return _current + offset;
     }
 
     public void Reset()
@@ -34,7 +33,7 @@ public unsafe struct DynamicLinearArena
         _offset = 0;
         _current = _baseMemory;
         var footer = GetFooter(_baseMemory);
-        
+
         //NOTE(Jens): Should we release any newly allocated blocks or just re-use them when/if needed again?
         RecursiveRelease(footer->Next);
         footer->Next = null;
@@ -59,19 +58,23 @@ public unsafe struct DynamicLinearArena
         GetFooter(_current)->Next = null;
     }
 
-    public static DynamicLinearArena Create(Allocator* allocator, nuint initialSize) => new(allocator, initialSize);
+    public static DynamicLinearArena Create(in PlatformAllocator allocator, nuint initialSize)
+        => Create(allocator.UnderlyingAllocator, initialSize);
+    internal static DynamicLinearArena Create(Allocator* allocator, nuint initialSize)
+        => new(allocator, initialSize);
 
     private void Expand()
     {
         _offset = 0;
         var mem = (byte*)_allocator->Allocate((nuint)_blockSize + FooterSize);
         GetFooter(_current)->Next = mem;
-        _current = mem;
         // Make sure the Next pointer is set to null. The underlying Allocator might not zero the memory
-        GetFooter(_current)->Next = null;
+        GetFooter(mem)->Next = null;
+        _current = mem;
+        
     }
 
-    public void Release() 
+    public void Release()
         => RecursiveRelease(_baseMemory);
 
     //NOTE(Jens): The footer is used to track the info we need for new blocks
