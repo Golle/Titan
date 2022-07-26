@@ -7,6 +7,7 @@ using Titan.ECS.Entities;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
+using Titan.Graphics.D3D12;
 using Titan.Graphics.Modules;
 using Titan.Input;
 using Titan.Input.Modules;
@@ -26,6 +27,7 @@ AppBuilder
     //.AddResource(SchedulerConfiguration.SingleThreaded)
     .AddModule<CoreModule>()
     .AddModule<WindowModule>()
+    .AddModule<D3D12RenderModule>()
     .AddModule<InputModule>()
     .UseRunner<WindowRunner>()
 

@@ -78,4 +78,6 @@ public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
     public static implicit operator T*(in ComPtr<T> p) => p._ptr;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator T**(in ComPtr<T> p) => p.GetAddressOf();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator IUnknown*(in ComPtr<T> p) => (IUnknown*)p._ptr;
 }
