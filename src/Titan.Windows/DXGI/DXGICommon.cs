@@ -5,6 +5,14 @@ namespace Titan.Windows.DXGI;
 
 public static unsafe class DXGICommon
 {
-    [DllImport("dxgi", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    private const string DllName = "dxgi";
+    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
     public static extern HRESULT CreateDXGIFactory1(in Guid riid, void** ppFactory);
+
+    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern HRESULT CreateDXGIFactory2(
+        DXGI_CREATE_FACTORY_FLAGS Flags,
+        in Guid riid,
+        void** ppFactory
+    );
 }

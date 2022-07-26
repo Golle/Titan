@@ -27,14 +27,17 @@ public unsafe struct D3D12Device
             EnableDebugLayer();
         }
 
+        // Create the DXGI factory (Used to Query hardware devices)
         using ComPtr<IDXGIFactory7> dxgiFactory = default;
-        var hr = CreateDXGIFactory1(typeof(IDXGIFactory7).GUID, (void**)dxgiFactory.GetAddressOf());
+        var factoryFlags = debug ? DXGI_CREATE_FACTORY_FLAGS.DXGI_CREATE_FACTORY_DEBUG : 0;
+        var hr = CreateDXGIFactory2(factoryFlags, typeof(IDXGIFactory7).GUID, (void**)dxgiFactory.GetAddressOf());
         if (FAILED(hr))
         {
             Logger.Error<ID3D12Device>($"Failed to create {nameof(IDXGIFactory7)} with HRESULT {hr}");
             return false;
         }
 
+        // Get the Adapters on this machine
         using ComPtr<IDXGIAdapter1> adapter = default;
         if (!GetHardwareAdapter(dxgiFactory.Get(), adapter.GetAddressOf()))
         {
@@ -42,6 +45,7 @@ public unsafe struct D3D12Device
             return false;
         }
 
+        // Create the D3D12 Device
         if (FAILED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0, typeof(ID3D12Device).GUID, (void**)device._instance.GetAddressOf())))
         {
             Logger.Error<D3D12Device>($"Failed to create the {nameof(ID3D12Device)} with HRESULT: {hr}");
@@ -60,9 +64,7 @@ public unsafe struct D3D12Device
             Logger.Trace<D3D12Device>($"{D3D12_FEATURE.D3D12_FEATURE_FORMAT_SUPPORT} - Format: {formatSupport.Format}. Support1: {formatSupport.Support1} Support2: {formatSupport.Support2}");
         }
 
-        
         // Check the MaxFeatureLevel
-
         D3D12_FEATURE_DATA_FEATURE_LEVELS featureLevels = default;
         var levels = stackalloc D3D_FEATURE_LEVEL[4];
         levels[0] = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0;
@@ -80,12 +82,14 @@ public unsafe struct D3D12Device
             return false;
         }
 
+
         device._fatureLevel = featureLevels.MaxSupportedFeatureLevel;
         Logger.Trace<D3D12Device>($"{D3D12_FEATURE.D3D12_FEATURE_FEATURE_LEVELS} - MaxSupportedFeatureLevel: {featureLevels.MaxSupportedFeatureLevel}");
-
-
+        
         return true;
 
+
+        // Enumerate the Adapters and return the one with Highest Performance that supports D3D12
         static bool GetHardwareAdapter(IDXGIFactory7* factory, IDXGIAdapter1** adapter)
         {
             DXGI_ADAPTER_DESC1 adapterDesc = default;
@@ -122,6 +126,7 @@ public unsafe struct D3D12Device
 
         static void EnableDebugLayer()
         {
+            // Enable the Debug layer for D3D12
             using ComPtr<ID3D12Debug> spDebugController0 = default;
             using ComPtr<ID3D12Debug1> spDebugController1 = default;
             var hr = D3D12GetDebugInterface(typeof(ID3D12Debug).GUID, (void**)spDebugController0.GetAddressOf());
@@ -141,8 +146,6 @@ public unsafe struct D3D12Device
             spDebugController1.Get()->SetEnableGPUBasedValidation(true);
         }
     }
-
-
 
     public void Release()
     {

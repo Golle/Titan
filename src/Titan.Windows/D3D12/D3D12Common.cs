@@ -7,7 +7,6 @@ namespace Titan.Windows.D3D12;
 
 public static unsafe class D3D12Common
 {
-
     [DllImport("d3d12", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
     public static extern HRESULT D3D12CreateDevice(
         IUnknown* pAdapter,
@@ -16,5 +15,8 @@ public static unsafe class D3D12Common
         void** ppDevice);
 
     [DllImport("d3d12", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HRESULT D3D12GetDebugInterface(in Guid riid, void** ppvDebug);
+    public static extern HRESULT D3D12GetDebugInterface(
+        in Guid riid,
+        void** ppvDebug
+    );
 }
