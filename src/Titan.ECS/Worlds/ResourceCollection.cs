@@ -6,7 +6,7 @@ using Titan.Core.Logging;
 using Titan.Memory;
 using Titan.Memory.Arenas;
 
-namespace Titan.ECS.World;
+namespace Titan.ECS.Worlds;
 
 public unsafe struct ResourceCollection
 {

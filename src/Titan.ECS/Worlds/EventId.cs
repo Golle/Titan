@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 
-namespace Titan.ECS.World;
+namespace Titan.ECS.Worlds;
 
 public readonly struct EventId
 {
@@ -23,7 +22,7 @@ public readonly struct EventId
     public override int GetHashCode() => (int)_id;
 
 #if DEBUG
-    private static readonly Dictionary<uint, string> _eventNames = new();
+    private static readonly System.Collections.Generic.Dictionary<uint, string> _eventNames = new();
     public override string ToString() => _eventNames.TryGetValue(_id, out var id) ? id : _id.ToString();
 #else
     public override string ToString() => _id.ToString();

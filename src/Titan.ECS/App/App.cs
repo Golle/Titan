@@ -1,5 +1,5 @@
 using Titan.ECS.Scheduler;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 
 namespace Titan.ECS.App;
 
@@ -29,13 +29,13 @@ namespace Titan.ECS.App;
 public struct App
 {
     private ResourceCollection _resources;
-    private World.World _world;
+    private World _world;
 
     public static App Create(ResourceCollection resources) =>
         new()
         {
             _resources = resources,
-            _world = World.World.Create(resources)
+            _world = World.Create(resources)
         };
 
     public void Run()

@@ -3,7 +3,7 @@ using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.Events;
 
-namespace Titan.ECS.World;
+namespace Titan.ECS.Worlds;
 
 public struct World
 {

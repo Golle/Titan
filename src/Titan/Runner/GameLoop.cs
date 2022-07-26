@@ -3,7 +3,7 @@ using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Threading2;
 using Titan.ECS.Scheduler;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 
 namespace Titan.Runner;
 

@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 using Titan.Memory;
 using Titan.Memory.Arenas;
 

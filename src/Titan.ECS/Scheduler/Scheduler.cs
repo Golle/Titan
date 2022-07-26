@@ -4,7 +4,7 @@ using Titan.Core.Logging;
 using Titan.Core.Threading2;
 using Titan.ECS.Memory;
 using Titan.ECS.Systems;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 using Titan.Memory;
 
 namespace Titan.ECS.Scheduler;
@@ -21,7 +21,7 @@ public unsafe struct Scheduler
     private StageExecutor* _executors;
     private const int _stageCount = (int)Stage.Count;
 
-    public void Update(ref JobApi jobApi, ref World.World world)
+    public void Update(ref JobApi jobApi, ref World world)
     {
         Execute((int)Stage.First, jobApi);
         Execute((int)Stage.PreUpdate, jobApi);
@@ -29,14 +29,14 @@ public unsafe struct Scheduler
         Execute((int)Stage.PostUpdate, jobApi);
     }
 
-    public void Shutdown(ref JobApi jobApi, ref World.World world)
+    public void Shutdown(ref JobApi jobApi, ref World world)
     {
         Logger.Trace<Scheduler>("Shutdown");
         Execute((int)Stage.Shutdown, jobApi);
         Execute((int)Stage.PostShutdown, jobApi);
     }
 
-    public void Startup(ref JobApi jobApi, ref World.World world)
+    public void Startup(ref JobApi jobApi, ref World world)
     {
         Logger.Trace<Scheduler>("Startup");
         Execute((int)Stage.PreStartup, jobApi);
@@ -48,7 +48,7 @@ public unsafe struct Scheduler
     private void Execute(int stage, in JobApi jobApi) 
         => _executors[stage].Run(_stages[stage], jobApi);
 
-    internal void Init(in ResourceCollection resources, ref World.World world)
+    internal void Init(in ResourceCollection resources, ref World world)
     {
         //NOTE(Jens): Rewrite this method to something more readable
         //NOTE(Jens): it currently allocates new memory for each system when they are initialized, we should calculate the size needed and allocate everything in a single call. This is to prevent memory being allocated in different places.

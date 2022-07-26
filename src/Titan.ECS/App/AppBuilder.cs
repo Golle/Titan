@@ -8,7 +8,7 @@ using Titan.ECS.Events;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 using Titan.Memory;
 
 namespace Titan.ECS.App;
