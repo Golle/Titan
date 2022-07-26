@@ -12,6 +12,7 @@ public unsafe struct Win32VirtualAllocFixedSizeAllocator : IAllocator<FixedSizeA
     private volatile int _offset;
     public static void* CreateContext(in FixedSizeArgs args)
     {
+        //NOTE(Jens): This should be aligned at 64kb since that is what VirtualAlloc does. 
         var size = args.Size;
         var contextSize = (nuint)sizeof(Win32VirtualAllocAllocator);
         var mem = (byte*)Kernel32.VirtualAlloc(null, size + contextSize, AllocationType.MEM_COMMIT | AllocationType.MEM_RESERVE, AllocationProtect.PAGE_READWRITE);
