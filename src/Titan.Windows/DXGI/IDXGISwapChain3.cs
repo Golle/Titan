@@ -62,7 +62,7 @@ public unsafe struct IDXGISwapChain3
     public HRESULT Present(uint syncInterval, uint flags) => ((delegate* unmanaged[Stdcall]<void*, uint, uint, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this), syncInterval, flags);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT GetBuffer(uint buffer, Guid* riid, void** ppSurface) => ((delegate* unmanaged[Stdcall]<void*, uint, Guid*, void**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), buffer, riid, ppSurface);
+    public HRESULT GetBuffer(uint buffer, in Guid riid, void** ppSurface) => ((delegate* unmanaged[Stdcall]<void*, uint, in Guid, void**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), buffer, riid, ppSurface);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT SetFullscreenState([MarshalAs(UnmanagedType.Bool)] bool Fullscreen, IDXGIOutput* pTarget) =>

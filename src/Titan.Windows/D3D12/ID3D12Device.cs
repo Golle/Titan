@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Windows.D3D11;
 
 // ReSharper disable InconsistentNaming
 
@@ -73,16 +74,13 @@ public unsafe struct ID3D12Device
     public HRESULT CheckFeatureSupport(D3D12_FEATURE Feature, void* pFeatureSupportData, uint FeatureSupportDataSize)
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_FEATURE, void*, uint, HRESULT>)_vtbl[13])(Unsafe.AsPointer(ref this), Feature, pFeatureSupportData, FeatureSupportDataSize);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* pDescriptorHeapDesc, in Guid riid, void** ppvHeap)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_DESCRIPTOR_HEAP_DESC*, in Guid, void**, HRESULT>)_vtbl[14])(Unsafe.AsPointer(ref this), pDescriptorHeapDesc, riid, ppvHeap);
 
-    //    HRESULT(STDMETHODCALLTYPE* CreateDescriptorHeap)(
-    //     ID3D12Device* This,
-    //     _In_  const D3D12_DESCRIPTOR_HEAP_DESC* pDescriptorHeapDesc,
-    //     REFIID riid,
-    //        _COM_Outptr_ void** ppvHeap);
-
-    //UINT(STDMETHODCALLTYPE* GetDescriptorHandleIncrementSize)(
-    // ID3D12Device* This,
-    // _In_ D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeapType);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public uint GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeapType)
+         => ((delegate* unmanaged[Stdcall]<void*, D3D12_DESCRIPTOR_HEAP_TYPE, uint>)_vtbl[15])(Unsafe.AsPointer(ref this), DescriptorHeapType);
 
     //HRESULT(STDMETHODCALLTYPE* CreateRootSignature)(
     // ID3D12Device* This,
@@ -110,11 +108,9 @@ public unsafe struct ID3D12Device
     //    _In_opt_  const D3D12_UNORDERED_ACCESS_VIEW_DESC* pDesc,
     //    _In_  D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor);
 
-    //void (STDMETHODCALLTYPE* CreateRenderTargetView ) (
-    //    ID3D12Device* This,
-    //    _In_opt_ ID3D12Resource * pResource,
-    //    _In_opt_  const D3D12_RENDER_TARGET_VIEW_DESC* pDesc,
-    //    _In_  D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CreateRenderTargetView(ID3D12Resource* pResource, D3D12_RENDER_TARGET_VIEW_DESC* pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, D3D12_RENDER_TARGET_VIEW_DESC*, D3D12_CPU_DESCRIPTOR_HANDLE, void>)_vtbl[20])(Unsafe.AsPointer(ref this), pResource, pDesc, DestDescriptor);
 
     //void (STDMETHODCALLTYPE* CreateDepthStencilView ) (
     //    ID3D12Device* This,

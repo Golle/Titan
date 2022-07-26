@@ -54,11 +54,10 @@ public unsafe struct IDXGIFactory7
     // /* [in] */ UINT Adapter,
     // /* [annotation][out] */
     // _COM_Outptr_ IDXGIAdapter ** ppAdapter);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT MakeWindowAssociation(HWND WindowHandle, DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS Flags)
+        => ((delegate* unmanaged[Stdcall]<void*, HWND, DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this), WindowHandle, Flags);
 
-    //HRESULT(STDMETHODCALLTYPE* MakeWindowAssociation)(
-    // IDXGIFactory1* This,
-    // HWND WindowHandle,
-    // UINT Flags);
 
     //    HRESULT(STDMETHODCALLTYPE* GetWindowAssociation)(
     //     IDXGIFactory1* This,

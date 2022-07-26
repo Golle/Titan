@@ -1,12 +1,11 @@
-using System;
 using System.Runtime.CompilerServices;
-// ReSharper disable InconsistentNaming
+using System.Runtime.InteropServices;
 
 namespace Titan.Windows.D3D12;
 
+[Guid("6102dee4-af59-4b09-b999-b44d73f09b24")]
 public unsafe struct ID3D12CommandAllocator
 {
-    public static readonly Guid UUID = new("6102dee4-af59-4b09-b999-b44d73f09b24");
     private void** _vtbl;
 
     //HRESULT(STDMETHODCALLTYPE* QueryInterface)(
