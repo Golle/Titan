@@ -187,6 +187,8 @@ public unsafe struct D3D12Device
             goto Error;
         }
 
+
+
         return true;
 
 
