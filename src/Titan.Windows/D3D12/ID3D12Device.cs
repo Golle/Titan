@@ -10,14 +10,10 @@ namespace Titan.Windows.D3D12;
 public unsafe struct ID3D12Device
 {
     private void** _vtbl;
-
-    //HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-    //     ID3D12Device* This,
-    //     REFIID riid,
-    //     _COM_Outptr_  void** ppvObject);
-
-    //ULONG(STDMETHODCALLTYPE* AddRef)(
-    // ID3D12Device* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public uint AddRef() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint Release() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[2])(Unsafe.AsPointer(ref this));
@@ -46,12 +42,12 @@ public unsafe struct ID3D12Device
     //UINT(STDMETHODCALLTYPE* GetNodeCount)(
     // ID3D12Device* This);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)] 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateCommandQueue(D3D12_COMMAND_QUEUE_DESC* pDesc, in Guid riid, void** ppCommandQueue) => ((delegate* unmanaged[Stdcall]<void*, D3D12_COMMAND_QUEUE_DESC*, in Guid, void**, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this), pDesc, riid, ppCommandQueue);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE type, in Guid riid, void** ppCommandAllocator) => ((delegate* unmanaged[Stdcall]<void*, D3D12_COMMAND_LIST_TYPE, in Guid, void**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), type, riid, ppCommandAllocator);
-    
+
     //HRESULT(STDMETHODCALLTYPE* CreateGraphicsPipelineState)(
     // ID3D12Device* This,
     // _In_  const D3D12_GRAPHICS_PIPELINE_STATE_DESC* pDesc,
@@ -73,11 +69,10 @@ public unsafe struct ID3D12Device
     // REFIID riid,
     //        _COM_Outptr_ void** ppCommandList);
 
-    //HRESULT(STDMETHODCALLTYPE* CheckFeatureSupport)(
-    // ID3D12Device* This,
-    // D3D12_FEATURE Feature,
-    // _Inout_updates_bytes_(FeatureSupportDataSize) void* pFeatureSupportData,
-    //UINT FeatureSupportDataSize);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT CheckFeatureSupport(D3D12_FEATURE Feature, void* pFeatureSupportData, uint FeatureSupportDataSize)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_FEATURE, void*, uint, HRESULT>)_vtbl[13])(Unsafe.AsPointer(ref this), Feature, pFeatureSupportData, FeatureSupportDataSize);
+
 
     //    HRESULT(STDMETHODCALLTYPE* CreateDescriptorHeap)(
     //     ID3D12Device* This,

@@ -14,4 +14,7 @@ public static unsafe class D3D12Common
         D3D_FEATURE_LEVEL minimumFeatureLevel,
         in Guid riid, // Expected: ID3D12Device
         void** ppDevice);
+
+    [DllImport("d3d12", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern HRESULT D3D12GetDebugInterface(in Guid riid, void** ppvDebug);
 }

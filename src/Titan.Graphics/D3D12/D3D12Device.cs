@@ -15,10 +15,17 @@ namespace Titan.Graphics.D3D12;
 public unsafe struct D3D12Device
 {
     private ComPtr<ID3D12Device> _instance;
+    private D3D_FEATURE_LEVEL _fatureLevel;
+
+    public D3D_FEATURE_LEVEL FeatureLevel => _fatureLevel;
 
     public static bool CreateAndInit(HWND windowHandle, uint width, uint height, bool debug, out D3D12Device device)
     {
         device = default;
+        if (debug)
+        {
+            EnableDebugLayer();
+        }
 
         using ComPtr<IDXGIFactory7> dxgiFactory = default;
         var hr = CreateDXGIFactory1(typeof(IDXGIFactory7).GUID, (void**)dxgiFactory.GetAddressOf());
@@ -40,6 +47,41 @@ public unsafe struct D3D12Device
             Logger.Error<D3D12Device>($"Failed to create the {nameof(ID3D12Device)} with HRESULT: {hr}");
             return false;
         }
+
+        // Check format support (just for debugging)
+        D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = default;
+        hr = device._instance.Get()->CheckFeatureSupport(D3D12_FEATURE.D3D12_FEATURE_FORMAT_SUPPORT, &formatSupport, (uint)sizeof(D3D12_FEATURE_DATA_FORMAT_SUPPORT));
+        if (FAILED(hr))
+        {
+            Logger.Error<D3D12Device>($"Failed to get the {D3D12_FEATURE.D3D12_FEATURE_FORMAT_SUPPORT} with HRESULT {hr}");
+        }
+        else
+        {
+            Logger.Trace<D3D12Device>($"{D3D12_FEATURE.D3D12_FEATURE_FORMAT_SUPPORT} - Format: {formatSupport.Format}. Support1: {formatSupport.Support1} Support2: {formatSupport.Support2}");
+        }
+
+        
+        // Check the MaxFeatureLevel
+
+        D3D12_FEATURE_DATA_FEATURE_LEVELS featureLevels = default;
+        var levels = stackalloc D3D_FEATURE_LEVEL[4];
+        levels[0] = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0;
+        levels[1] = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1;
+        levels[2] = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_12_0;
+        levels[3] = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_12_1;
+        featureLevels.NumFeatureLevels = 4;
+        featureLevels.pFeatureLevelsRequested = levels;
+        hr = device._instance.Get()->CheckFeatureSupport(D3D12_FEATURE.D3D12_FEATURE_FEATURE_LEVELS, &featureLevels, (uint)sizeof(D3D12_FEATURE_DATA_FEATURE_LEVELS));
+        if (FAILED(hr))
+        {
+            // If this check fails, we don't know what shaders etc to load.
+            Logger.Error<D3D12Device>($"Failed to get the feature levels with HRESULT {hr}");
+            device._instance.Release();
+            return false;
+        }
+
+        device._fatureLevel = featureLevels.MaxSupportedFeatureLevel;
+        Logger.Trace<D3D12Device>($"{D3D12_FEATURE.D3D12_FEATURE_FEATURE_LEVELS} - MaxSupportedFeatureLevel: {featureLevels.MaxSupportedFeatureLevel}");
 
 
         return true;
@@ -77,7 +119,30 @@ public unsafe struct D3D12Device
 
             return false;
         }
+
+        static void EnableDebugLayer()
+        {
+            using ComPtr<ID3D12Debug> spDebugController0 = default;
+            using ComPtr<ID3D12Debug1> spDebugController1 = default;
+            var hr = D3D12GetDebugInterface(typeof(ID3D12Debug).GUID, (void**)spDebugController0.GetAddressOf());
+            if (FAILED(hr))
+            {
+                Logger.Error<D3D12Device>($"Failed {nameof(D3D12GetDebugInterface)} with HRESULT: {hr}");
+                return;
+            }
+
+            hr = spDebugController0.Get()->QueryInterface(typeof(ID3D12Debug1).GUID, (void**)spDebugController1.GetAddressOf());
+            if (FAILED(hr))
+            {
+                Logger.Error<D3D12Device>($"Failed to query {nameof(ID3D12Debug1)} interface with HRESULT: {hr}");
+                return;
+            }
+            spDebugController1.Get()->EnableDebugLayer();
+            spDebugController1.Get()->SetEnableGPUBasedValidation(true);
+        }
     }
+
+
 
     public void Release()
     {

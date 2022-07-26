@@ -42,9 +42,9 @@ public unsafe class AppBuilder
         AddSystemToStage<T>(Stage.Startup, RunCriteria.Once);
         return this;
     }
-    public AppBuilder AddShutdownSystem<T>() where T : unmanaged, IStructSystem<T>
+    public AppBuilder AddShutdownSystem<T>(RunCriteria criteria = RunCriteria.Once) where T : unmanaged, IStructSystem<T>
     {
-        AddSystemToStage<T>(Stage.Shutdown, RunCriteria.Once);
+        AddSystemToStage<T>(Stage.Shutdown, criteria);
         return this;
     }
 

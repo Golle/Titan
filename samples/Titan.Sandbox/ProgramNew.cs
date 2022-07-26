@@ -14,11 +14,8 @@ using Titan.Input.Modules;
 using Titan.Modules;
 using Titan.Runner;
 using Titan.Sandbox;
+using Titan.Windows.D3D12;
 using EntityFilter = Titan.ECS.Entities.EntityFilter;
-
-var f = new EntityFilterConfig()
-    .With<Transform3DComponent>()
-    .Not<TestComponent>();
 
 
 AppBuilder
