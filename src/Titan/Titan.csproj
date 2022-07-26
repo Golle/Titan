@@ -25,4 +25,7 @@
     <ProjectReference Include="..\Titan.Sound\Titan.Sound.csproj" />
     <ProjectReference Include="..\Titan.UI\Titan.UI.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Memory\" />
+  </ItemGroup>
 </Project>

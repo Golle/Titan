@@ -1,4 +1,5 @@
 using Titan.Core.Logging;
+using Titan.ECS.Events;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 

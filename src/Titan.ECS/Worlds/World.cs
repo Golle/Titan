@@ -1,28 +1,34 @@
 using Titan.Core;
-using Titan.Core.Memory;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
 using Titan.ECS.Events;
 
-namespace Titan.ECS.World;
+namespace Titan.ECS.Worlds;
 
 public struct World
 {
     private ResourceCollection _resources;
-    internal void Init(in MemoryPool pool, in ResourceCollection resources)
-    {
-        _resources = resources;
-    }
+    internal static World Create(in ResourceCollection resources) =>
+        new()
+        {
+            _resources = resources
+        };
 
     public Components<T> GetComponents<T>() where T : unmanaged, IComponent =>
         _resources
             .GetResource<ComponentRegistry>()
             .Access<T>();
 
-    public Events<T> GetEvents<T>() where T : unmanaged, IEvent =>
+
+    public EventsReader<T> GetEventReader<T>() where T : unmanaged, IEvent =>
         _resources
             .GetResource<EventsRegistry>()
-            .GetEvents<T>();
+            .GetReader<T>();
+
+    public EventsWriter<T> GetEventWriter<T>() where T : unmanaged, IEvent =>
+        _resources
+            .GetResource<EventsRegistry>()
+            .GetWriter<T>();
 
     public ref T GetResource<T>() where T : unmanaged, IResource =>
         ref _resources.GetResource<T>();

@@ -1,8 +1,10 @@
-using Titan.Core.Logging;
-using Titan.Core.Memory;
 using Titan.ECS.App;
+using Titan.ECS.Entities;
+using Titan.ECS.Memory;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
+using Titan.Memory;
+using Titan.Memory.Arenas;
 
 namespace Titan.Modules;
 
@@ -12,23 +14,38 @@ public unsafe struct MemoryModule : IModule
     public static void Build(AppBuilder builder)
     {
         var config = builder.GetResourceOrDefault<MemoryConfiguration>();
+
         if (config.TransientMemory > 0)
         {
-            Logger.Trace<MemoryModule>($"Creating transient {nameof(MemoryAllocator)} with size {config.TransientMemory} bytes.");
-            var pool = builder.GetResourcePointer<MemoryPool>();
-            var allocator = pool->CreateAllocator<MemoryAllocator>(config.TransientMemory);
+            ref var allocator = ref builder.GetResource<PlatformAllocator>();
+            var arena = FixedSizeLinearArena.Create(allocator.Allocate(config.TransientMemory), config.TransientMemory);
 
             builder
-                .AddResource(allocator)
-                .AddSystemToStage<TransientMemorySystem>(Stage.First, RunCriteria.Always, int.MaxValue);
+                .AddResource(new TransientMemory(arena))
+                .AddSystemToStage<TransientMemorySystem>(Stage.First, RunCriteria.Always);
         }
     }
 
 
     private struct TransientMemorySystem : IStructSystem<TransientMemorySystem>
     {
-        private ApiResource<MemoryAllocator> _memory;
-        public static void Init(ref TransientMemorySystem system, in SystemsInitializer init) => system._memory = init.GetApi<MemoryAllocator>();
+        private ApiResource<TransientMemory> _memory;
+        private EntityHandler TEst;
+        private EntityHandler TEst1;
+        private EntityHandler TEst2;
+        private EntityHandler TEst3;
+        private EntityHandler TEst4;
+
+        public static void Init(ref TransientMemorySystem system, in SystemsInitializer init)
+        {
+            system._memory = init.GetApi<TransientMemory>();
+            system.TEst = init.GetEntityHandler();
+            system.TEst1 = init.GetEntityHandler();
+            system.TEst2 = init.GetEntityHandler();
+            system.TEst3 = init.GetEntityHandler();
+            system.TEst4 = init.GetEntityHandler();
+        }
+
         public static void Update(ref TransientMemorySystem system) => system._memory.Get().Reset();
         public static bool ShouldRun(in TransientMemorySystem system) => true;
     }

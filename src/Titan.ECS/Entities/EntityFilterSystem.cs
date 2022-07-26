@@ -1,3 +1,4 @@
+using Titan.ECS.Events;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 
@@ -24,17 +25,17 @@ internal struct EntityFilterSystem : IStructSystem<EntityFilterSystem>
     {
         ref var registry = ref system.Registry.Get();
         ref readonly var entityInfo = ref system.EntityInfo.Get();
-        foreach (ref readonly var @event in system.ComponenAdded.GetEvents())
+        foreach (ref readonly var @event in system.ComponenAdded)
         {
             registry.EntityChanged(@event.Entity, entityInfo.Get(@event.Entity).Components);
         }
 
-        foreach (ref readonly var @event in system.ComponenDestroyed.GetEvents())
+        foreach (ref readonly var @event in system.ComponenDestroyed)
         {
             registry.EntityChanged(@event.Entity, entityInfo.Get(@event.Entity).Components);
         }
 
-        foreach (ref readonly var @event in system.EntityDestroyed.GetEvents())
+        foreach (ref readonly var @event in system.EntityDestroyed)
         {
             registry.EntityDestroyed(@event.Entity);
         }

@@ -5,7 +5,6 @@ namespace Titan.ECS.Systems;
 public readonly unsafe struct MutableResource<T> where T : unmanaged
 {
     private readonly T* _resource;
-
     internal MutableResource(T* resource)
     {
         _resource = resource;

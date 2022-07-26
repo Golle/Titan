@@ -1,7 +1,5 @@
 using System.Runtime.CompilerServices;
-using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Core.Memory;
 using Titan.Windows;
 using Titan.Windows.D3D;
 using Titan.Windows.D3D11;
@@ -12,7 +10,7 @@ using static Titan.Windows.DXGI.DXGI_ADAPTER_FLAG;
 using static Titan.Windows.DXGI.DXGI_GPU_PREFERENCE;
 using static Titan.Windows.DXGI.DXGICommon;
 
-namespace Titan.Graphics.NewRender;
+namespace Titan.Graphics.NewRender.D3D11;
 
 internal struct D3D11Texture
 {
@@ -21,7 +19,7 @@ internal struct D3D11Texture
 
 internal unsafe struct D3D11GraphicsDevice //: IRenderDevice<D3D11GraphicsDevice>
 {
-    private MemoryPool _pool;
+    //private MemoryPool _pool;
     private ComPtr<ID3D11Device> _device;
     private ComPtr<ID3D11DeviceContext> _context;
 
@@ -38,8 +36,8 @@ internal unsafe struct D3D11GraphicsDevice //: IRenderDevice<D3D11GraphicsDevice
         }
 
         // Allocate memory for the internal state (these can never be released... DOH)
-        var texture = _pool.GetPointer<D3D11Texture>();
-        outTexture.InternalState = texture;
+        //var texture = _pool.GetPointer<D3D11Texture>();
+        //outTexture.InternalState = texture;
         outTexture.ReleaseFunc = &ReleaseTexture;
 
         return true;
@@ -56,11 +54,11 @@ internal unsafe struct D3D11GraphicsDevice //: IRenderDevice<D3D11GraphicsDevice
 
 
 
-    public static bool Create(in MemoryPool pool, uint width, uint height, bool debug, out D3D11GraphicsDevice device)
+    public static bool Create(/*in MemoryPool pool,*/ uint width, uint height, bool debug, out D3D11GraphicsDevice device)
     {
         device = new D3D11GraphicsDevice
         {
-            _pool = pool
+            //_pool = pool
         };
 
         ComPtr<IDXGIFactory7> factory = default;

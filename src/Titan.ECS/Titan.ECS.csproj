@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
+    <ProjectReference Include="..\Titan.Memory\Titan.Memory.csproj" />
   </ItemGroup>
 
   <ItemGroup>

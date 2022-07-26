@@ -34,6 +34,7 @@ AppBuilder
     .AddSystemExperimental<SampleSystemInstance>()
     .AddComponents<Transform3DComponent>(maxComponents: 10_000)
     .AddComponents<TestComponent>(maxComponents: 1000)
+    .AddResource<GlobalFrameCounter>()
     .Build()
     .Run();
 

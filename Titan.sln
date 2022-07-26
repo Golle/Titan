@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Sound", "src\Titan.So
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Core.Tests", "tests\Titan.Core.Tests\Titan.Core.Tests.csproj", "{4736CCBC-C6E2-4131-8DB1-AB48A4AB810F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Memory", "src\Titan.Memory\Titan.Memory.csproj", "{159C2AB9-061B-4359-8417-558657D86D8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +166,12 @@ Global
 		{4736CCBC-C6E2-4131-8DB1-AB48A4AB810F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4736CCBC-C6E2-4131-8DB1-AB48A4AB810F}.Shipping|Any CPU.ActiveCfg = Debug|Any CPU
 		{4736CCBC-C6E2-4131-8DB1-AB48A4AB810F}.Shipping|Any CPU.Build.0 = Debug|Any CPU
+		{159C2AB9-061B-4359-8417-558657D86D8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{159C2AB9-061B-4359-8417-558657D86D8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{159C2AB9-061B-4359-8417-558657D86D8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{159C2AB9-061B-4359-8417-558657D86D8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{159C2AB9-061B-4359-8417-558657D86D8F}.Shipping|Any CPU.ActiveCfg = Debug|Any CPU
+		{159C2AB9-061B-4359-8417-558657D86D8F}.Shipping|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,6 +196,7 @@ Global
 		{1DFFC1E2-AED1-4061-A21F-AF6296A95F96} = {74127627-7DB8-4DB4-B491-454C750DB930}
 		{04AB8E57-9333-4191-8941-D4B244AF0441} = {74127627-7DB8-4DB4-B491-454C750DB930}
 		{4736CCBC-C6E2-4131-8DB1-AB48A4AB810F} = {2E5F74ED-A362-46AD-81EF-3D06CC61DF7C}
+		{159C2AB9-061B-4359-8417-558657D86D8F} = {74127627-7DB8-4DB4-B491-454C750DB930}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {78854958-BC31-4FAE-99A7-2C398C2607BD}

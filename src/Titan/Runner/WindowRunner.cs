@@ -1,7 +1,7 @@
 using Titan.Core.Logging;
 using Titan.Core.Threading2;
 using Titan.ECS.Scheduler;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 using Titan.Graphics.Modules;
 using Titan.Modules;
 

@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
+using Titan.ECS.Events;
 
 namespace Titan.ECS.Systems;
 

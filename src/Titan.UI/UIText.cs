@@ -1,5 +1,5 @@
 using Titan.ECS.Entities;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 using Titan.Graphics;
 using Titan.Graphics.Rendering.Text;
 

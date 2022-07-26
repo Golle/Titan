@@ -1,4 +1,5 @@
 using Titan.Core.Logging;
+using Titan.ECS.Events;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 
@@ -20,12 +21,12 @@ internal struct EntityInfoSystem : IStructSystem<EntityInfoSystem>
     public static void Update(ref EntityInfoSystem system)
     {
         ref var entityInfo = ref system.EntityInfo.Get();
-        foreach (ref readonly var @event in system.Added.GetEvents())
+        foreach (ref readonly var @event in system.Added)
         {
             entityInfo.Get(@event.Entity).Components += @event.Id;
             Logger.Trace<EntityInfoSystem>($"Component {@event.Id} added to Entity {@event.Entity.Id}");
         }
-        foreach (ref readonly var @event in system.Destroyed.GetEvents())
+        foreach (ref readonly var @event in system.Destroyed)
         {
             entityInfo.Get(@event.Entity).Components -= @event.Id;
             Logger.Trace<EntityInfoSystem>($"Component {@event.Id} removed from Entity {@event.Entity.Id}");

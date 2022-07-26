@@ -1,4 +1,5 @@
 using Titan.Core.Logging;
+using Titan.ECS.Events;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 
@@ -23,14 +24,14 @@ internal struct ComponentSystem : IStructSystem<ComponentSystem>
     public static void Update(ref ComponentSystem system)
     {
         ref var registry = ref system._registry.Get();
-        foreach (ref readonly var @event in system._componentBeingDestroyed.GetEvents())
+        foreach (ref readonly var @event in system._componentBeingDestroyed)
         {
             Logger.Trace<ComponentSystem>($"Component with ID: {@event.Id} and entity ID: {@event.Entity.Id} is being destroyed");
             registry.Destroy(@event.Entity, @event.Id);
             system._componentDestroyed.Send(new ComponentDestroyed(@event.Id, @event.Entity));
         }
 
-        foreach (ref readonly var @event in system._entityDestroyed.GetEvents())
+        foreach (ref readonly var @event in system._entityDestroyed)
         {
             Logger.Trace<ComponentSystem>($"Entity with ID: {@event.Entity.Id} is being destroyed");
             registry.Destroy(@event.Entity);

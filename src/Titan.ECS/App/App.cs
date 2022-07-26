@@ -1,6 +1,5 @@
-using Titan.Core.Memory;
 using Titan.ECS.Scheduler;
-using Titan.ECS.World;
+using Titan.ECS.Worlds;
 
 namespace Titan.ECS.App;
 
@@ -29,34 +28,32 @@ namespace Titan.ECS.App;
 
 public struct App
 {
-    private MemoryPool _pool;
     private ResourceCollection _resources;
-    private World.World _world;
+    private World _world;
 
-    internal void Init(in MemoryPool pool, in ResourceCollection resources)
-    {
-        _pool = pool;
-        _resources = resources;
-        _world.Init(pool, resources);
-        
-        resources
-            .GetResource<Scheduler.Scheduler>()
-            .Init(_resources, ref _world);
-    }
+    public static App Create(ResourceCollection resources) =>
+        new()
+        {
+            _resources = resources,
+            _world = World.Create(resources)
+        };
 
     public void Run()
     {
         ref var scheduler = ref _resources.GetResource<Scheduler.Scheduler>();
+        scheduler.Init(_resources, ref _world);
 
         _resources
             .GetResource<Runner>()
             .Run(ref scheduler, ref _world);
+
 
         Cleanup();
     }
 
     private void Cleanup()
     {
-        _pool.Dispose();
+        //NOTE(Jens): release all resources and world maybe?
+        //_resources.Reset();
     }
 }
