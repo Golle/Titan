@@ -44,10 +44,14 @@ internal unsafe struct EntityFilterRegistry : IApi
 
     public static EntityFilterRegistry Create(in PlatformAllocator allocator, uint maxFilters, uint maxEntities, uint maxEntitiesPerFilter)
     {
+        //TODO: Implement this in virtual address space, and only allocate memory when it's needed.
+        //NOTE(Jens): This allocates a lot of memory up-front. We should replace this with VirtualAlloc tha can RESERVE a big chunk of memory(worst case for a filter), and just COMMIT small parts of it and expand that when needed.
+        //NOTE(Jens): Address space example |FilterInfo|Indicies.............<Empty>.............|Entities.............<Empty>.............|
+        //NOTE(Jens): The system that modifies this memory (this system) will access FilterInfo, Indices and Entities. The locality will not be perfect in this case. but the system that will run on each frame and do the game logic will only access the Entities address space. This will have high locality
         Logger.Info<EntityFilterRegistry>($"Create {nameof(EntityFilterRegistry)} with max filters: {maxFilters}, max entites: {maxEntities} and max entities per filter: {maxEntitiesPerFilter}");
         var filterSize = maxEntities * sizeof(uint) + maxEntitiesPerFilter * sizeof(Entity) + sizeof(FilterInternal);
         var totalSize = maxFilters * filterSize;
-        Logger.Info<EntityFilterRegistry>($"Allocating {totalSize} bytes for {nameof(EntityFilter)}s");
+        Logger.Info<EntityFilterRegistry>($"Allocating {totalSize} bytes for {nameof(EntityFilter)}s. Each filter is {filterSize} bytes");
 
         var filters = (byte*)allocator.Allocate((nuint)totalSize, true);
         return new EntityFilterRegistry(filters, (uint)filterSize, maxFilters, maxEntities, maxEntitiesPerFilter);
