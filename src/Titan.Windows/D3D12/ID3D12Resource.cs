@@ -44,22 +44,21 @@ public unsafe struct ID3D12Resource
     // REFIID riid,
     // _COM_Outptr_opt_  void** ppvDevice);
 
-    //HRESULT(STDMETHODCALLTYPE* Map)(
-    // ID3D12Resource* This,
-    // UINT Subresource,
-    // _In_opt_  const D3D12_RANGE* pReadRange,
-    // _Outptr_opt_result_bytebuffer_(_Inexpressible_("Dependent on resource"))  void** ppData);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT Map(uint Subresource, D3D12_RANGE* pReadRange, void** ppData)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_RANGE*, void**, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this), Subresource, pReadRange, ppData);
 
-    //void (STDMETHODCALLTYPE* Unmap ) (
-    //    ID3D12Resource* This,
-    //    UINT Subresource,
-    //    _In_opt_  const D3D12_RANGE* pWrittenRange);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Unmap(uint Subresource, D3D12_RANGE* pWrittenRange)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_RANGE*, void>)_vtbl[9])(Unsafe.AsPointer(ref this), Subresource, pWrittenRange);
 
-    //D3D12_RESOURCE_DESC(STDMETHODCALLTYPE* GetDesc)(
-    // ID3D12Resource* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public D3D12_RESOURCE_DESC GetDesc()
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_RESOURCE_DESC>)_vtbl[10])(Unsafe.AsPointer(ref this));
 
-    //    D3D12_GPU_VIRTUAL_ADDRESS(STDMETHODCALLTYPE* GetGPUVirtualAddress)(
-    //     ID3D12Resource* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress()
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_GPU_VIRTUAL_ADDRESS>)_vtbl[11])(Unsafe.AsPointer(ref this));
 
     //    HRESULT(STDMETHODCALLTYPE* WriteToSubresource)(
     //     ID3D12Resource* This,

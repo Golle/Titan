@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Windows.D3D11;
 using Titan.Windows.DXGI;
 
 namespace Titan.Windows.D3D12;
@@ -26,4 +27,20 @@ public unsafe struct D3D12_RENDER_TARGET_VIEW_DESC
         //D3D12_TEX2DMS_ARRAY_RTV Texture2DMSArray;
         //D3D12_TEX3D_RTV Texture3D;
     }
+}
+public unsafe struct D3D12_INPUT_ELEMENT_DESC
+{
+    public byte* SemanticName;
+    public uint SemanticIndex;
+    public DXGI_FORMAT Format;
+    public uint InputSlot;
+    public uint AlignedByteOffset;
+    public D3D12_INPUT_CLASSIFICATION InputSlotClass;
+    public uint InstanceDataStepRate;
+}
+
+public enum D3D12_INPUT_CLASSIFICATION
+{
+    D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA = 0,
+    D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA = 1
 }

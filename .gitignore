@@ -11,6 +11,8 @@ x86/
 
 .vs/
 
+tmp/
+
 # Generated models
 /resources/models*/
 /assets/*

@@ -38,7 +38,6 @@ public static unsafe class D3D11Common
         [In] IDXGIOutput* pRestrictToOutput,
         [In] IDXGISwapChain1** ppSwapChain
     );
-
     [DllImport("d3d11", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
     public static extern HRESULT D3D11CreateDeviceAndSwapChain(
         [In] IDXGIAdapter* pAdapter,
@@ -49,37 +48,10 @@ public static unsafe class D3D11Common
         [In] uint featureLevels,
         [In] uint sdkVersion,
         [In] DXGI_SWAP_CHAIN_DESC* pSwapChainDesc,
-        [Out] IDXGISwapChain **ppSwapChain,
+        [Out] IDXGISwapChain** ppSwapChain,
         [Out] ID3D11Device** ppDevice,
-        [Out] D3D_FEATURE_LEVEL *pFeatureLevel,
+        [Out] D3D_FEATURE_LEVEL* pFeatureLevel,
         [Out] ID3D11DeviceContext** ppImmediateContext
     );
 
-    [DllImport("d3dcompiler_47", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HRESULT D3DCompile(
-        [In] void * pSrcData,
-        [In] nuint srcDataSize,
-        [In] sbyte* pSourceName,
-        [In] D3D_SHADER_MACRO* pDefines,
-        [In] ID3DInclude* pInclude,
-        [In] sbyte* pEntrypoint,
-        [In] sbyte* pTarget,
-        [In] uint flags1,
-        [In] uint flags2,
-        [Out] ID3DBlob** ppCode,
-        [Out] ID3DBlob** ppErrorMsgs
-    );
-
-    [DllImport("d3dcompiler_47", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HRESULT D3DCompileFromFile(
-        [In] char* pFileName,
-        [In] D3D_SHADER_MACRO* pDefines,
-        [In] ID3DInclude* pInclude,
-        [In] sbyte* pEntrypoint,
-        [In] sbyte* pTarget,
-        [In] uint flags1,
-        [In] uint flags2,
-        [Out] ID3DBlob** ppCode,
-        [Out] ID3DBlob** ppErrorMsgs
-    );
 }

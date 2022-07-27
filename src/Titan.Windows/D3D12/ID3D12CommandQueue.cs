@@ -66,10 +66,9 @@ public unsafe struct ID3D12CommandQueue
     //        _In_  const D3D12_TILE_REGION_SIZE* pRegionSize,
     //        D3D12_TILE_MAPPING_FLAGS Flags);
 
-    //    void (STDMETHODCALLTYPE* ExecuteCommandLists ) (
-    //        ID3D12CommandQueue* This,
-    //        _In_ UINT NumCommandLists,
-    //        _In_reads_(NumCommandLists)  ID3D12CommandList* const * ppCommandLists);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ExecuteCommandLists(uint NumCommandLists, ID3D12CommandList** ppCommandLists)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, ID3D12CommandList**, void>)_vtbl[10])(Unsafe.AsPointer(ref this), NumCommandLists, ppCommandLists);
 
     //void (STDMETHODCALLTYPE* SetMarker ) (
     //    ID3D12CommandQueue* This,
@@ -86,10 +85,9 @@ public unsafe struct ID3D12CommandQueue
     //    void (STDMETHODCALLTYPE* EndEvent ) (
     //        ID3D12CommandQueue* This);
 
-    //    HRESULT(STDMETHODCALLTYPE* Signal)(
-    //     ID3D12CommandQueue* This,
-    //     ID3D12Fence* pFence,
-    //     UINT64 Value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT Signal(ID3D12Fence* pFence, ulong Value)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Fence*, ulong, HRESULT>)_vtbl[14])(Unsafe.AsPointer(ref this), pFence, Value);
 
     //    HRESULT(STDMETHODCALLTYPE* Wait)(
     //     ID3D12CommandQueue* This,

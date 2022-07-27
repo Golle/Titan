@@ -45,6 +45,8 @@ public unsafe struct ID3D12CommandAllocator
     //REFIID riid,
     //_COM_Outptr_opt_  void** ppvDevice);
 
-    //HRESULT(STDMETHODCALLTYPE* Reset)(
-    //    ID3D12CommandAllocator* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT Reset()
+        => ((delegate* unmanaged[Stdcall]<void*, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this));
+
 }

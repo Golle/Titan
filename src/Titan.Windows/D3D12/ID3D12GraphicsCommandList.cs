@@ -1,16 +1,16 @@
 using System.Runtime.CompilerServices;
 using System;
 using System.Runtime.InteropServices;
-using Titan.Windows.Win32;
+using Titan.Windows.D3D;
 
 namespace Titan.Windows.D3D12;
 
 [Guid("5b160d0f-ac1b-4185-8ba8-b3ae42a5a455")]
-public unsafe struct ID3D12GraphicsCommandListVtbl
+public unsafe struct ID3D12GraphicsCommandList
 {
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(Guid* riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(in Guid riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
 
@@ -52,28 +52,22 @@ public unsafe struct ID3D12GraphicsCommandListVtbl
     //    D3D12_COMMAND_LIST_TYPE(STDMETHODCALLTYPE* GetType)(
     //        ID3D12GraphicsCommandList* This);
 
-    //    DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, Close)
-    //    HRESULT(STDMETHODCALLTYPE* Close)(
-    //        ID3D12GraphicsCommandList* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT Close()
+        => ((delegate* unmanaged[Stdcall]<void*, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this));
 
-    //    DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, Reset)
-    //    HRESULT(STDMETHODCALLTYPE* Reset)(
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12CommandAllocator * pAllocator,
-    //        _In_opt_  ID3D12PipelineState* pInitialState);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT Reset(ID3D12CommandAllocator* pAllocator, ID3D12PipelineState* pInitialState)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12CommandAllocator*, ID3D12PipelineState*, HRESULT>)_vtbl[10])(Unsafe.AsPointer(ref this), pAllocator, pInitialState);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ClearState)
     //    void (STDMETHODCALLTYPE* ClearState ) (
     //        ID3D12GraphicsCommandList* This,
     //        _In_opt_ ID3D12PipelineState * pPipelineState);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, DrawInstanced)
-    //    void (STDMETHODCALLTYPE* DrawInstanced ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT VertexCountPerInstance,
-    //        _In_  UINT InstanceCount,
-    //        _In_  UINT StartVertexLocation,
-    //        _In_  UINT StartInstanceLocation);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DrawInstanced(uint VertexCountPerInstance, uint InstanceCount, uint StartVertexLocation, uint StartInstanceLocation)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, uint, uint, void>)_vtbl[12])(Unsafe.AsPointer(ref this), VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, DrawIndexedInstanced)
     //    void (STDMETHODCALLTYPE* DrawIndexedInstanced ) (
@@ -135,22 +129,18 @@ public unsafe struct ID3D12GraphicsCommandListVtbl
     //        _In_  UINT SrcSubresource,
     //        _In_  DXGI_FORMAT Format);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, IASetPrimitiveTopology)
-    //    void (STDMETHODCALLTYPE* IASetPrimitiveTopology ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D_PRIMITIVE_TOPOLOGY, void>)_vtbl[20])(Unsafe.AsPointer(ref this), PrimitiveTopology);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, RSSetViewports)
-    //    void (STDMETHODCALLTYPE* RSSetViewports ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_range_(0, D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE)  UINT NumViewports,
-    //        _In_reads_( NumViewports)  const D3D12_VIEWPORT* pViewports);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void RSSetViewports(uint NumViewports, D3D12_VIEWPORT* pViewports)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_VIEWPORT*, void>)_vtbl[21])(Unsafe.AsPointer(ref this), NumViewports, pViewports);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, RSSetScissorRects)
-    //    void (STDMETHODCALLTYPE* RSSetScissorRects ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_range_(0, D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE)  UINT NumRects,
-    //        _In_reads_( NumRects)  const D3D12_RECT* pRects);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void RSSetScissorRects(uint NumRects, D3D12_RECT* pRects)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_RECT*, void>)_vtbl[22])(Unsafe.AsPointer(ref this), NumRects, pRects);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, OMSetBlendFactor)
     //    void (STDMETHODCALLTYPE* OMSetBlendFactor ) (
@@ -166,12 +156,9 @@ public unsafe struct ID3D12GraphicsCommandListVtbl
     //    void (STDMETHODCALLTYPE* SetPipelineState ) (
     //        ID3D12GraphicsCommandList* This,
     //        _In_ ID3D12PipelineState * pPipelineState);
-
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ResourceBarrier)
-    //    void (STDMETHODCALLTYPE* ResourceBarrier ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT NumBarriers,
-    //        _In_reads_(NumBarriers)  const D3D12_RESOURCE_BARRIER* pBarriers);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ResourceBarrier(uint NumBarriers, D3D12_RESOURCE_BARRIER* pBarriers)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_RESOURCE_BARRIER*, void>)_vtbl[26])(Unsafe.AsPointer(ref this), NumBarriers, pBarriers);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ExecuteBundle)
     //    void (STDMETHODCALLTYPE* ExecuteBundle ) (
@@ -188,11 +175,9 @@ public unsafe struct ID3D12GraphicsCommandListVtbl
     //    void (STDMETHODCALLTYPE* SetComputeRootSignature ) (
     //        ID3D12GraphicsCommandList* This,
     //        _In_opt_ ID3D12RootSignature * pRootSignature);
-
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetGraphicsRootSignature)
-    //    void (STDMETHODCALLTYPE* SetGraphicsRootSignature ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_opt_ ID3D12RootSignature * pRootSignature);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetGraphicsRootSignature(ID3D12RootSignature* pRootSignature)
+     => ((delegate* unmanaged[Stdcall]<void*, ID3D12RootSignature*, void>)_vtbl[30])(Unsafe.AsPointer(ref this), pRootSignature);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetComputeRootDescriptorTable)
     //    void (STDMETHODCALLTYPE* SetComputeRootDescriptorTable ) (
@@ -277,12 +262,9 @@ public unsafe struct ID3D12GraphicsCommandListVtbl
     //        ID3D12GraphicsCommandList* This,
     //        _In_opt_  const D3D12_INDEX_BUFFER_VIEW* pView);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, IASetVertexBuffers)
-    //    void (STDMETHODCALLTYPE* IASetVertexBuffers ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT StartSlot,
-    //        _In_  UINT NumViews,
-    //        _In_reads_opt_(NumViews)  const D3D12_VERTEX_BUFFER_VIEW* pViews);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void IASetVertexBuffers(uint StartSlot, uint NumViews, D3D12_VERTEX_BUFFER_VIEW* pViews)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, D3D12_VERTEX_BUFFER_VIEW*, void>)_vtbl[44])(Unsafe.AsPointer(ref this), StartSlot, NumViews, pViews);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SOSetTargets)
     //    void (STDMETHODCALLTYPE* SOSetTargets ) (
@@ -290,14 +272,9 @@ public unsafe struct ID3D12GraphicsCommandListVtbl
     //        _In_ UINT StartSlot,
     //        _In_  UINT NumViews,
     //        _In_reads_opt_(NumViews)  const D3D12_STREAM_OUTPUT_BUFFER_VIEW* pViews);
-
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, OMSetRenderTargets)
-    //    void (STDMETHODCALLTYPE* OMSetRenderTargets ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT NumRenderTargetDescriptors,
-    //        _In_opt_  const D3D12_CPU_DESCRIPTOR_HANDLE* pRenderTargetDescriptors,
-    //        _In_  BOOL RTsSingleHandleToDescriptorRange,
-    //        _In_opt_  const D3D12_CPU_DESCRIPTOR_HANDLE* pDepthStencilDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void OMSetRenderTargets(uint NumRenderTargetDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE* pRenderTargetDescriptors, int RTsSingleHandleToDescriptorRange, D3D12_CPU_DESCRIPTOR_HANDLE* pDepthStencilDescriptor)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_CPU_DESCRIPTOR_HANDLE*, int, D3D12_CPU_DESCRIPTOR_HANDLE*, void>)_vtbl[46])(Unsafe.AsPointer(ref this), NumRenderTargetDescriptors, pRenderTargetDescriptors, RTsSingleHandleToDescriptorRange, pDepthStencilDescriptor);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ClearDepthStencilView)
     //    void (STDMETHODCALLTYPE* ClearDepthStencilView ) (
@@ -310,8 +287,8 @@ public unsafe struct ID3D12GraphicsCommandListVtbl
     //        _In_reads_(NumRects)  const D3D12_RECT* pRects);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetView, float* ColorRGBA, uint NumRects, D3D12_RECT* pRects) 
-        => ((delegate* unmanaged[Stdcall]<void*, D3D12_CPU_DESCRIPTOR_HANDLE , float*, uint, D3D12_RECT*, void>)_vtbl[48])(Unsafe.AsPointer(ref this), RenderTargetView, ColorRGBA, NumRects, pRects);
+    public void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetView, float* ColorRGBA, uint NumRects, D3D12_RECT* pRects)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_CPU_DESCRIPTOR_HANDLE, float*, uint, D3D12_RECT*, void>)_vtbl[48])(Unsafe.AsPointer(ref this), RenderTargetView, ColorRGBA, NumRects, pRects);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ClearUnorderedAccessViewUint)
     //    void (STDMETHODCALLTYPE* ClearUnorderedAccessViewUint ) (
@@ -400,3 +377,5 @@ public unsafe struct ID3D12GraphicsCommandListVtbl
 
     //END_INTERFACE
 }
+
+
