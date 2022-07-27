@@ -20,6 +20,7 @@ using static Titan.Windows.DXGI.DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS;
 using static Titan.Windows.DXGI.DXGI_SWAP_EFFECT;
 using static Titan.Windows.DXGI.DXGI_USAGE;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using Titan.Windows.Win32;
 using Titan.Graphics.NewRender;
@@ -335,12 +336,17 @@ Error:
             var psMain = Encoding.UTF8.GetBytes("PSMain");
             var vs50 = Encoding.UTF8.GetBytes("vs_5_0");
             var ps50 = Encoding.UTF8.GetBytes("ps_5_0");
-            const string shaderPath = @"F:\Git\Titan\tmp\shaders.hlsl";
+
+            //NOTE(Jens): change this path to test it out.
+            const string shaderPath = @"F:\Git\Titan\samples\Titan.Sandbox\dx12sampleshader.hlsl";
+            var path = File.Exists("dx12sampleshader.hlsl") ? "dx12sampleshader.hlsl" : shaderPath;
+
+
             fixed (byte* pVsMain = vsMain)
             fixed (byte* pPsMain = psMain)
             fixed (byte* pPs50 = ps50)
             fixed (byte* pVs50 = vs50)
-            fixed (char* pShaderPath = shaderPath)
+            fixed (char* pShaderPath = path)
             {
                 hr = D3DCompiler.D3DCompileFromFileNew(pShaderPath, null, null, pVsMain, pVs50, compileFlags, 0, vertexShader.GetAddressOf(), null);
                 if (FAILED(hr))
