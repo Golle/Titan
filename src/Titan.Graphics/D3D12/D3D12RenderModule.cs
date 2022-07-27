@@ -3,7 +3,6 @@ using Titan.ECS.App;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 using Titan.Graphics.Modules;
-using Titan.Windows.D3D12;
 
 namespace Titan.Graphics.D3D12;
 
@@ -11,12 +10,8 @@ public struct D3D12RenderModule : IModule
 {
     public static void Build(AppBuilder builder)
     {
-        unsafe
-        {
-            var size = sizeof(D3D12_ROOT_PARAMETER);
-        }
         ref readonly var window = ref builder.GetResource<Window>();
-        if (D3D12Device.CreateAndInit(window.Handle, window.Width, window.Height, false, out var device))
+        if (D3D12Device.CreateAndInit(window.Handle, window.Width, window.Height, true, out var device))
         {
             device.LoadAssets();
 
