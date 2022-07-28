@@ -19,13 +19,9 @@ using static Titan.Windows.DXGI.DXGI_GPU_PREFERENCE;
 using static Titan.Windows.DXGI.DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS;
 using static Titan.Windows.DXGI.DXGI_SWAP_EFFECT;
 using static Titan.Windows.DXGI.DXGI_USAGE;
-using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Titan.Windows.Win32;
-using Titan.Graphics.NewRender;
-using Titan.Windows.D3D11;
-using Titan.Graphics.D3D11;
 
 namespace Titan.Graphics.D3D12;
 
@@ -49,12 +45,16 @@ public unsafe struct D3D12Device
     D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
 
     public ComPtr<ID3D12Fence> _fence;
-    public ulong _fenceValue;
-
+    private ulong _fenceValue;
     private fixed ulong _renderTargets[FrameCount];
+    private fixed ulong _fenceValues[FrameCount];
+    private fixed ulong _fences[FrameCount];
     private HANDLE _fenceEvent;
+    private D3D12_VIEWPORT _viewPort;
+    private D3D12_RECT _scissorRect;
 
     private ref ComPtr<ID3D12Resource> GetRenderTarget(int index) => ref *(ComPtr<ID3D12Resource>*)Unsafe.AsPointer(ref _renderTargets[index]);
+    private ref ComPtr<ID3D12Fence> GetFence(int index) => ref *(ComPtr<ID3D12Fence>*)Unsafe.AsPointer(ref _fences[index]);
     public D3D_FEATURE_LEVEL FeatureLevel => _fatureLevel;
 
     public static bool CreateAndInit(HWND windowHandle, uint width, uint height, bool debug, out D3D12Device device)
@@ -179,25 +179,18 @@ public unsafe struct D3D12Device
             device._descriptorHeapSize = device._instance.Get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
         }
 
-        // Create frame resources.
+        if (!device.InitBackbuffer())
         {
-            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
-            device._descriptorHeap.Get()->GetCPUDescriptorHandleForHeapStart(&rtvHandle);
-            // Create a RTV for each frame.
-            for (var n = 0; n < FrameCount; n++)
-            {
-                ref var renderTarget = ref device.GetRenderTarget(n);
-                hr = device._swapChain.Get()->GetBuffer((uint)n, typeof(ID3D12Resource).GUID, (void**)renderTarget.GetAddressOf());
-                if (FAILED(hr))
-                {
-                    Logger.Error<D3D12Device>($"Failed to GetBuffer for render target {n} with HRESULT {hr}");
-                    goto Error;
-                }
-                device._instance.Get()->CreateRenderTargetView(renderTarget.Get(), null, rtvHandle);
-                rtvHandle.ptr += device._descriptorHeapSize * 1;
-            }
+            Logger.Error<D3D12Device>("Backbuffer failed.. Sad face.");
+            goto Error;
         }
 
+        for(var i = 0; i < FrameCount; ++i)
+        {
+            hr = device._instance.Get()->CreateFence(0, D3D12_FENCE_FLAGS.D3D12_FENCE_FLAG_NONE, typeof(ID3D12Fence).GUID, (void**)device.GetFence(i).GetAddressOf());
+        }
+
+        // Create frame resources.
         hr = device._instance.Get()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, typeof(ID3D12CommandAllocator).GUID, (void**)device._commandAllocator.GetAddressOf());
         if (FAILED(hr))
         {
@@ -205,6 +198,7 @@ public unsafe struct D3D12Device
             goto Error;
         }
 
+        device.UpdateViewPort(width, height);
 
 
         return true;
@@ -446,7 +440,7 @@ Error:
 
             // Define the geometry for a triangle.
             var triangleVertices = stackalloc Vertex[3];
-            var aspectRatio = 1024f / 768f;
+            var aspectRatio = 1f;// 1024f / 768f;
 
             triangleVertices[0] = new Vertex
             {
@@ -472,7 +466,7 @@ Error:
             // recommended. Every time the GPU needs it, the upload heap will be marshalled 
             // over. Please read up on Default Heap usage. An upload heap is used here for 
             // code simplicity and because there are very few verts to actually transfer.
-            
+
             // This is default Upload. maybe add helper methods for these?
             D3D12_HEAP_PROPERTIES heapProperties = new()
             {
@@ -579,6 +573,26 @@ Error:
 
     }
 
+    private bool InitBackbuffer()
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
+        _descriptorHeap.Get()->GetCPUDescriptorHandleForHeapStart(&rtvHandle);
+        // Create a RTV for each frame.
+        for (var n = 0; n < FrameCount; n++)
+        {
+            ref var renderTarget = ref GetRenderTarget(n);
+            var hr = _swapChain.Get()->GetBuffer((uint)n, typeof(ID3D12Resource).GUID, (void**)renderTarget.ReleaseAndGetAddressOf());
+            if (FAILED(hr))
+            {
+                Logger.Error<D3D12Device>($"Failed to GetBuffer for render target {n} with HRESULT {hr}");
+                return false;
+            }
+            _instance.Get()->CreateRenderTargetView(renderTarget.Get(), null, rtvHandle);
+            rtvHandle.ptr += _descriptorHeapSize * 1;
+        }
+        return true;
+    }
+
     private void WaitForPreviousFrame()
     {
         // WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
@@ -615,26 +629,58 @@ Error:
         WaitForPreviousFrame();
     }
 
-    private void PopulateCommandList()
+    public bool Resize(uint width, uint height)
     {
-
-        D3D12_VIEWPORT viewport = new D3D12_VIEWPORT
+        Logger.Warning<D3D12Device>("This is some really bad code that doens't even solve the problem :) we'll continue when the device, buffers etc have abstractions.");
+        return true;
+        UpdateViewPort(width, height);
+        WaitForPreviousFrame();
+        FlushGpu();
+        _commandAllocator.Get()->Reset();
+        _commandList.Get()->Reset(_commandAllocator.Get(), null);
+        
+        _commandList.Get()->Close();
+        for (var i = 0; i < FrameCount; ++i)
         {
-            Width = 1024,
-            Height = 768,
+            GetRenderTarget(i).Release();
+        }
+        var hr = _swapChain.Get()->ResizeBuffers(FrameCount, width, height, DXGI_FORMAT_UNKNOWN, 0);
+        if (FAILED(hr))
+        {
+            Logger.Error<ID3D12Device>("Failed to resize buffers on the swapchain");
+            return false;
+        }
+        if (!InitBackbuffer())
+        {
+            Logger.Error<ID3D12Device>("Failed to recreate backbuffers.");
+            return false;
+        }
+        _commandQueue.Get()->ExecuteCommandLists(1, (ID3D12CommandList**)_commandList.GetAddressOf());
+        return true;
+    }
+
+    private void UpdateViewPort(uint width, uint height)
+    {
+        _viewPort = new D3D12_VIEWPORT
+        {
+            Width = width,
+            Height = height,
             MaxDepth = 1,
             MinDepth = 0,
             TopLeftX = 0,
             TopLeftY = 0
         };
-
-        var scissorRect = new D3D12_RECT
+        _scissorRect = new D3D12_RECT
         {
             Left = 0,
-            Right = 1024,
+            Right = (int)width,
             Top = 0,
-            Bottom = 768
+            Bottom = (int)height
         };
+    }
+
+    private void PopulateCommandList()
+    {
         HRESULT hr;
         // Command list allocators can only be reset when the associated 
         // command lists have finished execution on the GPU; apps should use 
@@ -648,8 +694,9 @@ Error:
 
         // Set necessary state.
         _commandList.Get()->SetGraphicsRootSignature(_rootSignature.Get());
-        _commandList.Get()->RSSetViewports(1, &viewport);
-        _commandList.Get()->RSSetScissorRects(1, &scissorRect);
+
+        _commandList.Get()->RSSetViewports(1, (D3D12_VIEWPORT*)Unsafe.AsPointer(ref _viewPort));
+        _commandList.Get()->RSSetScissorRects(1, (D3D12_RECT*)Unsafe.AsPointer(ref _scissorRect));
 
         // Indicate that the back buffer will be used as a render target.
 
@@ -699,6 +746,21 @@ Error:
         _commandList.Get()->Close();
     }
 
+
+    private void FlushGpu()
+    {
+        for (int i = 0; i < FrameCount; i++)
+        {
+            var fenceValue = ++_fenceValue;
+            _commandQueue.Get()->Signal(_fence.Get(), fenceValue);
+            if (_fence.Get()->GetCompletedValue() < fenceValue)
+            {
+                _fence.Get()->SetEventOnCompletion(fenceValue, _fenceEvent);
+                Kernel32.WaitForSingleObject(_fenceEvent, -1);
+            }
+        }
+        _frameIndex = 0;
+    }
 }
 
 
