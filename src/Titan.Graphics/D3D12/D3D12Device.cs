@@ -472,6 +472,7 @@ Error:
             // recommended. Every time the GPU needs it, the upload heap will be marshalled 
             // over. Please read up on Default Heap usage. An upload heap is used here for 
             // code simplicity and because there are very few verts to actually transfer.
+            
             // This is default Upload. maybe add helper methods for these?
             D3D12_HEAP_PROPERTIES heapProperties = new()
             {
