@@ -89,6 +89,7 @@ internal unsafe struct EventsRegistry : IResource
         {
             var size = sizeof(T) + sizeof(EventHeader);
             var header = (EventHeader*)arena->Allocate((nuint)size);
+            header->Next = null; // make sure the header doesn't point to something that doesn't exist.
             var mem = (T*)(header + 1);
             *mem = @event;
             _current.Push(header);
