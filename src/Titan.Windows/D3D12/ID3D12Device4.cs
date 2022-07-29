@@ -1,13 +1,11 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Windows.D3D11;
 
 namespace Titan.Windows.D3D12;
 
-[Guid("189819f1-1db6-4b57-be54-1821339b85f7")]
-//[Guid("e865df17-a9ee-46f9-a463-3098315aa2e5")]
-public unsafe struct ID3D12Device
+[Guid("e865df17-a9ee-46f9-a463-3098315aa2e5")]
+public unsafe struct ID3D12Device4
 {
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -77,7 +75,7 @@ public unsafe struct ID3D12Device
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeapType)
-         => ((delegate* unmanaged[Stdcall]<void*, D3D12_DESCRIPTOR_HEAP_TYPE, uint>)_vtbl[15])(Unsafe.AsPointer(ref this), DescriptorHeapType);
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_DESCRIPTOR_HEAP_TYPE, uint>)_vtbl[15])(Unsafe.AsPointer(ref this), DescriptorHeapType);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateRootSignature(uint nodeMask, void* pBlobWithRootSignature, nuint blobLengthInBytes, in Guid riid, void** ppvRootSignature)
@@ -204,7 +202,8 @@ public unsafe struct ID3D12Device
     // _In_reads_(NumObjects) ID3D12Pageable *const * ppObjects);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT CreateFence(ulong initialValue, D3D12_FENCE_FLAGS flags, in Guid riid, void** ppFence) => ((delegate* unmanaged[Stdcall]<void*, ulong, D3D12_FENCE_FLAGS, in Guid, void**, HRESULT>)_vtbl[36])(Unsafe.AsPointer(ref this), initialValue, flags, riid, ppFence);
+    public HRESULT CreateFence(ulong initialValue, D3D12_FENCE_FLAGS flags, in Guid riid, void** ppFence) 
+        => ((delegate* unmanaged[Stdcall]<void*, ulong, D3D12_FENCE_FLAGS, in Guid, void**, HRESULT>)_vtbl[36])(Unsafe.AsPointer(ref this), initialValue, flags, riid, ppFence);
 
     //HRESULT(STDMETHODCALLTYPE* GetDeviceRemovedReason)(
     // ID3D12Device* This);
@@ -249,4 +248,108 @@ public unsafe struct ID3D12Device
 
     //LUID(STDMETHODCALLTYPE* GetAdapterLuid)(
     //    ID3D12Device* This);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device1, CreatePipelineLibrary)
+    //    HRESULT(STDMETHODCALLTYPE* CreatePipelineLibrary)(
+    //        ID3D12Device4* This,
+    //        _In_reads_(BlobLength) const void* pLibraryBlob,
+    //        SIZE_T BlobLength,
+    //        REFIID riid,
+    //        _COM_Outptr_  void** ppPipelineLibrary);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device1, SetEventOnMultipleFenceCompletion)
+    //    HRESULT(STDMETHODCALLTYPE* SetEventOnMultipleFenceCompletion)(
+    //        ID3D12Device4* This,
+    //        _In_reads_(NumFences) ID3D12Fence *const * ppFences,
+    //        _In_reads_(NumFences)  const UINT64* pFenceValues,
+    //        UINT NumFences,
+    //        D3D12_MULTIPLE_FENCE_WAIT_FLAGS Flags,
+    //        HANDLE hEvent);
+
+    //    DECLSPEC_XFGVIRT(ID3D12Device1, SetResidencyPriority)
+    //    HRESULT(STDMETHODCALLTYPE* SetResidencyPriority)(
+    //        ID3D12Device4* This,
+    //        UINT NumObjects,
+    //        _In_reads_(NumObjects) ID3D12Pageable *const * ppObjects,
+    //        _In_reads_(NumObjects)  const D3D12_RESIDENCY_PRIORITY* pPriorities);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device2, CreatePipelineState)
+    //    HRESULT(STDMETHODCALLTYPE* CreatePipelineState)(
+    //        ID3D12Device4* This,
+    //        const D3D12_PIPELINE_STATE_STREAM_DESC* pDesc,
+    //        REFIID riid,
+    //        _COM_Outptr_ void** ppPipelineState);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device3, OpenExistingHeapFromAddress)
+    //    HRESULT(STDMETHODCALLTYPE* OpenExistingHeapFromAddress)(
+    //        ID3D12Device4* This,
+    //        _In_  const void* pAddress,
+    //        REFIID riid,
+    //        _COM_Outptr_ void** ppvHeap);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device3, OpenExistingHeapFromFileMapping)
+    //    HRESULT(STDMETHODCALLTYPE* OpenExistingHeapFromFileMapping)(
+    //        ID3D12Device4* This,
+    //        _In_ HANDLE hFileMapping,
+    //        REFIID riid,
+    //        _COM_Outptr_ void** ppvHeap);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device3, EnqueueMakeResident)
+    //    HRESULT(STDMETHODCALLTYPE* EnqueueMakeResident)(
+    //        ID3D12Device4* This,
+    //        D3D12_RESIDENCY_FLAGS Flags,
+    //        UINT NumObjects,
+    //        _In_reads_(NumObjects) ID3D12Pageable *const * ppObjects,
+    //        _In_  ID3D12Fence* pFenceToSignal,
+    //        UINT64 FenceValueToSignal);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT CreateCommandList1(uint nodeMask, D3D12_COMMAND_LIST_TYPE type, D3D12_COMMAND_LIST_FLAGS flags, in Guid riid, void** ppCommandList)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_COMMAND_LIST_TYPE, D3D12_COMMAND_LIST_FLAGS, in Guid, void**, HRESULT>)_vtbl[51])(Unsafe.AsPointer(ref this), nodeMask, type, flags, riid, ppCommandList);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device4, CreateProtectedResourceSession)
+    //    HRESULT(STDMETHODCALLTYPE* CreateProtectedResourceSession)(
+    //        ID3D12Device4* This,
+    //        _In_  const D3D12_PROTECTED_RESOURCE_SESSION_DESC* pDesc,
+    //        _In_  REFIID riid,
+    //        _COM_Outptr_  void** ppSession);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device4, CreateCommittedResource1)
+    //    HRESULT(STDMETHODCALLTYPE* CreateCommittedResource1)(
+    //        ID3D12Device4* This,
+    //        _In_  const D3D12_HEAP_PROPERTIES* pHeapProperties,
+    //        D3D12_HEAP_FLAGS HeapFlags,
+    //        _In_ const D3D12_RESOURCE_DESC* pDesc,
+    //        D3D12_RESOURCE_STATES InitialResourceState,
+    //        _In_opt_ const D3D12_CLEAR_VALUE* pOptimizedClearValue,
+    //        _In_opt_  ID3D12ProtectedResourceSession* pProtectedSession,
+    //        REFIID riidResource,
+    //        _COM_Outptr_opt_ void** ppvResource);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device4, CreateHeap1)
+    //    HRESULT(STDMETHODCALLTYPE* CreateHeap1)(
+    //        ID3D12Device4* This,
+    //        _In_  const D3D12_HEAP_DESC* pDesc,
+    //        _In_opt_  ID3D12ProtectedResourceSession* pProtectedSession,
+    //        REFIID riid,
+    //        _COM_Outptr_opt_ void** ppvHeap);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device4, CreateReservedResource1)
+    //    HRESULT(STDMETHODCALLTYPE* CreateReservedResource1)(
+    //        ID3D12Device4* This,
+    //        _In_  const D3D12_RESOURCE_DESC* pDesc,
+    //        D3D12_RESOURCE_STATES InitialState,
+    //        _In_opt_ const D3D12_CLEAR_VALUE* pOptimizedClearValue,
+    //        _In_opt_  ID3D12ProtectedResourceSession* pProtectedSession,
+    //        REFIID riid,
+    //        _COM_Outptr_opt_ void** ppvResource);
+
+    //DECLSPEC_XFGVIRT(ID3D12Device4, GetResourceAllocationInfo1)
+    //    D3D12_RESOURCE_ALLOCATION_INFO* (STDMETHODCALLTYPE* GetResourceAllocationInfo1 ) (
+    //        ID3D12Device4* This,
+    //        D3D12_RESOURCE_ALLOCATION_INFO* RetVal,
+    //        UINT visibleMask,
+    //        UINT numResourceDescs,
+    //        _In_reads_(numResourceDescs) const D3D12_RESOURCE_DESC* pResourceDescs,
+    //        _Out_writes_opt_(numResourceDescs)  D3D12_RESOURCE_ALLOCATION_INFO1* pResourceAllocationInfo1);
+
 }

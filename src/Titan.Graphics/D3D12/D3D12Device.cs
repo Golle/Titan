@@ -28,7 +28,7 @@ namespace Titan.Graphics.D3D12;
 public unsafe struct D3D12Device
 {
     private const int FrameCount = 2;
-    private ComPtr<ID3D12Device> _instance;
+    private ComPtr<ID3D12Device4> _instance;
     private ComPtr<ID3D12CommandQueue> _commandQueue;
     private ComPtr<IDXGISwapChain3> _swapChain;
     private uint _frameIndex;
@@ -86,7 +86,8 @@ public unsafe struct D3D12Device
         }
 
         // Create the D3D12 Device
-        if (FAILED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0, typeof(ID3D12Device).GUID, (void**)device._instance.GetAddressOf())))
+        hr = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0, typeof(ID3D12Device4).GUID, (void**)device._instance.GetAddressOf());
+        if (FAILED(hr))
         {
             Logger.Error<D3D12Device>($"Failed to create the {nameof(ID3D12Device)} with HRESULT: {hr}");
             goto Error;
@@ -418,19 +419,21 @@ Error:
             }
         }
         {
-            var hr = _instance.Get()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _commandAllocator.Get(), _pipelineState.Get(), typeof(ID3D12GraphicsCommandList).GUID, (void**)_commandList.GetAddressOf());
+
+            var hr = _instance.Get()->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAGS.D3D12_COMMAND_LIST_FLAG_NONE, typeof(ID3D12GraphicsCommandList).GUID, (void**)_commandList.GetAddressOf());
+            //var hr = _instance.Get()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _commandAllocator.Get(), _pipelineState.Get(), typeof(ID3D12GraphicsCommandList).GUID, (void**)_commandList.GetAddressOf());
             if (FAILED(hr))
             {
                 Logger.Error<D3D12Device>($"Failed to create the {nameof(ID3D12GraphicsCommandList)} with HRESULT {hr}");
                 goto Error;
             }
 
-            hr = _commandList.Get()->Close();
-            if (FAILED(hr))
-            {
-                Logger.Error<D3D12Device>($"Failed to Close the {nameof(ID3D12GraphicsCommandList)} with HRESULT {hr}");
-                goto Error;
-            }
+            //hr = _commandList.Get()->Close();
+            //if (FAILED(hr))
+            //{
+            //    Logger.Error<D3D12Device>($"Failed to Close the {nameof(ID3D12GraphicsCommandList)} with HRESULT {hr}");
+            //    goto Error;
+            //}
 
         }
 
@@ -564,6 +567,7 @@ Error:
         for (var i = 0; i < FrameCount; ++i)
         {
             GetRenderTarget(i).Release();
+            GetFence(i).Release();
         }
 
         _pipelineState.Release();

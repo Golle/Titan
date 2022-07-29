@@ -32,17 +32,10 @@ public struct D3D12RenderModule : IModule
     {
         private ApiResource<GraphicsDevice> RenderDevice;
         public static void Init(ref D3D12RenderSystem system, in SystemsInitializer init) => system.RenderDevice = init.GetApi<GraphicsDevice>();
-
-        public static void Update(ref D3D12RenderSystem system)
-        {
-            system.RenderDevice.Get().Device.Render();
-        }
-
-        public static bool ShouldRun(in D3D12RenderSystem system)
-        {
-            throw new System.NotImplementedException();
-        }
+        public static void Update(ref D3D12RenderSystem system) => system.RenderDevice.Get().Device.Render();
+        public static bool ShouldRun(in D3D12RenderSystem system) => throw new System.NotImplementedException("This system should ba marked at AlwaysRun");
     }
+
     private struct D3D12DeviceTearDown : IStructSystem<D3D12DeviceTearDown>
     {
         private ApiResource<GraphicsDevice> Device;
@@ -52,7 +45,7 @@ public struct D3D12RenderModule : IModule
             Logger.Trace<D3D12DeviceTearDown>("Release D3D12Device");
             system.Device.Get().Device.Release();
         }
-        public static bool ShouldRun(in D3D12DeviceTearDown system) => throw new System.NotImplementedException();
+        public static bool ShouldRun(in D3D12DeviceTearDown system) => throw new System.NotImplementedException("This system should ba marked at AlwaysRun");
     }
 
     private struct D3D12ResizeSystem : IStructSystem<D3D12ResizeSystem>
@@ -71,9 +64,9 @@ public struct D3D12RenderModule : IModule
         public static void Update(ref D3D12ResizeSystem system)
         {
             ref readonly var window = ref system.Window.Get();
-            var height = window.Height;
+            var height = window.Height; 
             var width = window.Width;
-            foreach (ref readonly var @event in system.WindowResize)
+            foreach (ref readonly var _ in system.WindowResize)
             {
                 system.Device.Get().Device.Resize(width, height);
                 Logger.Error<D3D12ResizeSystem>($"Resize device: {width}x{height}");
