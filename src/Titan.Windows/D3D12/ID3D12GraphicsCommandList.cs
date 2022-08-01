@@ -36,11 +36,10 @@ public unsafe struct ID3D12GraphicsCommandList
     //        ID3D12GraphicsCommandList* This,
     //        _In_ REFGUID guid,
     //        _In_opt_  const IUnknown* pData);
-
-    //DECLSPEC_XFGVIRT(ID3D12Object, SetName)
-    //    HRESULT(STDMETHODCALLTYPE* SetName)(
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_z_ LPCWSTR Name);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT SetName(char* Name)
+        => ((delegate* unmanaged[Stdcall]<void*, char*, HRESULT>)_vtbl[6])(Unsafe.AsPointer(ref this), Name);
 
     //DECLSPEC_XFGVIRT(ID3D12DeviceChild, GetDevice)
     //    HRESULT(STDMETHODCALLTYPE* GetDevice)(

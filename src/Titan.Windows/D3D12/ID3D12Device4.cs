@@ -36,9 +36,9 @@ public unsafe struct ID3D12Device4
     // _In_ REFGUID guid,
     // _In_opt_  const IUnknown* pData);
 
-    //HRESULT(STDMETHODCALLTYPE* SetName)(
-    // ID3D12Device* This,
-    // _In_z_ LPCWSTR Name);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT SetName(char* Name)
+        => ((delegate* unmanaged[Stdcall]<void*, char*, HRESULT>)_vtbl[6])(Unsafe.AsPointer(ref this), Name);
 
     //UINT(STDMETHODCALLTYPE* GetNodeCount)(
     // ID3D12Device* This);
@@ -137,10 +137,9 @@ public unsafe struct ID3D12Device4
     // _In_  UINT numResourceDescs,
     // _In_reads_(numResourceDescs)  const D3D12_RESOURCE_DESC* pResourceDescs);
 
-    //D3D12_HEAP_PROPERTIES(STDMETHODCALLTYPE* GetCustomHeapProperties)(
-    // ID3D12Device* This,
-    // _In_ UINT nodeMask,
-    // D3D12_HEAP_TYPE heapType);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public D3D12_HEAP_PROPERTIES* GetCustomHeapProperties(uint nodeMask, D3D12_HEAP_TYPE heapType, D3D12_HEAP_PROPERTIES* retVal)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_HEAP_PROPERTIES*, uint, D3D12_HEAP_TYPE, D3D12_HEAP_PROPERTIES*>)_vtbl[26])(Unsafe.AsPointer(ref this), retVal, nodeMask, heapType);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateCommittedResource(D3D12_HEAP_PROPERTIES* pHeapProperties, D3D12_HEAP_FLAGS HeapFlags, D3D12_RESOURCE_DESC* pDesc, D3D12_RESOURCE_STATES InitialResourceState, D3D12_CLEAR_VALUE* pOptimizedClearValue, in Guid riidResource, void** ppvResource)
@@ -202,7 +201,7 @@ public unsafe struct ID3D12Device4
     // _In_reads_(NumObjects) ID3D12Pageable *const * ppObjects);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT CreateFence(ulong initialValue, D3D12_FENCE_FLAGS flags, in Guid riid, void** ppFence) 
+    public HRESULT CreateFence(ulong initialValue, D3D12_FENCE_FLAGS flags, in Guid riid, void** ppFence)
         => ((delegate* unmanaged[Stdcall]<void*, ulong, D3D12_FENCE_FLAGS, in Guid, void**, HRESULT>)_vtbl[36])(Unsafe.AsPointer(ref this), initialValue, flags, riid, ppFence);
 
     //HRESULT(STDMETHODCALLTYPE* GetDeviceRemovedReason)(

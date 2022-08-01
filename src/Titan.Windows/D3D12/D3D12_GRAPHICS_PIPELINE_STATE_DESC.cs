@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Titan.Windows.DXGI;
 
 namespace Titan.Windows.D3D12;
@@ -20,17 +21,17 @@ public unsafe struct D3D12_GRAPHICS_PIPELINE_STATE_DESC
     public D3D12_INDEX_BUFFER_STRIP_CUT_VALUE IBStripCutValue;
     public D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveTopologyType;
     public uint NumRenderTargets;
+
     //public DXGI_FORMAT RTVFormats[8];
     private D3D12_GRAPHICS_PIPELINE_STATE_DESC_RTV_FORMATS _rtvFormats;
     public DXGI_FORMAT* RTVFormats => (DXGI_FORMAT*)Unsafe.AsPointer(ref _rtvFormats);
+    [StructLayout(LayoutKind.Sequential, Size = sizeof(DXGI_FORMAT) * 8)]
+    private struct D3D12_GRAPHICS_PIPELINE_STATE_DESC_RTV_FORMATS { }
+    
+
     public DXGI_FORMAT DSVFormat;
     public DXGI_SAMPLE_DESC SampleDesc;
     public uint NodeMask;
     public D3D12_CACHED_PIPELINE_STATE CachedPSO;
     public D3D12_PIPELINE_STATE_FLAGS Flags;
-
-    private struct D3D12_GRAPHICS_PIPELINE_STATE_DESC_RTV_FORMATS
-    {
-        public DXGI_FORMAT RTVFormats1, RTVFormats2, RTVFormats3, RTVFormats4, RTVFormats5, RTVFormats6, RTVFormats7, RTVFormats8;
-    }
 }
