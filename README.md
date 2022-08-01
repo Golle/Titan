@@ -1,5 +1,5 @@
 # Titan
-Titan, Game Engine in .NET 7 C# 11 and DirectX 11
+Titan, Game Engine in .NET 7 C# 11 and DirectX 12
 
 
 # Work in progress

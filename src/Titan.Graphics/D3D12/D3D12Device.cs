@@ -21,20 +21,25 @@ using static Titan.Windows.DXGI.DXGI_SWAP_EFFECT;
 using static Titan.Windows.DXGI.DXGI_USAGE;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization.Metadata;
 using Titan.Windows.Win32;
 
 namespace Titan.Graphics.D3D12;
 
 public unsafe struct D3D12Device
 {
-    private const int FrameCount = 2;
+    public ComPtr<ID3D12Device4> Device => _instance;
+    public ComPtr<IDXGISwapChain3> SwapChain => _swapChain;
+
     private ComPtr<ID3D12Device4> _instance;
-    private ComPtr<ID3D12CommandQueue> _commandQueue;
+
     private ComPtr<IDXGISwapChain3> _swapChain;
     private uint _frameIndex;
     private D3D_FEATURE_LEVEL _fatureLevel;
 
 
+    private ComPtr<ID3D12CommandQueue> _commandQueue;
+    private const int FrameCount = 2;
     private ComPtr<ID3D12CommandAllocator> _commandAllocator;
     private ComPtr<ID3D12DescriptorHeap> _descriptorHeap;
     private uint _descriptorHeapSize;
@@ -67,7 +72,7 @@ public unsafe struct D3D12Device
 
         // Create the DXGI factory (Used to Query hardware devices)
         using ComPtr<IDXGIFactory7> dxgiFactory = default;
-        using ComPtr<IDXGIAdapter1> adapter = default;
+        using ComPtr<IDXGIAdapter3> adapter = default;
         using ComPtr<IDXGISwapChain1> swapChain = default;
 
         var factoryFlags = debug ? DXGI_CREATE_FACTORY_FLAGS.DXGI_CREATE_FACTORY_DEBUG : 0;
@@ -84,6 +89,28 @@ public unsafe struct D3D12Device
             Logger.Error("Failed to find a D3D12 compatible device.");
             goto Error;
         }
+
+        DXGI_QUERY_VIDEO_MEMORY_INFO videoMem;
+        hr = adapter.Get()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP.DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMem);
+        if (FAILED(hr))
+        {
+            Logger.Error<D3D12Device>($"Failed to query the LOCAL video memory with HRESULT {hr}");
+        }
+        else
+        {
+            Logger.Trace<D3D12Device>($"Local memory. Available: {videoMem.AvailableForReservation} Budget: {videoMem.Budget} Current reservation: {videoMem.CurrentReservation} Current usage: {videoMem.CurrentUsage}");
+        }
+
+        hr = adapter.Get()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP.DXGI_MEMORY_SEGMENT_GROUP_NON_LOCAL, &videoMem);
+        if (FAILED(hr))
+        {
+            Logger.Error<D3D12Device>($"Failed to query the NON_LOCAL video memory with HRESULT {hr}");
+        }
+        else
+        {
+            Logger.Trace<D3D12Device>($"Non Local memory. Available: {videoMem.AvailableForReservation} Budget: {videoMem.Budget} Current reservation: {videoMem.CurrentReservation} Current usage: {videoMem.CurrentUsage}");
+        }
+
 
         // Create the D3D12 Device
         hr = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0, typeof(ID3D12Device4).GUID, (void**)device._instance.GetAddressOf());
@@ -124,17 +151,48 @@ public unsafe struct D3D12Device
         device._fatureLevel = featureLevels.MaxSupportedFeatureLevel;
         Logger.Trace<D3D12Device>($"{D3D12_FEATURE.D3D12_FEATURE_FEATURE_LEVELS} - MaxSupportedFeatureLevel: {featureLevels.MaxSupportedFeatureLevel}");
 
+        {
+
+            D3D12_FEATURE_DATA_ARCHITECTURE1 arch = default;
+            hr = device._instance.Get()->CheckFeatureSupport(D3D12_FEATURE.D3D12_FEATURE_ARCHITECTURE1, &arch, (uint)sizeof(D3D12_FEATURE_DATA_ARCHITECTURE1));
+            if (FAILED(hr))
+            {
+                Logger.Error<D3D12Device>($"Failed to get the {D3D12_FEATURE.D3D12_FEATURE_ARCHITECTURE1} with HRESULT {hr}");
+            }
+            else
+            {
+                Logger.Trace<D3D12Device>($"NodeIndex: {arch.NodeIndex} TileBasedRenderer: {arch.TileBasedRenderer} UMA: {arch.UMA} CacheCoherentUMA: {arch.CacheCoherentUMA} IsolatedMMU: {arch.IsolatedMMU}");
+            }
+        }
+
+        {
+
+            for (var i = 1; i < 4; ++i)
+            {
+                D3D12_HEAP_PROPERTIES prop = default;
+                var type = (D3D12_HEAP_TYPE)i;
+                device._instance.Get()->GetCustomHeapProperties(0, type, &prop);
+                Logger.Trace<D3D12Device>($"{type}: Type: {prop.Type}: Pool pref: {prop.MemoryPoolPreference} CPU page: {prop.CPUPageProperty}");
+            }
+            
+
+        }
+
+
+
+
+
 
         // Create the command queue that is needed to set up the swapchain
-        D3D12_COMMAND_QUEUE_DESC desc = default;
-        desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-        desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-        hr = device._instance.Get()->CreateCommandQueue(&desc, typeof(ID3D12CommandQueue).GUID, (void**)device._commandQueue.GetAddressOf());
-        if (FAILED(hr))
-        {
-            Logger.Error<D3D12Device>($"Failed to create a {nameof(ID3D12CommandQueue)} with HRESULT {hr}");
-            goto Error;
-        }
+        //D3D12_COMMAND_QUEUE_DESC desc = default;
+        //desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        //desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+        //hr = device._instance.Get()->CreateCommandQueue(&desc, typeof(ID3D12CommandQueue).GUID, (void**)device._commandQueue.GetAddressOf());
+        //if (FAILED(hr))
+        //{
+        //    Logger.Error<D3D12Device>($"Failed to create a {nameof(ID3D12CommandQueue)} with HRESULT {hr}");
+        //    goto Error;
+        //}
 
         // Create the Swapchain
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = default;
@@ -155,6 +213,10 @@ public unsafe struct D3D12Device
 
         // Retarget the IDXGISwapChain1 to IDXGISwapChain3
         device._swapChain = new ComPtr<IDXGISwapChain3>((IDXGISwapChain3*)swapChain.Get());
+
+
+        return true;
+
         device._frameIndex = device._swapChain.Get()->GetCurrentBackBufferIndex();
 
         hr = dxgiFactory.Get()->MakeWindowAssociation(windowHandle, DXGI_MWA_NO_ALT_ENTER);
@@ -186,7 +248,7 @@ public unsafe struct D3D12Device
             goto Error;
         }
 
-        for(var i = 0; i < FrameCount; ++i)
+        for (var i = 0; i < FrameCount; ++i)
         {
             hr = device._instance.Get()->CreateFence(0, D3D12_FENCE_FLAGS.D3D12_FENCE_FLAG_NONE, typeof(ID3D12Fence).GUID, (void**)device.GetFence(i).GetAddressOf());
         }
@@ -211,13 +273,13 @@ Error:
         return false;
 
         // Enumerate the Adapters and return the one with Highest Performance that supports D3D12
-        static bool GetHardwareAdapter(IDXGIFactory7* factory, IDXGIAdapter1** adapter)
+        static bool GetHardwareAdapter(IDXGIFactory7* factory, IDXGIAdapter3** adapter)
         {
             DXGI_ADAPTER_DESC1 adapterDesc = default;
             for (var i = 0u; ; ++i)
             {
-                ComPtr<IDXGIAdapter1> pAdapter = default;
-                if (factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, typeof(IDXGIAdapter1).GUID, (void**)pAdapter.ReleaseAndGetAddressOf()) == DXGI_ERROR.DXGI_ERROR_NOT_FOUND)
+                ComPtr<IDXGIAdapter3> pAdapter = default;
+                if (factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, typeof(IDXGIAdapter3).GUID, (void**)pAdapter.ReleaseAndGetAddressOf()) == DXGI_ERROR.DXGI_ERROR_NOT_FOUND)
                 {
                     // no more adapters
                     break;
@@ -642,7 +704,7 @@ Error:
         FlushGpu();
         _commandAllocator.Get()->Reset();
         _commandList.Get()->Reset(_commandAllocator.Get(), null);
-        
+
         _commandList.Get()->Close();
         for (var i = 0; i < FrameCount; ++i)
         {
