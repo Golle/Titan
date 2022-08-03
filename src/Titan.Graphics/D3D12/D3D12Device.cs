@@ -21,7 +21,6 @@ using static Titan.Windows.DXGI.DXGI_SWAP_EFFECT;
 using static Titan.Windows.DXGI.DXGI_USAGE;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text.Json.Serialization.Metadata;
 using Titan.Windows.Win32;
 
 namespace Titan.Graphics.D3D12;
@@ -174,25 +173,35 @@ public unsafe struct D3D12Device
                 device._instance.Get()->GetCustomHeapProperties(0, type, &prop);
                 Logger.Trace<D3D12Device>($"{type}: Type: {prop.Type}: Pool pref: {prop.MemoryPoolPreference} CPU page: {prop.CPUPageProperty}");
             }
-            
+
 
         }
 
-
-
-
+        uint allowTearing = 0;
+        {
+            
+            hr = dxgiFactory.Get()->CheckFeatureSupport(DXGI_FEATURE.DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(uint));
+            if (FAILED(hr))
+            {
+                Logger.Error<D3D12Device>($"Failed to check feature support on {nameof(IDXGIFactory7)} with HRESULT {hr}");
+            }
+            else
+            {
+                Logger.Trace<D3D12Device>($"{DXGI_FEATURE.DXGI_FEATURE_PRESENT_ALLOW_TEARING}: {allowTearing != 0}");
+            }
+        }
 
 
         // Create the command queue that is needed to set up the swapchain
-        //D3D12_COMMAND_QUEUE_DESC desc = default;
-        //desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-        //desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-        //hr = device._instance.Get()->CreateCommandQueue(&desc, typeof(ID3D12CommandQueue).GUID, (void**)device._commandQueue.GetAddressOf());
-        //if (FAILED(hr))
-        //{
-        //    Logger.Error<D3D12Device>($"Failed to create a {nameof(ID3D12CommandQueue)} with HRESULT {hr}");
-        //    goto Error;
-        //}
+        D3D12_COMMAND_QUEUE_DESC desc = default;
+        desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+        hr = device._instance.Get()->CreateCommandQueue(&desc, typeof(ID3D12CommandQueue).GUID, (void**)device._commandQueue.GetAddressOf());
+        if (FAILED(hr))
+        {
+            Logger.Error<D3D12Device>($"Failed to create a {nameof(ID3D12CommandQueue)} with HRESULT {hr}");
+            goto Error;
+        }
 
         // Create the Swapchain
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = default;
@@ -203,6 +212,7 @@ public unsafe struct D3D12Device
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         swapChainDesc.SampleDesc.Count = 1;
+        swapChainDesc.Flags = allowTearing != 0 ? DXGI_SWAP_CHAIN_FLAG.DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
         hr = dxgiFactory.Get()->CreateSwapChainForHwnd(device._commandQueue, windowHandle, &swapChainDesc, null, null, swapChain.GetAddressOf());
         if (FAILED(hr))
@@ -214,7 +224,7 @@ public unsafe struct D3D12Device
         // Retarget the IDXGISwapChain1 to IDXGISwapChain3
         device._swapChain = new ComPtr<IDXGISwapChain3>((IDXGISwapChain3*)swapChain.Get());
 
-
+        dxgiFactory.Release();
         return true;
 
         device._frameIndex = device._swapChain.Get()->GetCurrentBackBufferIndex();

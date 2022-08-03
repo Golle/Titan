@@ -29,3 +29,9 @@ float4 PSMain(PSInput input) : SV_TARGET
 {
     return input.color;
 }
+
+
+// generate a single triangle in the vertex shader  for full screen effects (post processing)
+// const float2 tex = float2(uint2(VertexId, VertexId << 1) & 2);
+// output.Position = float4(lerp(float2(-1, 1), float2(1, -1), tex, 0, 1));
+// output.UV = tex;
