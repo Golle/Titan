@@ -54,11 +54,10 @@ public unsafe struct IDXGIFactory7
     // /* [in] */ UINT Adapter,
     // /* [annotation][out] */
     // _COM_Outptr_ IDXGIAdapter ** ppAdapter);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT MakeWindowAssociation(HWND WindowHandle, DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS Flags)
+        => ((delegate* unmanaged[Stdcall]<void*, HWND, DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this), WindowHandle, Flags);
 
-    //HRESULT(STDMETHODCALLTYPE* MakeWindowAssociation)(
-    // IDXGIFactory1* This,
-    // HWND WindowHandle,
-    // UINT Flags);
 
     //    HRESULT(STDMETHODCALLTYPE* GetWindowAssociation)(
     //     IDXGIFactory1* This,
@@ -182,13 +181,11 @@ public unsafe struct IDXGIFactory7
     ///* [annotation] */
     //_COM_Outptr_  void** ppvAdapter);
 
-    //HRESULT(STDMETHODCALLTYPE* CheckFeatureSupport)(
-    //IDXGIFactory7* This,
-    //DXGI_FEATURE Feature,
-    ///* [annotation] */
-    //_Inout_updates_bytes_(FeatureSupportDataSize) void* pFeatureSupportData,
-    //    UINT FeatureSupportDataSize);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT CheckFeatureSupport(DXGI_FEATURE Feature, void* pFeatureSupportData, uint FeatureSupportDataSize)
+        => ((delegate* unmanaged[Stdcall]<void*, DXGI_FEATURE, void*, uint, HRESULT>)_vtbl[28])(Unsafe.AsPointer(ref this), Feature, pFeatureSupportData, FeatureSupportDataSize);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT EnumAdapterByGpuPreference(uint Adapter, DXGI_GPU_PREFERENCE GpuPreference, in Guid riid, void** ppvAdapter)
         => ((delegate* unmanaged[Stdcall]<void*, uint, DXGI_GPU_PREFERENCE, in Guid, void**, HRESULT>)_vtbl[29])(Unsafe.AsPointer(ref this), Adapter, GpuPreference, riid, ppvAdapter);
 

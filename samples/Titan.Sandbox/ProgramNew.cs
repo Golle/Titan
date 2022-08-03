@@ -7,6 +7,7 @@ using Titan.ECS.Entities;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
+using Titan.Graphics.D3D12;
 using Titan.Graphics.Modules;
 using Titan.Input;
 using Titan.Input.Modules;
@@ -15,10 +16,6 @@ using Titan.Runner;
 using Titan.Sandbox;
 using EntityFilter = Titan.ECS.Entities.EntityFilter;
 
-var f = new EntityFilterConfig()
-    .With<Transform3DComponent>()
-    .Not<TestComponent>();
-
 
 AppBuilder
     .Create()
@@ -26,6 +23,7 @@ AppBuilder
     //.AddResource(SchedulerConfiguration.SingleThreaded)
     .AddModule<CoreModule>()
     .AddModule<WindowModule>()
+    .AddModule<D3D12RenderModule>()
     .AddModule<InputModule>()
     .UseRunner<WindowRunner>()
 

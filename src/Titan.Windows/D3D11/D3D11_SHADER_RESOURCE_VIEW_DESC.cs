@@ -21,6 +21,7 @@ public struct D3D11_SHADER_RESOURCE_VIEW_DESC
     //        }
     //    }
     //}
+    //NOTE(Jens): This is the one we shoudl always use. The code gen is a lot better than previous version.
     public unsafe ref D3D11_TEX2D_SRV Texture2D => ref ((D3D11_SHADER_RESOURCE_VIEW_DESC_UNION*)Unsafe.AsPointer(ref UnionMembers))->Texture2D;
 
     [StructLayout(LayoutKind.Explicit)]

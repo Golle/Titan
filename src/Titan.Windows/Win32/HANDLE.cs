@@ -10,6 +10,7 @@ public struct HANDLE
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator nuint(HANDLE rawInput) => rawInput.Value;
+    public static implicit operator nint(HANDLE rawInput) => (nint)rawInput.Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator HANDLE(nuint handle) => new() { Value = handle };

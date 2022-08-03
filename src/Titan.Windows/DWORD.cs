@@ -14,5 +14,8 @@ public struct DWORD
     public static implicit operator uint(DWORD dword) => dword.Value;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator DWORD(uint dword) => new() { Value = dword };
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator DWORD(int dword) => new() { Value = unchecked((uint)dword) };
     public override string ToString() => Value.ToString();
 }

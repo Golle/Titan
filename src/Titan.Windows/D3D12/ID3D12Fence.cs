@@ -1,23 +1,24 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Titan.Windows.Win32;
 
 namespace Titan.Windows.D3D12;
 
+[Guid("0a753dcf-c4d8-4b91-adf6-be5a60d95a76")]
 public unsafe struct ID3D12Fence
 {
-    public static readonly Guid UUID = new("0a753dcf-c4d8-4b91-adf6-be5a60d95a76");
     private void** _vtbl;
-
-    //HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-    //ID3D12Fence* This,
-    //REFIID riid,
-    //_COM_Outptr_  void** ppvObject);
-
-    //ULONG(STDMETHODCALLTYPE* AddRef)(
-    //    ID3D12Fence* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT QueryInterface(in Guid riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public uint AddRef()
+        => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public uint Release() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[2])(Unsafe.AsPointer(ref this));
+    public uint Release()
+        => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[2])(Unsafe.AsPointer(ref this));
 
     //HRESULT(STDMETHODCALLTYPE* GetPrivateData)(
     //ID3D12Fence* This,
@@ -45,16 +46,16 @@ public unsafe struct ID3D12Fence
     //REFIID riid,
     //_COM_Outptr_opt_  void** ppvDevice);
 
-    //UINT64(STDMETHODCALLTYPE* GetCompletedValue)(
-    //    ID3D12Fence* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ulong GetCompletedValue()
+        => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[8])(Unsafe.AsPointer(ref this));
 
-    //HRESULT(STDMETHODCALLTYPE* SetEventOnCompletion)(
-    //    ID3D12Fence* This,
-    //    UINT64 Value,
-    //    HANDLE hEvent);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT SetEventOnCompletion(ulong Value, HANDLE hEvent)
+    => ((delegate* unmanaged[Stdcall]<void*, ulong, HANDLE, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), Value, hEvent);
 
-    //HRESULT(STDMETHODCALLTYPE* Signal)(
-    //    ID3D12Fence* This,
-    //    UINT64 Value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT Signal(ulong Value)
+        => ((delegate* unmanaged[Stdcall]<void*, ulong, HRESULT>)_vtbl[10])(Unsafe.AsPointer(ref this), Value);
 
 }
