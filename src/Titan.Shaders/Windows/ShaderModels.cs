@@ -3,7 +3,7 @@ namespace Titan.Shaders.Windows;
 public enum ShaderModels
 {
     // FXC (d3dcompiler_47)
-    VS_5_0 = 1,
+    VS_5_0,
     VS_5_1,
     PS_5_0,
     PS_5_1,
@@ -11,7 +11,7 @@ public enum ShaderModels
     CS_5_1,
 
     // DXC (dxccompiler.dll)
-    VS_6_0 = 100,
+    VS_6_0,
     VS_6_1,
     VS_6_2,
     VS_6_3,
@@ -19,6 +19,7 @@ public enum ShaderModels
     VS_6_5,
     VS_6_6,
     VS_6_7,
+    
     PS_6_0,
     PS_6_1,
     PS_6_2,

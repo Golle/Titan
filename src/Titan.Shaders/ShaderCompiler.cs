@@ -10,6 +10,27 @@ using Titan.Windows.D3D;
 namespace Titan.Shaders;
 
 
+public static class ShaderCompiler1
+{
+    private static readonly IShaderCompiler[] _compilers =
+    {
+        new FxcCompiler(),
+        new DxcCompiler()
+    };
+
+    public static ShaderCompilationResult Compile(string filePath, string entryPoint, ShaderModels shaderModel)
+    {
+        foreach (var shaderCompiler in _compilers)
+        {
+            if (shaderCompiler.IsSupported(shaderModel))
+            {
+                return shaderCompiler.CompileShader(filePath, entryPoint, shaderModel);
+            }
+        }
+        throw new NotSupportedException($"Shader model {shaderModel} is not yet supported.");
+    }
+}
+
 
 
 public static unsafe class ShaderCompiler
@@ -61,7 +82,7 @@ public static unsafe class ShaderCompiler
             using ComPtr<IDXCCompiler3> compiler = default;
             using ComPtr<IDxcUtils> utils = default;
 
-            var hr = DxcCompilerCommon.DxcCreateInstance(DxcCompilerCommon.CLSID, typeof(IDXCCompiler3).GUID, (void**)compiler.GetAddressOf());
+            var hr = DxcCompilerCommon.DxcCreateInstance(DxcCompilerCommon.CLSID_Compiler, typeof(IDXCCompiler3).GUID, (void**)compiler.GetAddressOf());
             if (Common.FAILED(hr))
             {
                 Console.WriteLine($"Failed to create {nameof(IDXCCompiler3)} instance with HRESULT {hr}");
@@ -81,8 +102,6 @@ public static unsafe class ShaderCompiler
 
 
 
-
-             
             using ComPtr<IDxcBlobEncoding> pSource = default;
             fixed (char* pFilePath = filePath)
             {
@@ -137,7 +156,7 @@ public static unsafe class ShaderCompiler
                 if (pErrors.Get() != null && pErrors.Get()->GetStringLength() != 0)
                 {
                     var error = new ReadOnlySpan<byte>(pErrors.Get()->GetStringPointer(), (int)pErrors.Get()->GetStringLength());
-                    
+
                     Console.Error.WriteLine($"Warnings and Errors:\n{Encoding.UTF8.GetString(error)}\n");
                 }
             }
