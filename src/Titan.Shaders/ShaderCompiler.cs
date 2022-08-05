@@ -6,6 +6,10 @@ using Titan.Windows.Win32;
 
 namespace Titan.Shaders;
 
+/// <summary>
+/// The ShaderCompiler requires dxccompiler.dll, dxil.dll and d3dcompiler_47.dll. The latter one is probably in the dll search path on a dev machine, but the other ones must be downloaded.
+/// Call the SetShaderCompilerDllFolder to set the search path for the dlls
+/// </summary>
 public static class ShaderCompiler
 {
     private static readonly IShaderCompiler[] _compilers =
