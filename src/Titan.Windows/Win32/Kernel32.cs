@@ -62,4 +62,16 @@ public static unsafe class Kernel32
     [DllImport(DllName, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool CloseHandle(HANDLE handle);
+
+    [DllImport(DllName, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetDllDirectoryA(
+        byte* lpPathName
+    );
+
+    [DllImport(DllName, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetDllDirectoryW(
+        char* lpPathName
+    );
 }
