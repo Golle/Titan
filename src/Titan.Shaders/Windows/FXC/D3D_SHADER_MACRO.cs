@@ -1,4 +1,4 @@
-﻿namespace Titan.Shaders.Windows;
+namespace Titan.Shaders.Windows.FXC;
 
 internal unsafe struct D3D_SHADER_MACRO
 {

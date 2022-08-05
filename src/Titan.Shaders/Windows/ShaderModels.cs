@@ -10,7 +10,7 @@ public enum ShaderModels
     CS_5_0,
     CS_5_1,
 
-    // DXC
+    // DXC (dxccompiler.dll)
     VS_6_0 = 100,
     VS_6_1,
     VS_6_2,
@@ -36,7 +36,4 @@ public enum ShaderModels
     CS_6_5,
     CS_6_6,
     CS_6_7,
-
-    
-    
 }
