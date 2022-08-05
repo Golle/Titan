@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Shaders.Windows.DXC;
 using Titan.Windows;
-using static System.Net.WebRequestMethods;
 using static Titan.Shaders.Windows.DXC.DxcCompilerCommon;
 using static Titan.Windows.Common;
 
