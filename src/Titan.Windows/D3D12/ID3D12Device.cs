@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Windows.D3D11;
 
 namespace Titan.Windows.D3D12;
 
