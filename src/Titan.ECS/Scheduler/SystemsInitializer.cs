@@ -26,27 +26,39 @@ public readonly unsafe ref struct SystemsInitializer
             _world->GetResourcePointer<EntityIdContainer>()
         );
 
-    public MutableResource<T> GetMutableResource<T>() where T : unmanaged, IResource
+    public MutableResource<T> GetMutableResource<T>(bool track = true) where T : unmanaged, IResource
     {
-        _state->MutableResources.Add<T>();
+        if (track)
+        {
+            _state->MutableResources.Add<T>();
+        }
         return new(_world->GetResourcePointer<T>());
     }
 
-    public ReadOnlyResource<T> GetReadOnlyResource<T>() where T : unmanaged, IResource
+    public ReadOnlyResource<T> GetReadOnlyResource<T>(bool track = true) where T : unmanaged, IResource
     {
-        _state->ReadOnlyResources.Add<T>();
+        if (track)
+        {
+            _state->ReadOnlyResources.Add<T>();
+        }
         return new(_world->GetResourcePointer<T>());
     }
 
-    public MutableStorage<T> GetMutableStorage<T>() where T : unmanaged, IComponent
+    public MutableStorage<T> GetMutableStorage<T>(bool track = true) where T : unmanaged, IComponent
     {
-        _state->MutableComponents |= ComponentId<T>.Id;
+        if (track)
+        {
+            _state->MutableComponents |= ComponentId<T>.Id;
+        }
         return new(_world->GetComponents<T>(), GetEventsWriter<ComponentBeingDestroyed>(), GetEventsWriter<ComponentAdded>());
     }
 
-    public ReadOnlyStorage<T> GetReadOnlyStorage<T>() where T : unmanaged, IComponent
+    public ReadOnlyStorage<T> GetReadOnlyStorage<T>(bool track = true) where T : unmanaged, IComponent
     {
-        _state->ReadOnlyComponents |= ComponentId<T>.Id;
+        if (track)
+        {
+            _state->ReadOnlyComponents |= ComponentId<T>.Id;
+        }
         return new(_world->GetComponents<T>());
     }
 
