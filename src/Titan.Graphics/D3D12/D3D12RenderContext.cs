@@ -10,55 +10,6 @@ using static Titan.Windows.Common;
 
 namespace Titan.Graphics.D3D12;
 
-internal unsafe struct GPUHeap
-{
-    private ComPtr<ID3D12DescriptorHeap> _heap;
-    private D3D12_GPU_DESCRIPTOR_HANDLE _gpuStart;
-    private D3D12_CPU_DESCRIPTOR_HANDLE _cpuStart;
-
-    private uint _descriptorIncrementSize;
-    public static bool Create(ID3D12Device4* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint numberOfDescriptors, bool isShaderVisible, out GPUHeap heap)
-    {
-        heap = default;
-        D3D12_DESCRIPTOR_HEAP_DESC desc = new()
-        {
-            Flags = isShaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAGS.D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : 0,
-            NumDescriptors = numberOfDescriptors,
-            Type = type,
-            NodeMask = 0
-        };
-
-        var hr = device->CreateDescriptorHeap(&desc, typeof(ID3D12DescriptorHeap).GUID, (void**)heap._heap.GetAddressOf());
-        if (FAILED(hr))
-        {
-            Logger.Error<GPUHeap>($"Failed to create {nameof(ID3D12DescriptorHeap)} with HRESULT {hr}");
-            return false;
-        }
-
-        fixed (char* pName = $"GPUHeap {type}")
-        {
-            heap._heap.Get()->SetName(pName);
-        }
-        heap._descriptorIncrementSize = device->GetDescriptorHandleIncrementSize(type);
-
-        fixed (D3D12_CPU_DESCRIPTOR_HANDLE* pCpuHandle = &heap._cpuStart)
-        fixed (D3D12_GPU_DESCRIPTOR_HANDLE* pGpuHandle = &heap._gpuStart)
-        {
-            heap._heap.Get()->GetCPUDescriptorHandleForHeapStart(pCpuHandle);
-            heap._heap.Get()->GetGPUDescriptorHandleForHeapStart(pGpuHandle);
-        }
-
-        //heap._heap.Get()->
-        return true;
-    }
-
-    public void Release()
-    {
-        _heap.Release();
-    }
-}
-
-
 public unsafe struct D3D12RenderContext
 {
     //private const int BufferCount = 2; // Double buffering, maybe we want to configure this?

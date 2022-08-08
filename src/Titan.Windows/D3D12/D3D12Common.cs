@@ -8,6 +8,11 @@ namespace Titan.Windows.D3D12;
 
 public static unsafe class D3D12Common
 {
+    public const int D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_1 = 1000000;
+    public const int D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2 = 1000000;
+    public const int D3D12_MAX_SHADER_VISIBLE_SAMPLER_HEAP_SIZE = 2048;
+
+
 
     private const string DllName = "d3d12";
     [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]

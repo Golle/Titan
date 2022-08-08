@@ -204,8 +204,9 @@ public unsafe struct ID3D12Device4
     public HRESULT CreateFence(ulong initialValue, D3D12_FENCE_FLAGS flags, in Guid riid, void** ppFence)
         => ((delegate* unmanaged[Stdcall]<void*, ulong, D3D12_FENCE_FLAGS, in Guid, void**, HRESULT>)_vtbl[36])(Unsafe.AsPointer(ref this), initialValue, flags, riid, ppFence);
 
-    //HRESULT(STDMETHODCALLTYPE* GetDeviceRemovedReason)(
-    // ID3D12Device* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT GetDeviceRemovedReason()
+        => ((delegate* unmanaged[Stdcall]<void*, HRESULT>)_vtbl[37])(Unsafe.AsPointer(ref this));
 
     //    void (STDMETHODCALLTYPE* GetCopyableFootprints ) (
     //        ID3D12Device* This,

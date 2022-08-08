@@ -50,13 +50,10 @@ public unsafe struct IDXGISwapChain3
     // _In_ REFIID riid,
     // /* [annotation][retval][out] */
     // _COM_Outptr_  void** ppParent);
-
-    //HRESULT(STDMETHODCALLTYPE* GetDevice)(
-    // IDXGISwapChain* This,
-    // /* [annotation][in] */
-    // _In_ REFIID riid,
-    // /* [annotation][retval][out] */
-    // _COM_Outptr_  void** ppDevice);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT GetDevice(in Guid riid, void** ppDevice)
+        => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppDevice);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT Present(uint syncInterval, uint flags) => ((delegate* unmanaged[Stdcall]<void*, uint, uint, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this), syncInterval, flags);
