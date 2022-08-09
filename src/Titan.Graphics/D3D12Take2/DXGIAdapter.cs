@@ -1,3 +1,4 @@
+using System;
 using Titan.Core.Logging;
 using Titan.Windows;
 using Titan.Windows.D3D;
@@ -10,7 +11,7 @@ using static Titan.Windows.DXGI.DXGI_GPU_PREFERENCE;
 
 namespace Titan.Graphics.D3D12Take2;
 
-internal unsafe struct DXGIAdapter
+internal unsafe struct DXGIAdapter : IDisposable
 {
     private ComPtr<IDXGIAdapter3> _adapter;
     public bool Initialize(IDXGIFactory7* factory, D3D_FEATURE_LEVEL minFeatureLevel = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0)
@@ -46,11 +47,8 @@ internal unsafe struct DXGIAdapter
     }
 
 
-    public void Shutdown()
-    {
-
-        _adapter.Release();
-    }
-
     public static implicit operator IDXGIAdapter3*(in DXGIAdapter adapter) => adapter._adapter.Get();
+
+    public void Dispose() => Shutdown();
+    public void Shutdown() => _adapter.Release();
 }

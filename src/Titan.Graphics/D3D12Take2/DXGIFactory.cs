@@ -1,3 +1,4 @@
+using System;
 using Titan.Core.Logging;
 using Titan.Windows;
 using Titan.Windows.DXGI;
@@ -7,7 +8,7 @@ using static Titan.Windows.DXGI.DXGICommon;
 
 namespace Titan.Graphics.D3D12Take2;
 
-internal unsafe struct DXGIFactory
+internal unsafe struct DXGIFactory : IDisposable
 {
     private ComPtr<IDXGIFactory7> _factory;
     public bool Initialize(bool debug)
@@ -23,12 +24,8 @@ internal unsafe struct DXGIFactory
 
         return true;
     }
-
-    public void Shutdown()
-    {
-        _factory.Release();
-    }
-
-
     public static implicit operator IDXGIFactory7*(in DXGIFactory factory) => factory._factory.Get();
+
+    public void Shutdown() => _factory.Release();
+    public void Dispose() => Shutdown();
 }

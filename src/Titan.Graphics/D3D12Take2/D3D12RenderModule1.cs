@@ -1,8 +1,8 @@
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.ECS.App;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
+using Titan.Graphics.D3D12Take2.Systems;
 using Titan.Graphics.Modules;
 using Titan.Windows;
 using Titan.Windows.D3D;
@@ -12,16 +12,21 @@ namespace Titan.Graphics.D3D12Take2;
 
 public unsafe struct D3D12RenderModule1 : IModule
 {
+    private const uint BufferCount = 3;
+
     public static void Build(AppBuilder builder)
     {
         ref readonly var window = ref builder.GetResource<Window>();
 
+        // add some config that we can check if debug should be enabled
         EnableDebugLayer();
 
-        DXGIFactory factory = default;
-        DXGIAdapter adapter = default;
+        // factory and adapter are only used to create device and swapchain, can be disposed at the end of the function.
+        using DXGIFactory factory = default;
+        using DXGIAdapter adapter = default;
+
         D3D12Device device = default;
-        D3D12Surface swapChain = default;
+        D3D12Surface surface = default;
         D3D12GraphicsQueue queue = default;
         D3D12Command command = default;
 
@@ -34,7 +39,8 @@ public unsafe struct D3D12RenderModule1 : IModule
             goto Error;
         }
 
-        var args = new D3D12DeviceCreationArgs
+        // Create the device
+        var deviceArgs = new D3D12DeviceCreationArgs
         {
             Height = window.Height,
             Width = window.Width,
@@ -42,58 +48,55 @@ public unsafe struct D3D12RenderModule1 : IModule
             MinimumFeatureLevel = D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0
         };
 
-        if (!device.Initialize(adapter, args))
+        if (!device.Initialize(adapter, deviceArgs))
         {
             goto Error;
         }
-        
 
+        // Create the graphics queue
         if (!queue.Initialize(device))
         {
             goto Error;
         }
 
+        // Set up the swapchain
         var swapChainArgs = new SwapChainCreationArgs
         {
             AllowTearing = true,
-            BufferCount = 3,
+            BufferCount = BufferCount,
             Height = window.Height,
             Width = window.Width,
             VSync = true,
             WindowHandle = window.Handle
         };
-        if (!swapChain.Initialize(factory, device, queue, swapChainArgs))
-        {
-            goto Error;
-        }
-        if (!command.Initialize(device, queue, 3))
+        if (!surface.Initialize(factory, device, queue, swapChainArgs))
         {
             goto Error;
         }
 
-        //for (var i = 0; i < 100; ++i)
-        //{
-        //    swapChain.Present();
-        //}
+        // Create the d3d command list
+        if (!command.Initialize(device, queue, BufferCount))
+        {
+            goto Error;
+        }
 
-        //factory.Shutdown();
-        //device.Shutdown();
-        //adapter.Shutdown();
-        //swapChain.Shutdown();
-        //queue.Shutdown();
-
+        // Add the resources and register the systems needed
         builder
             .AddResource<RenderData>()
             .AddResource(new D3D12Core
             {
-                Surface = swapChain,
-                Command = command
+                Surface = surface,
+                Command = command,
+                Device = device,
+                Queue = queue
             })
+
+
+            .AddSystemToStage<BeginFrameSystem>(Stage.PreUpdate, RunCriteria.Always)
+            .AddSystemToStage<SwapChainPresentSystem>(Stage.PostUpdate, RunCriteria.Always)
+            .AddShutdownSystem<D3D12TearDownSystem>(RunCriteria.Always)
             ;
 
-        builder
-            .AddSystemToStage<BeginFrameSystem>(Stage.PreUpdate, RunCriteria.Always)
-            .AddSystemToStage<SwapChainPresentSystem>(Stage.PostUpdate, RunCriteria.Always);
         return;
 
 
@@ -101,11 +104,10 @@ public unsafe struct D3D12RenderModule1 : IModule
 
 Error:
         Logger.Error<D3D12RenderModule1>("Failed to inialize the D3D12 renderer module.");
-        factory.Shutdown();
         device.Shutdown();
-        adapter.Shutdown();
-        swapChain.Shutdown();
+        surface.Shutdown();
         queue.Shutdown();
+        command.Shutdown();
     }
 
 
@@ -130,60 +132,4 @@ Error:
         spDebugController1.Get()->EnableDebugLayer();
         spDebugController1.Get()->SetEnableGPUBasedValidation(true);
     }
-}
-
-internal struct D3D12Core : IResource
-{
-    public D3D12Surface Surface;
-    public D3D12Command Command;
-}
-
-public struct RenderData : IResource
-{
-    public ulong FrameCount;
-    public uint FrameIndex;
-}
-
-
-
-internal struct BeginFrameSystem : IStructSystem<BeginFrameSystem>
-{
-    private MutableResource<D3D12Core> Core;
-
-    public static void Init(ref BeginFrameSystem system, in SystemsInitializer init)
-    {
-        system.Core = init.GetMutableResource<D3D12Core>();
-    }
-
-    public static void Update(ref BeginFrameSystem system)
-    {
-        system.Core.Get().Command.BeginFrame();
-    }
-
-    public static bool ShouldRun(in BeginFrameSystem system) => throw new System.NotImplementedException("This should be marked as always");
-}
-
-internal struct SwapChainPresentSystem : IStructSystem<SwapChainPresentSystem>
-{
-    private MutableResource<D3D12Core> Resources;
-    private MutableResource<RenderData> RenderData;
-
-    public static void Init(ref SwapChainPresentSystem system, in SystemsInitializer init)
-    {
-        system.Resources = init.GetMutableResource<D3D12Core>(false);
-        system.RenderData = init.GetMutableResource<RenderData>(false);
-    }
-
-    public static void Update(ref SwapChainPresentSystem system)
-    {
-        ref var surface = ref system.Resources.Get().Surface;
-        ref var command = ref system.Resources.Get().Command;
-        ref var renderData = ref system.RenderData.Get();
-
-        command.EndFrame();
-        surface.Present();
-        renderData.FrameIndex = surface.FrameIndex;
-        renderData.FrameCount++;
-    }
-    public static bool ShouldRun(in SwapChainPresentSystem system) => throw new System.NotImplementedException("This should be marked as always");
 }
