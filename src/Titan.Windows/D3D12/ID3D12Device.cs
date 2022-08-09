@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Windows.D3D11;
+using static Titan.Windows.D3D11.D3D11_SHADER_RESOURCE_VIEW_DESC;
 
 namespace Titan.Windows.D3D12;
 
@@ -37,12 +39,13 @@ public unsafe struct ID3D12Device
     // _In_ REFGUID guid,
     // _In_opt_  const IUnknown* pData);
 
-    //HRESULT(STDMETHODCALLTYPE* SetName)(
-    // ID3D12Device* This,
-    // _In_z_ LPCWSTR Name);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT SetName(char* Name)
+        => ((delegate* unmanaged[Stdcall]<void*, char*, HRESULT>)_vtbl[6])(Unsafe.AsPointer(ref this), Name);
 
-    //UINT(STDMETHODCALLTYPE* GetNodeCount)(
-    // ID3D12Device* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public uint GetNodeCount()
+        => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[7])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateCommandQueue(D3D12_COMMAND_QUEUE_DESC* pDesc, in Guid riid, void** ppCommandQueue)
@@ -56,11 +59,9 @@ public unsafe struct ID3D12Device
     public HRESULT CreateGraphicsPipelineState(D3D12_GRAPHICS_PIPELINE_STATE_DESC* pDesc, in Guid riid, void** ppPipelineState)
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_GRAPHICS_PIPELINE_STATE_DESC*, in Guid, void**, HRESULT>)_vtbl[10])(Unsafe.AsPointer(ref this), pDesc, riid, ppPipelineState);
 
-    //HRESULT(STDMETHODCALLTYPE* CreateComputePipelineState)(
-    // ID3D12Device* This,
-    // _In_  const D3D12_COMPUTE_PIPELINE_STATE_DESC* pDesc,
-    // REFIID riid,
-    //        _COM_Outptr_ void** ppPipelineState);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT CreateComputePipelineState(D3D12_COMPUTE_PIPELINE_STATE_DESC* pDesc, in Guid riid, void** ppPipelineState)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_COMPUTE_PIPELINE_STATE_DESC*, in Guid, void**, HRESULT>)_vtbl[11])(Unsafe.AsPointer(ref this), pDesc, riid, ppPipelineState);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateCommandList(uint nodeMask, D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator* pCommandAllocator, ID3D12PipelineState* pInitialState, in Guid riid, void** ppCommandList)
@@ -82,33 +83,26 @@ public unsafe struct ID3D12Device
     public HRESULT CreateRootSignature(uint nodeMask, void* pBlobWithRootSignature, nuint blobLengthInBytes, in Guid riid, void** ppvRootSignature)
         => ((delegate* unmanaged[Stdcall]<void*, uint, void*, nuint, in Guid, void**, HRESULT>)_vtbl[16])(Unsafe.AsPointer(ref this), nodeMask, pBlobWithRootSignature, blobLengthInBytes, riid, ppvRootSignature);
 
-    //void (STDMETHODCALLTYPE* CreateConstantBufferView ) (
-    //    ID3D12Device* This,
-    //    _In_opt_  const D3D12_CONSTANT_BUFFER_VIEW_DESC* pDesc,
-    //    _In_  D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_CONSTANT_BUFFER_VIEW_DESC*, D3D12_CPU_DESCRIPTOR_HANDLE, void>)_vtbl[17])(Unsafe.AsPointer(ref this), pDesc, DestDescriptor);
 
-    //void (STDMETHODCALLTYPE* CreateShaderResourceView ) (
-    //    ID3D12Device* This,
-    //    _In_opt_ ID3D12Resource * pResource,
-    //    _In_opt_  const D3D12_SHADER_RESOURCE_VIEW_DESC* pDesc,
-    //    _In_  D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CreateShaderResourceView(ID3D12Resource* pResource, D3D12_SHADER_RESOURCE_VIEW_DESC* pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, D3D12_SHADER_RESOURCE_VIEW_DESC*, D3D12_CPU_DESCRIPTOR_HANDLE, void>)_vtbl[18])(Unsafe.AsPointer(ref this), pResource, pDesc, DestDescriptor);
 
-    //void (STDMETHODCALLTYPE* CreateUnorderedAccessView ) (
-    //    ID3D12Device* This,
-    //    _In_opt_ ID3D12Resource * pResource,
-    //    _In_opt_  ID3D12Resource* pCounterResource,
-    //    _In_opt_  const D3D12_UNORDERED_ACCESS_VIEW_DESC* pDesc,
-    //    _In_  D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CreateUnorderedAccessView(ID3D12Resource* pResource, ID3D12Resource* pCounterResource, D3D12_UNORDERED_ACCESS_VIEW_DESC* pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, ID3D12Resource*, D3D12_UNORDERED_ACCESS_VIEW_DESC*, D3D12_CPU_DESCRIPTOR_HANDLE, void>)_vtbl[19])(Unsafe.AsPointer(ref this), pResource, pCounterResource, pDesc, DestDescriptor);
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void CreateRenderTargetView(ID3D12Resource* pResource, D3D12_RENDER_TARGET_VIEW_DESC* pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor)
         => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, D3D12_RENDER_TARGET_VIEW_DESC*, D3D12_CPU_DESCRIPTOR_HANDLE, void>)_vtbl[20])(Unsafe.AsPointer(ref this), pResource, pDesc, DestDescriptor);
 
-    //void (STDMETHODCALLTYPE* CreateDepthStencilView ) (
-    //    ID3D12Device* This,
-    //    _In_opt_ ID3D12Resource * pResource,
-    //    _In_opt_  const D3D12_DEPTH_STENCIL_VIEW_DESC* pDesc,
-    //    _In_  D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CreateDepthStencilView(ID3D12Resource* pResource, D3D12_DEPTH_STENCIL_VIEW_DESC* pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, D3D12_DEPTH_STENCIL_VIEW_DESC*, D3D12_CPU_DESCRIPTOR_HANDLE, void>)_vtbl[21])(Unsafe.AsPointer(ref this), pResource, pDesc, DestDescriptor);
 
     //void (STDMETHODCALLTYPE* CreateSampler ) (
     //    ID3D12Device* This,
