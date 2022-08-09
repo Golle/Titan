@@ -19,7 +19,7 @@ internal unsafe struct GPUHeap
     private D3D12_DESCRIPTOR_HEAP_TYPE _type;
 
     private bool _shaderVisible;
-    //NOTE(Jens): add a free list
+    //NOTE(Jens): add a free list (we should build a GPU memory system to handle this)
 
     public static bool Create(ID3D12Device4* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint numberOfDescriptors, bool shaderVisible, out GPUHeap heap)
     {

@@ -64,7 +64,6 @@ internal unsafe struct D3D12Command
         frame.Wait(_fenceEvent, _fence.Get());
         frame.Allocator.Get()->Reset();
         _commandList.Get()->Reset(frame.Allocator, null);
-
     }
 
     public void EndFrame()

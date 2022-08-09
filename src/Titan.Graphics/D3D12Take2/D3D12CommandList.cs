@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.IO;
 using Titan.Windows;
 using Titan.Windows.D3D12;
 

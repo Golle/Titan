@@ -36,7 +36,7 @@ public unsafe struct ID3D12GraphicsCommandList
     //        ID3D12GraphicsCommandList* This,
     //        _In_ REFGUID guid,
     //        _In_opt_  const IUnknown* pData);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT SetName(char* Name)
         => ((delegate* unmanaged[Stdcall]<void*, char*, HRESULT>)_vtbl[6])(Unsafe.AsPointer(ref this), Name);
@@ -151,102 +151,67 @@ public unsafe struct ID3D12GraphicsCommandList
     public void ResourceBarrier(uint NumBarriers, D3D12_RESOURCE_BARRIER* pBarriers)
         => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_RESOURCE_BARRIER*, void>)_vtbl[26])(Unsafe.AsPointer(ref this), NumBarriers, pBarriers);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ExecuteBundle)
-    //    void (STDMETHODCALLTYPE* ExecuteBundle ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12GraphicsCommandList * pCommandList);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ExecuteBundle(ID3D12GraphicsCommandList* pCommandList)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12GraphicsCommandList*, void>)_vtbl[27])(Unsafe.AsPointer(ref this), pCommandList);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetDescriptorHeaps(uint NumDescriptorHeaps, ID3D12DescriptorHeap** ppDescriptorHeaps)
         => ((delegate* unmanaged[Stdcall]<void*, uint, ID3D12DescriptorHeap**, void>)_vtbl[28])(Unsafe.AsPointer(ref this), NumDescriptorHeaps, ppDescriptorHeaps);
 
-
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetComputeRootSignature)
-    //    void (STDMETHODCALLTYPE* SetComputeRootSignature ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_opt_ ID3D12RootSignature * pRootSignature);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetComputeRootSignature(ID3D12RootSignature* pRootSignature)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12RootSignature*, void>)_vtbl[29])(Unsafe.AsPointer(ref this), pRootSignature);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetGraphicsRootSignature(ID3D12RootSignature* pRootSignature)
      => ((delegate* unmanaged[Stdcall]<void*, ID3D12RootSignature*, void>)_vtbl[30])(Unsafe.AsPointer(ref this), pRootSignature);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetComputeRootDescriptorTable)
-    //    void (STDMETHODCALLTYPE* SetComputeRootDescriptorTable ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetComputeRootDescriptorTable(uint RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_GPU_DESCRIPTOR_HANDLE, void>)_vtbl[31])(Unsafe.AsPointer(ref this), RootParameterIndex, BaseDescriptor);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetGraphicsRootDescriptorTable)
-    //    void (STDMETHODCALLTYPE* SetGraphicsRootDescriptorTable ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetGraphicsRootDescriptorTable(uint RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_GPU_DESCRIPTOR_HANDLE, void>)_vtbl[32])(Unsafe.AsPointer(ref this), RootParameterIndex, BaseDescriptor);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetComputeRoot32BitConstant(uint RootParameterIndex, uint SrcData, uint DestOffsetIn32BitValues)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, uint, void>)_vtbl[33])(Unsafe.AsPointer(ref this), RootParameterIndex, SrcData, DestOffsetIn32BitValues);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetGraphicsRoot32BitConstant(uint RootParameterIndex, uint SrcData, uint DestOffsetIn32BitValues)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, uint, void>)_vtbl[34])(Unsafe.AsPointer(ref this), RootParameterIndex, SrcData, DestOffsetIn32BitValues);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetComputeRoot32BitConstant)
-    //    void (STDMETHODCALLTYPE* SetComputeRoot32BitConstant ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  UINT SrcData,
-    //        _In_  UINT DestOffsetIn32BitValues);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetComputeRoot32BitConstants(uint RootParameterIndex, uint Num32BitValuesToSet, void* pSrcData, uint DestOffsetIn32BitValues)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, void*, uint, void>)_vtbl[35])(Unsafe.AsPointer(ref this), RootParameterIndex, Num32BitValuesToSet, pSrcData, DestOffsetIn32BitValues);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetGraphicsRoot32BitConstant)
-    //    void (STDMETHODCALLTYPE* SetGraphicsRoot32BitConstant ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  UINT SrcData,
-    //        _In_  UINT DestOffsetIn32BitValues);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetGraphicsRoot32BitConstants(uint RootParameterIndex, uint Num32BitValuesToSet, void* pSrcData, uint DestOffsetIn32BitValues)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, void*, uint, void>)_vtbl[36])(Unsafe.AsPointer(ref this), RootParameterIndex, Num32BitValuesToSet, pSrcData, DestOffsetIn32BitValues);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetComputeRoot32BitConstants)
-    //    void (STDMETHODCALLTYPE* SetComputeRoot32BitConstants ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  UINT Num32BitValuesToSet,
-    //        _In_reads_(Num32BitValuesToSet * sizeof(UINT))  const void* pSrcData,
-    //        _In_  UINT DestOffsetIn32BitValues);
+    public void SetComputeRootConstantBufferView(uint RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_GPU_VIRTUAL_ADDRESS, void>)_vtbl[37])(Unsafe.AsPointer(ref this), RootParameterIndex, BufferLocation);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetGraphicsRoot32BitConstants)
-    //    void (STDMETHODCALLTYPE* SetGraphicsRoot32BitConstants ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  UINT Num32BitValuesToSet,
-    //        _In_reads_(Num32BitValuesToSet * sizeof(UINT))  const void* pSrcData,
-    //        _In_  UINT DestOffsetIn32BitValues);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetGraphicsRootConstantBufferView(uint RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_GPU_VIRTUAL_ADDRESS, void>)_vtbl[38])(Unsafe.AsPointer(ref this), RootParameterIndex, BufferLocation);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetComputeRootConstantBufferView)
-    //    void (STDMETHODCALLTYPE* SetComputeRootConstantBufferView ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  D3D12_GPU_VIRTUAL_ADDRESS BufferLocation);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetGraphicsRootConstantBufferView)
-    //    void (STDMETHODCALLTYPE* SetGraphicsRootConstantBufferView ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  D3D12_GPU_VIRTUAL_ADDRESS BufferLocation);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetComputeRootShaderResourceView(uint RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_GPU_VIRTUAL_ADDRESS, void>)_vtbl[39])(Unsafe.AsPointer(ref this), RootParameterIndex, BufferLocation);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetComputeRootShaderResourceView)
-    //    void (STDMETHODCALLTYPE* SetComputeRootShaderResourceView ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  D3D12_GPU_VIRTUAL_ADDRESS BufferLocation);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetGraphicsRootShaderResourceView(uint RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_GPU_VIRTUAL_ADDRESS, void>)_vtbl[40])(Unsafe.AsPointer(ref this), RootParameterIndex, BufferLocation);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetGraphicsRootShaderResourceView)
-    //    void (STDMETHODCALLTYPE* SetGraphicsRootShaderResourceView ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  D3D12_GPU_VIRTUAL_ADDRESS BufferLocation);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetComputeRootUnorderedAccessView(uint RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_GPU_VIRTUAL_ADDRESS, void>)_vtbl[41])(Unsafe.AsPointer(ref this), RootParameterIndex, BufferLocation);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetComputeRootUnorderedAccessView)
-    //    void (STDMETHODCALLTYPE* SetComputeRootUnorderedAccessView ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  D3D12_GPU_VIRTUAL_ADDRESS BufferLocation);
-
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetGraphicsRootUnorderedAccessView)
-    //    void (STDMETHODCALLTYPE* SetGraphicsRootUnorderedAccessView ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT RootParameterIndex,
-    //        _In_  D3D12_GPU_VIRTUAL_ADDRESS BufferLocation);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetGraphicsRootUnorderedAccessView(uint RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_GPU_VIRTUAL_ADDRESS, void>)_vtbl[42])(Unsafe.AsPointer(ref this), RootParameterIndex, BufferLocation);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void IASetIndexBuffer(D3D12_INDEX_BUFFER_VIEW* pView)
@@ -256,12 +221,10 @@ public unsafe struct ID3D12GraphicsCommandList
     public void IASetVertexBuffers(uint StartSlot, uint NumViews, D3D12_VERTEX_BUFFER_VIEW* pViews)
         => ((delegate* unmanaged[Stdcall]<void*, uint, uint, D3D12_VERTEX_BUFFER_VIEW*, void>)_vtbl[44])(Unsafe.AsPointer(ref this), StartSlot, NumViews, pViews);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SOSetTargets)
-    //    void (STDMETHODCALLTYPE* SOSetTargets ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT StartSlot,
-    //        _In_  UINT NumViews,
-    //        _In_reads_opt_(NumViews)  const D3D12_STREAM_OUTPUT_BUFFER_VIEW* pViews);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SOSetTargets(uint StartSlot, uint NumViews, D3D12_STREAM_OUTPUT_BUFFER_VIEW* pViews)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, D3D12_STREAM_OUTPUT_BUFFER_VIEW*, void>)_vtbl[45])(Unsafe.AsPointer(ref this), StartSlot, NumViews, pViews);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void OMSetRenderTargets(uint NumRenderTargetDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE* pRenderTargetDescriptors, int RTsSingleHandleToDescriptorRange, D3D12_CPU_DESCRIPTOR_HANDLE* pDepthStencilDescriptor)
         => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_CPU_DESCRIPTOR_HANDLE*, int, D3D12_CPU_DESCRIPTOR_HANDLE*, void>)_vtbl[46])(Unsafe.AsPointer(ref this), NumRenderTargetDescriptors, pRenderTargetDescriptors, RTsSingleHandleToDescriptorRange, pDepthStencilDescriptor);
@@ -274,25 +237,13 @@ public unsafe struct ID3D12GraphicsCommandList
     public void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetView, float* ColorRGBA, uint NumRects, D3D12_RECT* pRects)
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_CPU_DESCRIPTOR_HANDLE, float*, uint, D3D12_RECT*, void>)_vtbl[48])(Unsafe.AsPointer(ref this), RenderTargetView, ColorRGBA, NumRects, pRects);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ClearUnorderedAccessViewUint)
-    //    void (STDMETHODCALLTYPE* ClearUnorderedAccessViewUint ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap,
-    //        _In_  D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle,
-    //        _In_  ID3D12Resource* pResource,
-    //        _In_  const UINT Values[4],
-    //        _In_  UINT NumRects,
-    //        _In_reads_(NumRects)  const D3D12_RECT* pRects);
-
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ClearUnorderedAccessViewFloat)
-    //    void (STDMETHODCALLTYPE* ClearUnorderedAccessViewFloat ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap,
-    //        _In_  D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle,
-    //        _In_  ID3D12Resource* pResource,
-    //        _In_  const FLOAT Values[4],
-    //        _In_  UINT NumRects,
-    //        _In_reads_(NumRects)  const D3D12_RECT* pRects);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ClearUnorderedAccessViewUint(D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap, D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle, ID3D12Resource* pResource, uint* Values, uint NumRects, D3D12_RECT* pRects)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_GPU_DESCRIPTOR_HANDLE, D3D12_CPU_DESCRIPTOR_HANDLE, ID3D12Resource*, uint*, uint, D3D12_RECT*, void>)_vtbl[49])(Unsafe.AsPointer(ref this), ViewGPUHandleInCurrentHeap, ViewCPUHandle, pResource, Values, NumRects, pRects);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ClearUnorderedAccessViewFloat(D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap, D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle, ID3D12Resource* pResource, float* Values, uint NumRects, D3D12_RECT* pRects)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_GPU_DESCRIPTOR_HANDLE, D3D12_CPU_DESCRIPTOR_HANDLE, ID3D12Resource*, float*, uint, D3D12_RECT*, void>)_vtbl[50])(Unsafe.AsPointer(ref this), ViewGPUHandleInCurrentHeap, ViewCPUHandle, pResource, Values, NumRects, pRects);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, DiscardResource)
     //    void (STDMETHODCALLTYPE* DiscardResource ) (
@@ -338,16 +289,13 @@ public unsafe struct ID3D12GraphicsCommandList
     //        _In_reads_bytes_opt_(Size) const void* pData,
     //        UINT Size);
 
-    //    DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, BeginEvent)
-    //    void (STDMETHODCALLTYPE* BeginEvent ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        UINT Metadata,
-    //        _In_reads_bytes_opt_(Size) const void* pData,
-    //        UINT Size);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void BeginEvent(uint Metadata, void* pData, uint Size)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, void*, uint, void>)_vtbl[57])(Unsafe.AsPointer(ref this), Metadata, pData, Size);
 
-    //    DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, EndEvent)
-    //    void (STDMETHODCALLTYPE* EndEvent ) (
-    //        ID3D12GraphicsCommandList* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void EndEvent()
+        => ((delegate* unmanaged[Stdcall]<void*, void>)_vtbl[58])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ExecuteIndirect(ID3D12CommandSignature* pCommandSignature, uint MaxCommandCount, ID3D12Resource* pArgumentBuffer, ulong ArgumentBufferOffset, ID3D12Resource* pCountBuffer, ulong CountBufferOffset)
