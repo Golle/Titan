@@ -18,6 +18,7 @@ internal struct D3D12TearDownSystem : IStructSystem<D3D12TearDownSystem>
         core.Command.Shutdown();
         core.Queue.Shutdown();
         core.Device.Shutdown();
+        core.Adapter.Shutdown();
 
         core = default;
     }

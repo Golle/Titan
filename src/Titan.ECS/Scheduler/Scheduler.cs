@@ -104,7 +104,6 @@ public unsafe struct Scheduler
                 {
                     continue;
                 }
-                // NOTE(Jens): this has not been implemented yet.
                 var dependencyType = systemState.DependsOn(states[j]);
                 if (dependencyType is DependencyType.OneWay or DependencyType.TwoWay)
                 {

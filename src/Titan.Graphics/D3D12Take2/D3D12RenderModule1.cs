@@ -2,6 +2,7 @@ using Titan.Core.Logging;
 using Titan.ECS.App;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
+using Titan.Graphics.D3D12Take2.Stats;
 using Titan.Graphics.D3D12Take2.Systems;
 using Titan.Graphics.Modules;
 using Titan.Windows;
@@ -23,7 +24,7 @@ public unsafe struct D3D12RenderModule1 : IModule
 
         // factory and adapter are only used to create device and swapchain, can be disposed at the end of the function.
         using DXGIFactory factory = default;
-        using DXGIAdapter adapter = default;
+        DXGIAdapter adapter = default;
 
         D3D12Device device = default;
         D3D12Surface surface = default;
@@ -88,19 +89,21 @@ public unsafe struct D3D12RenderModule1 : IModule
                 Surface = surface,
                 Command = command,
                 Device = device,
-                Queue = queue
+                Queue = queue,
+                Adapter = adapter
             })
 
-
+            
             .AddSystemToStage<BeginFrameSystem>(Stage.PreUpdate, RunCriteria.Always)
             .AddSystemToStage<SwapChainPresentSystem>(Stage.PostUpdate, RunCriteria.Always)
             .AddShutdownSystem<D3D12TearDownSystem>(RunCriteria.Always)
             ;
 
+        builder
+            .AddModule<D3D12DebugModule>();
+
+        
         return;
-
-
-
 
 Error:
         Logger.Error<D3D12RenderModule1>("Failed to inialize the D3D12 renderer module.");
@@ -108,6 +111,7 @@ Error:
         surface.Shutdown();
         queue.Shutdown();
         command.Shutdown();
+        adapter.Shutdown();
     }
 
 

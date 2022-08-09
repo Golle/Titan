@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices.ComTypes;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
+using Titan.Graphics.D3D12Take2.Stats;
 
 namespace Titan.Graphics.D3D12Take2.Systems;
 
