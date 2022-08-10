@@ -1,6 +1,4 @@
 using System;
-using System.Diagnostics;
-using Titan.Core.Logging;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 
