@@ -154,15 +154,13 @@ public unsafe struct ID3D12Device4
     //        /* [annotation][out] */ 
     //        _Out_ HANDLE *pNTHandle);
 
-    //    HRESULT(STDMETHODCALLTYPE* MakeResident)(
-    //     ID3D12Device* This,
-    //     UINT NumObjects,
-    //     _In_reads_(NumObjects) ID3D12Pageable *const * ppObjects);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT MakeResident(uint NumObjects, ID3D12Pageable** ppObjects)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, ID3D12Pageable**, HRESULT>)_vtbl[34])(Unsafe.AsPointer(ref this), NumObjects, ppObjects);
 
-    //HRESULT(STDMETHODCALLTYPE* Evict)(
-    // ID3D12Device* This,
-    // UINT NumObjects,
-    // _In_reads_(NumObjects) ID3D12Pageable *const * ppObjects);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT Evict(uint NumObjects, ID3D12Pageable** ppObjects)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, ID3D12Pageable**, HRESULT>)_vtbl[35])(Unsafe.AsPointer(ref this), NumObjects, ppObjects);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateFence(ulong initialValue, D3D12_FENCE_FLAGS flags, in Guid riid, void** ppFence)
@@ -249,15 +247,10 @@ public unsafe struct ID3D12Device4
     //        _In_ HANDLE hFileMapping,
     //        REFIID riid,
     //        _COM_Outptr_ void** ppvHeap);
-
-    //DECLSPEC_XFGVIRT(ID3D12Device3, EnqueueMakeResident)
-    //    HRESULT(STDMETHODCALLTYPE* EnqueueMakeResident)(
-    //        ID3D12Device4* This,
-    //        D3D12_RESIDENCY_FLAGS Flags,
-    //        UINT NumObjects,
-    //        _In_reads_(NumObjects) ID3D12Pageable *const * ppObjects,
-    //        _In_  ID3D12Fence* pFenceToSignal,
-    //        UINT64 FenceValueToSignal);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT EnqueueMakeResident(D3D12_RESIDENCY_FLAGS Flags, uint NumObjects, ID3D12Pageable** ppObjects, ID3D12Fence* pFenceToSignal, ulong FenceValueToSignal)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_RESIDENCY_FLAGS, uint, ID3D12Pageable**, ID3D12Fence*, ulong, HRESULT>)_vtbl[50])(Unsafe.AsPointer(ref this), Flags, NumObjects, ppObjects, pFenceToSignal, FenceValueToSignal);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateCommandList1(uint nodeMask, D3D12_COMMAND_LIST_TYPE type, D3D12_COMMAND_LIST_FLAGS flags, in Guid riid, void** ppCommandList)
@@ -276,11 +269,9 @@ public unsafe struct ID3D12Device4
     public HRESULT CreateHeap1(D3D12_HEAP_DESC* pDesc, ID3D12ProtectedResourceSession* pProtectedSession, in Guid riid, void** ppvHeap)
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_HEAP_DESC*, ID3D12ProtectedResourceSession*, in Guid, void**, HRESULT>)_vtbl[54])(Unsafe.AsPointer(ref this), pDesc, pProtectedSession, riid, ppvHeap);
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateReservedResource1(D3D12_RESOURCE_DESC* pDesc, D3D12_RESOURCE_STATES InitialState, D3D12_CLEAR_VALUE* pOptimizedClearValue, ID3D12ProtectedResourceSession* pProtectedSession, in Guid riid, void** ppvResource)
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_RESOURCE_DESC*, D3D12_RESOURCE_STATES, D3D12_CLEAR_VALUE*, ID3D12ProtectedResourceSession*, in Guid, void**, HRESULT>)_vtbl[55])(Unsafe.AsPointer(ref this), pDesc, InitialState, pOptimizedClearValue, pProtectedSession, riid, ppvResource);
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public D3D12_RESOURCE_ALLOCATION_INFO GetResourceAllocationInfo1(D3D12_RESOURCE_ALLOCATION_INFO* RetVal, uint visibleMask, uint numResourceDescs, D3D12_RESOURCE_DESC* pResourceDescs, D3D12_RESOURCE_ALLOCATION_INFO1* pResourceAllocationInfo1)
