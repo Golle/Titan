@@ -78,14 +78,9 @@ public unsafe struct ID3D12GraphicsCommandList
     //        _In_  UINT ThreadGroupCountY,
     //        _In_  UINT ThreadGroupCountZ);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, CopyBufferRegion)
-    //    void (STDMETHODCALLTYPE* CopyBufferRegion ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12Resource * pDstBuffer,
-    //        UINT64 DstOffset,
-    //        _In_ ID3D12Resource *pSrcBuffer,
-    //        UINT64 SrcOffset,
-    //        UINT64 NumBytes);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CopyBufferRegion(ID3D12Resource* pDstBuffer, ulong DstOffset, ID3D12Resource* pSrcBuffer, ulong SrcOffset, ulong NumBytes)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, ulong, ID3D12Resource*, ulong, ulong, void>)_vtbl[15])(Unsafe.AsPointer(ref this), pDstBuffer, DstOffset, pSrcBuffer, SrcOffset, NumBytes);
 
     //    DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, CopyTextureRegion)
     //    void (STDMETHODCALLTYPE* CopyTextureRegion ) (
@@ -97,11 +92,9 @@ public unsafe struct ID3D12GraphicsCommandList
     //        _In_ const D3D12_TEXTURE_COPY_LOCATION* pSrc,
     //        _In_opt_  const D3D12_BOX* pSrcBox);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, CopyResource)
-    //    void (STDMETHODCALLTYPE* CopyResource ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12Resource * pDstResource,
-    //        _In_  ID3D12Resource* pSrcResource);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CopyResource(ID3D12Resource* pDstResource, ID3D12Resource* pSrcResource)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, ID3D12Resource*, void>)_vtbl[17])(Unsafe.AsPointer(ref this), pDstResource, pSrcResource);
 
     //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, CopyTiles)
     //    void (STDMETHODCALLTYPE* CopyTiles ) (
@@ -240,7 +233,7 @@ public unsafe struct ID3D12GraphicsCommandList
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ClearUnorderedAccessViewUint(D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap, D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle, ID3D12Resource* pResource, uint* Values, uint NumRects, D3D12_RECT* pRects)
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_GPU_DESCRIPTOR_HANDLE, D3D12_CPU_DESCRIPTOR_HANDLE, ID3D12Resource*, uint*, uint, D3D12_RECT*, void>)_vtbl[49])(Unsafe.AsPointer(ref this), ViewGPUHandleInCurrentHeap, ViewCPUHandle, pResource, Values, NumRects, pRects);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ClearUnorderedAccessViewFloat(D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap, D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle, ID3D12Resource* pResource, float* Values, uint NumRects, D3D12_RECT* pRects)
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_GPU_DESCRIPTOR_HANDLE, D3D12_CPU_DESCRIPTOR_HANDLE, ID3D12Resource*, float*, uint, D3D12_RECT*, void>)_vtbl[50])(Unsafe.AsPointer(ref this), ViewGPUHandleInCurrentHeap, ViewCPUHandle, pResource, Values, NumRects, pRects);
