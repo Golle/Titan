@@ -14,7 +14,7 @@ public readonly struct LoggingModule : IModule
         ref readonly var config = ref builder.GetResourceOrDefault<LoggingConfiguration>();
         if (config.Enabled)
         {
-            Logger.Start();
+            Logger.Start<ConsoleLogger>();
             builder
                 .AddSystemToStage<LoggerTeardown>(Stage.PostShutdown, priority: int.MaxValue)// Set Priority to Max to it's executed after all other systems have run their shutdown
                 
