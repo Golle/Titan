@@ -7,7 +7,6 @@ using Titan.ECS.Entities;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
-using Titan.Graphics.D3D12;
 using Titan.Graphics.D3D12Take2;
 using Titan.Graphics.Modules;
 using Titan.Input;
@@ -17,9 +16,14 @@ using Titan.Runner;
 using Titan.Sandbox;
 using EntityFilter = Titan.ECS.Entities.EntityFilter;
 
-
 AppBuilder
     .Create()
+    .AddResource(new LoggingConfiguration
+    {
+        Enabled = true,
+        Type = LoggerType.Console,
+        FilePath = @"c:\tmp\titan.log"
+    })
     .AddResource(new ECSConfiguration { MaxEntities = 1_000_000 })
     //.AddResource(SchedulerConfiguration.SingleThreaded)
     .AddModule<CoreModule>()

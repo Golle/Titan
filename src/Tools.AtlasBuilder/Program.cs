@@ -13,7 +13,6 @@ var destinationPath = @"F:\Git\Titan\samples\Titan.Sandbox\assets\textures";
 foreach (var file in Directory.EnumerateFiles(texturePath, "*.xml"))
 {
     var name = Path.GetFileNameWithoutExtension(file).ToLower();
-
     
     Logger.Info($"Parsing file {name}");
 
