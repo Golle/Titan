@@ -2,6 +2,8 @@ using System.Runtime.CompilerServices;
 using System;
 using System.Runtime.InteropServices;
 using Titan.Windows.D3D;
+using Titan.Windows.DXGI;
+using System.Xml.Linq;
 
 namespace Titan.Windows.D3D12;
 
@@ -41,15 +43,13 @@ public unsafe struct ID3D12GraphicsCommandList
     public HRESULT SetName(char* Name)
         => ((delegate* unmanaged[Stdcall]<void*, char*, HRESULT>)_vtbl[6])(Unsafe.AsPointer(ref this), Name);
 
-    //DECLSPEC_XFGVIRT(ID3D12DeviceChild, GetDevice)
-    //    HRESULT(STDMETHODCALLTYPE* GetDevice)(
-    //        ID3D12GraphicsCommandList* This,
-    //REFIID riid,
-    //        _COM_Outptr_opt_  void** ppvDevice);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT GetDevice(in Guid riid, void** ppvDevice)
+        => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppvDevice);
 
-    //DECLSPEC_XFGVIRT(ID3D12CommandList, GetType)
-    //    D3D12_COMMAND_LIST_TYPE(STDMETHODCALLTYPE* GetType)(
-    //        ID3D12GraphicsCommandList* This);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public D3D12_COMMAND_LIST_TYPE GetType()
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_COMMAND_LIST_TYPE>)_vtbl[8])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT Close()
@@ -82,15 +82,9 @@ public unsafe struct ID3D12GraphicsCommandList
     public void CopyBufferRegion(ID3D12Resource* pDstBuffer, ulong DstOffset, ID3D12Resource* pSrcBuffer, ulong SrcOffset, ulong NumBytes)
         => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, ulong, ID3D12Resource*, ulong, ulong, void>)_vtbl[15])(Unsafe.AsPointer(ref this), pDstBuffer, DstOffset, pSrcBuffer, SrcOffset, NumBytes);
 
-    //    DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, CopyTextureRegion)
-    //    void (STDMETHODCALLTYPE* CopyTextureRegion ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_  const D3D12_TEXTURE_COPY_LOCATION* pDst,
-    //        UINT DstX,
-    //        UINT DstY,
-    //        UINT DstZ,
-    //        _In_ const D3D12_TEXTURE_COPY_LOCATION* pSrc,
-    //        _In_opt_  const D3D12_BOX* pSrcBox);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CopyTextureRegion(D3D12_TEXTURE_COPY_LOCATION* pDst, uint DstX, uint DstY, uint DstZ, D3D12_TEXTURE_COPY_LOCATION* pSrc, D3D12_BOX* pSrcBox)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_TEXTURE_COPY_LOCATION*, uint, uint, uint, D3D12_TEXTURE_COPY_LOCATION*, D3D12_BOX*, void>)_vtbl[16])(Unsafe.AsPointer(ref this), pDst, DstX, DstY, DstZ, pSrc, pSrcBox);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void CopyResource(ID3D12Resource* pDstResource, ID3D12Resource* pSrcResource)
@@ -106,14 +100,9 @@ public unsafe struct ID3D12GraphicsCommandList
     //        UINT64 BufferStartOffsetInBytes,
     //        D3D12_TILE_COPY_FLAGS Flags);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ResolveSubresource)
-    //    void (STDMETHODCALLTYPE* ResolveSubresource ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12Resource * pDstResource,
-    //        _In_  UINT DstSubresource,
-    //        _In_  ID3D12Resource* pSrcResource,
-    //        _In_  UINT SrcSubresource,
-    //        _In_  DXGI_FORMAT Format);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ResolveSubresource(ID3D12Resource* pDstResource, uint DstSubresource, ID3D12Resource* pSrcResource, uint SrcSubresource, DXGI_FORMAT Format)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, uint, ID3D12Resource*, uint, DXGI_FORMAT, void>)_vtbl[19])(Unsafe.AsPointer(ref this), pDstResource, DstSubresource, pSrcResource, SrcSubresource, Format);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology)
@@ -122,7 +111,6 @@ public unsafe struct ID3D12GraphicsCommandList
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RSSetViewports(uint NumViewports, D3D12_VIEWPORT* pViewports)
         => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_VIEWPORT*, void>)_vtbl[21])(Unsafe.AsPointer(ref this), NumViewports, pViewports);
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RSSetScissorRects(uint NumRects, D3D12_RECT* pRects)

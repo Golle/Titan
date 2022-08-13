@@ -170,16 +170,9 @@ public unsafe struct ID3D12Device4
     public HRESULT GetDeviceRemovedReason()
         => ((delegate* unmanaged[Stdcall]<void*, HRESULT>)_vtbl[37])(Unsafe.AsPointer(ref this));
 
-    //    void (STDMETHODCALLTYPE* GetCopyableFootprints ) (
-    //        ID3D12Device* This,
-    //        _In_  const D3D12_RESOURCE_DESC* pResourceDesc,
-    //        _In_range_(0, D3D12_REQ_SUBRESOURCES)  UINT FirstSubresource,
-    //         _In_range_(0, D3D12_REQ_SUBRESOURCES - FirstSubresource)  UINT NumSubresources,
-    //            UINT64 BaseOffset,
-    //        _Out_writes_opt_(NumSubresources)  D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts,
-    //        _Out_writes_opt_(NumSubresources)  UINT* pNumRows,
-    //        _Out_writes_opt_(NumSubresources)  UINT64* pRowSizeInBytes,
-    //        _Out_opt_  UINT64* pTotalBytes);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void GetCopyableFootprints(D3D12_RESOURCE_DESC* pResourceDesc, uint FirstSubresource, uint NumSubresources, ulong BaseOffset, D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts, uint* pNumRows, ulong* pRowSizeInBytes, ulong* pTotalBytes)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_RESOURCE_DESC*, uint, uint, ulong, D3D12_PLACED_SUBRESOURCE_FOOTPRINT*, uint*, ulong*, ulong*, void>)_vtbl[38])(Unsafe.AsPointer(ref this), pResourceDesc, FirstSubresource, NumSubresources, BaseOffset, pLayouts, pNumRows, pRowSizeInBytes, pTotalBytes);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT CreateQueryHeap(D3D12_QUERY_HEAP_DESC* pDesc, in Guid riid, void** ppvHeap)

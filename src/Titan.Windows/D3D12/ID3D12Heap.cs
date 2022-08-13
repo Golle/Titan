@@ -46,8 +46,8 @@ public unsafe struct ID3D12Heap
     //REFIID riid,
     //_COM_Outptr_opt_  void** ppvDevice);
 
-    //DECLSPEC_XFGVIRT(ID3D12Heap, GetDesc)
-    //D3D12_HEAP_DESC* (STDMETHODCALLTYPE* GetDesc ) (
-    //    ID3D12Heap* This,
-    //    D3D12_HEAP_DESC* RetVal);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public D3D12_HEAP_DESC* GetDesc(D3D12_HEAP_DESC* RetVal)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_HEAP_DESC*, D3D12_HEAP_DESC*>)_vtbl[8])(Unsafe.AsPointer(ref this), RetVal);
+
 }

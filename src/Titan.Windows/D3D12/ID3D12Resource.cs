@@ -39,10 +39,9 @@ public unsafe struct ID3D12Resource
     // ID3D12Resource* This,
     // _In_z_ LPCWSTR Name);
 
-    //HRESULT(STDMETHODCALLTYPE* GetDevice)(
-    // ID3D12Resource* This,
-    // REFIID riid,
-    // _COM_Outptr_opt_  void** ppvDevice);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT GetDevice(in Guid riid, void** ppvDevice)
+    => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppvDevice);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT Map(uint Subresource, D3D12_RANGE* pReadRange, void** ppData)
@@ -53,8 +52,8 @@ public unsafe struct ID3D12Resource
         => ((delegate* unmanaged[Stdcall]<void*, uint, D3D12_RANGE*, void>)_vtbl[9])(Unsafe.AsPointer(ref this), Subresource, pWrittenRange);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public D3D12_RESOURCE_DESC GetDesc()
-        => ((delegate* unmanaged[Stdcall]<void*, D3D12_RESOURCE_DESC>)_vtbl[10])(Unsafe.AsPointer(ref this));
+    public D3D12_RESOURCE_DESC* GetDesc(D3D12_RESOURCE_DESC* RetVal)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_RESOURCE_DESC*, D3D12_RESOURCE_DESC*>)_vtbl[10])(Unsafe.AsPointer(ref this), RetVal);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress()
@@ -76,9 +75,9 @@ public unsafe struct ID3D12Resource
     //        UINT SrcSubresource,
     //        _In_opt_ const D3D12_BOX* pSrcBox);
 
-    //HRESULT(STDMETHODCALLTYPE* GetHeapProperties)(
-    // ID3D12Resource* This,
-    // _Out_opt_ D3D12_HEAP_PROPERTIES * pHeapProperties,
-    // _Out_opt_  D3D12_HEAP_FLAGS* pHeapFlags);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT GetHeapProperties(D3D12_HEAP_PROPERTIES* pHeapProperties, D3D12_HEAP_FLAGS* pHeapFlags)
+        => ((delegate* unmanaged[Stdcall]<void*, D3D12_HEAP_PROPERTIES*, D3D12_HEAP_FLAGS*, HRESULT>)_vtbl[14])(Unsafe.AsPointer(ref this), pHeapProperties, pHeapFlags);
+
 
 }

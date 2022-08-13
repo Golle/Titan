@@ -1,14 +1,18 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 // ReSharper disable InconsistentNaming
 
 namespace Titan.Windows;
 
+#if DEBUG
+[DebuggerDisplay("{DebugString()}")]
+#endif
 public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
 {
     private T* _ptr;
-        
+
     public ComPtr(in T* ptr)
     {
         _ptr = ptr;
@@ -52,7 +56,7 @@ public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ComPtr<T> Wrap(in T* ptr) => new() {_ptr = ptr}; // Use object initializer to avoid InternalAddRef
+    public static ComPtr<T> Wrap(in T* ptr) => new() { _ptr = ptr }; // Use object initializer to avoid InternalAddRef
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Dispose() => InternalRelease();
@@ -73,11 +77,16 @@ public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
             _ptr = null;
         }
     }
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator T*(in ComPtr<T> p) => p._ptr;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator T**(in ComPtr<T> p) => p.GetAddressOf();
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator IUnknown*(in ComPtr<T> p) => (IUnknown*)p._ptr;
+
+#if DEBUG
+    private string DebugString()
+        => $"Ptr: 0x{(nint)_ptr:x16}";
+#endif
 }
