@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
+using Titan.Core.Memory;
 using Titan.Graphics.D3D11.BlendStates;
 using Titan.Graphics.D3D11.Buffers;
 using Titan.Graphics.D3D11.Rasterizer;
@@ -225,7 +226,7 @@ namespace Titan.Graphics.D3D11
 
             var numberOfResources = handles.Length;
             var resources = stackalloc ID3D11ShaderResourceView*[numberOfResources];
-            Unsafe.InitBlock(resources, 0, (uint) (sizeof(ID3D11ShaderResourceView*)*numberOfResources));
+            MemoryUtils.Init(resources, sizeof(ID3D11ShaderResourceView*)*numberOfResources);
             _context->PSSetShaderResources(0, (uint)numberOfResources, resources);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -237,7 +238,7 @@ namespace Titan.Graphics.D3D11
             }
             var numberOfResources = handles.Length;
             var resources = stackalloc ID3D11ShaderResourceView*[numberOfResources];
-            Unsafe.InitBlock(resources, 0, (uint)(sizeof(ID3D11ShaderResourceView*) * numberOfResources));
+            MemoryUtils.Init(resources, sizeof(ID3D11ShaderResourceView*) * numberOfResources);
             _context->VSSetShaderResources(0, (uint)numberOfResources, resources);
         }
         

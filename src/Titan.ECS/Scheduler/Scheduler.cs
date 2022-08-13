@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.Core.Threading2;
 using Titan.ECS.Memory;
 using Titan.ECS.Systems;
@@ -120,7 +121,7 @@ public unsafe struct Scheduler
                 systemNode.DependenciesCount = dependenciesCount;
                 //NOTE(Jens): THIS WILL ALLOCATE MORE MEMORY, possible Fragmentation 
                 systemNode.Dependencies = pool.Allocate<int>((uint)dependenciesCount);
-                Unsafe.CopyBlockUnaligned(systemNode.Dependencies, dependencies, (uint)(sizeof(int) * dependenciesCount));
+                MemoryUtils.Copy(systemNode.Dependencies, dependencies, sizeof(int) * dependenciesCount);
                 Logger.Trace<Scheduler>($"{systemNode.Stage}: System {nodes[i].Id} has {dependenciesCount} dependencies");
                 for (var a = 0; a < systemNode.DependenciesCount; ++a)
                 {

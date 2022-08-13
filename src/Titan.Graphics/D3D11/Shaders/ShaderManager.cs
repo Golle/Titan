@@ -65,7 +65,7 @@ public unsafe class ShaderManager : IDisposable
 
         static MemoryChunk<byte> AllocAndCopy(string value)
         {
-            var memory = MemoryUtils.AllocateBlock<byte>((uint)(value.Length + 1), true);
+            var memory = MemoryUtilsOld.AllocateBlock<byte>((uint)(value.Length + 1), true);
             Encoding.ASCII.GetBytes(value, memory.AsSpan());
             return memory;
         }

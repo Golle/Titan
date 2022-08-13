@@ -31,7 +31,7 @@ namespace Titan.Graphics.Loaders.Fonts
             font->Base = args.Base;
 
             var maxElements = (uint)(max - min + 1);
-            font->Glyphs = MemoryUtils.AllocateBlock<Glyph>(maxElements); //Sparse array to support indexing
+            font->Glyphs = MemoryUtilsOld.AllocateBlock<Glyph>(maxElements); //Sparse array to support indexing
 
             foreach (ref readonly var character in args.Characters)
             {

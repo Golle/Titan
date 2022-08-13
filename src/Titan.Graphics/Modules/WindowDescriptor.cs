@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
+using Titan.Core.Memory;
 
 namespace Titan.Graphics.Modules;
 
@@ -30,7 +31,7 @@ public struct WindowDescriptor : IDefault<WindowDescriptor>
             fixed (char* pSource = value)
             fixed (char* pDestination = _title)
             {
-                Unsafe.CopyBlock(pDestination, pSource, (uint)_titleLength * sizeof(char));
+                MemoryUtils.Copy(pDestination, pSource, _titleLength * sizeof(char));
             }
         }
     }

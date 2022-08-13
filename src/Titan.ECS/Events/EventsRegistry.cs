@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.ECS.Worlds;
 using Titan.Memory;
 using Titan.Memory.Arenas;
@@ -36,8 +37,8 @@ internal unsafe struct EventsRegistry : IResource
         _arena1 = DynamicLinearArena.Create(allocator, halfSize);
         _arena2 = DynamicLinearArena.Create(allocator, halfSize);
 
-        _current = (DynamicLinearArena*)Unsafe.AsPointer(ref _arena1);
-        _previous = (DynamicLinearArena*)Unsafe.AsPointer(ref _arena2);
+        _current = MemoryUtils.AsPointer(ref _arena1);
+        _previous = MemoryUtils.AsPointer(ref _arena2);
     }
 
 
@@ -48,11 +49,11 @@ internal unsafe struct EventsRegistry : IResource
         return new(&previous->FirstEvent, &previous->Count);
     }
 
-    public EventsWriter<T> GetWriter<T>() where T : unmanaged, IEvent 
-        => new((EventsRegistry*)Unsafe.AsPointer(ref this));
+    public EventsWriter<T> GetWriter<T>() where T : unmanaged, IEvent
+        => new(MemoryUtils.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void Send<T>(in T @event) where T : unmanaged, IEvent 
+    internal void Send<T>(in T @event) where T : unmanaged, IEvent
         => _internal[EventId.Id<T>()].Send(_current, @event);
 
     internal void Swap()
@@ -94,7 +95,7 @@ internal unsafe struct EventsRegistry : IResource
             *mem = @event;
             _current.Push(header);
         }
-        public EventState* GetPreviousPointer() => (EventState*)Unsafe.AsPointer(ref _previous);
+        public EventState* GetPreviousPointer() => MemoryUtils.AsPointer(ref _previous);
     }
 
     private struct EventState

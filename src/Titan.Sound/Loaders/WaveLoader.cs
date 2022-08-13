@@ -53,7 +53,7 @@ public unsafe class WaveLoader : IAssetLoader
         ReadOnlySpan<byte> data = default;
         WAVEFORMATEX format = default;
         Debug.Assert(pBytes != null);
-        
+
         while (pBytes < lastBytes)
         {
             var header = (WaveChunkHeader*)pBytes;
@@ -74,7 +74,7 @@ public unsafe class WaveLoader : IAssetLoader
                     pBytes += header->Size;
                     break;
                 case WaveChunkTypes.FMT:
-                    Unsafe.CopyBlockUnaligned(&format, pBytes, header->Size);
+                    MemoryUtils.Copy(&format, pBytes, header->Size);
                     format.cbSize = (WORD)sizeof(WAVEFORMATEX); // Should this be header->Size or sizeof(WAVEFORMATEX) ?
                     pBytes += header->Size;
                     break;

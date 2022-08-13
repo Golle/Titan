@@ -26,7 +26,7 @@ public unsafe class EventManager
 
         Logger.Trace<EventManager>($"Initialize {nameof(EventManager)} with max events {config.MaxEvents}");
         _maxEvents = (int)config.MaxEvents;
-        _events = MemoryUtils.AllocateBlock<Event>(config.MaxEvents * 2);
+        _events = MemoryUtilsOld.AllocateBlock<Event>(config.MaxEvents * 2);
     }
 
     public static void Terminate()

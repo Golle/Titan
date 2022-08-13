@@ -43,7 +43,7 @@ public unsafe class SpriteRenderQueue : IDisposable, IServicePreUpdate, IService
         _nineSliceSprite = new NineSliceSpriteBatch(config.MaxNinePatchSprites);
         _textBatch = new TextBatch(config.MaxTextBlocks, textManager, fontManager);
 
-        _vertices = MemoryUtils.AllocateBlock<SpriteVertex>(maxVertices);
+        _vertices = MemoryUtilsOld.AllocateBlock<SpriteVertex>(maxVertices);
         _elements = new SpriteElement[100]; // TODO: Hardcoded for now, not sure what an optimal number would be. UIElements will be created for each texture change
         _sortable = new SortableRenderable[1_000]; // TODO: hardcoded for now. This is the amount of "items" added to the queue. 1 for each text, sprite or nine patch.  
 

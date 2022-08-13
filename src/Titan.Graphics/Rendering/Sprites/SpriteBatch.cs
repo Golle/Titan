@@ -12,7 +12,7 @@ namespace Titan.Graphics.Rendering.Sprites
         private int _count;
         public SpriteBatch(uint maxSprites)
         {
-            _sprites = MemoryUtils.AllocateBlock<NormalSprite>(maxSprites);
+            _sprites = MemoryUtilsOld.AllocateBlock<NormalSprite>(maxSprites);
         }
 
         public int Add(in Vector2 position, in Size size, in Color color, ReadOnlySpan<Vector2> coordinates)

@@ -13,7 +13,7 @@ namespace Titan.Graphics.Rendering.Sprites
         private int _count;
         public NineSliceSpriteBatch(uint maxSprites)
         {
-            _sprites = MemoryUtils.AllocateBlock<NineSliceSprite>(maxSprites);
+            _sprites = MemoryUtilsOld.AllocateBlock<NineSliceSprite>(maxSprites);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

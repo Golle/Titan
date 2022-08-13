@@ -18,8 +18,8 @@ namespace Titan.Graphics.Rendering.Text
             var handle = _resources.CreateResource();
             var textBlock = _resources.GetResourcePointer(handle);
             // TODO: allocate these in the same block
-            textBlock->VisibleCharacters = MemoryUtils.AllocateBlock<CharacterPositions>(args.MaxCharacters);
-            textBlock->Characters = MemoryUtils.AllocateBlock<char>(args.MaxCharacters);
+            textBlock->VisibleCharacters = MemoryUtilsOld.AllocateBlock<CharacterPositions>(args.MaxCharacters);
+            textBlock->Characters = MemoryUtilsOld.AllocateBlock<char>(args.MaxCharacters);
             textBlock->CharacterCount = (ushort)args.InitialCharacters.Length;
 
             fixed (char* pCharacters = args.InitialCharacters)

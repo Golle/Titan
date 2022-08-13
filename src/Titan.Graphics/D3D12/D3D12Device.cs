@@ -21,6 +21,7 @@ using static Titan.Windows.DXGI.DXGI_SWAP_EFFECT;
 using static Titan.Windows.DXGI.DXGI_USAGE;
 using System.IO;
 using System.Runtime.InteropServices;
+using Titan.Core.Memory;
 using Titan.Windows.Win32;
 
 namespace Titan.Graphics.D3D12;
@@ -57,8 +58,8 @@ public unsafe struct D3D12Device
     private D3D12_VIEWPORT _viewPort;
     private D3D12_RECT _scissorRect;
 
-    private ref ComPtr<ID3D12Resource> GetRenderTarget(int index) => ref *(ComPtr<ID3D12Resource>*)Unsafe.AsPointer(ref _renderTargets[index]);
-    private ref ComPtr<ID3D12Fence> GetFence(int index) => ref *(ComPtr<ID3D12Fence>*)Unsafe.AsPointer(ref _fences[index]);
+    private ref ComPtr<ID3D12Resource> GetRenderTarget(int index) => ref *(ComPtr<ID3D12Resource>*)MemoryUtils.AsPointer(ref _renderTargets[index]);
+    private ref ComPtr<ID3D12Fence> GetFence(int index) => ref *(ComPtr<ID3D12Fence>*)MemoryUtils.AsPointer(ref _fences[index]);
     public D3D_FEATURE_LEVEL FeatureLevel => _fatureLevel;
 
     public static bool CreateAndInit(HWND windowHandle, uint width, uint height, bool debug, out D3D12Device device)
@@ -179,7 +180,7 @@ public unsafe struct D3D12Device
 
         uint allowTearing = 0;
         {
-            
+
             hr = dxgiFactory.Get()->CheckFeatureSupport(DXGI_FEATURE.DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(uint));
             if (FAILED(hr))
             {
@@ -592,7 +593,7 @@ Error:
                 Logger.Error<D3D12Device>($"Failed to Map vertex buffer with HRESULT {hr}");
                 goto Error;
             }
-            Unsafe.CopyBlockUnaligned(pVertexDataBegin, triangleVertices, (uint)(sizeof(Vertex) * 3));
+            MemoryUtils.Copy(pVertexDataBegin, triangleVertices, sizeof(Vertex) * 3);
             _vertexBuffer.Get()->Unmap(0, null);
             // Initialize the vertex buffer view.
             _vertexBufferView.BufferLocation = _vertexBuffer.Get()->GetGPUVirtualAddress();

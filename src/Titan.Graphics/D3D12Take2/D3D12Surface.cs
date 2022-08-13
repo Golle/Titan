@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.Windows;
 using Titan.Windows.D3D12;
 using Titan.Windows.DXGI;
@@ -175,15 +176,14 @@ Error:
         // support max 3 buffers
         private D3D12Texture _resource1, _resource2, _resource3;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref D3D12Texture Get(uint index) => ref *GetPointer(index);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public D3D12Texture* GetPointer(uint index) => (D3D12Texture*)Unsafe.AsPointer(ref _resource1) + index;
-
         public ref D3D12Texture this[uint index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ref Get(index);
+            get
+            {
+                var ptr = MemoryUtils.AsPointer(ref _resource1) + index;
+                return ref MemoryUtils.ToRef(ptr);
+            }
         }
     }
 }

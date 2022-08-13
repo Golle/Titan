@@ -32,7 +32,7 @@ namespace Titan.UI.Debugging
         public unsafe BoundingBoxRenderQueue()
         {
             var maxVertices = 10_000u;
-            _lines = MemoryUtils.AllocateBlock<Line>(maxVertices);
+            _lines = MemoryUtilsOld.AllocateBlock<Line>(maxVertices);
 
             VertexBuffer = GraphicsDevice.BufferManager.Create(new BufferCreation
             {

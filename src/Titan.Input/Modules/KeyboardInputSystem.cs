@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Titan.Core.Memory;
 using Titan.ECS.Events;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
@@ -26,11 +27,11 @@ public struct KeyboardInputSystem : IStructSystem<KeyboardInputSystem>
     public static unsafe void Update(ref KeyboardInputSystem system)
     {
         var state = system._state.AsPointer();
-        Unsafe.CopyBlockUnaligned(state->Previous, state->Current, KeyCodeBufferSize);
+        MemoryUtils.Copy(state->Previous, state->Current, KeyCodeBufferSize);
 
         if (system._lostFocus.HasEvents())
         {
-            Unsafe.InitBlockUnaligned(state->Current, 0, KeyCodeBufferSize);
+            MemoryUtils.Init(state->Current, KeyCodeBufferSize);
             return;
         }
 

@@ -209,7 +209,7 @@ namespace Titan.Assets
                     var path = asset.Files[i];
                     using var fileHandle = FileSystem.OpenReadHandle(path);
                     var length = fileHandle.Length;
-                    var block = MemoryUtils.AllocateBlock<byte>((uint)length);
+                    var block = MemoryUtilsOld.AllocateBlock<byte>((uint)length);
 
                     var bytesRead = fileHandle.Read(block.AsSpan());
 
