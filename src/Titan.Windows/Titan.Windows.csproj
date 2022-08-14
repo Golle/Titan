@@ -8,6 +8,8 @@
     <NoWarn>1701;1702;0649;0169</NoWarn>
     <Configurations>Debug;Release;Shipping</Configurations>
     <IsTrimmable>true</IsTrimmable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
     <DefineConstants></DefineConstants>

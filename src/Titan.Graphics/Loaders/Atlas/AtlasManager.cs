@@ -28,8 +28,8 @@ namespace Titan.Graphics.Loaders.Atlas
             var atlas = _resources.GetResourcePointer(handle);
 
             var totalCoordinates = args.NineSliceCount * 16 + args.TextureCount * 4;
-            atlas->Coordinates = MemoryUtils.AllocateBlock<Vector2>(totalCoordinates);
-            atlas->Descriptors = MemoryUtils.AllocateBlock<AtlasDescriptor>(args.NineSliceCount + args.TextureCount);
+            atlas->Coordinates = MemoryUtilsOld.AllocateBlock<Vector2>(totalCoordinates);
+            atlas->Descriptors = MemoryUtilsOld.AllocateBlock<AtlasDescriptor>(args.NineSliceCount + args.TextureCount);
             
             return handle;
         }

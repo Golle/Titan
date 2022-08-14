@@ -47,7 +47,7 @@ public unsafe struct IXAudio2VoiceCallback
 
     public static IXAudio2VoiceCallback* Create(Interface obj)
     {
-        IXAudio2VoiceCallback* callback = MemoryUtils.AllocateBlock<IXAudio2VoiceCallback>(1);
+        IXAudio2VoiceCallback* callback = MemoryUtilsOld.AllocateBlock<IXAudio2VoiceCallback>(1);
         callback->_handle= GCHandle.Alloc(obj);
         callback->_vtbl = _lpvtbl;
         return callback;

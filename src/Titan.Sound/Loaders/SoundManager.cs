@@ -35,7 +35,7 @@ public unsafe class SoundManager : IDisposable
             
             // change from uint8 to int16 (byte to short)
             size *= 4;
-            soundclip->Data = MemoryUtils.AllocateBlock<byte>(size, true);
+            soundclip->Data = MemoryUtilsOld.AllocateBlock<byte>(size, true);
             var mem = (short*)soundclip->Data;
 
             for (var i = 0; i < args.Data.Length; ++i)
@@ -47,10 +47,10 @@ public unsafe class SoundManager : IDisposable
         else
         {
             var dataLength = (uint)args.Data.Length;
-            soundclip->Data = MemoryUtils.AllocateBlock<byte>(dataLength);
+            soundclip->Data = MemoryUtilsOld.AllocateBlock<byte>(dataLength);
             fixed (byte* pBytes = args.Data)
             {
-                Unsafe.CopyBlockUnaligned(soundclip->Data.AsPointer(), pBytes, dataLength);
+                MemoryUtils.Copy(soundclip->Data.AsPointer(), pBytes, dataLength);
             }
         }
         

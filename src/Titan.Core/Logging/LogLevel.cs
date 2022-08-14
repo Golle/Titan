@@ -1,6 +1,6 @@
 namespace Titan.Core.Logging
 {
-    internal enum LogLevel
+    public enum LogLevel
     {
         Trace = 1,
         Debug = 2,

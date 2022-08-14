@@ -30,7 +30,7 @@ namespace Titan.Graphics.Loaders.Models
             }
 
             var model = _resources.GetResourcePointer(handle);
-            model->Mesh.Submeshes = MemoryUtils.AllocateBlock<Submesh>((uint)args.Submeshes.Length);
+            model->Mesh.Submeshes = MemoryUtilsOld.AllocateBlock<Submesh>((uint)args.Submeshes.Length);
             var size = model->Mesh.Submeshes.Size;
             fixed (Submesh* pSubmeshes = args.Submeshes)
             {

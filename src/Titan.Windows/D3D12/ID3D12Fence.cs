@@ -48,7 +48,7 @@ public unsafe struct ID3D12Fence
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ulong GetCompletedValue()
-        => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[8])(Unsafe.AsPointer(ref this));
+        => ((delegate* unmanaged[Stdcall]<void*, ulong>)_vtbl[8])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT SetEventOnCompletion(ulong Value, HANDLE hEvent)

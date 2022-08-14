@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Titan.Core;
+using Titan.Core.Memory;
 using Titan.Memory.Arenas;
 
 namespace Titan.ECS.Memory;
@@ -20,7 +21,7 @@ public unsafe struct TransientMemory : IApi
         var ptr = (T*)_arena.Allocate(size);
         if (initialize)
         {
-            Unsafe.InitBlockUnaligned(ptr, 0, size);
+            MemoryUtils.Init(ptr, size);
         }
         return ptr;
     }

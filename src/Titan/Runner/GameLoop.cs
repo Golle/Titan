@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Threading;
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.Core.Threading2;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Worlds;
@@ -48,9 +49,9 @@ internal readonly unsafe struct GameLoop
     {
         var token = _cancellationTokenSource.Token;
         Logger.Trace<GameLoop>("Starting the game loop");
-        ref var scheduler = ref *_scheduler;
-        ref var world = ref *_world;
-        ref var jobApi = ref *_jobApi;
+        ref var scheduler = ref MemoryUtils.ToRef(_scheduler);
+        ref var world = ref MemoryUtils.ToRef(_world);
+        ref var jobApi = ref MemoryUtils.ToRef(_jobApi);
         var timer = Stopwatch.StartNew();
         var frames = 0;
         while (!token.IsCancellationRequested)
@@ -59,8 +60,8 @@ internal readonly unsafe struct GameLoop
             frames++;
             if (timer.Elapsed.TotalSeconds >= 1.0f)
             {
-                Logger.Trace<GameLoop>($"FPS: {frames}. Render time: {timer.Elapsed.TotalMilliseconds/frames} ms");
-                timer.Restart();;
+                //Logger.Trace<GameLoop>($"FPS: {frames}. Render time: {timer.Elapsed.TotalMilliseconds/frames} ms");
+                timer.Restart(); ;
                 frames = 0;
             }
         }

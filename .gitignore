@@ -2,7 +2,7 @@
 *.user
 
 # Build results
-[Dd]ebug/
+# [Dd]ebug/ # enable this if needed. but we might want a namespace called "Debug" inside Titan, and this will ignore that. (Debug is usually a sub dir in bin or obj)
 [Rr]elease/
 x64/
 x86/

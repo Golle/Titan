@@ -28,7 +28,7 @@ internal class TextBatch : IDisposable
     {
         _textManager = textManager;
         _fontManager = fontManager;
-        _textBatches = MemoryUtils.AllocateBlock<TextBatchSprite>(maxTextBlocks);
+        _textBatches = MemoryUtilsOld.AllocateBlock<TextBatchSprite>(maxTextBlocks);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining|MethodImplOptions.AggressiveOptimization)]

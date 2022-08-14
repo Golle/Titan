@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core;
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.Memory.Allocators;
 
 namespace Titan.Memory;
@@ -11,7 +12,7 @@ public unsafe struct PlatformAllocator : IApi
 {
     private Allocator _allocator;
 
-    internal Allocator* UnderlyingAllocator => (Allocator*)Unsafe.AsPointer(ref _allocator);
+    internal Allocator* UnderlyingAllocator => MemoryUtils.AsPointer(ref _allocator);
 
     //NOTE(Jens): Should we introduce some kind of MemoryBlock in addition to raw pointers?
     public readonly T* Allocate<T>(uint count = 1u, bool initialize = true) where T : unmanaged
@@ -25,8 +26,7 @@ public unsafe struct PlatformAllocator : IApi
         var memory = _allocator.Allocate(size);
         if (initialize)
         {
-            // This wont work for allocations greater than 4gb
-            Unsafe.InitBlockUnaligned(memory, 0, (uint)size);
+            MemoryUtils.Init(memory, size);
             return memory;
         }
         return memory;
@@ -63,6 +63,6 @@ public unsafe struct PlatformAllocator : IApi
         return Allocator.Create<NativeMemoryAllocator>();
     }
 
-    public readonly void Free(void* ptr) 
+    public readonly void Free(void* ptr)
         => _allocator.Free(ptr);
 }

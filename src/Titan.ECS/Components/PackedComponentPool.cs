@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
+using Titan.Core.Memory;
 using Titan.ECS.Entities;
 
 namespace Titan.ECS.Components;
@@ -76,11 +77,11 @@ public unsafe struct PackedComponentPool<T> : IComponentPool<T> where T : unmana
     private static void* Init(void* mem, uint maxEntities, uint maxComponents)
     {
         var size = CalculateSize(maxEntities, maxComponents);
-        Unsafe.InitBlockUnaligned(mem, 0, size);
+        MemoryUtils.Init(mem, size);
         var pool = (PackedComponentPool<T>*)mem;
-        
+
         var indices = (int*)(pool + 1);
-        Unsafe.InitBlockUnaligned(indices, byte.MaxValue, sizeof(int) * maxEntities); // initialize indices with -1
+        MemoryUtils.Init(indices, sizeof(int) * maxEntities, byte.MaxValue); // initialize indices with -1
         var components = (T*)(indices + maxEntities);
         *pool = new PackedComponentPool<T>(maxEntities, maxComponents, indices, components);
         return pool;

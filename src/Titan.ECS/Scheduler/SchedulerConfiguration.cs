@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core;
+using Titan.Core.Memory;
 using Titan.ECS.Scheduler.Executors;
 
 namespace Titan.ECS.Scheduler;
@@ -47,7 +48,7 @@ public unsafe struct SchedulerConfiguration : IDefault<SchedulerConfiguration>
     public void SetExecutor<T>(Stage stage) where T : IExecutor
     {
         Debug.Assert(stage != Stage.Count);
-        var pData = (StageExecutor*)Unsafe.AsPointer(ref this);
+        var pData = (StageExecutor*)MemoryUtils.AsPointer(ref this);
         pData[(int)stage] = new StageExecutor { RunFunc = &T.RunSystems };
     }
 

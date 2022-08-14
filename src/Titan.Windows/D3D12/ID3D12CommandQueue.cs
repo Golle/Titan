@@ -89,10 +89,9 @@ public unsafe struct ID3D12CommandQueue
     public HRESULT Signal(ID3D12Fence* pFence, ulong Value)
         => ((delegate* unmanaged[Stdcall]<void*, ID3D12Fence*, ulong, HRESULT>)_vtbl[14])(Unsafe.AsPointer(ref this), pFence, Value);
 
-    //    HRESULT(STDMETHODCALLTYPE* Wait)(
-    //     ID3D12CommandQueue* This,
-    //     ID3D12Fence* pFence,
-    //     UINT64 Value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT Wait(ID3D12Fence* pFence, ulong Value)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Fence*, ulong, HRESULT>)_vtbl[15])(Unsafe.AsPointer(ref this), pFence, Value);
 
     //    HRESULT(STDMETHODCALLTYPE* GetTimestampFrequency)(
     //     ID3D12CommandQueue* This,

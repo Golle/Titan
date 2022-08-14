@@ -19,8 +19,8 @@ namespace Titan.Core.Memory
 
         public void Init(uint count)
         {
-            _data = MemoryUtils.AllocateBlock<T>(count, true);
-            _usedData = MemoryUtils.AllocateBlock<int>(count, true);
+            _data = MemoryUtilsOld.AllocateBlock<T>(count, true);
+            _usedData = MemoryUtilsOld.AllocateBlock<int>(count, true);
             _maxCount = (int) count;
         }
 

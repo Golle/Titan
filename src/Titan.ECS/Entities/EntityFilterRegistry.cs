@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.ECS.Components;
 using Titan.Memory;
 
@@ -37,9 +38,8 @@ internal unsafe struct EntityFilterRegistry : IApi
             filter->Indexers = (int*)(filter + 1);
             filter->Entities = (Entity*)(filter->Indexers + maxEntities);
 
-            Unsafe.InitBlockUnaligned(filter->Indexers, byte.MaxValue, sizeof(int) * maxEntities); // set indexers to -1
+            MemoryUtils.Init(filter->Indexers, sizeof(int) * maxEntities, byte.MaxValue); // set indexers to -1
         }
-
     }
 
     public static EntityFilterRegistry Create(in PlatformAllocator allocator, uint maxFilters, uint maxEntities, uint maxEntitiesPerFilter)
