@@ -46,8 +46,8 @@ Error:
 
     public void Shutdown()
     {
-        _queue.Release();
-        _device.Release();
+        _queue.Reset();
+        _device.Reset();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

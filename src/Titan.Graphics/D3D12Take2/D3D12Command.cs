@@ -86,9 +86,9 @@ internal unsafe struct D3D12Command
         {
             _commandFrames[i].Release();
         }
-        _commandList.Release();
-        _commandQueue.Release();
-        _fence.Release();
+        _commandList.Reset();
+        _commandQueue.Reset();
+        _fence.Reset();
     }
 
     private struct CommandFrame
@@ -107,7 +107,7 @@ internal unsafe struct D3D12Command
         }
         public void Release()
         {
-            Allocator.Release();
+            Allocator.Reset();
         }
     }
 

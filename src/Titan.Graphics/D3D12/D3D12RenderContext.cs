@@ -166,7 +166,7 @@ Error:
     public void Release()
     {
         FlushGPU();
-        _fence.Release();
+        _fence.Reset();
         _fenceValue = 0;
         if (_fenceEvent.Value != 0)
         {
@@ -174,10 +174,10 @@ Error:
             _fenceEvent = default;
         }
 
-        _commandQueue.Release();
-        _commandList.Release();
-        _swapChain.Release();
-        _device.Release();
+        _commandQueue.Reset();
+        _commandList.Reset();
+        _swapChain.Reset();
+        _device.Reset();
 
         for (var i = 0; i < _maxCommandFrameCount; ++i)
         {

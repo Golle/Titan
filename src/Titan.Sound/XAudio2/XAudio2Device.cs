@@ -23,7 +23,7 @@ internal unsafe class XAudio2Device : IDisposable
     public XAudio2Device(AudioDeviceConfiguration config)
     {
         // TODO: what flags and processor should we use?
-        CheckAndThrow(XAudio2Common.XAudio2Create(_xAudio2, 0U, XAUDIO2_PROCESSOR.XAUDIO2_USE_DEFAULT_PROCESSOR), nameof(XAudio2Common.XAudio2Create)); 
+        CheckAndThrow(XAudio2Common.XAudio2Create(_xAudio2.GetAddressOf(), 0U, XAUDIO2_PROCESSOR.XAUDIO2_USE_DEFAULT_PROCESSOR), nameof(XAudio2Common.XAudio2Create)); 
 
         // TODO: check the flags and arguments
         fixed (IXAudio2MasteringVoice** pMasteringVoice = &_masteringVoice)

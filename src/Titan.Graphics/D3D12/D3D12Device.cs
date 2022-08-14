@@ -225,7 +225,7 @@ public unsafe struct D3D12Device
         // Retarget the IDXGISwapChain1 to IDXGISwapChain3
         device._swapChain = new ComPtr<IDXGISwapChain3>((IDXGISwapChain3*)swapChain.Get());
 
-        dxgiFactory.Release();
+        dxgiFactory.Reset();
         return true;
 
         device._frameIndex = device._swapChain.Get()->GetCurrentBackBufferIndex();
@@ -630,23 +630,23 @@ Error:
 
     public void Release()
     {
-        _commandList.Release();
-        _instance.Release();
-        _commandQueue.Release();
-        _descriptorHeap.Release();
-        _swapChain.Release();
+        _commandList.Reset();
+        _instance.Reset();
+        _commandQueue.Reset();
+        _descriptorHeap.Reset();
+        _swapChain.Reset();
 
-        _commandAllocator.Release();
+        _commandAllocator.Reset();
         for (var i = 0; i < FrameCount; ++i)
         {
-            GetRenderTarget(i).Release();
-            GetFence(i).Release();
+            GetRenderTarget(i).Reset();
+            GetFence(i).Reset();
         }
 
-        _pipelineState.Release();
-        _rootSignature.Release();
-        _vertexBuffer.Release();
-        _fence.Release();
+        _pipelineState.Reset();
+        _rootSignature.Reset();
+        _vertexBuffer.Reset();
+        _fence.Reset();
 
     }
 
@@ -719,7 +719,7 @@ Error:
         _commandList.Get()->Close();
         for (var i = 0; i < FrameCount; ++i)
         {
-            GetRenderTarget(i).Release();
+            GetRenderTarget(i).Reset();
         }
         var hr = _swapChain.Get()->ResizeBuffers(FrameCount, width, height, DXGI_FORMAT_UNKNOWN, 0);
         if (FAILED(hr))

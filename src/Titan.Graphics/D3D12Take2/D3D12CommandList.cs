@@ -25,6 +25,6 @@ internal unsafe struct D3D12CommandList
     {
         //NOTE(Jens): needs a fence?
 
-        _commandList.Release();
+        _commandList.Reset();
     }
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Titan.Core.Memory;
 
@@ -50,6 +51,16 @@ public static unsafe class MemoryUtils
     {
         Debug.Assert(ptr != null);
         return ref *ptr;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T** AddressOf<T>(in T* ptr) where T : unmanaged
+    {
+        //NOTE(Jens): any risk with doing it like this?
+        fixed (T** pptr = &ptr)
+        {
+            return pptr;
+        }
     }
 }
 

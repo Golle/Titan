@@ -40,20 +40,12 @@ public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
     public T** ReleaseAndGetAddressOf()
     {
         InternalRelease();
-        fixed (T** ptr = &_ptr)
-        {
-            return ptr;
-        }
+        return GetAddressOf();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly T** GetAddressOf()
-    {
-        fixed (T** ptr = &_ptr)
-        {
-            return ptr;
-        }
-    }
+        => (T**)Unsafe.AsPointer(ref Unsafe.AsRef(in this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ComPtr<T> Wrap(in T* ptr) => new() { _ptr = ptr }; // Use object initializer to avoid InternalAddRef
@@ -61,29 +53,31 @@ public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Dispose() => InternalRelease();
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Release() => InternalRelease();
+    public uint Reset() => InternalRelease();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void InternalAddRef() => ((IUnknown*)_ptr)->AddRef();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void InternalRelease()
+    private uint InternalRelease()
     {
-        // TODO: handle AddRef and Release counts
+        var result = 0u;
         if (_ptr != null)
         {
-            var unknown = ((IUnknown*)_ptr);
-            var result = unknown->Release();
+            var unknown = (IUnknown*)_ptr;
+            result = unknown->Release();
             _ptr = null;
         }
+        return result;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator T*(in ComPtr<T> p) => p._ptr;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator T**(in ComPtr<T> p) => p.GetAddressOf();
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator IUnknown*(in ComPtr<T> p) => (IUnknown*)p._ptr;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator ComPtr<T>(T* ptr) => new(ptr);
 
 #if DEBUG
     private string DebugString()

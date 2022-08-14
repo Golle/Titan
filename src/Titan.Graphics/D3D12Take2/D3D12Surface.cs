@@ -158,12 +158,12 @@ Error:
     public void Shutdown()
     {
         //NOTE(Jens): do we need to wait for a fence here?
-        _swapChain.Release();
-        _device.Release();
+        _swapChain.Reset();
+        _device.Reset();
         _rtvHeap.Release();
         for (var i = 0u; i < _bufferCount; ++i)
         {
-            _backBuffers[i].Resource.Release();
+            _backBuffers[i].Resource.Reset();
         }
 
         this = default;

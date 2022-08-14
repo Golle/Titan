@@ -48,7 +48,7 @@ internal unsafe struct D3D11GraphicsDevice //: IRenderDevice<D3D11GraphicsDevice
         var texture = (D3D11Texture*)internalState;
         if (texture != null)
         {
-            texture->Resource.Release();
+            texture->Resource.Reset();
         }
     }
 

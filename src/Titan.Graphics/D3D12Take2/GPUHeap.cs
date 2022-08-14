@@ -97,7 +97,7 @@ internal unsafe struct GPUHeap
 
     public void Release()
     {
-        _heap.Release();
+        _heap.Reset();
     }
 
     public void SetName(string name)
