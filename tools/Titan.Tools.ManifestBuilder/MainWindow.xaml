@@ -9,7 +9,20 @@
         Height="800" Width="1200"
         Title="Titan - Assets">
     <Grid>
+        <DockPanel>
 
-        <TextBlock FontSize="100" Name="Platform"/>
+            <StackPanel DockPanel.Dock="Bottom" Height="300" Background="red">
+                <Button>A button</Button>
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Left" Width="200" Background="blue">
+                <Button IsEnabled="True" Click="ButtonBase_OnClick">Side</Button>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Right" Background="green">
+                <Button>Right</Button>
+            </StackPanel>
+
+        </DockPanel>
+
     </Grid>
 </Window>

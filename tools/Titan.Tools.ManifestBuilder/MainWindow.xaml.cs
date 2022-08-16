@@ -11,8 +11,10 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
 
-        Platform.Text = $"Platform: {(Environment.Is64BitProcess ? "x64" : "x86")}\nThis is titan!";
-        
+    private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show("This is a text!");
     }
 }
