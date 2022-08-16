@@ -15,24 +15,25 @@
 
   <Window.Styles>
 
-    <Style Selector="DockPanel > Border">
+    <Style Selector="DockPanel ContentControl">
       <Setter Property="BorderBrush" Value="#555"/>
       <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="10"/>
+    </Style>
+
+    <Style Selector="DockPanel > ContentControl#PART_">
+      <Setter Property="BorderBrush" Value="#555"/>
+      <Setter Property="BorderThickness" Value="1"/>
     </Style>
   </Window.Styles>
 
   <DockPanel LastChildFill="True">
-    <Border DockPanel.Dock="Bottom" Height="300">
-      <ContentControl Content="{Binding Bottom}"/>
-    </Border>
-    <Border DockPanel.Dock="Left" Width="200">
-      <ContentControl Content="{Binding Left}"/>
-    </Border>
-    <Border DockPanel.Dock="Right">
-      <ContentControl Content="{Binding Right}"/>
-    </Border>
+    <Grid DockPanel.Dock="Bottom" Height="300" ColumnDefinitions="*, 300">
+      <ContentControl Name="PART_FileBrowser" Padding="10" Grid.Column="0" Content="{Binding Bottom}"/>
+      <ContentControl Name="PART_FileInfo" Padding="10" Grid.Column="1" Content="{Binding BottomRight}"/>
+    </Grid>
+    <ContentControl Name="PART_ManifestBrowser" DockPanel.Dock="Left" Width="200" Content="{Binding Left}"/>
+    <ContentControl Name="PART_ContentViewer" DockPanel.Dock="Right" Content="{Binding Right}"/>
   </DockPanel>
-
 
 </Window>

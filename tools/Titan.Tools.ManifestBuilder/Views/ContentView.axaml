@@ -3,14 +3,32 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:controls="clr-namespace:Titan.Tools.ManifestBuilder.Controls"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
              x:Class="Titan.Tools.ManifestBuilder.Views.ContentView">
 
   <Design.DataContext>
     <viewModels:ContentViewModel/>
   </Design.DataContext>
 
-  <Border Background="{Binding Background}">
-    <TextBlock Text="{Binding ATExt}"/>
-  </Border>
+  <Panel>
+    <StackPanel VerticalAlignment="Top" Spacing="10">
+      <TextBlock Name="PART_Folder" FontSize="20" Margin="10 10 0 0" Foreground="White" Text="{Binding CurrentFolder, StringFormat='Path: {0}'}" />
+      <!--<TextBlock FontSize="20" Foreground="White" Margin="10 0 0 0" Text="{Binding BasePath, StringFormat='BasePath: {0}'}" />-->
+      <!--<TextBlock FontSize="20" Foreground="White" Margin="10 0 0 0" Text="{Binding Info, StringFormat='CurrentFile: {0}'}" />-->
+      <Separator BorderBrush="White" BorderThickness="1"/>
+    </StackPanel>
+    <ScrollViewer Margin="0 50 0 0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
+      <ItemsRepeater Items="{Binding FileEntries}">
+        <ItemsRepeater.Layout>
+          <WrapLayout/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate DataType="viewModels:FileEntryModel">
+            <controls:FileEntryControl FileName="{Binding FileName}" CommandParameter="{Binding .}" FileEntryType="{Binding Type}" DoubleClick="{Binding $parent[Panel].DataContext.Open}" SingleClick="{Binding $parent[Panel].DataContext.ShowInfo}"/>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
+    </ScrollViewer>
+  </Panel>
 </UserControl>

@@ -1,0 +1,85 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Titan.Tools.ManifestBuilder.Controls"
+        xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels">
+  <Design.PreviewWith>
+    <Border Padding="20" Width="400" Height="300">
+      <WrapPanel>
+        <controls:FileEntryControl FileName="asset_01.jpg"/>
+        <controls:FileEntryControl FileName="asset_01.jpg"/>
+        <controls:FileEntryControl FileName=".." FileEntryType="History"/>
+        <controls:FileEntryControl FileName="assets" FileEntryType="Folder"/>
+        <controls:FileEntryControl FileName="assets" IsSelected="True" FileEntryType="Document"/>
+        <controls:FileEntryControl FileName="assets" IsSelected="True" FileEntryType="Folder"/>
+      </WrapPanel>
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="controls|FileEntryControl">
+    <Setter Property="Width" Value="100"/>
+    <Setter Property="Margin" Value="10"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Background">
+          <StackPanel Spacing="10">
+            <Panel Name="PART_Icons">
+              <Image Name="PART_IconFolder">
+                <DrawingImage Drawing="{StaticResource IconFolderRegular}"/>
+              </Image>
+              <Image Name="PART_IconDocument">
+                <DrawingImage Drawing="{StaticResource IconDocumentRegular}"/>
+              </Image>
+              <Image Name="PART_IconHistory">
+                <DrawingImage Drawing="{StaticResource IconFolderHistory}"/>
+              </Image>
+            </Panel>
+            <TextBlock Text="{TemplateBinding FileName}"/>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="controls|FileEntryControl /template/ Border#PART_Background">
+    <Setter Property="Background" Value="#111111"/>
+    <Setter Property="CornerRadius" Value="4"/>
+    <Setter Property="Padding" Value="10"/>
+  </Style>
+
+  <Style Selector="controls|FileEntryControl:pointerover /template/ Border#PART_Background">
+    <Setter Property="Background" Value="#555"/>
+    <Setter Property="CornerRadius" Value="4"/>
+    <Setter Property="Padding" Value="10"/>
+  </Style>
+
+  <Style Selector="controls|FileEntryControl /template/ Panel#PART_Icons">
+    <Setter Property="Height" Value="60"/>
+    <Setter Property="Width" Value="60"/>
+  </Style>
+
+  <Style Selector="controls|FileEntryControl /template/ Image">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+  <Style Selector="controls|FileEntryControl[FileEntryType=Document] /template/ Image#PART_IconDocument">
+    <Setter Property="IsVisible" Value="True"/>
+  </Style>
+
+  <Style Selector="controls|FileEntryControl[FileEntryType=Folder] /template/ Image#PART_IconFolder">
+    <Setter Property="IsVisible" Value="True"/>
+  </Style>
+
+  <Style Selector="controls|FileEntryControl[FileEntryType=History] /template/ Image#PART_IconHistory">
+    <Setter Property="IsVisible" Value="True"/>
+  </Style>
+
+  <Style Selector="controls|FileEntryControl /template/ TextBlock">
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property="TextAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="controls|FileEntryControl[IsSelected=True] /template/ Border#PART_Background">
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="BorderBrush" Value="#777"/>
+  </Style>
+</Styles>

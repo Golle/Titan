@@ -1,13 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace Titan.Tools.ManifestBuilder.Views
 {
-    public partial class ContentView : UserControl
+    public partial class FileInfoView : UserControl
     {
-        public ContentView()
+        public FileInfoView()
         {
             InitializeComponent();
         }

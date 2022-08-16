@@ -1,0 +1,7 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <GeometryDrawing x:Key="IconDocumentRegular" Brush="#FFFFFFFF" Geometry="M9.206,0 L0,0 L0,16 L12,16 L12,2.792 L9.206,0 z M8.998,1.206 L10.79,3 L8.998,3 L8.998,1.206 z M1,15 L1,0.9984 L8,0.9984 L8,4 L11,4 L11,15 L1,15 z"   />
+  <GeometryDrawing x:Key="IconFolderRegular" Brush="#FFFFFFFF" Geometry="M1.6,1.6 L1.6,12.8 L14.4,12.8 L14.4,3.2 L7.669,3.2 L6.069,1.6 L1.6,1.6 z M8.331,1.6 L15.2,1.6 A0.8,-0.8 0 0 1 16,2.4 L16,13.6 A0.8,-0.8 0 0 1 15.2,14.4 L0.8,14.4 A0.8,-0.8 0 0 1 0,13.6 L0,0.8 A0.8,-0.8 0 0 1 0.8,0 L6.731,0 L8.331,1.6 z"/>
+  <GeometryDrawing x:Key="IconFolderHistory" Brush="#FFFFFFFF" Geometry="M6.731,0 L8.331,1.6 L15.2,1.6 C15.64,1.6 16,1.958 16,2.4 L16,13.6 C16,14.04 15.64,14.4 15.2,14.4 L0.8,14.4 C0.3584,14.4 0,14.04 0,13.6 L0,0.8 C0,0.3584 0.3584,0 0.8,0 L6.731,0 z M6.069,1.6 L1.6,1.6 L1.6,12.8 L14.4,12.8 L14.4,3.2 L7.669,3.2 L6.069,1.6 z M8.8,4.8 L8.8,8 L11.2,8 L11.2,9.6 L7.2,9.6 L7.2,4.8 L8.8,4.8 z"   />
+
+</ResourceDictionary>
