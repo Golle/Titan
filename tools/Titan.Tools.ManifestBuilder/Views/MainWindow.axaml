@@ -3,8 +3,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
         Width="1200" Height="800"
+        MinWidth="800" MinHeight="600"
         x:Class="Titan.Tools.ManifestBuilder.Views.MainWindow"
         Title="Titan - Manifest Builder">
 
@@ -12,6 +13,26 @@
     <viewModels:MainWindowViewModel/>
   </Design.DataContext>
 
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+  <Window.Styles>
+
+    <Style Selector="DockPanel > Border">
+      <Setter Property="BorderBrush" Value="#555"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+  </Window.Styles>
+
+  <DockPanel LastChildFill="True">
+    <Border DockPanel.Dock="Bottom" Height="300">
+      <ContentControl Content="{Binding Bottom}"/>
+    </Border>
+    <Border DockPanel.Dock="Left" Width="200">
+      <ContentControl Content="{Binding Left}"/>
+    </Border>
+    <Border DockPanel.Dock="Right">
+      <ContentControl Content="{Binding Right}"/>
+    </Border>
+  </DockPanel>
+
 
 </Window>
