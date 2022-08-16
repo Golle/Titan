@@ -1,0 +1,12 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:manifestBuilder="clr-namespace:Titan.Tools.ManifestBuilder"
+             x:Class="Titan.Tools.ManifestBuilder.App">
+    <Application.DataTemplates>
+        <manifestBuilder:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme Mode="Dark"/>
+    </Application.Styles>
+</Application>
