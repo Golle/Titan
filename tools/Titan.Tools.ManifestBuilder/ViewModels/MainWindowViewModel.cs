@@ -11,7 +11,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         var fileInfo = new FileInfoViewModel();
         Bottom = new ContentViewModel(fileInfo.FileSelected);
-        Left = new ContentViewModel(fileInfo.FileSelected);
+        Left = new ManifestViewModel();
         Right = new ContentViewModel(fileInfo.FileSelected);
 
         BottomRight = fileInfo;

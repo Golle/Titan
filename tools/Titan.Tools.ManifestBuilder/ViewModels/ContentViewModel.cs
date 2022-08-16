@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Input;
-using Avalonia.Media;
 using DynamicData.Binding;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.Controls;
@@ -65,6 +64,11 @@ public class ContentViewModel : ViewModelBase
     public ICommand ShowInfo { get; }
 
     private readonly Action<string> _fileSelected;
+
+    public ContentViewModel()
+    :this(_ => { })
+    {
+    }
     public ContentViewModel(Action<string> onFileSelected)
     {
         _fileSelected = onFileSelected;

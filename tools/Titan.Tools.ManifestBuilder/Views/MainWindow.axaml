@@ -32,7 +32,7 @@
       <ContentControl Name="PART_FileBrowser" Padding="10" Grid.Column="0" Content="{Binding Bottom}"/>
       <ContentControl Name="PART_FileInfo" Padding="10" Grid.Column="1" Content="{Binding BottomRight}"/>
     </Grid>
-    <ContentControl Name="PART_ManifestBrowser" DockPanel.Dock="Left" Width="200" Content="{Binding Left}"/>
+    <ContentControl Name="PART_ManifestBrowser" DockPanel.Dock="Left" Width="400" Content="{Binding Left}"/>
     <ContentControl Name="PART_ContentViewer" DockPanel.Dock="Right" Content="{Binding Right}"/>
   </DockPanel>
 
