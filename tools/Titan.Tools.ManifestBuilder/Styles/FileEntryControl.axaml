@@ -1,7 +1,8 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:Titan.Tools.ManifestBuilder.Controls"
-        xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels">
+        xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime">
   <Design.PreviewWith>
     <Border Padding="20" Width="400" Height="300">
       <WrapPanel>
@@ -14,6 +15,10 @@
       </WrapPanel>
     </Border>
   </Design.PreviewWith>
+
+  <Styles.Resources>
+    <system:Double x:Key="IconSize">40</system:Double>
+  </Styles.Resources>
 
   <Style Selector="controls|FileEntryControl">
     <Setter Property="Width" Value="100"/>
@@ -53,8 +58,8 @@
   </Style>
 
   <Style Selector="controls|FileEntryControl /template/ Panel#PART_Icons">
-    <Setter Property="Height" Value="60"/>
-    <Setter Property="Width" Value="60"/>
+    <Setter Property="Height" Value="{StaticResource IconSize}"/>
+    <Setter Property="Width" Value="{StaticResource IconSize}"/>
   </Style>
 
   <Style Selector="controls|FileEntryControl /template/ Image">

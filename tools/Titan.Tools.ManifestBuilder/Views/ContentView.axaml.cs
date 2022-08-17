@@ -1,20 +1,17 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
-namespace Titan.Tools.ManifestBuilder.Views
-{
-    public partial class ContentView : UserControl
-    {
-        public ContentView()
-        {
-            InitializeComponent();
-        }
+namespace Titan.Tools.ManifestBuilder.Views;
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
+public partial class ContentView : UserControl
+{
+    public ContentView()
+    {
+        InitializeComponent();
+    }
+
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
     }
 }

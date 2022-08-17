@@ -1,4 +1,6 @@
+using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Titan.Tools.ManifestBuilder.ViewModels;
@@ -13,6 +15,7 @@ namespace Titan.Tools.ManifestBuilder
             AvaloniaXamlLoader.Load(this);
         }
 
+        public static Window MainWindow => Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop ? desktop.MainWindow : throw new NotSupportedException("This sshould not happen.");
         public override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

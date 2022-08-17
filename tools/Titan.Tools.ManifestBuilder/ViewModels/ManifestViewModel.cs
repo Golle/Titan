@@ -1,51 +1,100 @@
+using System;
 using System.Collections.ObjectModel;
-using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Avalonia.Controls;
+using ReactiveUI;
+using Titan.Tools.ManifestBuilder.Common;
+using Titan.Tools.ManifestBuilder.Services;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels;
 
 public class ManifestViewModel : ViewModelBase
 {
-    public string Title => "The manifest";
-    public ObservableCollection<Node> Items { get; }
+    private readonly IManifestService _manifestService;
+    private string? _title;
+    public string? Title
+    {
+        get => _title;
+        set => SetProperty(ref _title, value);
+    }
+    
+    private string? _error;
+    public string? Error
+    {
+        get => _error;
+        set
+        {
 
+            SetProperty(ref _error, value);
+            HasError = !string.IsNullOrWhiteSpace(value);
+            this.RaisePropertyChanged(nameof(HasError));
+        }
+    }
+    public bool HasError { get; private set; }
 
+    public NotifyTaskCompletion<ObservableCollection<ItemNode>> Items { get; }
+
+    private ItemNode? _selectedItem;
+    public ItemNode? SelectedItem
+    {
+        get => _selectedItem;
+        set => SetProperty(ref _selectedItem, value);
+    }
     public ManifestViewModel()
+    : this(null!)
     {
-        Items = GetSubfolders(@"f:\git\titan");
-    }
-    public ObservableCollection<Node> GetSubfolders(string strPath)
-    {
-        ObservableCollection<Node> subfolders = new ObservableCollection<Node>();
-        string[] subdirs = Directory.GetDirectories(strPath, "*", SearchOption.TopDirectoryOnly);
-
-        foreach (string dir in subdirs)
-        {
-            Node thisnode = new Node(dir);
-
-            if (Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly).Length > 0)
-            {
-                thisnode.Subfolders = new ObservableCollection<Node>();
-
-                thisnode.Subfolders = GetSubfolders(dir);
-            }
-
-            subfolders.Add(thisnode);
-        }
-
-        return subfolders;
     }
 
-    public class Node
+    internal ManifestViewModel(IManifestService manifestService)
     {
-        public ObservableCollection<Node> Subfolders { get; set; }
+        _manifestService = manifestService;
 
-        public string strNodeText { get; }
-        public string strFullPath { get; }
+        Items = new NotifyTaskCompletion<ObservableCollection<ItemNode>>(LoadManifests());
+    }
 
-        public Node(string _strFullPath)
+    private async Task<ObservableCollection<ItemNode>> LoadManifests()
+    {
+        var result = new ObservableCollection<ItemNode>();
+        if (Design.IsDesignMode)
         {
-            strFullPath = _strFullPath;
-            strNodeText = Path.GetFileName(_strFullPath);
+            return result;
         }
+
+        Error = null;
+        var manifests = await _manifestService.ListManifests();
+        if (manifests.Failed)
+        {
+            Error = manifests.Error ?? "Unknown error occurred.";
+            return result;
+        }
+
+        var manifest = manifests.Data!.FirstOrDefault();
+        if (manifest == null)
+        {
+            Error = "NO manifest was found";
+            return result;
+        }
+
+        Title = manifest.Name;
+        result.Add(new ItemNode
+        {
+            Name = "Textures",
+            Children = new ObservableCollection<ItemNode>(manifest.Textures.Select(t => new ItemNode { Name = System.IO.Path.GetFileNameWithoutExtension(t.Path) }))
+        });
+
+        result.Add(new ItemNode
+        {
+            Name = "Models",
+            Children = new ObservableCollection<ItemNode>(manifest.Models.Select(t => new ItemNode { Name = System.IO.Path.GetFileNameWithoutExtension(t.Path) }))
+        });
+        return result;
+    }
+
+    public class ItemNode
+    {
+        public ObservableCollection<ItemNode> Children { get; set; } = new();
+        public required string Name { get; set; }
+
     }
 }
