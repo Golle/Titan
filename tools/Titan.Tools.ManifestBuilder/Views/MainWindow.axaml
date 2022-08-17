@@ -7,13 +7,33 @@
         Width="1200" Height="800"
         MinWidth="800" MinHeight="600"
         x:Class="Titan.Tools.ManifestBuilder.Views.MainWindow"
-        Title="Titan - Manifest Builder">
-
+        Title="Titan - Manifest Builder"
+        
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        >
   <Design.DataContext>
     <viewModels:MainWindowViewModel/>
   </Design.DataContext>
-
-  <Window.Styles>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial
+            BackgroundSource="Digger"
+            TintColor="Black"
+            TintOpacity="1"
+            MaterialOpacity="0.85" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <DockPanel LastChildFill="True">
+      <Border DockPanel.Dock="Top" Height="30" IsHitTestVisible="False" BorderThickness="0 0 0 1" BorderBrush="#888" Padding="10 0">
+        <TextBlock VerticalAlignment="Center">Titan - Manifest Builder</TextBlock>
+      </Border>
+      <ContentControl Content="{Binding ViewModel}"/>
+    </DockPanel>
+  </Panel>
+  <!--<Window.Styles>
 
     <Style Selector="DockPanel ContentControl">
       <Setter Property="BorderBrush" Value="#555"/>
@@ -25,9 +45,9 @@
       <Setter Property="BorderBrush" Value="#555"/>
       <Setter Property="BorderThickness" Value="1"/>
     </Style>
-  </Window.Styles>
+  </Window.Styles>-->
 
-  <DockPanel LastChildFill="True">
+  <!--<DockPanel LastChildFill="True">
 
     <Menu DockPanel.Dock="Top">
         <MenuItem Header="_File">
@@ -50,7 +70,9 @@
       <ContentControl Name="PART_FileInfo" Padding="10" Grid.Column="1" Content="{Binding BottomRight}"/>
     </Grid>
     <ContentControl Name="PART_ManifestBrowser" DockPanel.Dock="Left" Content="{Binding Left}"/>
-    <!--<ContentControl Name="PART_ContentViewer" DockPanel.Dock="Right" Content="{Binding Right}"/>-->
-  </DockPanel>
+    -->
+  <!--<ContentControl Name="PART_ContentViewer" DockPanel.Dock="Right" Content="{Binding Right}"/>-->
+  <!--
+  </DockPanel>-->
 
 </Window>

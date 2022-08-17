@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Splat;
@@ -11,6 +12,7 @@ public class MainWindowViewModel : ViewModelBase
     public ViewModelBase BottomRight { get; }
     public ViewModelBase Left { get; }
     public ViewModelBase Right { get; }
+    public ViewModelBase ViewModel { get; }
 
     public MainWindowViewModel()
     {
@@ -26,6 +28,8 @@ public class MainWindowViewModel : ViewModelBase
             BottomRight = fileInfo;
         }
 
+
+        ViewModel = new ContentViewModel(s => {});
 
     }
 }

@@ -4,7 +4,7 @@
         xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
         xmlns:system="clr-namespace:System;assembly=System.Runtime">
   <Design.PreviewWith>
-    <Border Padding="20" Width="400" Height="300">
+    <Border Padding="20" Width="400" Height="300" Background="#20ffffff">
       <WrapPanel>
         <controls:FileEntryControl FileName="asset_01.jpg"/>
         <controls:FileEntryControl FileName="asset_01.jpg"/>
@@ -46,7 +46,7 @@
   </Style>
 
   <Style Selector="controls|FileEntryControl /template/ Border#PART_Background">
-    <Setter Property="Background" Value="#111111"/>
+    <Setter Property="Background" Value="#2a2a2a"/>
     <Setter Property="CornerRadius" Value="4"/>
     <Setter Property="Padding" Value="10"/>
   </Style>
