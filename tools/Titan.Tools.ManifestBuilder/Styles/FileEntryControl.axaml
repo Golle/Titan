@@ -1,7 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:Titan.Tools.ManifestBuilder.Controls"
-        xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
         xmlns:system="clr-namespace:System;assembly=System.Runtime">
   <Design.PreviewWith>
     <Border Padding="20" Width="400" Height="300" Background="#20ffffff">
@@ -49,6 +48,8 @@
     <Setter Property="Background" Value="#2a2a2a"/>
     <Setter Property="CornerRadius" Value="4"/>
     <Setter Property="Padding" Value="10"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
   </Style>
 
   <Style Selector="controls|FileEntryControl:pointerover /template/ Border#PART_Background">
@@ -86,5 +87,6 @@
   <Style Selector="controls|FileEntryControl[IsSelected=True] /template/ Border#PART_Background">
     <Setter Property="BorderThickness" Value="1"/>
     <Setter Property="BorderBrush" Value="#777"/>
+    <Setter Property="Background" Value="#333"/>
   </Style>
 </Styles>

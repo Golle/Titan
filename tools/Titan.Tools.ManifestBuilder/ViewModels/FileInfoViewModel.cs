@@ -1,50 +1,48 @@
+using System;
 using System.IO;
-using ReactiveUI;
+using System.Linq;
+using Avalonia.Data.Converters;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels;
 
 public class FileInfoViewModel : ViewModelBase
 {
-    public void FileSelected(string path)
+    public required string FileName { get; init; }
+    public string? FilePath { get; init; }
+    public DateTime? FileCreated { get; init; }
+    public DateTime? FileChanged { get; init; }
+    public long? Size { get; init; }
+    public bool HasSize => Size != null;
+    public bool IsImage => Image != null;
+    public IImage? Image { get; init; }
+
+    //NOTE(Jens): add more if we need it
+    private static readonly string[] SupportedImageFileExtensions = { ".jpg", ".png", ".bmp" };
+    public static FileInfoViewModel Create(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
-            FileName = "n/a";
-            return;
+            return new FileInfoViewModel
+            {
+                FileName = "n/a"
+            };
         }
 
         var fileInfo = new FileInfo(path);
-        Size = (fileInfo.Attributes & FileAttributes.Directory) == 0 ? fileInfo.Length : null;
-        FileName = fileInfo.Name;
-        FileCreated = fileInfo.CreationTime.ToString("yy-MM-dd HH:mm:ss");
-        FileChanged = fileInfo.LastWriteTime.ToString("yy-MM-dd HH:mm:ss");
-    }
+        long? size = (fileInfo.Attributes & FileAttributes.Directory) == 0 ? fileInfo.Length : null;
+        var isImage = SupportedImageFileExtensions.Contains(Path.GetExtension(fileInfo.Name), StringComparer.OrdinalIgnoreCase);
+        return new FileInfoViewModel
+        {
+            Size = size,
+            FileCreated = fileInfo.CreationTime,
+            FileChanged = fileInfo.LastWriteTime,
+            FileName = fileInfo.Name,
+            FilePath = path,
+            Image =  isImage? new Bitmap(path) : null
+        };
 
-    private long? _size;
-    public long? Size
-    {
-        get => _size;
-        private set => this.RaiseAndSetIfChanged(ref _size, value);
     }
-
-    private string? _fileName;
-    public string? FileName
-    {
-        get => _fileName;
-        private set => this.RaiseAndSetIfChanged(ref _fileName, value);
-    }
-
-    private string _fileChanged = string.Empty;
-    public string FileChanged
-    {
-        get => _fileChanged;
-        private set => this.RaiseAndSetIfChanged(ref _fileChanged, value);
-    }
-    private string _fileCreated = string.Empty;
-    public string FileCreated
-    {
-        get => _fileCreated;
-        private set => this.RaiseAndSetIfChanged(ref _fileCreated, value);
-    }
-
+    
 }

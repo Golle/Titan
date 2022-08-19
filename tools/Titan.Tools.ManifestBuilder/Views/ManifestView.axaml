@@ -10,7 +10,7 @@
     <viewModels:ManifestViewModel/>
   </Design.DataContext>
   <DockPanel LastChildFill="True">
-    <StackPanel DockPanel.Dock="Left" Width="300">
+    <StackPanel DockPanel.Dock="Left">
       <TextBlock Text="{Binding Title}"/>
 
       <TextBlock IsVisible="{Binding Items.IsNotCompleted}">Loading....</TextBlock>
@@ -29,12 +29,5 @@
         </TreeView.ItemTemplate>
       </TreeView>
     </StackPanel>
-
-    <Border DockPanel.Dock="Right" Width="300" BorderThickness="1 0" BorderBrush="#ccc" Background="red" >
-        
-    </Border>
-    <Border DockPanel.Dock="Left" Background="blue">
-
-    </Border>
   </DockPanel>
 </UserControl>

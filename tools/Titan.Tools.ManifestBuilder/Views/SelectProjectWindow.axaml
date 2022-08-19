@@ -1,0 +1,71 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cm="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+        Width="800" Height="500"
+        x:Class="Titan.Tools.ManifestBuilder.Views.SelectProjectWindow"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        Title="SelectProjectWindow"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        >
+  <Design.DataContext>
+    <cm:SelectProjectWindowViewModel/>
+  </Design.DataContext>
+
+  <Window.Styles>
+    <Style Selector="Button.big">
+      <Setter Property="Height" Value="60"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="FontSize" Value="30"/>
+    </Style>
+    <Style Selector="ItemsRepeater > Button">
+      <!--<Setter Property="Margin" Value="10"/>-->
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="Background" Value="#22000000"/>
+    </Style>
+    <Style Selector="ItemsRepeater:pointerover > Button">
+      <Setter Property="Cursor" Value="Hand"></Setter>
+    </Style>
+  </Window.Styles>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.8" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <StackPanel Spacing="20" Margin="10">
+      <TextBlock FontSize="20">Manifest Builder</TextBlock>
+      <Grid ColumnDefinitions="3*,40, 2*">
+        <StackPanel Grid.Column="0" Spacing="10">
+          <TextBlock>Recent projects</TextBlock>
+          <ItemsRepeater Name="PART_RecentProjects" Items="{Binding RecentProjects}">
+            <ItemsRepeater.ItemTemplate>
+              <DataTemplate DataType="cm:RecentProjectViewModel">
+                <Button Margin="0 0 0 10" BorderThickness="1" CornerRadius="6" BorderBrush="{StaticResource SeparatorLight}" Padding="10" Command="{Binding $parent[Window].DataContext.OpenRecentProject}" CommandParameter="{Binding Path}" >
+                  <StackPanel Spacing="10">
+                    <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding Title}"/>
+                    <TextBlock FontSize="12" Margin="10 0" Text="{Binding Path}"/>
+                  </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+          </ItemsRepeater>
+
+        </StackPanel>
+        <StackPanel  Grid.Column="2" Spacing="10">
+          <TextBlock>Open or create a project</TextBlock>
+          <Button Classes="big" Command="{Binding OpenProject}" HorizontalAlignment="Stretch">Open or Create</Button>
+        </StackPanel>
+      </Grid>
+
+    </StackPanel>
+
+  </Panel>
+
+</Window>

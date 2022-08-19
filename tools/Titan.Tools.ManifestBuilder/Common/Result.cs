@@ -1,6 +1,6 @@
 namespace Titan.Tools.ManifestBuilder.Common;
 
-internal record struct Result<T>(T? Data, string? Error)
+public record struct Result<T>(T? Data, string? Error)
 {
     public bool Failed => !string.IsNullOrEmpty(Error);
     public bool Succeeded => !Failed;

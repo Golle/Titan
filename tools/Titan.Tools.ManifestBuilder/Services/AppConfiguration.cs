@@ -1,40 +1,96 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Text.Json.Serialization;
+using Titan.Tools.ManifestBuilder.Common;
 
 namespace Titan.Tools.ManifestBuilder.Services;
 
-internal record AppConfig(string ProjectBasePath);
-
-internal interface IAppConfiguration
+public class RecentProjects
 {
-    Task CreateOrInit(string basePath);
-    Task<AppConfig> GetConfig();
+    public const int MaxRecentProjects = 10;
+    public List<string> Paths { get; set; } = new(MaxRecentProjects);
+    public bool AddProject(string path)
+    {
+        var alreadyExist = Paths.Any(p => p.Equals(path, StringComparison.OrdinalIgnoreCase));
+        if (!alreadyExist)
+        {
+            Paths.Add(path);
+        }
+
+        if (Paths.Count >= MaxRecentProjects)
+        {
+            Paths.RemoveAt(0);
+        }
+        return !alreadyExist;
+    }
+}
+public record struct PanelSize(double Size);
+public record struct WindowSize(double Width, double Height, int X, int Y)
+{
+    [JsonIgnore]
+    public bool HasValues => Width != 0 && Height != 0;
 }
 
-/// <summary>
-/// This class will take care of any configuration (right now there's no config except for the base path)
-/// </summary>
-internal class AppConfiguration : IAppConfiguration
+public record Settings(WindowSize WindowSize, PanelSize ManifestPanelSize, PanelSize PropertiesPanelSize, PanelSize ContentPanelSize, RecentProjects RecentProjects)
 {
-    private string? _basePath;
-    public Task CreateOrInit(string basePath)
+    public static Settings Default() => new(default, default, default, default, new RecentProjects());
+}
+
+public interface IAppSettings
+{
+    Settings GetSettings();
+    void Save(Settings settings);
+}
+
+internal class AppDataSettings : IAppSettings
+{
+    private readonly IJsonSerializer _jsonSerializer;
+    private Settings? _settings;
+    public AppDataSettings(IJsonSerializer jsonSerializer)
     {
-        if (!Directory.Exists(basePath))
+        _jsonSerializer = jsonSerializer;
+    }
+    public Settings GetSettings()
+    {
+        if (_settings != null)
         {
-            Directory.CreateDirectory(basePath);
+            return _settings;
         }
-        _basePath = basePath;
-        return Task.CompletedTask;
+
+        var path = GlobalConfiguration.SettingsFile;
+        if (File.Exists(path))
+        {
+            try
+            {
+                var bytes = File.ReadAllBytes(path);
+                _settings = _jsonSerializer.Deserialize<Settings>(bytes);
+            }
+            catch
+            {
+                Debug.WriteLine("Failed to deserialize/read the settings. Will use default.");
+            }
+        }
+
+        return _settings ??= Settings.Default();
     }
 
-    public Task<AppConfig> GetConfig()
+    public void Save(Settings settings)
     {
-        if (string.IsNullOrWhiteSpace(_basePath))
+        try
         {
-            throw new InvalidOperationException("Base path has not been set, this is an invalid state.");
+            var path = GlobalConfiguration.SettingsFile;
+            var serializeToUtf8 = _jsonSerializer.SerializeToUtf8(settings, true);
+            File.WriteAllBytes(path, serializeToUtf8);
         }
-        return Task.FromResult(new AppConfig(_basePath!));
+        catch
+        {
+            //NOTE(Jens): not sure how to handle this.
+            return;
+        }
+        // only update settings on successful save
+        _settings = settings;
     }
 }

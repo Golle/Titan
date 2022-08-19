@@ -10,6 +10,7 @@ internal interface IJsonSerializer
     ValueTask<T?> DeserializeAsync<T>(Stream utf8Stream);
     Task SerializeAsync<T>(Stream stream, in T value, bool writeIndented = false);
     string Serialize<T>(in T value);
+    byte[] SerializeToUtf8<T>(in T value, bool writeIndented = false);
 }
 public class JsonSerializer : IJsonSerializer
 {
@@ -27,4 +28,10 @@ public class JsonSerializer : IJsonSerializer
     public ValueTask<T?> DeserializeAsync<T>(Stream utf8Stream) => System.Text.Json.JsonSerializer.DeserializeAsync<T>(utf8Stream, Options);
     public Task SerializeAsync<T>(Stream stream, in T value, bool writeIndented = false) => System.Text.Json.JsonSerializer.SerializeAsync(stream, value, writeIndented ? OptionsPrettyPrint : Options);
     public string Serialize<T>(in T value) => System.Text.Json.JsonSerializer.Serialize(value, Options);
+    public byte[] SerializeToUtf8<T>(in T value, bool writeIndented)
+    {
+        using var stream = new MemoryStream();
+        System.Text.Json.JsonSerializer.Serialize(stream, value, writeIndented ? OptionsPrettyPrint : Options);
+        return stream.ToArray();
+    }
 }

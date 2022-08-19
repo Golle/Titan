@@ -11,9 +11,13 @@
     <Folder Include="Assets\" />
     <AvaloniaResource Include="Assets\**" />
     <None Remove=".gitignore" />
+    <None Remove="Resources\Colors.xaml" />
     <None Remove="Resources\Icons.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaXaml Include="Resources\Colors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
     <AvaloniaXaml Include="Resources\Icons.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
@@ -25,5 +29,6 @@
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
     <PackageReference Include="MessageBox.Avalonia" Version="2.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0-preview.7.22375.6" />
   </ItemGroup>
 </Project>

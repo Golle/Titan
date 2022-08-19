@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Titan.Tools.ManifestBuilder.Views.EditorView">
+  <Design.DataContext>
+    <vm:EditorViewModel/>
+  </Design.DataContext>
+
+  <DockPanel>
+    <ContentControl DockPanel.Dock="Bottom" Height="400" Content="{Binding ContentView}"/>
+    <ContentControl DockPanel.Dock="Left" Content="{Binding ManifestView}"/>
+
+  </DockPanel>
+</UserControl>

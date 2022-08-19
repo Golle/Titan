@@ -1,42 +1,35 @@
 using System;
-using Splat;
+using Microsoft.Extensions.DependencyInjection;
 using Titan.Tools.ManifestBuilder.Services;
+using Titan.Tools.ManifestBuilder.ViewModels;
+using Titan.Tools.ManifestBuilder.Views;
 
 namespace Titan.Tools.ManifestBuilder;
 
 internal static class Registry
 {
-    public static void Init(IMutableDependencyResolver services) =>
-        services
-            .RegisterLazySingleton<IJsonSerializer>(_ => new JsonSerializer())
-            .RegisterLazySingleton<IAppConfiguration>(_ => new AppConfiguration())
-            .RegisterLazySingleton<IManifestService>(resolver => new ManifestService(resolver.GetRequiredService<IAppConfiguration>(), resolver.GetRequiredService<IJsonSerializer>()))
-
-    //services
-    //.RegisterLazySingleton<IModalService>(_ => new ModalService())
-    ;
-
-
-
-    //NOTE(Jens): Some helper methods for this DI framework from the 80s.
-    public static T GetRequiredService<T>(this IReadonlyDependencyResolver resolver)
+    private static readonly IServiceProvider _serviceProvider;
+    static Registry()
     {
-        if (resolver is null)
-        {
-            throw new ArgumentNullException(nameof(resolver));
-        }
+        _serviceProvider = new ServiceCollection()
+                .AddSingleton<IMessenger, MulticastDelegateMessenger>()
+                .AddSingleton<IDialogService, DialogService>()
+                .AddSingleton<IJsonSerializer, JsonSerializer>()
+                .AddSingleton<IAppSettings, AppDataSettings>()
+                .AddSingleton<IManifestService, ManifestService>()
 
-        var service = resolver.GetService(typeof(T));
-        if (service == null)
-        {
-            throw new InvalidOperationException($"Service {typeof(T).Name} has not been registered.");
-        }
-        return (T)service;
-    }
+                .AddSingleton<MainWindow>()
 
-    public static IMutableDependencyResolver RegisterLazySingleton<T>(this IMutableDependencyResolver services, Func<IReadonlyDependencyResolver, object> factory)
-    {
-        services.RegisterLazySingleton(() => factory((IReadonlyDependencyResolver)services), typeof(T));
-        return services;
+                .AddSingleton<EditorViewModel>()
+                .AddSingleton<MainWindowViewModel>()
+                .AddSingleton<ProjectSelectorViewModel>()
+                .AddSingleton<ContentViewModel>()
+                .AddSingleton<ManifestViewModel>()
+                .AddSingleton<FileInfoViewModel>()
+
+
+                .BuildServiceProvider()
+            ;
     }
+    public static T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
 }

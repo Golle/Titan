@@ -6,27 +6,23 @@ using Titan.Tools.ManifestBuilder.Models;
 
 namespace Titan.Tools.ManifestBuilder.Services;
 
-internal interface IManifestService
+public interface IManifestService
 {
-    Task<Result<IReadOnlyList<Manifest>>> ListManifests();
+    Task<Result<IReadOnlyList<Manifest>>> ListManifests(string projectPath);
 }
 
 internal class ManifestService : IManifestService
 {
-    private readonly IAppConfiguration _configuration;
     private readonly IJsonSerializer _jsonSerializer;
 
-    public ManifestService(IAppConfiguration configuration, IJsonSerializer jsonSerializer)
+    public ManifestService(IJsonSerializer jsonSerializer)
     {
-        _configuration = configuration;
         _jsonSerializer = jsonSerializer;
     }
 
-    public async Task<Result<IReadOnlyList<Manifest>>> ListManifests()
+    public async Task<Result<IReadOnlyList<Manifest>>> ListManifests(string projectPath)
     {
-        var config = await _configuration.GetConfig();
-
-        var paths = Directory.GetFiles(config.ProjectBasePath, $"*.{GlobalConfiguration.ManifestFileExtension}", SearchOption.TopDirectoryOnly);
+        var paths = Directory.GetFiles(projectPath, $"*.{GlobalConfiguration.ManifestFileExtension}", SearchOption.TopDirectoryOnly);
 
         List<Manifest> manifests = new(paths.Length);
         foreach (var path in paths)

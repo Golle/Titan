@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using ReactiveUI;
@@ -18,7 +19,7 @@ public class ManifestViewModel : ViewModelBase
         get => _title;
         set => SetProperty(ref _title, value);
     }
-    
+
     private string? _error;
     public string? Error
     {
@@ -33,27 +34,35 @@ public class ManifestViewModel : ViewModelBase
     }
     public bool HasError { get; private set; }
 
-    public NotifyTaskCompletion<ObservableCollection<ItemNode>> Items { get; }
+    private NotifyTaskCompletion<ObservableCollection<ItemNode>> _items;
+    public NotifyTaskCompletion<ObservableCollection<ItemNode>> Items
+    {
+        get => _items;
+        set => SetProperty(ref _items, value);
+    }
 
     private ItemNode? _selectedItem;
+
     public ItemNode? SelectedItem
     {
         get => _selectedItem;
         set => SetProperty(ref _selectedItem, value);
     }
-    public ManifestViewModel()
-    : this(null!)
+
+
+    public ManifestViewModel(IManifestService? manifestService)
     {
+        _manifestService = manifestService ?? Registry.GetRequiredService<IManifestService>();
+        _items = new NotifyTaskCompletion<ObservableCollection<ItemNode>>(Task.FromResult(new ObservableCollection<ItemNode>()));
     }
 
-    internal ManifestViewModel(IManifestService manifestService)
+    public Task Load(string projectPath)
     {
-        _manifestService = manifestService;
-
-        Items = new NotifyTaskCompletion<ObservableCollection<ItemNode>>(LoadManifests());
+        Items = new NotifyTaskCompletion<ObservableCollection<ItemNode>>(LoadManifests(projectPath));
+        return Task.CompletedTask;
     }
 
-    private async Task<ObservableCollection<ItemNode>> LoadManifests()
+    private async Task<ObservableCollection<ItemNode>> LoadManifests(string path)
     {
         var result = new ObservableCollection<ItemNode>();
         if (Design.IsDesignMode)
@@ -62,7 +71,7 @@ public class ManifestViewModel : ViewModelBase
         }
 
         Error = null;
-        var manifests = await _manifestService.ListManifests();
+        var manifests = await _manifestService.ListManifests(path);
         if (manifests.Failed)
         {
             Error = manifests.Error ?? "Unknown error occurred.";
@@ -90,7 +99,10 @@ public class ManifestViewModel : ViewModelBase
         });
         return result;
     }
-
+    public ManifestViewModel()
+        : this(null)
+    {
+    }
     public class ItemNode
     {
         public ObservableCollection<ItemNode> Children { get; set; } = new();
