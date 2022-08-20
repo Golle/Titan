@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Titan.Tools.ManifestBuilder.Services;
@@ -33,8 +32,10 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     protected override async void OnOpened(EventArgs e)
     {
-        SetPanelSizes();
+        
         base.OnOpened(e);
+
+        SetPanelSizes();
 
         var window = new SelectProjectWindow();
         var result = await window.ShowDialog<string>(this);
@@ -51,6 +52,10 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     private void SetWindowSize()
     {
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
         var windowSize = _appSettings
             .GetSettings()
             .WindowSize;
@@ -75,6 +80,10 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     private void SetPanelSizes()
     {
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
         var settings = _appSettings.GetSettings();
         var grid = GetGrid();
         if (settings.ManifestPanelSize.Size != 0 && settings.PropertiesPanelSize.Size != 0)
@@ -88,7 +97,12 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             var propertiesWidth = settings.PropertiesPanelSize.Size;
             columnDefinitions[ManifestColumnIndex].Width = new GridLength(manifestWidth, GridUnitType.Star);
             columnDefinitions[PropertiesColumnIndex].Width = new GridLength(propertiesWidth, GridUnitType.Star);
-            columnDefinitions[MiddleColumnIndex].Width = new GridLength(totalWidth - manifestWidth - propertiesWidth, GridUnitType.Star);
+            var middleWidth = totalWidth - manifestWidth - propertiesWidth;
+            if (middleWidth <= 0)
+            {
+                middleWidth = 1;
+            }
+            columnDefinitions[MiddleColumnIndex].Width = new GridLength(middleWidth, GridUnitType.Star);
         }
 
         if (settings.ContentPanelSize.Size != 0)
@@ -112,6 +126,11 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     private void SavePanelAndWindowSizes()
     {
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
+
         var settings = _appSettings.GetSettings();
         var grid = GetGrid();
 
