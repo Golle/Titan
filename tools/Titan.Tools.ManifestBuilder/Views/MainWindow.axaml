@@ -12,7 +12,7 @@
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
-        >
+>
   <Design.DataContext>
     <viewModels:MainWindowViewModel/>
   </Design.DataContext>
@@ -50,7 +50,7 @@
           <RowDefinition MinHeight="200" Height="*"/>
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" Grid.Column="0" Background="blue" DockPanel.Dock="Left" Content="{Binding Manifest}"/>
+        <ContentControl Grid.Row="0" Grid.Column="0" DockPanel.Dock="Left" Content="{Binding Project}"/>
         <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns"/>
         <ContentControl Grid.Row="0" Grid.Column="2" Background="Magenta" DockPanel.Dock="Right" Content="{Binding Properties}"/>
         <GridSplitter Grid.Row="0" Grid.Column="3" ResizeDirection="Columns"/>

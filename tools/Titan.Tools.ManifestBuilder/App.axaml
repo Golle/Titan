@@ -17,5 +17,6 @@
     <Application.Styles>
         <FluentTheme Mode="Dark"/>
         <StyleInclude Source="/Styles/FileEntryControl.axaml"/>
+        <StyleInclude Source="/Styles/Buttons.axaml"/>
     </Application.Styles>
 </Application>

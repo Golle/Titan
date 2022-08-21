@@ -31,4 +31,12 @@
     <PackageReference Include="MessageBox.Avalonia" Version="2.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0-preview.7.22375.6" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\ManifestView2.axaml.cs">
+      <DependentUpon>ManifestView2.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ProjectExplorerView.axaml.cs">
+      <DependentUpon>ProjectExplorerView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Titan.Tools.ManifestBuilder.Common;
 using Titan.Tools.ManifestBuilder.Models;
@@ -9,6 +10,8 @@ namespace Titan.Tools.ManifestBuilder.Services;
 public interface IManifestService
 {
     Task<Result<IReadOnlyList<Manifest>>> ListManifests(string projectPath);
+    Task<Result<Manifest>> CreateManifest(string projectPath, string name);
+    Task<Result> SaveManifest(string projectPath, Manifest manifest);
 }
 
 internal class ManifestService : IManifestService
@@ -19,6 +22,49 @@ internal class ManifestService : IManifestService
     {
         _jsonSerializer = jsonSerializer;
     }
+
+    public async Task<Result<Manifest>> CreateManifest(string projectPath, string name)
+    {
+        var path = GetManifestPath(projectPath, name);
+        if (File.Exists(path))
+        {
+            return Result<Manifest>.Fail($"A manifest with the name {name} already exists in the project.");
+        }
+        var manifest = new Manifest
+        {
+            Name = name,
+            Path = path
+        };
+
+        var saveResult = await SaveManifest(projectPath, manifest);
+        if (saveResult.Failed)
+        {
+            return Result<Manifest>.Fail("Failed to save the manifest with an unknown error.");
+        }
+        return Result<Manifest>.Success(manifest);
+    }
+
+    public async Task<Result> SaveManifest(string projectPath, Manifest manifest)
+    {
+        var path = GetManifestPath(projectPath, manifest.Name);
+
+        await using var file = File.OpenWrite(path);
+        await _jsonSerializer.SerializeAsync(file, manifest, true);
+
+        return Result.Success();
+    }
+
+    private static string GetManifestPath(string projectPath, string name)
+    {
+        return Path.Combine(projectPath, $"{GetSafeFileName(name)}.{GlobalConfiguration.ManifestFileExtension}");
+
+        static string GetSafeFileName(string name)
+            => Path
+                .GetInvalidFileNameChars()
+                .Aggregate(name, (current, invalidChar) => current.Replace(invalidChar, '_'))
+                .Trim();
+    }
+
 
     public async Task<Result<IReadOnlyList<Manifest>>> ListManifests(string projectPath)
     {
@@ -33,6 +79,7 @@ internal class ManifestService : IManifestService
             {
                 return Result<IReadOnlyList<Manifest>>.Fail($"Failed to deserialize contents of {path}.");
             }
+            manifest.Path = path;
             manifests.Add(manifest);
         }
         return Result<IReadOnlyList<Manifest>>.Success(manifests);
