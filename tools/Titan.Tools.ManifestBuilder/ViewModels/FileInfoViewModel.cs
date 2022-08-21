@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Avalonia.Data.Converters;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 

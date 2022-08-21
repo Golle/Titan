@@ -4,7 +4,6 @@ using System.Windows.Input;
 using DynamicData.Binding;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.Services;
-using Titan.Tools.ManifestBuilder.ViewModels.Dialogs;
 using Titan.Tools.ManifestBuilder.ViewModels.Manifest;
 using Titan.Tools.ManifestBuilder.Views.Dialogs;
 
