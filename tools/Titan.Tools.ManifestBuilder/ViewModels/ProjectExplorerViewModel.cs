@@ -1,27 +1,26 @@
-using System;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData.Binding;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.Services;
+using Titan.Tools.ManifestBuilder.ViewModels.Dialogs;
 using Titan.Tools.ManifestBuilder.ViewModels.Manifest;
 using Titan.Tools.ManifestBuilder.Views.Dialogs;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels;
 
-
 public class ProjectExplorerViewModel : ViewModelBase
 {
+    private readonly IDialogService? _dialogService;
+
     public bool ProjectLoaded
     {
         get => _projectLoaded;
         set => SetProperty(ref _projectLoaded, value);
     }
     public bool HasManifests => Manifests.Count > 0;
-    
+
     public IObservableCollection<ManifestViewModel> Manifests { get; } = new ObservableCollectionExtended<ManifestViewModel>();
 
     private ManifestViewModel? _selectedManifest;
@@ -36,9 +35,10 @@ public class ProjectExplorerViewModel : ViewModelBase
     }
 
     public ICommand CreateManifest { get; }
-    public ProjectExplorerViewModel(IManifestService? manifestService = null)
+    public ProjectExplorerViewModel(IManifestService? manifestService = null, IDialogService? dialogService = null)
     {
-        _manifestService ??= Registry.GetRequiredService<IManifestService>();
+        _dialogService = dialogService ?? Registry.GetRequiredService<IDialogService>();
+        _manifestService = manifestService ?? Registry.GetRequiredService<IManifestService>();
 
         CreateManifest = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -56,7 +56,7 @@ public class ProjectExplorerViewModel : ViewModelBase
                 }
                 else
                 {
-                    // display message box.
+                    await _dialogService.MessageBox("Error", $"Failed to create the manifest with error: {createManifestResult.Error}");
                 }
             }
         });

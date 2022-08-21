@@ -3,21 +3,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dialogs="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels.Dialogs"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
-        x:Class="Titan.Tools.ManifestBuilder.Views.Dialogs.CreateManifestDialog"
-        Title="CreateManifestDialog"
+        mc:Ignorable="d" d:DesignWidth="400"
+        x:Class="Titan.Tools.ManifestBuilder.Views.Dialogs.MessageBoxDialog"
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         Width="400"
-        
         SizeToContent="Height"
         >
 
   <Design.DataContext>
-    <dialogs:CreateManifestDialogViewModel/>
+    <dialogs:MessageBoxViewModel/>
   </Design.DataContext>
   <Panel>
     <ExperimentalAcrylicBorder DockPanel.Dock="Top" IsHitTestVisible="False">
@@ -27,16 +25,17 @@
     </ExperimentalAcrylicBorder>
 
     <StackPanel Spacing="10">
-      <TextBlock Padding="5 5 5 0" FontSize="16" IsHitTestVisible="False">Create manifest</TextBlock>
+      <TextBlock Padding="5 5 5 0" FontSize="16" IsHitTestVisible="False" Text="{Binding Title}"/>
       <Separator Height="1" Background="{StaticResource SeparatorLight}"/>
       <Border Padding="10" VerticalAlignment="Center">
         <StackPanel Spacing="10">
-          <TextBlock FontSize="16">Name</TextBlock>
-          <TextBox Watermark="Manifest name" Text="{Binding Name}"/>
+          <TextBlock FontSize="16" Text="{Binding Message}"/>
           <Separator Height="1" Background="{StaticResource SeparatorLight}"/>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-            <Button Classes="accept" Command="{Binding Create}" IsEnabled="{Binding Name, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">Create</Button>
-            <Button Command="{Binding Close}">Cancel</Button>
+            <Button IsVisible="{Binding IsOk}" Command="{Binding Close}" CommandParameter="{x:Static dialogs:MessageBoxResult.Ok}">Ok</Button>
+            <Button IsVisible="{Binding IsOkCancel}" Command="{Binding Close}" CommandParameter="{x:Static dialogs:MessageBoxResult.Cancel}">Cancel</Button>
+            <Button IsVisible="{Binding IsYesNo}" Command="{Binding Close}" CommandParameter="{x:Static dialogs:MessageBoxResult.Yes}">Yes</Button>
+            <Button IsVisible="{Binding IsYesNo}" Command="{Binding Close}" CommandParameter="{x:Static dialogs:MessageBoxResult.No}">No</Button>
           </StackPanel>
         </StackPanel>
       </Border>

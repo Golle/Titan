@@ -10,7 +10,7 @@
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
         Title="SelectProjectWindow"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterOwner"
         CanResize="False"
         >
   <Design.DataContext>
