@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Titan.Tools.ManifestBuilder.ViewModels.Manifest;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels;
 

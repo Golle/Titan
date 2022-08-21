@@ -2,6 +2,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Titan.Tools.ManifestBuilder.Services;
 using Titan.Tools.ManifestBuilder.ViewModels;
+using Titan.Tools.ManifestBuilder.ViewModels.Manifest;
 using Titan.Tools.ManifestBuilder.Views;
 
 namespace Titan.Tools.ManifestBuilder;

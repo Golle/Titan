@@ -1,13 +1,10 @@
-using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Controls;
-using DynamicData;
 using DynamicData.Binding;
-using Titan.Tools.ManifestBuilder.Models;
 
-namespace Titan.Tools.ManifestBuilder.ViewModels;
+namespace Titan.Tools.ManifestBuilder.ViewModels.Manifest;
 
-public class ManifestViewModel2 : ViewModelBase
+public class ManifestViewModel : ViewModelBase
 {
     private ManifestTreeNodeViewModel? _selectedNode;
     public required string Name { get; init; }
@@ -17,7 +14,7 @@ public class ManifestViewModel2 : ViewModelBase
         set => SetProperty(ref _selectedNode, value);
     }
     public required IObservableCollection<ManifestTreeNodeViewModel> Nodes { get; init; }
-    public static ManifestViewModel2 CreateFromManifest(Manifest manifest)
+    public static ManifestViewModel CreateFromManifest(Models.Manifest manifest)
     {
         var nodes = new[]
         {
@@ -25,14 +22,14 @@ public class ManifestViewModel2 : ViewModelBase
             new ManifestTreeNodeViewModel("Models", manifest.Models.Select(m => new ManifestTreeNodeViewModel(System.IO.Path.GetFileNameWithoutExtension(m.Path))))
         };
 
-        return new ManifestViewModel2
+        return new ManifestViewModel
         {
             Name = manifest.Name,
             Nodes = new ObservableCollectionExtended<ManifestTreeNodeViewModel>(nodes)
         };
     }
 
-    public ManifestViewModel2()
+    public ManifestViewModel()
     {
         if (Design.IsDesignMode)
         {
@@ -43,27 +40,5 @@ public class ManifestViewModel2 : ViewModelBase
                 new ManifestTreeNodeViewModel("Test_02", new []{new ManifestTreeNodeViewModel("Child 01"), new ManifestTreeNodeViewModel("Child 02", new[] {new ManifestTreeNodeViewModel("Sub child 01")})})
             });
         }
-    }
-}
-
-public class ManifestTreeNodeViewModel : ViewModelBase
-{
-    private string _name;
-    public string Name
-    {
-        get => _name;
-        set => SetProperty(ref _name, value);
-    }
-    public IObservableCollection<ManifestTreeNodeViewModel> Children { get; } = new ObservableCollectionExtended<ManifestTreeNodeViewModel>();
-
-    public ManifestTreeNodeViewModel(string name)
-        : this(name, Enumerable.Empty<ManifestTreeNodeViewModel>())
-    {
-
-    }
-    public ManifestTreeNodeViewModel(string name, IEnumerable<ManifestTreeNodeViewModel> children)
-    {
-        _name = name;
-        Children.AddRange(children);
     }
 }

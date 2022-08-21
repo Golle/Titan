@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Titan.Tools.ManifestBuilder.Views;
+namespace Titan.Tools.ManifestBuilder.Views.Manifest;
 
 public partial class ManifestView : UserControl
 {
