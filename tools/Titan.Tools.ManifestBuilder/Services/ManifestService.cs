@@ -96,6 +96,7 @@ internal class ManifestService : IManifestService
             manifest.Path = path;
             manifests.Add(manifest);
         }
+        
         return Result<IReadOnlyList<Manifest>>.Success(manifests);
     }
 }

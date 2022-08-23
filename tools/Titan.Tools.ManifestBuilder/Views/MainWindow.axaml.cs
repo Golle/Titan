@@ -36,7 +36,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     protected override async void OnOpened(EventArgs e)
     {
-        
         base.OnOpened(e);
 
         SetPanelSizes();
@@ -127,7 +126,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         SavePanelAndWindowSizes();
         base.OnClosing(e);
     }
-
+    
     private void SavePanelAndWindowSizes()
     {
         if (Design.IsDesignMode)

@@ -14,8 +14,6 @@ public class ViewModelBase : ReactiveObject
         action();
         NotifyPropertyChanged(propertyName);
     }
-
-
     public void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
         => this.RaisePropertyChanged(propertyName);
 }

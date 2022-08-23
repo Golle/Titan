@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using ColorTextBlock.Avalonia;
 using DynamicData.Binding;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.Common;
@@ -63,6 +62,7 @@ public class ProjectExplorerViewModel : ViewModelBase
                 }
             }
         });
+        _messenger.Subscribe<AddFileToManifestMessage>(this, message => _selectedManifest?.AddItemToManifest(message.Item));
     }
 
     public async Task LoadProject(string path)
@@ -72,7 +72,9 @@ public class ProjectExplorerViewModel : ViewModelBase
         var manifests = await _manifestService.ListManifests(_projectPath!);
         if (manifests.Succeeded)
         {
-            var viewModels = manifests.Data!.Select(m => new ManifestViewModel(m, _messenger));
+            var viewModels = manifests.Data!
+                .OrderByDescending(m => m.Order)
+                .Select(m => new ManifestViewModel(m, _messenger));
             Manifests.Load(viewModels);
         }
         else

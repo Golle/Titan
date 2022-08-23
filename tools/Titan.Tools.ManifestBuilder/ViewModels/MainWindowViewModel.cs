@@ -21,7 +21,6 @@ public class MainWindowViewModel : ViewModelBase
         Project = new ProjectExplorerViewModel();
         Properties = new NodePropertiesViewModel();
 
-
         SaveAll = ReactiveCommand.CreateFromTask(async () =>
         {
             var result = await Project.SaveAll();

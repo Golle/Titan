@@ -1,20 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reactive;
 using System.Windows.Input;
 using DynamicData.Binding;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.Controls;
+using Titan.Tools.ManifestBuilder.Models;
+using Titan.Tools.ManifestBuilder.Services;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels;
 
+public record struct AddFileToManifestMessage(ManifestItem Item);
 public class FileEntryViewModel : ViewModelBase
 {
     private bool _selected;
     public string FileName { get; }
     public string FullPath { get; }
     public FileEntryType Type { get; }
+    public bool IsDocument => Type is FileEntryType.Document;
     public bool Selected
     {
         get => _selected;
@@ -59,10 +62,15 @@ public class ContentViewModel : ViewModelBase
 
     public IObservableCollection<FileEntryViewModel> FileEntries { get; } = new ObservableCollectionExtended<FileEntryViewModel>();
     public ICommand Open { get; }
-    public ReactiveCommand<FileEntryViewModel, Unit> Select { get; }
+    public ICommand Select { get; }
+    public ICommand AddToManifest { get; }
 
-    public ContentViewModel()
+    public ContentViewModel(IMessenger? messenger = null, IManifestItemFactory? manifestItemFactory = null, IDialogService? dialogService = null)
     {
+        messenger ??= Registry.GetRequiredService<IMessenger>();
+        manifestItemFactory ??= Registry.GetRequiredService<IManifestItemFactory>();
+        dialogService ??= Registry.GetRequiredService<IDialogService>();
+
         Open = ReactiveCommand.CreateFromTask<FileEntryViewModel>(async fileEntry =>
         {
             if (fileEntry.Type is FileEntryType.Folder or FileEntryType.History)
@@ -70,7 +78,6 @@ public class ContentViewModel : ViewModelBase
                 CurrentFolder = fileEntry.FullPath;
                 FileEntries.Load(EnumerateAll(fileEntry.FullPath));
             }
-
         });
 
         Select = ReactiveCommand.CreateFromTask<FileEntryViewModel>(async fileEntry =>
@@ -82,6 +89,18 @@ public class ContentViewModel : ViewModelBase
             }
             fileEntry.Selected = true;
         });
+
+        AddToManifest = ReactiveCommand.CreateFromTask<FileEntryViewModel>(async fileEntry =>
+        {
+            var relativePath = Path.GetRelativePath(_basePath!, fileEntry.FullPath);
+            var itemResult = manifestItemFactory.CreateFromPath(relativePath);
+            if (itemResult.Failed)
+            {
+                await dialogService.MessageBox("Error", $"Failed to add file to the manifest with error: {itemResult.Error}");
+                return;
+            }
+            await messenger.SendAsync(new AddFileToManifestMessage(itemResult.Data!));
+        });
     }
 
 
@@ -89,6 +108,7 @@ public class ContentViewModel : ViewModelBase
     {
         FileEntries.Load(EnumerateAll(path));
     }
+
     private IEnumerable<FileEntryViewModel> EnumerateAll(string path)
     {
         if (!BasePath.Equals(path, StringComparison.InvariantCultureIgnoreCase) && Directory.GetParent(path) is not null and var parent)
@@ -104,5 +124,11 @@ public class ContentViewModel : ViewModelBase
         {
             yield return new FileEntryViewModel(Path.GetFileName(file), file, FileEntryType.Document);
         }
+    }
+
+    public ContentViewModel()
+        : this(null)
+    {
+
     }
 }

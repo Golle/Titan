@@ -30,7 +30,14 @@
                     FileEntryType="{Binding Type}"
                     IsSelected="{Binding Selected}"
                     DoubleClick="{Binding $parent[UserControl].DataContext.Open}"
-                    SingleClick="{Binding $parent[UserControl].DataContext.Select}"/>
+                    SingleClick="{Binding $parent[UserControl].DataContext.Select}"
+                    >
+                  <controls:FileEntryControl.ContextMenu>
+                    <ContextMenu IsVisible="{Binding IsDocument}">
+                      <MenuItem Header="Add to manifest" Command="{Binding $parent[UserControl].DataContext.AddToManifest}" CommandParameter="{Binding .}"/>
+                    </ContextMenu>
+                  </controls:FileEntryControl.ContextMenu>
+                </controls:FileEntryControl>
               </DataTemplate>
             </ItemsRepeater.ItemTemplate>
           </ItemsRepeater>

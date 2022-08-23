@@ -22,16 +22,19 @@
         </StackPanel>
 
         <StackPanel IsVisible="{Binding HasManifests}" Spacing="10" >
-          <ComboBox Items="{Binding Manifests}" SelectedItem="{Binding SelectedManifest}" HorizontalAlignment="Stretch">
-            <ComboBox.ItemTemplate>
-              <DataTemplate>
-                <StackPanel Spacing="5" Orientation="Horizontal">
-                  <TextBlock Text="{Binding Name}"/>
-                  <TextBlock IsVisible="{Binding IsDirty}" Text="*"/>
-                </StackPanel>
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
+          <Grid ColumnDefinitions="*,10, Auto">
+            <ComboBox Grid.Column="0" Items="{Binding Manifests}" SelectedItem="{Binding SelectedManifest}" HorizontalAlignment="Stretch">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Spacing="5" Orientation="Horizontal">
+                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock IsVisible="{Binding IsDirty}" Text="*"/>
+                  </StackPanel>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Grid.Column="2" Command="{Binding CreateManifest}">+</Button>
+          </Grid>
           <Separator Height="1" Background="{StaticResource SeparatorLight}"/>
           <manifests:ManifestView DataContext="{Binding SelectedManifest}"/>
         </StackPanel>

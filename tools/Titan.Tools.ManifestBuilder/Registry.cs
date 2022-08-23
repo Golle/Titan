@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Titan.Tools.ManifestBuilder.Models;
 using Titan.Tools.ManifestBuilder.Services;
 using Titan.Tools.ManifestBuilder.Views;
 
@@ -17,7 +18,7 @@ internal static class Registry
                 .AddSingleton<IJsonSerializer, JsonSerializer>()
                 .AddSingleton<IAppSettings, AppDataSettings>()
                 .AddSingleton<IManifestService, ManifestService>()
-
+                .AddSingleton<IManifestItemFactory, ManifestItemFactory>()
                 .AddSingleton<MainWindow>()
 
                 //.AddSingleton<EditorViewModel>()

@@ -32,33 +32,28 @@ public class ManifestViewModel : ViewModelBase
     }
     private readonly ICommand _selectedNodeChanged;
 
+    private readonly ManifestTreeNodeViewModel _textures;
+    private readonly ManifestTreeNodeViewModel _models;
+    private readonly ManifestTreeNodeViewModel _materials;
+
     public Manifest Manifest { get; }
     public ManifestViewModel(Manifest manifest, IMessenger messenger)
     {
         Manifest = manifest;
-        Nodes = new IManifestTreeNode[]
-        {
-            new ManifestTreeNodeViewModel(nameof(manifest.Textures), manifest.Textures.Select(m =>
-            {
-                var viewModel = new TextureNodeViewModel(m);
-                viewModel.PropertyChanged += (_, _) => IsDirty = true;
-                return viewModel;
-            })),
-            new ManifestTreeNodeViewModel(nameof(manifest.Models), manifest.Models.Select(m =>
-            {
-                var viewModel = new ModelNodeViewModel(m);
-                viewModel.PropertyChanged += (_, _) => IsDirty = true;
-                return viewModel;
-            })),
-            new ManifestTreeNodeViewModel(nameof(manifest.Materials), manifest.Materials.Select(m =>
-            {
-                var viewModel = new MaterialNodeViewModel(m);
-                viewModel.PropertyChanged += (_, _) => IsDirty = true;
-                return viewModel;
-            })),
-        };
+
+        _textures = new ManifestTreeNodeViewModel(nameof(manifest.Textures), manifest.Textures.Select(m => CheckForDirty(new TextureNodeViewModel(m))));
+        _models = new ManifestTreeNodeViewModel(nameof(manifest.Models), manifest.Models.Select(m => CheckForDirty(new ModelNodeViewModel(m))));
+        _materials = new ManifestTreeNodeViewModel(nameof(manifest.Materials), manifest.Materials.Select(m => CheckForDirty(new MaterialNodeViewModel(m))));
+
+        Nodes = new IManifestTreeNode[] { _textures, _models, _materials };
 
         _selectedNodeChanged = ReactiveCommand.CreateFromTask<IManifestTreeNode>(node => messenger.SendAsync(new ManifestNodeSelected(node)));
+
+        T CheckForDirty<T>(T viewModel) where T : ViewModelBase
+        {
+            viewModel.PropertyChanged += (_, _) => IsDirty = true;
+            return viewModel;
+        }
     }
 
     #region DESIGN_CONSTRUCTOR
@@ -80,4 +75,26 @@ public class ManifestViewModel : ViewModelBase
         }
     }
     #endregion
+
+    public void AddItemToManifest(ManifestItem item)
+    {
+        switch (item)
+        {
+            case TextureItem texture:
+                Manifest.Textures.Add(texture);
+                _textures.Children.Add(new TextureNodeViewModel(texture));
+                break;
+            case ModelItem model:
+                Manifest.Models.Add(model);
+                _models.Children.Add(new ModelNodeViewModel(model));
+                break;
+            case MaterialItem material:
+                Manifest.Materials.Add(material);
+                _materials.Children.Add(new MaterialNodeViewModel(material));
+                break;
+            default:
+                throw new NotSupportedException($"Type {item.GetType().Name} is not supported.");
+        }
+        IsDirty = true;
+    }
 }

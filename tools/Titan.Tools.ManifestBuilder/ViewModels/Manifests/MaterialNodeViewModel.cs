@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;
 using Titan.Tools.ManifestBuilder.Models;
 
