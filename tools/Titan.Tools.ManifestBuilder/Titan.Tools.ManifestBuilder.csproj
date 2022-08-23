@@ -10,6 +10,7 @@
   <ItemGroup>
     <Folder Include="Assets\" />
     <AvaloniaResource Include="Assets\**" />
+    <Folder Include="DataTemplates\Attributes\" />
     <None Remove=".gitignore" />
     <None Remove="Resources\Colors.xaml" />
     <None Remove="Resources\Icons.xaml" />

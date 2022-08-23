@@ -6,6 +6,7 @@ using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Media;
+using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;
 using Titan.Tools.ManifestBuilder.DataTemplates.Descriptors;
 using Titan.Tools.ManifestBuilder.Models;
 using Titan.Tools.ManifestBuilder.ViewModels.Manifests;

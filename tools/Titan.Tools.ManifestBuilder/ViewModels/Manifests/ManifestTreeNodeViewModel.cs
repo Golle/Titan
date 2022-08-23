@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DynamicData;
 using DynamicData.Binding;
+using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;
 using Titan.Tools.ManifestBuilder.Models;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels.Manifests;
