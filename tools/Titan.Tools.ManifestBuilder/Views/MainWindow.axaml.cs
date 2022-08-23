@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Titan.Tools.ManifestBuilder.Services;
 using Titan.Tools.ManifestBuilder.ViewModels;
+using Titan.Tools.ManifestBuilder.Views.Dialogs;
 
 namespace Titan.Tools.ManifestBuilder.Views;
 

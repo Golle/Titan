@@ -3,9 +3,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:cm="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
+        xmlns:dialogs="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels.Dialogs"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
         Width="800" Height="500"
-        x:Class="Titan.Tools.ManifestBuilder.Views.SelectProjectWindow"
+        x:Class="Titan.Tools.ManifestBuilder.Views.Dialogs.SelectProjectWindow"
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
@@ -14,7 +15,7 @@
         CanResize="False"
         >
   <Design.DataContext>
-    <cm:SelectProjectWindowViewModel/>
+    <dialogs:SelectProjectWindowViewModel/>
   </Design.DataContext>
 
   <Window.Styles>
@@ -46,7 +47,7 @@
           <TextBlock>Recent projects</TextBlock>
           <ItemsRepeater Name="PART_RecentProjects" Items="{Binding RecentProjects}">
             <ItemsRepeater.ItemTemplate>
-              <DataTemplate DataType="cm:RecentProjectViewModel">
+              <DataTemplate DataType="dialogs:RecentProjectViewModel">
                 <Button Margin="0 0 0 10" BorderThickness="1" CornerRadius="6" BorderBrush="{StaticResource SeparatorLight}" Padding="10" Command="{Binding $parent[Window].DataContext.OpenRecentProject}" CommandParameter="{Binding Path}" >
                   <StackPanel Spacing="10">
                     <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding Title}"/>

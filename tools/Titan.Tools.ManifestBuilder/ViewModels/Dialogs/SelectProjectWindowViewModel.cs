@@ -6,7 +6,7 @@ using Avalonia.Controls;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.Services;
 
-namespace Titan.Tools.ManifestBuilder.ViewModels;
+namespace Titan.Tools.ManifestBuilder.ViewModels.Dialogs;
 
 public class RecentProjectViewModel
 {

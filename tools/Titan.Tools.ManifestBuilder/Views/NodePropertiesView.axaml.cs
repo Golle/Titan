@@ -1,11 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Titan.Tools.ManifestBuilder.Views.Manifest;
+namespace Titan.Tools.ManifestBuilder.Views;
 
-public partial class ManifestView : UserControl
+public partial class NodePropertiesView : UserControl
 {
-    public ManifestView()
+    public NodePropertiesView()
     {
         InitializeComponent();
     }

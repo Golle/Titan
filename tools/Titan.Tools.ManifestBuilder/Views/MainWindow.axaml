@@ -3,12 +3,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
+        xmlns:views="clr-namespace:Titan.Tools.ManifestBuilder.Views"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
         Width="1200" Height="800"
         MinWidth="800" MinHeight="600"
         x:Class="Titan.Tools.ManifestBuilder.Views.MainWindow"
         Title="Titan - Manifest Builder"
-        
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
@@ -26,14 +26,15 @@
       <!-- Using a fixed Width on this element, or the window can't be moved. -->
       <Menu DockPanel.Dock="Top" Padding="10 0" Width="120" HorizontalAlignment="Left">
         <MenuItem Header="_File">
-          <MenuItem Header="_Open..."/>
+          <!--<MenuItem Header="_Save" Command="{Binding Project.}"/>-->
+          <MenuItem Header="_Save All"/>
           <Separator/>
-          <MenuItem Header="_Exit"/>
+          <MenuItem Header="_Exit" Command="{Binding ExitApplication}"/>
         </MenuItem>
-        <MenuItem Header="_Edit">
+        <!--<MenuItem Header="_Edit">
           <MenuItem Header="Copy"/>
           <MenuItem Header="Paste"/>
-        </MenuItem>
+        </MenuItem>-->
       </Menu>
 
       <Grid Name="TheGrid" >
@@ -50,11 +51,12 @@
           <RowDefinition MinHeight="200" Height="*"/>
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" Grid.Column="0" DockPanel.Dock="Left" Content="{Binding Project}"/>
+        <!--<ContentControl Grid.Row="0" Grid.Column="0" DockPanel.Dock="Left" Content="{Binding Project}"/>-->
+        <views:ProjectExplorerView Grid.Row="0" Grid.Column="0" DockPanel.Dock="Left" DataContext="{Binding Project}" />
         <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns"/>
-        <ContentControl Grid.Row="0" Grid.Column="2" Background="Magenta" DockPanel.Dock="Right" Content="{Binding Properties}"/>
+        <ContentControl Grid.Row="0" Grid.Column="2" Background="Magenta" DockPanel.Dock="Right" Content="{Binding Middle}"/>
         <GridSplitter Grid.Row="0" Grid.Column="3" ResizeDirection="Columns"/>
-        <ContentControl Grid.Row="0" Grid.Column="4" Background="red" Content="{Binding Middle}"/>
+        <ContentControl Grid.Row="0" Grid.Column="4" Content="{Binding Properties}"/>
 
         <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" ResizeDirection="Rows"/>
         <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Content="{Binding Content}"/>
