@@ -36,7 +36,7 @@ public class PropertiesDataTemplate : IDataTemplate
         foreach (var descriptor in descriptors)
         {
             stackPanel.Children.Add(descriptor.Build());
-            stackPanel.Children.Add(new Separator { Height = 1, Background = separatorBrush });
+            //stackPanel.Children.Add(new Separator { Height = 1, Background = separatorBrush });
         }
         return stackPanel;
     }
@@ -57,7 +57,7 @@ public class PropertiesDataTemplate : IDataTemplate
             var nameAttribute = Attribute.GetCustomAttribute(propertyInfo, typeof(DisplayNameAttribute)) as DisplayNameAttribute;
             var accessor = () => propertyInfo.GetMethod?.Invoke(obj, null);
             var propertyName = propertyInfo.Name;
-            var name = nameAttribute?.DisplayName ?? propertyName;
+            var name = nameAttribute?.DisplayName ?? ToNameWithWhiteSpace(propertyName);
             var order = orderAttribute?.Order ?? 0;
 
             switch (attr)
@@ -65,7 +65,7 @@ public class PropertiesDataTemplate : IDataTemplate
                 case EditorStringAttribute strAttr:
                     yield return new StringEditorDescriptor
                     {
-                        Name = propertyName,
+                        Name = name,
                         PropertyName = propertyName,
                         Accessor = accessor, //NOTE(Jens): Add check for missing getter?
                         Order = order,
@@ -109,7 +109,22 @@ public class PropertiesDataTemplate : IDataTemplate
                     };
                     break;
             }
+            
+        }
 
+        static string ToNameWithWhiteSpace(string name)
+        {
+            Span<char> buffer = stackalloc char[name.Length * 2];
+            var count = 0;
+            foreach (var character in name)
+            {
+                if (char.IsUpper(character) && count > 0)
+                {
+                    buffer[count++] = ' ';
+                }
+                buffer[count++] = character;
+            }
+            return new string(buffer[..count]);
         }
     }
 

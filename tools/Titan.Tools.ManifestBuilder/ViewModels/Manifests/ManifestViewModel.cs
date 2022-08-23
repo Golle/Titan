@@ -50,6 +50,12 @@ public class ManifestViewModel : ViewModelBase
                 viewModel.PropertyChanged += (_, _) => IsDirty = true;
                 return viewModel;
             })),
+            new ManifestTreeNodeViewModel(nameof(manifest.Materials), manifest.Materials.Select(m =>
+            {
+                var viewModel = new MaterialNodeViewModel(m);
+                viewModel.PropertyChanged += (_, _) => IsDirty = true;
+                return viewModel;
+            })),
         };
 
         _selectedNodeChanged = ReactiveCommand.CreateFromTask<IManifestTreeNode>(node => messenger.SendAsync(new ManifestNodeSelected(node)));
