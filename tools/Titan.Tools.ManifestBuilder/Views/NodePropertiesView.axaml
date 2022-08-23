@@ -14,7 +14,7 @@
     <Panel >
       <TextBlock IsVisible="{Binding Node, Converter={x:Static ObjectConverters.IsNull}}" VerticalAlignment="Center" HorizontalAlignment="Center">Select a node to get started</TextBlock>
       <StackPanel IsVisible="{Binding Node, Converter={x:Static ObjectConverters.IsNotNull}}" Spacing="10">
-        <ContentControl Content="{Binding Node}">
+          <ContentControl Content="{Binding Node}">
           <ContentControl.DataTemplates>
             <dataTemplates:PropertiesDataTemplate/>
           </ContentControl.DataTemplates>

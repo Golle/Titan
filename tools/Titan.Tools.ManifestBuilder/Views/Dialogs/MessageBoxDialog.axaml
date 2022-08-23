@@ -29,7 +29,7 @@
       <Separator Height="1" Background="{StaticResource SeparatorLight}"/>
       <Border Padding="10" VerticalAlignment="Center">
         <StackPanel Spacing="10">
-          <TextBlock FontSize="16" Text="{Binding Message}"/>
+          <TextBlock FontSize="16" Text="{Binding Message}" TextWrapping="Wrap"/>
           <Separator Height="1" Background="{StaticResource SeparatorLight}"/>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
             <Button IsVisible="{Binding IsOk}" Command="{Binding Close}" CommandParameter="{x:Static dialogs:MessageBoxResult.Ok}">Ok</Button>

@@ -1,8 +1,11 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ColorTextBlock.Avalonia;
 using DynamicData.Binding;
 using ReactiveUI;
+using Titan.Tools.ManifestBuilder.Common;
 using Titan.Tools.ManifestBuilder.Services;
 using Titan.Tools.ManifestBuilder.ViewModels.Manifests;
 using Titan.Tools.ManifestBuilder.Views.Dialogs;
@@ -33,6 +36,7 @@ public class ProjectExplorerViewModel : ViewModelBase
     public IObservableCollection<ManifestViewModel> Manifests { get; } = new ObservableCollectionExtended<ManifestViewModel>();
     public ICommand CreateManifest { get; }
 
+    public bool HasUnsavedChanges() => Manifests.Any(m => m.IsDirty);
     public ProjectExplorerViewModel(IManifestService? manifestService = null, IDialogService? dialogService = null, IMessenger? messenger = null)
     {
         _dialogService = dialogService ?? Registry.GetRequiredService<IDialogService>();
@@ -61,10 +65,11 @@ public class ProjectExplorerViewModel : ViewModelBase
         });
     }
 
-    private async Task LoadManifests()
+    public async Task LoadProject(string path)
     {
-        var manifests = await _manifestService.ListManifests(_projectPath!);
+        _projectPath = path;
 
+        var manifests = await _manifestService.ListManifests(_projectPath!);
         if (manifests.Succeeded)
         {
             var viewModels = manifests.Data!.Select(m => new ManifestViewModel(m, _messenger));
@@ -80,10 +85,24 @@ public class ProjectExplorerViewModel : ViewModelBase
         this.RaisePropertyChanged(nameof(HasManifests));
     }
 
-    public async Task LoadProject(string path)
+    public async Task<Result> SaveAll()
     {
-        _projectPath = path;
-        await LoadManifests();
+        if (_projectPath == null)
+        {
+            throw new InvalidOperationException("Can't save when a project path is missing.");
+        }
+
+        foreach (var viewModel in Manifests)
+        {
+            var manifest = viewModel.Manifest;
+            var result = await _manifestService.SaveManifest(_projectPath, manifest);
+            if (result.Failed)
+            {
+                return result;
+            }
+            viewModel.IsDirty = false;
+        }
+        return Result.Success();
     }
 
     public ProjectExplorerViewModel()

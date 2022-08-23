@@ -26,8 +26,14 @@
       <!-- Using a fixed Width on this element, or the window can't be moved. -->
       <Menu DockPanel.Dock="Top" Padding="10 0" Width="120" HorizontalAlignment="Left">
         <MenuItem Header="_File">
-          <!--<MenuItem Header="_Save" Command="{Binding Project.}"/>-->
-          <MenuItem Header="_Save All"/>
+          <MenuItem x:Name="SaveAll"  Command="{Binding SaveAll}">
+            <MenuItem.Header>
+              <Grid ColumnDefinitions="150, Auto">
+                <TextBlock Grid.Column="0">Save All</TextBlock>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Right">(Ctrl + S)</TextBlock>
+              </Grid>
+            </MenuItem.Header>
+          </MenuItem>
           <Separator/>
           <MenuItem Header="_Exit" Command="{Binding ExitApplication}"/>
         </MenuItem>

@@ -11,8 +11,13 @@ public record struct ManifestNodeSelected(IManifestTreeNode Node);
 
 public class ManifestViewModel : ViewModelBase
 {
-    public string Name => _manifest.Name;
-    private readonly Manifest _manifest;
+    private bool _isDirty;
+    public bool IsDirty
+    {
+        get => _isDirty;
+        set => SetProperty(ref _isDirty, value);
+    }
+    public string Name => Manifest.Name;
     public IManifestTreeNode[] Nodes { get; }
 
     private IManifestTreeNode? _selectedNode;
@@ -26,13 +31,25 @@ public class ManifestViewModel : ViewModelBase
         }
     }
     private readonly ICommand _selectedNodeChanged;
+
+    public Manifest Manifest { get; }
     public ManifestViewModel(Manifest manifest, IMessenger messenger)
     {
-        _manifest = manifest;
+        Manifest = manifest;
         Nodes = new IManifestTreeNode[]
         {
-            new ManifestTreeNodeViewModel(nameof(manifest.Textures), manifest.Textures.Select(m => new TextureNodeViewModel(m))),
-            new ManifestTreeNodeViewModel(nameof(manifest.Models), manifest.Models.Select(m => new ModelNodeViewModel(m))),
+            new ManifestTreeNodeViewModel(nameof(manifest.Textures), manifest.Textures.Select(m =>
+            {
+                var viewModel = new TextureNodeViewModel(m);
+                viewModel.PropertyChanged += (_, _) => IsDirty = true;
+                return viewModel;
+            })),
+            new ManifestTreeNodeViewModel(nameof(manifest.Models), manifest.Models.Select(m =>
+            {
+                var viewModel = new ModelNodeViewModel(m);
+                viewModel.PropertyChanged += (_, _) => IsDirty = true;
+                return viewModel;
+            })),
         };
 
         _selectedNodeChanged = ReactiveCommand.CreateFromTask<IManifestTreeNode>(node => messenger.SendAsync(new ManifestNodeSelected(node)));
@@ -43,7 +60,7 @@ public class ManifestViewModel : ViewModelBase
     {
         if (Design.IsDesignMode)
         {
-            _manifest = new Manifest { Name = "design manifest" };
+            Manifest = new Manifest { Name = "design manifest" };
             Nodes = new IManifestTreeNode[]
             {
                 new ManifestTreeNodeViewModel("Test_01", new[] { new ManifestTreeNodeViewModel("Child 01"), new ManifestTreeNodeViewModel("Child 02") }),

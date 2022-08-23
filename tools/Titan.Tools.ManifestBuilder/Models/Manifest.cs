@@ -5,6 +5,7 @@ namespace Titan.Tools.ManifestBuilder.Models;
 
 public class Manifest
 {
+
     [JsonIgnore]
     public string? Path { get; set; }
     public required string Name { get; set; }

@@ -8,7 +8,6 @@ using Avalonia.Controls.Templates;
 using Avalonia.Media;
 using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;
 using Titan.Tools.ManifestBuilder.DataTemplates.Descriptors;
-using Titan.Tools.ManifestBuilder.Models;
 using Titan.Tools.ManifestBuilder.ViewModels.Manifests;
 
 namespace Titan.Tools.ManifestBuilder.DataTemplates;
@@ -64,7 +63,6 @@ public class PropertiesDataTemplate : IDataTemplate
             switch (attr)
             {
                 case EditorStringAttribute strAttr:
-
                     yield return new StringEditorDescriptor
                     {
                         Name = propertyName,

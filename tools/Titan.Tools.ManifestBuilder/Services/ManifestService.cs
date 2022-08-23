@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,11 +47,22 @@ internal class ManifestService : IManifestService
 
     public async Task<Result> SaveManifest(string projectPath, Manifest manifest)
     {
-        var path = GetManifestPath(projectPath, manifest.Name);
+        var path = manifest.Path;
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentNullException(nameof(Manifest.Path), "Path is null");
+        }
 
-        await using var file = File.OpenWrite(path);
-        await _jsonSerializer.SerializeAsync(file, manifest, true);
-
+        try
+        {
+            await using var file = File.OpenWrite(path);
+            file.SetLength(0);
+            await _jsonSerializer.SerializeAsync(file, manifest, true);
+        }
+        catch (Exception e)
+        {
+            return Result.Fail($"Save failed with {e.GetType().Name} and message {e.Message}");
+        }
         return Result.Success();
     }
 
@@ -61,7 +73,9 @@ internal class ManifestService : IManifestService
         static string GetSafeFileName(string name)
             => Path
                 .GetInvalidFileNameChars()
+                .Concat(new[] { ' ' })
                 .Aggregate(name, (current, invalidChar) => current.Replace(invalidChar, '_'))
+                .ToLowerInvariant()
                 .Trim();
     }
 

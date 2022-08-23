@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Titan.Tools.ManifestBuilder.Services;
@@ -24,6 +25,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         _appSettings = appSettings ?? Registry.GetRequiredService<IAppSettings>();
         AvaloniaXamlLoader.Load(this);
         SetWindowSize();
+        
+        HotKeyManager.SetHotKey(this.Get<MenuItem>("SaveAll"), new KeyGesture(Key.S, KeyModifiers.Control));
 
 #if DEBUG
         this.AttachDevTools();

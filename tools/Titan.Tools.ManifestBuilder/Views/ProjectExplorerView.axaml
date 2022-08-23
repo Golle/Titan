@@ -22,10 +22,13 @@
         </StackPanel>
 
         <StackPanel IsVisible="{Binding HasManifests}" Spacing="10" >
-          <ComboBox Items="{Binding Manifests}" SelectedItem="{Binding SelectedManifest}">
+          <ComboBox Items="{Binding Manifests}" SelectedItem="{Binding SelectedManifest}" HorizontalAlignment="Stretch">
             <ComboBox.ItemTemplate>
               <DataTemplate>
-                <TextBlock Text="{Binding Name}"/>
+                <StackPanel Spacing="5" Orientation="Horizontal">
+                  <TextBlock Text="{Binding Name}"/>
+                  <TextBlock IsVisible="{Binding IsDirty}" Text="*"/>
+                </StackPanel>
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </ComboBox>
