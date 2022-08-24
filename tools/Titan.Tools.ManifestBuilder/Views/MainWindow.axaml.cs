@@ -38,6 +38,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         base.OnOpened(e);
 
+        
         SetPanelSizes();
 
         var window = new SelectProjectWindow();
@@ -144,7 +145,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             ManifestPanelSize = new PanelSize(columnDefintions[ManifestColumnIndex].ActualWidth),
             PropertiesPanelSize = new PanelSize(columnDefintions[PropertiesColumnIndex].ActualWidth),
             ContentPanelSize = new PanelSize(rowDefinitions[ContentRowIndex].ActualHeight),
-            WindowSize = new WindowSize(Width, Height, Position.X, Position.Y)
+            WindowSize = WindowState is WindowState.Maximized ? settings.WindowSize :  new WindowSize(Width, Height, Position.X, Position.Y) //NOTE(Jens): If the window is maximized, don't record windowsizes (can't figure out how to get the size before the state change)
         });
     }
 }
