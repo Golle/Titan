@@ -48,6 +48,7 @@ public static class Logger
 
     public static void Warning(string message) => Log(LogLevel.Warning, message);
 
+    public static void Raw(string message) => Log(0, message);
 
     private static void Log(LogLevel level, string message, string scope = null)
     {
