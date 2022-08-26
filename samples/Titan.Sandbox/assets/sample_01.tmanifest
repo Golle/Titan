@@ -1,0 +1,14 @@
+{
+    "name": "Sample Manifest 01",
+    "textures" :[
+        {
+            "path": "textures/bluesheet.png",
+            "type": "PNG"
+        }
+    ],
+    "models" :[
+        {
+            "path": "models/pillar.geo"
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <!-- Add Controls for Previewer Here -->
+
+      <Button Classes="accept">Button</Button>
+    </Border>
+  </Design.PreviewWith>
+
+    <!-- https://www.colourlovers.com/palette/124973/Pink_Elephant -->
+  <!-- Add Styles Here -->
+  <Style Selector="Button.accept">
+    <Setter Property="Background" Value="#ff80B3FF"/>
+    <Setter Property="Foreground" Value="black"/>
+
+  </Style>
+</Styles>
+

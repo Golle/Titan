@@ -1,0 +1,26 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:manifestBuilder="clr-namespace:Titan.Tools.ManifestBuilder"
+             xmlns:converters="clr-namespace:Titan.Tools.ManifestBuilder.Converters"
+             x:Class="Titan.Tools.ManifestBuilder.App">
+  <Application.DataTemplates>
+    <manifestBuilder:ViewLocator/>
+  </Application.DataTemplates>
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <FontFamily x:Key="CascadiaCode">/Assets/CascadiaCode-Regular-VTT.ttf#Cascadia Code</FontFamily>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Resources/Colors.xaml"/>
+        <ResourceInclude Source="/Resources/Icons.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+    <converters:EmptyStringFallbackConverter  x:Key="EmptyStringFallbackConverter"/>
+  </Application.Resources>
+  <Application.Styles>
+    <FluentTheme Mode="Dark"/>
+    <StyleInclude Source="/Styles/Buttons.axaml"/>
+
+    <StyleInclude Source="/Styles/FileEntryControl.axaml"/>
+  </Application.Styles>
+</Application>

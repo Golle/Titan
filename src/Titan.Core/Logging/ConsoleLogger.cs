@@ -12,6 +12,15 @@ public class ConsoleLogger : ILogger
 
     public void OnMessage(in LogMessage message)
     {
+        Console.ResetColor();
+
+        //NOTE(Jens): This is a Raw log call, don't set any colors just print it
+        if (message.Level == 0)
+        {
+            Console.WriteLine(message.Message);
+            return;
+        }
+
         var color = message.Level switch
         {
             LogLevel.Debug or LogLevel.Trace => ConsoleColor.Cyan,

@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:manifests="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels.Manifests"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Titan.Tools.ManifestBuilder.Views.Manifests.ManifestView">
+  <Design.DataContext>
+    <manifests:ManifestViewModel/>
+  </Design.DataContext>
+
+  <StackPanel>
+    <TreeView Items="{Binding Nodes}"
+              HorizontalAlignment="Stretch"
+              SelectedItem="{Binding SelectedNode}"
+    >
+      <TreeView.ItemTemplate>
+        <TreeDataTemplate ItemsSource="{Binding Children}">
+          <TextBlock Text="{Binding Name, Converter={StaticResource EmptyStringFallbackConverter}, ConverterParameter='[NO NAME]'}" />
+        </TreeDataTemplate>
+      </TreeView.ItemTemplate>
+    </TreeView>
+  </StackPanel>
+</UserControl>
