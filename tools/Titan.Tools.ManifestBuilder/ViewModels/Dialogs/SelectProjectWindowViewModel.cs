@@ -12,11 +12,10 @@ public class RecentProjectViewModel
 {
     public required string Title { get; init; }
     public required string Path { get; init; }
-
     public static RecentProjectViewModel Create(string path) =>
         new()
         {
-            Title = System.IO.Path.GetFileNameWithoutExtension(path) ?? "unknown",
+            Title = System.IO.Path.GetFileNameWithoutExtension(path),
             Path = path
         };
 }
@@ -28,14 +27,10 @@ public class SelectProjectWindowViewModel : ViewModelBase
     public IEnumerable<RecentProjectViewModel> RecentProjects { get; }
 
     public SelectProjectWindowViewModel() : this(null!) { }
-    public SelectProjectWindowViewModel(Window parentWindow)
-        : this(parentWindow, null)
-    {
-    }
-
-    public SelectProjectWindowViewModel(Window parentWindow, IAppSettings? appSettings = null)
+    public SelectProjectWindowViewModel(Window parentWindow, IAppSettings? appSettings = null, IApplicationState? applicationState = null)
     {
         appSettings ??= Registry.GetRequiredService<IAppSettings>();
+        applicationState ??= Registry.GetRequiredService<IApplicationState>();
         RecentProjects = appSettings
             .GetSettings()
             .RecentProjects
@@ -47,26 +42,29 @@ public class SelectProjectWindowViewModel : ViewModelBase
         OpenProject = ReactiveCommand.CreateFromTask(async () =>
         {
             var dialog = new OpenFolderDialog();
-            var result = await dialog.ShowAsync(parentWindow);
-            if (result != null)
+            var projectPath = await dialog.ShowAsync(parentWindow);
+            if (projectPath != null)
             {
                 var settings = appSettings.GetSettings();
-                if (settings.RecentProjects.AddProject(result))
+                if (settings.RecentProjects.AddProject(projectPath))
                 {
                     appSettings.Save(settings);
                 }
-                parentWindow.Close(result);
+                parentWindow.Close(projectPath);
+
+                applicationState.ProjectPath = projectPath;
             }
         });
 
-        OpenRecentProject = ReactiveCommand.Create<string>(path =>
+        OpenRecentProject = ReactiveCommand.Create<string>(projectPath =>
         {
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(projectPath))
             {
                 // do some error handling and remove the project from the list.
                 return;
             }
-            parentWindow.Close(path);
+            parentWindow.Close(projectPath);
+            applicationState.ProjectPath = projectPath;
         });
     }
 }

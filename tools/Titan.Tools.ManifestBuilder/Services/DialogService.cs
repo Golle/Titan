@@ -2,7 +2,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Titan.Tools.ManifestBuilder.Common;
 using Titan.Tools.ManifestBuilder.ViewModels.Dialogs;
 using Titan.Tools.ManifestBuilder.Views.Dialogs;
@@ -14,7 +13,6 @@ public interface IDialogService
     Task<string?> OpenFileDialog(string? path = null);
     Task<string?> OpenFolderDialog(string? path = null);
     Task<MessageBoxResult?> MessageBox(string title, string? message = null, MessageBoxType type = MessageBoxType.Ok);
-
 }
 
 internal class DialogService : IDialogService

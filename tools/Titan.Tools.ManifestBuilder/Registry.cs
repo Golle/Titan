@@ -19,6 +19,7 @@ internal static class Registry
                 .AddSingleton<IAppSettings, AppDataSettings>()
                 .AddSingleton<IManifestService, ManifestService>()
                 .AddSingleton<IManifestItemFactory, ManifestItemFactory>()
+                .AddSingleton<IApplicationState, ApplicationState>()
                 .AddSingleton<MainWindow>()
 
                 //.AddSingleton<EditorViewModel>()

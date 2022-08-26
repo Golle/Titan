@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dialogs="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels.Dialogs"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
+        x:Class="Titan.Tools.ManifestBuilder.Views.Dialogs.ExternalProcessWindow"
+        Title="ExternalProcessWindow"
+        Width="1000" Height="500"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+  <Design.DataContext>
+    <dialogs:ExternalProcessViewModel/>
+  </Design.DataContext>
+  <Window.Styles>
+    <Style Selector="ItemsRepeater#PART_Code TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
+    </Style>
+  </Window.Styles>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.8" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <DockPanel LastChildFill="True" Margin="10">
+      <TextBlock DockPanel.Dock="Top" FontSize="20" Height="40">External process</TextBlock>
+      <Panel DockPanel.Dock="Bottom" Margin="0 10 0 0">
+          <TextBlock HorizontalAlignment="Left" Text="{Binding Status, StringFormat='Status: {0}'}"/>
+          <Button IsEnabled="{Binding !IsRunning}" Command="{Binding $parent[Window].Close}" HorizontalAlignment="Right">Close</Button>
+      </Panel>
+      <Grid RowDefinitions="Auto, 10, *">
+        <TextBlock Grid.Row="0" FontWeight="Bold">Process output</TextBlock>
+        <Border Grid.Row="2" Background="#11ffffff" BorderThickness="1" CornerRadius="2" BorderBrush="#888">
+          <ScrollViewer Padding="10">
+            <ItemsRepeater Name="PART_Code" Items="{Binding LogOutput}">
+              <ItemsRepeater.DataTemplates>
+                <DataTemplate>
+                  <TextBlock Text="{Binding .}"/>
+                </DataTemplate>
+              </ItemsRepeater.DataTemplates>
+            </ItemsRepeater>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+    </DockPanel>
+  </Panel>
+</Window>

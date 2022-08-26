@@ -14,7 +14,7 @@ public partial class CookAssetsDialog : Window
         this.AttachDevTools();
 #endif
 
-        DataContext = new CookAssetsViewModel();
+        DataContext = new CookAssetsViewModel(this);
     }
 
     private void InitializeComponent()

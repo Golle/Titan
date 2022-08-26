@@ -9,6 +9,7 @@
 
   <Application.Resources>
     <ResourceDictionary>
+      <FontFamily x:Key="CascadiaCode">/Assets/CascadiaCode-Regular-VTT.ttf#Cascadia Code</FontFamily>
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="/Resources/Colors.xaml"/>
         <ResourceInclude Source="/Resources/Icons.xaml"/>
