@@ -7,10 +7,10 @@ namespace Titan.Windows.Win32
     {
         [DllImport("Ole32", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern HRESULT CoCreateInstance(
-            [In] Guid* rclsid,
+            [In] in Guid rclsid,
             [In] void* pUnkOuter,
             [In] CLSCTX dwClsContext,
-            [In] Guid* riid,
+            [In] in Guid riid,
             [Out] void** ppv
         );
     }

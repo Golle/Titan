@@ -6,6 +6,7 @@
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Assets\" />
@@ -31,6 +32,9 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
     <PackageReference Include="MessageBox.Avalonia" Version="2.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0-preview.7.22375.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Titan.Tools.Core\Titan.Tools.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\Manifests\ManifestView.axaml.cs">

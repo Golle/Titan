@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Titan.Tools.Core.Manifests;
 using Titan.Tools.ManifestBuilder.Common;
 using Titan.Tools.ManifestBuilder.Models;
 

@@ -1,4 +1,4 @@
-namespace Titan.Tools.ManifestBuilder.Models;
+namespace Titan.Tools.Core.Manifests;
 
 public class MaterialItem : ManifestItem
 {

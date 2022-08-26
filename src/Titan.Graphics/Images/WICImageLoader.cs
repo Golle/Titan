@@ -16,19 +16,15 @@ using static Titan.Windows.WIC.WICDecodeOptions;
 
 namespace Titan.Graphics.Images
 {
-    public unsafe class WICImageLoader : IImageLoader 
+    public unsafe class WICImageLoader : IImageLoader
     {
         private ComPtr<IWICImagingFactory> _factory;
 
         public WICImageLoader()
         {
-            fixed (Guid* clsid = &WICCLSID.CLSID_WICImagingFactory2)
-            {
-                var riid = typeof(IWICImagingFactory).GUID;
-                CheckAndThrow(CoCreateInstance(clsid, null, CLSCTX_INPROC_SERVER, &riid, (void**)_factory.GetAddressOf()), nameof(CoCreateInstance));
-            }
+            CheckAndThrow(CoCreateInstance(WICCLSID.CLSID_WICImagingFactory2, null, CLSCTX_INPROC_SERVER, typeof(IWICImagingFactory).GUID, (void**)_factory.GetAddressOf()), nameof(CoCreateInstance));
         }
-        
+
         public Image Load(byte* buffer, uint size)
         {
             using ComPtr<IWICStream> stream = default;
@@ -36,7 +32,7 @@ namespace Titan.Graphics.Images
             CheckAndThrow(stream.Get()->InitializeFromMemory(buffer, size), nameof(IWICStream.InitializeFromMemory));
 
             using ComPtr<IWICBitmapDecoder> decoder = default;
-            CheckAndThrow(_factory.Get()->CreateDecoderFromStream((IStream*) stream.Get(), null, WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), nameof(IWICImagingFactory.CreateDecoderFromStream));
+            CheckAndThrow(_factory.Get()->CreateDecoderFromStream((IStream*)stream.Get(), null, WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()), nameof(IWICImagingFactory.CreateDecoderFromStream));
             return LoadInternal(decoder);
         }
 
@@ -44,7 +40,7 @@ namespace Titan.Graphics.Images
         {
             fixed (byte* pBuffer = buffer)
             {
-                return Load(pBuffer, (uint) buffer.Length);
+                return Load(pBuffer, (uint)buffer.Length);
             }
         }
 
@@ -81,12 +77,12 @@ namespace Titan.Graphics.Images
                 var rowPitch = (width * newBitsPerPixel + 7) / 8;
                 var imageSize = rowPitch * height;
 
-                var buffer = (byte*) NativeMemory.Alloc(imageSize);
+                var buffer = (byte*)NativeMemory.Alloc((nuint)imageSize);
                 try
                 {
                     using ComPtr<IWICFormatConverter> converter = default;
                     CheckAndThrow(_factory.Get()->CreateFormatConverter(converter.GetAddressOf()), nameof(IWICImagingFactory.CreateFormatConverter));
-                    CheckAndThrow(converter.Get()->Initialize((IWICBitmapSource*) frameDecode.Get(), &newFormatGuid, WICBitmapDitherTypeErrorDiffusion, null, 0, WICBitmapPaletteTypeCustom), nameof(IWICFormatConverter.Initialize));
+                    CheckAndThrow(converter.Get()->Initialize((IWICBitmapSource*)frameDecode.Get(), &newFormatGuid, WICBitmapDitherTypeErrorDiffusion, null, 0, WICBitmapPaletteTypeCustom), nameof(IWICFormatConverter.Initialize));
                     CheckAndThrow(converter.Get()->CopyPixels(null, rowPitch, imageSize, buffer), nameof(IWICFormatConverter.CopyPixels));
 
                     return new Image(buffer, imageSize, WICToDXGITranslationTable.Translate(newFormatGuid), rowPitch, width, height);
@@ -104,7 +100,7 @@ namespace Titan.Graphics.Images
                 var stride = (width * bitsPerPixel + 7) / 8;
                 var imageSize = stride * height;
 
-                var buffer = (byte*) NativeMemory.Alloc(imageSize);
+                var buffer = (byte*)NativeMemory.Alloc((nuint)imageSize);
                 try
                 {
                     CheckAndThrow(frameDecode.Get()->CopyPixels(null, stride, imageSize, buffer), nameof(IWICBitmapFrameDecode.CopyPixels));
@@ -134,7 +130,7 @@ namespace Titan.Graphics.Images
 
             var pixelFormatInfoGuid = typeof(IWICPixelFormatInfo).GUID;
             using ComPtr<IWICPixelFormatInfo> info = default;
-            CheckAndThrow(componentInfo.Get()->QueryInterface(&pixelFormatInfoGuid, (void**) info.GetAddressOf()), nameof(IWICComponentInfo.QueryInterface));
+            CheckAndThrow(componentInfo.Get()->QueryInterface(&pixelFormatInfoGuid, (void**)info.GetAddressOf()), nameof(IWICComponentInfo.QueryInterface));
 
             uint bitsPerPixel;
             CheckAndThrow(info.Get()->GetBitsPerPixel(&bitsPerPixel), nameof(IWICPixelFormatInfo.GetBitsPerPixel));

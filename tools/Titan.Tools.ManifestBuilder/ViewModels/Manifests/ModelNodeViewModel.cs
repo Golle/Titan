@@ -1,3 +1,4 @@
+using Titan.Tools.Core.Manifests;
 using Titan.Tools.ManifestBuilder.Models;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels.Manifests;
