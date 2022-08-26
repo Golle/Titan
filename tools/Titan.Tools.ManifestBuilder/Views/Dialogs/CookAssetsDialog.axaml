@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dialogs="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels.Dialogs"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+        x:Class="Titan.Tools.ManifestBuilder.Views.Dialogs.CookAssetsDialog"
+        Title="CookAssetsDialog"
+        Width="800" Height="500"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+  <Design.DataContext>
+    <dialogs:CookAssetsViewModel></dialogs:CookAssetsViewModel>
+  </Design.DataContext>
+  <Window.Styles>
+    <Style Selector="Button#PART_Build">
+      <Setter Property="Height" Value="50"/>
+      <Setter Property="Width" Value="150"/>
+      <Setter Property="FontSize" Value="30"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+  </Window.Styles>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.8" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <DockPanel LastChildFill="True" Margin="10">
+      <TextBlock DockPanel.Dock="Top" FontSize="20" Height="40">Cook assets</TextBlock>
+      <WrapPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+        <Button Command="{Binding Build}" Classes="accept" Margin="10">Build</Button>
+        <Button Command="{Binding $parent[Window].Close}">Cancel</Button>
+      </WrapPanel>
+      <StackPanel Spacing="10">
+        <TextBlock FontWeight="Bold">This is a description</TextBlock>
+        <Separator Height="1" Background="{StaticResource SeparatorLight}" />
+        <TextBlock>Package path</TextBlock>
+        <Grid ColumnDefinitions="*, 10, Auto">
+          <TextBox Grid.Column="0" Text="{Binding PackagePath}" IsReadOnly="True" Watermark="Folder"/>
+          <Button Command="{Binding BrowsePackagePath}" Grid.Column="2">Browse</Button>
+        </Grid>
+        <TextBlock>Generated file output path</TextBlock>
+        <Grid ColumnDefinitions="*, 10, Auto">
+          <TextBox Grid.Column="0" Text="{Binding GeneratedPath}" IsReadOnly="True" Watermark="Folder"/>
+          <Button Command="{Binding BrowseGeneratedPath}" Grid.Column="2">Browse</Button>
+        </Grid>
+        <TextBlock>Generated file namespace</TextBlock>
+        <TextBox Text="{Binding Namespace}" Watermark="for example Game.Assets"/>
+      </StackPanel>
+    </DockPanel>
+  </Panel>
+</Window>

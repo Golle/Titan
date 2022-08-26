@@ -37,10 +37,9 @@
           <Separator/>
           <MenuItem Header="_Exit" Command="{Binding ExitApplication}"/>
         </MenuItem>
-        <!--<MenuItem Header="_Edit">
-          <MenuItem Header="Copy"/>
-          <MenuItem Header="Paste"/>
-        </MenuItem>-->
+        <MenuItem Header="_Build">
+          <MenuItem Header="Cook Assets" Command="{Binding OpenCookAssetsDialog}"/>
+        </MenuItem>
       </Menu>
 
       <Grid Name="TheGrid" >

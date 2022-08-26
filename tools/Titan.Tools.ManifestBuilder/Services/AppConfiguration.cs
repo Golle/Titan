@@ -8,6 +8,8 @@ using Titan.Tools.ManifestBuilder.Common;
 
 namespace Titan.Tools.ManifestBuilder.Services;
 
+
+public record struct CookAssetSettings(string? Namespace, string? OutputPath, string? GeneratedPath);
 public class RecentProjects
 {
     public const int MaxRecentProjects = 10;
@@ -34,9 +36,9 @@ public record struct WindowSize(double Width, double Height, int X, int Y)
     public bool HasValues => Width != 0 && Height != 0;
 }
 
-public record Settings(WindowSize WindowSize, PanelSize ManifestPanelSize, PanelSize PropertiesPanelSize, PanelSize ContentPanelSize, RecentProjects RecentProjects)
+public record Settings(WindowSize WindowSize, PanelSize ManifestPanelSize, PanelSize PropertiesPanelSize, PanelSize ContentPanelSize, CookAssetSettings CookAssetSettings, RecentProjects RecentProjects)
 {
-    public static Settings Default() => new(default, default, default, default, new RecentProjects());
+    public static Settings Default() => new(default, default, default, default, default, new RecentProjects());
 }
 
 public interface IAppSettings

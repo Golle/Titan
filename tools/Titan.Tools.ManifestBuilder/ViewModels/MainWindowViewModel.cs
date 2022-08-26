@@ -3,6 +3,7 @@ using System.Windows.Input;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.Services;
 using Titan.Tools.ManifestBuilder.ViewModels.Dialogs;
+using Titan.Tools.ManifestBuilder.Views.Dialogs;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels;
 
@@ -14,6 +15,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public ICommand ExitApplication { get; }
     public ICommand SaveAll { get; }
+    public ICommand OpenCookAssetsDialog { get; }
     public MainWindowViewModel(IDialogService? dialogService)
     {
         dialogService ??= Registry.GetRequiredService<IDialogService>();
@@ -46,6 +48,12 @@ public class MainWindowViewModel : ViewModelBase
                 }
             }
             App.Exit();
+        });
+
+        OpenCookAssetsDialog = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var dialog = new CookAssetsDialog();
+            await dialog.ShowDialog(App.MainWindow);
         });
     }
 
