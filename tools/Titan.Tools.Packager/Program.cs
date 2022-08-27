@@ -251,7 +251,9 @@ static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name
     builder.AppendLine($"// This is a generated file from {typeof(Program).Assembly.FullName}");
     if (!string.IsNullOrWhiteSpace(@namespace))
     {
-        builder.AppendLine($"namespace {@namespace};\n");
+        builder
+            .AppendLine($"namespace {@namespace};")
+            .AppendLine();
     }
 
     builder
