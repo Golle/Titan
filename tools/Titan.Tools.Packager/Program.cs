@@ -1,3 +1,4 @@
+using System.Diagnostics.Metrics;
 using System.Text;
 using Titan.Assets.NewAssets;
 using Titan.Core.Logging;
@@ -10,14 +11,14 @@ using Titan.Tools.Packager;
 Logger.Start<ConsoleLogger>();
 
 //NOTE(Jens): this is only used in debug. hardcoded paths
-#if DEBUG
-const string manifestFile = @"F:\Git\Titan\samples\Titan.Sandbox\assets\sample_01.tmanifest";
-const string outputDir = @"F:\Git\Titan\samples\Titan.Sandbox\assets\bin\";
-const string generatedOutputDir = @"F:\Git\Titan\samples\Titan.Sandbox";
-const string @namespace = "Titan.Sandbox";
+//#if DEBUG
+//const string manifestFile = @"F:\Git\Titan\samples\Titan.Sandbox\assets\sample_01.tmanifest";
+//const string outputDir = @"F:\Git\Titan\samples\Titan.Sandbox\assets\bin\";
+//const string generatedOutputDir = @"F:\Git\Titan\samples\Titan.Sandbox";
+//const string @namespace = "Titan.Sandbox";
 
-args = $"package -m {manifestFile} -o {outputDir} -g {generatedOutputDir} -n {@namespace}".Split(' ');
-#endif
+//args = $"package -m {manifestFile} -o {outputDir} -g {generatedOutputDir} -n {@namespace}".Split(' ');
+//#endif
 
 try
 {
@@ -27,8 +28,8 @@ try
             .WithOption(new Option<PipelineContext>("manifest")
             {
                 Alias = "m",
-                Description = "The absolute path to the manifest",
-                Callback = (context, path) => context with { ManifestPath = path },
+                Description = "The absolute path to the manifest (Multiple manifests are allowed)",
+                Callback = (context, path) => context with { ManifestPaths = context.ManifestPaths.Concat(new[] { path }).ToArray() },
                 RequiresArguments = true,
                 Validate = s => !string.IsNullOrWhiteSpace(s)
             })
@@ -87,6 +88,9 @@ return 0;
 
 
 
+
+
+
 static async Task<PipelineContext> RunPipeline(PipelineContext context)
 {
     if (!ValidateContext(context))
@@ -95,84 +99,94 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
     }
 
     var outputPath = context.OutputPath!;
-    var manifestFileName = Path.GetFileNameWithoutExtension(context.ManifestPath)!;
+    //NOTE(Jens): this can be separated into different threads later (if needed). Just the C# code gen that should be single threaded.
 
-    var manifest = await ReadManifest(context.ManifestPath);
-    if (manifest == null)
+    Logger.Info($"Manifests: {context.ManifestPaths.Length}");
+
+    using ImageReader imageReader = new();
+
+    for (var i = 0; i < context.ManifestPaths.Length; ++i)
     {
-        return context with { Failed = true, Reason = "Failed to get the manifest" };
-    }
-    Logger.Info($"Manifest: {manifest.Name}. Textures: {manifest.Textures.Count} Models: {manifest.Models.Count} Materials: {manifest.Materials.Count}");
-    var basePath = Path.GetDirectoryName(context.ManifestPath)!;
+        var (assetRegistryFilename, titanPakFilename) = GenerateFileNames(i);
 
-    List<(string Name, AssetDescriptor Descriptor)> assetDescriptors = new();
-
-    using PackageStream packageExporter = new(1 * 1024 * 1024 * 1024); // 1GB
-    // export images
-    {
-        using ImageReader imageReader = new();
-        foreach (var texture in manifest.Textures)
+        var manifestPath = context.ManifestPaths[i];
+        //NOTE(Jens): this will create different pak files for each manifest. is this what we want?
+        using PackageStream packageExporter = new(1 * 1024 * 1024 * 1024); // 1GB 
+        List<(string Name, AssetDescriptor Descriptor)> assetDescriptors = new();
+        var manifest = await ReadManifest(manifestPath);
+        if (manifest == null)
         {
-            //NOTE(Jens): Load and convert images to DXGI_FORMAT
-            var path = Path.Combine(basePath, texture.Path);
-            var descriptor = ExportImage(path, imageReader, packageExporter);
-            if (descriptor == null)
+            return context with { Failed = true, Reason = "Failed to get the manifest" };
+        }
+        Logger.Info($"Manifest: {manifest.Name}. Textures: {manifest.Textures.Count} Models: {manifest.Models.Count} Materials: {manifest.Materials.Count}");
+        var basePath = Path.GetDirectoryName(manifestPath)!;
+        // export images
+        {
+            foreach (var texture in manifest.Textures)
             {
-                return context with { Failed = true, Reason = $"Failed to export the image from path {path}" };
+                //NOTE(Jens): Load and convert images to DXGI_FORMAT
+                var path = Path.Combine(basePath, texture.Path);
+                var descriptor = ExportImage(path, imageReader, packageExporter);
+                if (descriptor == null)
+                {
+                    return context with { Failed = true, Reason = $"Failed to export the image from path {path}" };
+                }
+                assetDescriptors.Add((texture.Name, descriptor.Value));
+                Logger.Info($"Image {texture.Name}({texture.Path}) completed");
             }
-            assetDescriptors.Add((texture.Name, descriptor.Value));
-            Logger.Info($"Image {texture.Name}({texture.Path}) completed");
         }
-    }
-
-    // export models
-    {
-        foreach (var model in manifest.Models)
+        // export models
         {
-            Logger.Warning($"Exporting model {model.Name}. (model exporting has not been implemented yet.)");
+            foreach (var model in manifest.Models)
+            {
+                Logger.Warning($"Exporting model {model.Name}. (model exporting has not been implemented yet.)");
+            }
         }
-    }
 
-
-    // export materials
-    {
-        foreach (var material in manifest.Materials)
+        // export materials
         {
-            Logger.Warning($"Exporting material {material.Name}. (material exporting has not been implemented yet.)");
+            foreach (var material in manifest.Materials)
+            {
+                Logger.Warning($"Exporting material {material.Name}. (material exporting has not been implemented yet.)");
+            }
         }
-    }
+        var outputFile = Path.Combine(outputPath, titanPakFilename);
+        {
+            CreateIfNotExist(outputPath);
+            Logger.Info($"Writing the Titan Package to file {outputFile}");
+            await using var file = File.OpenWrite(outputFile);
+            file.SetLength((long)packageExporter.Offset);
+            file.Seek(0, SeekOrigin.Begin);
+            packageExporter.Export(file);
+            await file.FlushAsync();
+            Logger.Info($"{packageExporter.Offset} bytes written");
+        }
 
+        if (string.IsNullOrWhiteSpace(context.GeneratedCodePath))
+        {
+            Logger.Warning("No generated code path specified, no index will be created.");
+        }
+        else
+        {
+            var fileContents = GenerateCSharpIndex(titanPakFilename, assetDescriptors, manifest.Name, context.Namespace);
+            var generatedFilePath = Path.Combine(context.GeneratedCodePath, assetRegistryFilename);
+            CreateIfNotExist(context.GeneratedCodePath);
 
-    var outputFile = Path.Combine(outputPath, $"{manifestFileName}.titanpak");
-    {
-        CreateIfNotExist(outputPath);
-        Logger.Info($"Writing the Titan Package to file {outputFile}");
-        await using var file = File.OpenWrite(outputFile);
-        file.SetLength((long)packageExporter.Offset);
-        file.Seek(0, SeekOrigin.Begin);
-        packageExporter.Export(file);
-        await file.FlushAsync();
-        Logger.Info($"{packageExporter.Offset} bytes written");
-    }
-
-    if (string.IsNullOrWhiteSpace(context.GeneratedCodePath))
-    {
-        Logger.Warning("No generated code path specified, no index will be created.");
-    }
-    else
-    {
-        var fileContents = GenerateCSharpIndex(outputFile, assetDescriptors, context.Namespace);
-        var generatedFilePath = Path.Combine(context.GeneratedCodePath, $"AssetRegistry{ToPropertyName(manifestFileName)}.cs");
-        CreateIfNotExist(context.GeneratedCodePath);
-
-        Logger.Info($"Writing the generated code to {generatedFilePath}");
-        await using var writer = new StreamWriter(File.OpenWrite(generatedFilePath));
-        await writer.WriteAsync(fileContents);
-        await writer.FlushAsync();
-        //await File.WriteAllTextAsync(generatedFilePath, fileContents);
+            Logger.Info($"Writing the generated code to {generatedFilePath}");
+            await using var writer = new StreamWriter(File.OpenWrite(generatedFilePath));
+            writer.BaseStream.SetLength(0);
+            await writer.WriteAsync(fileContents);
+            await writer.FlushAsync();
+            //await File.WriteAllTextAsync(generatedFilePath, fileContents);
+        }
     }
 
     return context;
+
+
+
+    static (string ManifestName, string PakFileName) GenerateFileNames(int index)
+        => ($"AssetRegistry{++index,3:D3}.cs", $"data{index,3:D3}.titanpak");
 }
 
 
@@ -185,12 +199,17 @@ static bool ValidateContext(PipelineContext context)
         result = false;
     }
 
-    if (string.IsNullOrWhiteSpace(context.ManifestPath))
+    if (context.ManifestPaths.Length == 0)
     {
-        Logger.Error($"{nameof(PipelineContext.ManifestPath)} is null or empty.");
+        Logger.Error($"{nameof(PipelineContext.ManifestPaths)} is empty.");
         result = false;
     }
 
+    if (context.ManifestPaths.Any(string.IsNullOrWhiteSpace))
+    {
+        Logger.Error($"{nameof(PipelineContext.ManifestPaths)} has null or empty paths.");
+        result = false;
+    }
     return result;
 }
 
@@ -244,8 +263,10 @@ static async Task<Manifest?> ReadManifest(string? path)
 }
 
 
-static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string? @namespace)
+static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string manifestName, string? @namespace)
 {
+    //NOTE(Jens): use a name that can be compiled in C#
+    manifestName = ToPropertyName(manifestName);
     var unnamedCount = 0;
     var builder = new StringBuilder();
     builder.AppendLine($"// This is a generated file from {typeof(Program).Assembly.FullName}");
@@ -260,11 +281,15 @@ static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name
         .AppendLine("public static partial class AssetRegistry")
         .AppendLine("{");
 
-    builder.AppendLine($"\tpublic const string PackageFile =\"{Path.GetFileName(packageFile)}\"; // This wont work for multiple manifests.");
+    builder.AppendLine($"\tpublic static class {manifestName}")
+        .AppendLine("\t{");
+
+    builder.AppendLine($"\t\tpublic const string PackageFile =\"{Path.GetFileName(packageFile)}\";");
 
     builder
-        .AppendLine("\tpublic static partial class Textures")
-        .AppendLine("\t{");
+        .AppendLine("\t\tpublic static partial class Textures")
+        .AppendLine("\t\t{");
+
     foreach (var (name, descriptor) in descriptors)
     {
         string propertyName;
@@ -278,12 +303,13 @@ static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name
             propertyName = ToPropertyName(name);
         }
 
-
-
-        builder.AppendLine($"\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(descriptor)}");
+        builder.AppendLine($"\t\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(descriptor)}");
     }
-    builder.AppendLine("\t}");
-    builder.AppendLine("}");
+    builder.AppendLine("\t\t}")
+        .AppendLine("\t}")
+        .AppendLine("}");
+
+
     builder.Replace("\t", new string(' ', 4));
     return builder.ToString();
     static string DescriptorToString(in AssetDescriptor descriptor) =>
@@ -297,10 +323,6 @@ static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name
 
 static string ToPropertyName(string name)
 {
-    if (string.IsNullOrWhiteSpace(name))
-    {
-        Logger.Warning("Mi");
-    }
     Span<char> buffer = stackalloc char[name.Length];
     var count = 0;
     if (!char.IsLetter(name[0]))
@@ -323,8 +345,6 @@ static string ToPropertyName(string name)
 
     return new string(buffer[..count]);
 }
-
-
 
 static void CreateIfNotExist(string folder)
 {
