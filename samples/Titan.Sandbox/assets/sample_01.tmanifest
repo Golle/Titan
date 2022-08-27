@@ -1,14 +1,18 @@
 {
-    "name": "Sample Manifest 01",
-    "textures" :[
-        {
-            "path": "textures/bluesheet.png",
-            "type": "PNG"
-        }
-    ],
-    "models" :[
-        {
-            "path": "models/pillar.geo"
-        }
-    ]
+  "order": 0,
+  "name": "Sample Manifest 01",
+  "textures": [
+    {
+      "path": "textures/bluesheet.png",
+      "type": "PNG",
+      "name": null
+    }
+  ],
+  "models": [
+    {
+      "path": "models/pillar.geo",
+      "name": null
+    }
+  ],
+  "materials": []
 }
