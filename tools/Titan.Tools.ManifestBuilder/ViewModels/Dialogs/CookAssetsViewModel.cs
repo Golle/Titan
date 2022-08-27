@@ -1,11 +1,8 @@
-using System;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Controls;
 using ReactiveUI;
-using Titan.Tools.Core.Manifests;
 using Titan.Tools.ManifestBuilder.Common;
 using Titan.Tools.ManifestBuilder.Services;
 using Titan.Tools.ManifestBuilder.Views.Dialogs;
@@ -70,7 +67,7 @@ public class CookAssetsViewModel : ViewModelBase
                 await dialogService.MessageBox("Warning", $"We currently only support a single manifest per project. Only {manifests[0]} will be built.");
             }
 
-            var args = $"run --project {GlobalConfiguration.PackagerProjectPath} -- -m {manifests.First()} -o \"{_packagePath}\" -g \"{_generatedPath}\" {(_namespace != null ? $"-n {_namespace}" : string.Empty)}";
+            var args = $"run --project {GlobalConfiguration.PackagerProjectPath} -- package -m {manifests.First()} -o \"{_packagePath}\" -g \"{_generatedPath}\" {(_namespace != null ? $"-n {_namespace}" : string.Empty)}";
             var dialog = new ExternalProcessWindow
             {
                 DataContext = new ExternalProcessViewModel(new ExternalProcess("dotnet", args))

@@ -51,7 +51,7 @@ try
             .WithOption(new Option<PipelineContext>("namespace")
             {
                 Alias = "n",
-                Callback = (context, @namespace) => context with { Namespace = @namespace },
+                Callback = (context, ns) => context with { Namespace = ns },
                 RequiresArguments = true,
                 Validate = s => !string.IsNullOrWhiteSpace(s),
                 Description = "The namespace for the generated C# file."
@@ -246,6 +246,7 @@ static async Task<Manifest?> ReadManifest(string? path)
 
 static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string? @namespace)
 {
+    var unnamedCount = 0;
     var builder = new StringBuilder();
     builder.AppendLine($"// This is a generated file from {typeof(Program).Assembly.FullName}");
     if (!string.IsNullOrWhiteSpace(@namespace))
@@ -264,7 +265,20 @@ static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name
         .AppendLine("\t{");
     foreach (var (name, descriptor) in descriptors)
     {
-        builder.AppendLine($"\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {ToPropertyName(name)} = {DescriptorToString(descriptor)}");
+        string propertyName;
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            Logger.Warning($"Unnamed {descriptor.Type}, will use a default name.");
+            propertyName = $"UnnamedAsset{++unnamedCount,4:D4}";
+        }
+        else
+        {
+            propertyName = ToPropertyName(name);
+        }
+
+
+
+        builder.AppendLine($"\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(descriptor)}");
     }
     builder.AppendLine("\t}");
     builder.AppendLine("}");
@@ -281,6 +295,10 @@ static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name
 
 static string ToPropertyName(string name)
 {
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        Logger.Warning("Mi");
+    }
     Span<char> buffer = stackalloc char[name.Length];
     var count = 0;
     if (!char.IsLetter(name[0]))

@@ -11,7 +11,7 @@
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
         WindowStartupLocation="CenterOwner"
-        CanResize="False">
+        CanResize="True">
 
   <Design.DataContext>
     <dialogs:ExternalProcessViewModel/>
@@ -40,7 +40,7 @@
             <ItemsRepeater Name="PART_Code" Items="{Binding LogOutput}">
               <ItemsRepeater.DataTemplates>
                 <DataTemplate>
-                  <TextBlock Text="{Binding .}"/>
+                  <TextBlock Text="{Binding .}" TextWrapping="Wrap"/>
                 </DataTemplate>
               </ItemsRepeater.DataTemplates>
             </ItemsRepeater>
