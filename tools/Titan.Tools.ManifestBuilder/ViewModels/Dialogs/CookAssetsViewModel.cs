@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -61,13 +62,7 @@ public class CookAssetsViewModel : ViewModelBase
                 return;
             }
 
-            //NOTE(Jens): add support for multiple manifests. can probably execute them either in parallel and show different tabs inside the window.
-            if (manifests.Length > 1)
-            {
-                await dialogService.MessageBox("Warning", $"We currently only support a single manifest per project. Only {manifests[0]} will be built.");
-            }
-
-            var args = $"run --project {GlobalConfiguration.PackagerProjectPath} -- package -m {manifests.First()} -o \"{_packagePath}\" -g \"{_generatedPath}\" {(_namespace != null ? $"-n {_namespace}" : string.Empty)}";
+            var args = $"run --project {GlobalConfiguration.PackagerProjectPath} -- package {string.Join(' ', manifests.Select(m => $"-m {m}"))} -o \"{_packagePath}\" -g \"{_generatedPath}\" {(_namespace != null ? $"-n {_namespace}" : string.Empty)}";
             var dialog = new ExternalProcessWindow
             {
                 DataContext = new ExternalProcessViewModel(new ExternalProcess("dotnet", args))

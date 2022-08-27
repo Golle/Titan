@@ -67,7 +67,10 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         {
             Width = windowSize.Width;
             Height = windowSize.Height;
-            Position = new PixelPoint(windowSize.X, windowSize.Y);
+            if (windowSize.X >= 0 && windowSize.Y >= 0)
+            {
+                Position = new PixelPoint(windowSize.X, windowSize.Y);
+            }
         }
     }
 

@@ -1,0 +1,18 @@
+{
+  "order": 0,
+  "name": "AnotherManifest",
+  "textures": [
+    {
+      "path": "textures\\redsheet.png",
+      "type": "PNG",
+      "name": "redsheet"
+    },
+    {
+      "path": "textures\\seqoe_ui_light.png",
+      "type": "PNG",
+      "name": "seqoe_ui_light"
+    }
+  ],
+  "models": [],
+  "materials": []
+}
