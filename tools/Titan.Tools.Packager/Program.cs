@@ -289,7 +289,8 @@ static string GenerateCSharpIndex(uint manifestId, string packageFile, string ma
     builder
         .AppendLine($"\t\tpublic static uint Id => {manifestId};")
         .AppendLine($"\t\tpublic static string ManifestFile => \"{Path.GetFileName(manifestPath)}\";")
-        .AppendLine($"\t\tpublic static string TitanPackageFile => \"{Path.GetFileName(packageFile)}\";");
+        .AppendLine($"\t\tpublic static string TitanPackageFile => \"{Path.GetFileName(packageFile)}\";")
+        .AppendLine($"\t\tpublic static uint AssetCount => {descriptors.Count};");
 
     builder
             .AppendLine("\t\tpublic static partial class Textures")
@@ -308,7 +309,7 @@ static string GenerateCSharpIndex(uint manifestId, string packageFile, string ma
             propertyName = ToPropertyName(name);
         }
 
-        builder.AppendLine($"\t\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(id++, descriptor)}");
+        builder.AppendLine($"\t\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(id++, manifestId, descriptor)}");
     }
     builder.AppendLine("\t\t}")
         .AppendLine("\t}")
@@ -317,10 +318,10 @@ static string GenerateCSharpIndex(uint manifestId, string packageFile, string ma
 
     builder.Replace("\t", new string(' ', 4));
     return builder.ToString();
-    static string DescriptorToString(uint id, in AssetDescriptor descriptor) =>
+    static string DescriptorToString(uint id, uint manifestId, in AssetDescriptor descriptor) =>
         descriptor switch
         {
-            { Type: AssetDescriptorType.Texture } => $"new() {{ Id = {id}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }};",
+            { Type: AssetDescriptorType.Texture } => $"new() {{ Id = {id}, ManifestId = {manifestId}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }};",
             _ => throw new NotImplementedException($"Type {descriptor.Type} has not been implemented yet.")
         };
 }

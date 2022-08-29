@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 
 namespace Titan.Core.IO.NewFileSystem;
@@ -9,4 +9,5 @@ public interface IFileSystemApi
     static abstract void CloseFile(ref FileHandle fileHandle);
     static abstract int Read(in FileHandle fileHandle, Span<byte> buffer, ulong offset);
     static abstract unsafe int Read(in FileHandle fileHandle, void* buffer, nuint bufferSize, ulong offset);
+    static abstract long GetLength(in FileHandle fileHandle);
 }

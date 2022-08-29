@@ -34,4 +34,7 @@ public struct ManagedFileSystemApi : IFileSystemApi
 
     public static unsafe int Read(in FileHandle fileHandle, void* buffer, nuint bufferSize, ulong offset) 
         => Read(fileHandle, new Span<byte>(buffer, (int)bufferSize), offset); // Will overflow for big sizes
+
+    public static long GetLength(in FileHandle fileHandle) 
+        => RandomAccess.GetLength(new SafeFileHandle(fileHandle, true));
 }

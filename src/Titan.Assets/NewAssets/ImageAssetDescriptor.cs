@@ -16,10 +16,12 @@ public interface IManifestDescriptor
     static abstract uint Id { get; }
     static abstract string ManifestFile { get; }
     static abstract string TitanPackageFile { get; }
+    static abstract uint AssetCount { get; }
 }
 public unsafe struct AssetDescriptor
 {
     public uint Id;
+    public uint ManifestId;
     public AssetDescriptorType Type;
     public AssetReference Reference;
     private AssetDescriptorUnion _union;

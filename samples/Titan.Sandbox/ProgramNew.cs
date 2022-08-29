@@ -1,4 +1,7 @@
+using System.IO;
+using System;
 using System.Numerics;
+using Titan.Assets.NewAssets;
 using Titan.Components;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -16,6 +19,12 @@ using Titan.Runner;
 using Titan.Sandbox;
 using EntityFilter = Titan.ECS.Entities.EntityFilter;
 
+
+// Folders used during development.
+var baseDir = GetBaseDirectory();
+var assetsFolder = Path.Combine(baseDir, "assets");
+var titanPakFolder = Path.Combine(assetsFolder, "bin");
+
 AppBuilder
     .Create()
     .AddResource(new LoggingConfiguration
@@ -24,6 +33,10 @@ AppBuilder
         Type = LoggerType.Console,
         FilePath = @"c:\tmp\titan.log"
     })
+    .AddConfiguration(new AssetsDevConfiguration(assetsFolder, titanPakFolder))
+    .AddConfiguration(AssetsConfiguration.CreateFromRegistry<AssetRegistry.SampleManifest01>())
+    .AddConfiguration(AssetsConfiguration.CreateFromRegistry<AssetRegistry.AnotherManifest>())
+
     .AddResource(new ECSConfiguration { MaxEntities = 1_000_000 })
     //.AddResource(SchedulerConfiguration.SingleThreaded)
     .AddModule<CoreModule>()
@@ -40,6 +53,27 @@ AppBuilder
     .AddResource<GlobalFrameCounter>()
     .Build()
     .Run();
+
+
+static string GetBaseDirectory()
+{
+    var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+    const string BaseFileName = "Titan.Sandbox.csproj";
+    return FindParentWithFile(BaseFileName, baseDirectory, 7)
+           ?? baseDirectory;
+
+    static string FindParentWithFile(string filename, string? path, int steps)
+    {
+        if (steps == 0 || path == null)
+        {
+            return null;
+        }
+        return File.Exists(Path.Combine(path, filename))
+            ? path
+            : FindParentWithFile(filename, Directory.GetParent(path)?.FullName, steps - 1);
+    }
+}
+
 
 namespace Titan.Sandbox
 {
@@ -232,3 +266,6 @@ namespace Titan.Sandbox
     //    }
     //}
 }
+
+
+
