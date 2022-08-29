@@ -13,8 +13,8 @@ public enum AssetDescriptorType
 
 public interface IManifestDescriptor
 {
-    static abstract ReadOnlySpan<char> ManifestFile();
-    static abstract ReadOnlySpan<char> TitanPackageFile();
+    static abstract string ManifestFile { get; }
+    static abstract string TitanPackageFile { get; }
 }
 public unsafe struct AssetDescriptor
 {

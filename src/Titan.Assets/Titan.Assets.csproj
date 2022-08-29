@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
+    <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
   </ItemGroup>
 
 </Project>

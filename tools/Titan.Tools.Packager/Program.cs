@@ -109,7 +109,7 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
     {
         var (assetRegistryFilename, titanPakFilename) = GenerateFileNames(i);
 
-        var manifestPath = context.ManifestPaths[i];
+        var manifestPath = context.ManifestPaths[i]!;
         //NOTE(Jens): this will create different pak files for each manifest. is this what we want?
         using PackageStream packageExporter = new(1 * 1024 * 1024 * 1024); // 1GB 
         List<(string Name, AssetDescriptor Descriptor)> assetDescriptors = new();
@@ -168,7 +168,7 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
         }
         else
         {
-            var fileContents = GenerateCSharpIndex(titanPakFilename, assetDescriptors, manifest.Name, context.Namespace);
+            var fileContents = GenerateCSharpIndex(titanPakFilename, manifestPath, assetDescriptors, manifest.Name, context.Namespace);
             var generatedFilePath = Path.Combine(context.GeneratedCodePath, assetRegistryFilename);
             CreateIfNotExist(context.GeneratedCodePath);
 
@@ -263,7 +263,7 @@ static async Task<Manifest?> ReadManifest(string? path)
 }
 
 
-static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string manifestName, string? @namespace)
+static string GenerateCSharpIndex(string packageFile, string manifestPath, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string manifestName, string? @namespace)
 {
     //NOTE(Jens): use a name that can be compiled in C#
     manifestName = ToPropertyName(manifestName);
@@ -281,14 +281,16 @@ static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name
         .AppendLine("public static partial class AssetRegistry")
         .AppendLine("{");
 
-    builder.AppendLine($"\tpublic static class {manifestName}")
+    builder.AppendLine($"\tpublic struct {manifestName} : {typeof(IManifestDescriptor).FullName}")
         .AppendLine("\t{");
 
-    builder.AppendLine($"\t\tpublic const string PackageFile =\"{Path.GetFileName(packageFile)}\";");
+    builder
+        .AppendLine($"\t\tpublic static string ManifestFile => \"{Path.GetFileName(manifestPath)}\";")
+        .AppendLine($"\t\tpublic static string TitanPackageFile => \"{Path.GetFileName(packageFile)}\";");
 
     builder
-        .AppendLine("\t\tpublic static partial class Textures")
-        .AppendLine("\t\t{");
+            .AppendLine("\t\tpublic static partial class Textures")
+            .AppendLine("\t\t{");
 
     foreach (var (name, descriptor) in descriptors)
     {
