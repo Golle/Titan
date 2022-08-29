@@ -13,13 +13,15 @@ public enum AssetDescriptorType
 
 public interface IManifestDescriptor
 {
+    static abstract uint Id { get; }
     static abstract string ManifestFile { get; }
     static abstract string TitanPackageFile { get; }
 }
 public unsafe struct AssetDescriptor
 {
-    public AssetReference Reference;
+    public uint Id;
     public AssetDescriptorType Type;
+    public AssetReference Reference;
     private AssetDescriptorUnion _union;
     public ref ImageAssetDescriptor Image => ref ((AssetDescriptorUnion*)Unsafe.AsPointer(ref _union))->ImageAssetDescriptor;
     public ref ModelAssetDescriptor Model => ref ((AssetDescriptorUnion*)Unsafe.AsPointer(ref _union))->ModelAssetDescriptor;

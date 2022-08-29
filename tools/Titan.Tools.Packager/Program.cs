@@ -168,7 +168,8 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
         }
         else
         {
-            var fileContents = GenerateCSharpIndex(titanPakFilename, manifestPath, assetDescriptors, manifest.Name, context.Namespace);
+            var manifestId = (uint)(i + 1); //add one so we don't start at 0.
+            var fileContents = GenerateCSharpIndex(manifestId, titanPakFilename, manifestPath, assetDescriptors, manifest.Name, context.Namespace);
             var generatedFilePath = Path.Combine(context.GeneratedCodePath, assetRegistryFilename);
             CreateIfNotExist(context.GeneratedCodePath);
 
@@ -263,11 +264,12 @@ static async Task<Manifest?> ReadManifest(string? path)
 }
 
 
-static string GenerateCSharpIndex(string packageFile, string manifestPath, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string manifestName, string? @namespace)
+static string GenerateCSharpIndex(uint manifestId, string packageFile, string manifestPath, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string manifestName, string? @namespace)
 {
     //NOTE(Jens): use a name that can be compiled in C#
     manifestName = ToPropertyName(manifestName);
     var unnamedCount = 0;
+    var id = 1u;
     var builder = new StringBuilder();
     builder.AppendLine($"// This is a generated file from {typeof(Program).Assembly.FullName}");
     if (!string.IsNullOrWhiteSpace(@namespace))
@@ -285,6 +287,7 @@ static string GenerateCSharpIndex(string packageFile, string manifestPath, IRead
         .AppendLine("\t{");
 
     builder
+        .AppendLine($"\t\tpublic static uint Id => {manifestId};")
         .AppendLine($"\t\tpublic static string ManifestFile => \"{Path.GetFileName(manifestPath)}\";")
         .AppendLine($"\t\tpublic static string TitanPackageFile => \"{Path.GetFileName(packageFile)}\";");
 
@@ -305,7 +308,7 @@ static string GenerateCSharpIndex(string packageFile, string manifestPath, IRead
             propertyName = ToPropertyName(name);
         }
 
-        builder.AppendLine($"\t\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(descriptor)}");
+        builder.AppendLine($"\t\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(id++, descriptor)}");
     }
     builder.AppendLine("\t\t}")
         .AppendLine("\t}")
@@ -314,10 +317,10 @@ static string GenerateCSharpIndex(string packageFile, string manifestPath, IRead
 
     builder.Replace("\t", new string(' ', 4));
     return builder.ToString();
-    static string DescriptorToString(in AssetDescriptor descriptor) =>
+    static string DescriptorToString(uint id, in AssetDescriptor descriptor) =>
         descriptor switch
         {
-            { Type: AssetDescriptorType.Texture } => $"new() {{ Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }};",
+            { Type: AssetDescriptorType.Texture } => $"new() {{ Id = {id}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }};",
             _ => throw new NotImplementedException($"Type {descriptor.Type} has not been implemented yet.")
         };
 }
