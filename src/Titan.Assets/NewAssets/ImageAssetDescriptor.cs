@@ -17,6 +17,7 @@ public interface IManifestDescriptor
     static abstract string ManifestFile { get; }
     static abstract string TitanPackageFile { get; }
     static abstract uint AssetCount { get; }
+    static abstract AssetDescriptor[] AssetDescriptors { get; }
 }
 public unsafe struct AssetDescriptor
 {
@@ -50,4 +51,5 @@ public struct ModelAssetDescriptor
 {
     public uint Vertices;
     public uint Indices;
+    public byte IndexSize;
 }

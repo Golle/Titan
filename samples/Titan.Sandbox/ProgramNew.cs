@@ -36,10 +36,10 @@ AppBuilder
     .AddConfiguration(new AssetsDevConfiguration(assetsFolder, titanPakFolder))
     .AddConfiguration(AssetsConfiguration.CreateFromRegistry<AssetRegistry.SampleManifest01>())
     .AddConfiguration(AssetsConfiguration.CreateFromRegistry<AssetRegistry.AnotherManifest>())
-
     .AddResource(new ECSConfiguration { MaxEntities = 1_000_000 })
     //.AddResource(SchedulerConfiguration.SingleThreaded)
     .AddModule<CoreModule>()
+    .AddModule<AssetsModule>()
     .AddModule<WindowModule>()
     .AddModule<D3D12RenderModule1>()
     .AddModule<InputModule>()
@@ -47,10 +47,12 @@ AppBuilder
 
     .AddSystem<SampleSystem1>()
     .AddSystem<SampleSystem2>()
+    .AddSystem<AssetLoadingSampleSystem>()
     .AddSystemExperimental<SampleSystemInstance>()
     .AddComponents<Transform3DComponent>(maxComponents: 10_000)
     .AddComponents<TestComponent>(maxComponents: 1000)
     .AddResource<GlobalFrameCounter>()
+    .AddResource<SharedAssets>()
     .Build()
     .Run();
 
@@ -265,7 +267,53 @@ namespace Titan.Sandbox
 
     //    }
     //}
-}
 
+
+    internal struct TextureSample { } // Fake texture just to test AssetManagement
+    internal struct SharedAssets : IResource
+    {
+        public Handle<Asset> Texture1;
+        public Handle<Asset> Texture2;
+        public Handle<Asset> Texture3;
+    }
+    internal struct AssetLoadingSampleSystem : IStructSystem<AssetLoadingSampleSystem>
+    {
+        private AssetManager AssetManager;
+        private MutableResource<SharedAssets> SharedAssets;
+        private bool IsDone;
+        public static void Init(ref AssetLoadingSampleSystem system, in SystemsInitializer init)
+        {
+            system.AssetManager = init.GetAssetManager();
+            system.SharedAssets = init.GetMutableResource<SharedAssets>();
+        }
+
+        public static void Update(ref AssetLoadingSampleSystem system)
+        {
+            ref var assetManager = ref system.AssetManager;
+            ref var assets = ref system.SharedAssets.Get();
+
+            if (assets.Texture1.IsInvalid())
+            {
+                assets.Texture1 = assetManager.Load(AssetRegistry.AnotherManifest.Textures.Redsheet);
+                Logger.Trace<AssetLoadingSampleSystem>($"Load Texture1");
+            }
+            else
+            {
+                if (assetManager.IsLoaded(assets.Texture1))
+                {
+                    var handle = assetManager.GetAssetHandle<TextureSample>(assets.Texture1);
+                    Logger.Trace<AssetLoadingSampleSystem>($"Texture 1 handle: {handle}");
+                    Logger.Trace<AssetLoadingSampleSystem>($"Unload Texture1 and load Texture2");
+                    assetManager.Unload(ref assets.Texture1);
+                    assets.Texture2 = assetManager.Load(AssetRegistry.AnotherManifest.Textures.SeqoeUiLight);
+                    system.IsDone = true;
+                }
+            }
+        }
+
+        public static bool ShouldRun(in AssetLoadingSampleSystem system) => !system.IsDone;
+            //=> system.SharedAssets.Get().Texture1.IsInvalid();
+    }
+}
 
 

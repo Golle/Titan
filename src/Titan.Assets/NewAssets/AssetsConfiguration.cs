@@ -1,3 +1,4 @@
+using System;
 using Titan.Core;
 
 namespace Titan.Assets.NewAssets;
@@ -9,7 +10,7 @@ namespace Titan.Assets.NewAssets;
 /// <param name="AssetsFolder">The directory where the .tmanifest file is located</param>
 public record AssetsDevConfiguration(string AssetsFolder, string TitanPakFolder) : IConfiguration;
 
-public record AssetsConfiguration(uint Id, uint AssetCount, string ManifestFile, string TitanPakFile) : IConfiguration
+public record AssetsConfiguration(uint Id, string ManifestFile, string TitanPakFile, AssetDescriptor[] AssetDescriptors) : IConfiguration
 {
     /// <summary>
     /// Creates an asset configuration from a IManifestDescriptor and an optional path to the manifest directory.
@@ -17,5 +18,5 @@ public record AssetsConfiguration(uint Id, uint AssetCount, string ManifestFile,
     /// <typeparam name="TRegistry"></typeparam>
     /// <returns></returns>
     public static AssetsConfiguration CreateFromRegistry<TRegistry>() where TRegistry : IManifestDescriptor
-        => new(TRegistry.Id, TRegistry.AssetCount, TRegistry.ManifestFile, TRegistry.TitanPackageFile);
+        => new(TRegistry.Id, TRegistry.ManifestFile, TRegistry.TitanPackageFile, TRegistry.AssetDescriptors);
 }

@@ -1,4 +1,3 @@
-using System.Diagnostics.Metrics;
 using System.Text;
 using Titan.Assets.NewAssets;
 using Titan.Core.Logging;
@@ -85,10 +84,6 @@ finally
 }
 
 return 0;
-
-
-
-
 
 
 static async Task<PipelineContext> RunPipeline(PipelineContext context)
@@ -269,7 +264,6 @@ static string GenerateCSharpIndex(uint manifestId, string packageFile, string ma
     //NOTE(Jens): use a name that can be compiled in C#
     manifestName = ToPropertyName(manifestName);
     var unnamedCount = 0;
-    var id = 1u;
     var builder = new StringBuilder();
     builder.AppendLine($"// This is a generated file from {typeof(Program).Assembly.FullName}");
     if (!string.IsNullOrWhiteSpace(@namespace))
@@ -287,41 +281,59 @@ static string GenerateCSharpIndex(uint manifestId, string packageFile, string ma
         .AppendLine("\t{");
 
     builder
-        .AppendLine($"\t\tpublic static uint Id => {manifestId};")
-        .AppendLine($"\t\tpublic static string ManifestFile => \"{Path.GetFileName(manifestPath)}\";")
-        .AppendLine($"\t\tpublic static string TitanPackageFile => \"{Path.GetFileName(packageFile)}\";")
-        .AppendLine($"\t\tpublic static uint AssetCount => {descriptors.Count};");
+        .AppendLine($"\t\tpublic static uint {nameof(IManifestDescriptor.Id)} => {manifestId};")
+        .AppendLine($"\t\tpublic static string {nameof(IManifestDescriptor.ManifestFile)} => \"{Path.GetFileName(manifestPath)}\";")
+        .AppendLine($"\t\tpublic static string {nameof(IManifestDescriptor.TitanPackageFile)} => \"{Path.GetFileName(packageFile)}\";")
+        .AppendLine($"\t\tpublic static uint {nameof(IManifestDescriptor.AssetCount)} => {descriptors.Count};");
 
-    builder
-            .AppendLine("\t\tpublic static partial class Textures")
+
+    {
+        //NOTE(Jens): add the managed array of AssetDescriptors
+        builder.AppendLine($"\t\tpublic static {typeof(AssetDescriptor).FullName}[] {nameof(IManifestDescriptor.AssetDescriptors)} {{ get; }} =")
+            .AppendLine("\t\t{");
+        for (var i = 0; i < descriptors.Count; ++i)
+        {
+            builder.AppendLine($"\t\t\t{DescriptorToString(i, manifestId, descriptors[i].descriptor)},");
+        }
+        builder.AppendLine("\t\t};");
+    }
+
+    {
+        //NOTE(Jens): add the Textures (and other assets?)
+        builder
+            .AppendLine("\t\tpublic static class Textures")
             .AppendLine("\t\t{");
 
-    foreach (var (name, descriptor) in descriptors)
-    {
-        string propertyName;
-        if (string.IsNullOrWhiteSpace(name))
+        //foreach (var (name, descriptor) in descriptors)
+        for (var i = 0; i < descriptors.Count; ++i)
         {
-            Logger.Warning($"Unnamed {descriptor.Type}, will use a default name.");
-            propertyName = $"UnnamedAsset{++unnamedCount,4:D4}";
+            var (name, descriptor) = descriptors[i];
+            string propertyName;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                Logger.Warning($"Unnamed {descriptor.Type}, will use a default name.");
+                propertyName = $"UnnamedAsset{++unnamedCount,4:D4}";
+            }
+            else
+            {
+                propertyName = ToPropertyName(name);
+            }
+            builder.AppendLine($"\t\t\tpublic static ref readonly {typeof(AssetDescriptor).FullName} {propertyName} => ref {nameof(IManifestDescriptor.AssetDescriptors)}[{i}];");
         }
-        else
-        {
-            propertyName = ToPropertyName(name);
-        }
-
-        builder.AppendLine($"\t\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(id++, manifestId, descriptor)}");
+        builder.AppendLine("\t\t}");
     }
-    builder.AppendLine("\t\t}")
+
+    builder
         .AppendLine("\t}")
         .AppendLine("}");
 
 
     builder.Replace("\t", new string(' ', 4));
     return builder.ToString();
-    static string DescriptorToString(uint id, uint manifestId, in AssetDescriptor descriptor) =>
+    static string DescriptorToString(int id, uint manifestId, in AssetDescriptor descriptor) =>
         descriptor switch
         {
-            { Type: AssetDescriptorType.Texture } => $"new() {{ Id = {id}, ManifestId = {manifestId}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }};",
+            { Type: AssetDescriptorType.Texture } => $"new() {{ Id = {id}, ManifestId = {manifestId}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }}",
             _ => throw new NotImplementedException($"Type {descriptor.Type} has not been implemented yet.")
         };
 }

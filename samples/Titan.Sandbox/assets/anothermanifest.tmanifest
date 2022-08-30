@@ -11,6 +11,11 @@
       "path": "textures\\seqoe_ui_light.png",
       "type": "PNG",
       "name": "seqoe_ui_light"
+    },
+    {
+      "path": "textures\\greysheet.png",
+      "type": "PNG",
+      "name": "greysheet_01"
     }
   ],
   "models": [],

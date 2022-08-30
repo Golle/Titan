@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using System.Linq.Expressions;
 using Titan.Core;
 using Titan.Core.Memory;
 using Titan.ECS.Components;
@@ -76,4 +76,7 @@ public readonly unsafe ref struct SystemsInitializer
 
     public void RunAfter<T>() where T : unmanaged, IStructSystem<T>
         => _state->RunAfter.Add<T>();
+
+    public T* GetResourcePointer<T>() where T : unmanaged 
+        => _world->GetResourcePointer<T>();
 }

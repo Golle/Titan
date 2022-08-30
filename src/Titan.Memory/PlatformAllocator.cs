@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -11,8 +10,11 @@ namespace Titan.Memory;
 public unsafe struct PlatformAllocator : IApi
 {
     private Allocator _allocator;
-
     internal Allocator* UnderlyingAllocator => MemoryUtils.AsPointer(ref _allocator);
+
+
+    public readonly T* Allocate<T>(int count = 1, bool initialize = true) where T : unmanaged
+        => Allocate<T>((uint)count, initialize);
 
     //NOTE(Jens): Should we introduce some kind of MemoryBlock in addition to raw pointers?
     public readonly T* Allocate<T>(uint count = 1u, bool initialize = true) where T : unmanaged

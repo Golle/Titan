@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Titan.Core.Logging;
@@ -7,6 +8,8 @@ namespace Titan.Core.Threading2;
 
 public readonly struct ManagedThreadPool : IThreadPoolApi
 {
+
+    private const int HandleOffset = 1124521;
     private static Thread[] _threads;
     private static SemaphoreSlim _notifier;
 
@@ -22,7 +25,10 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
 
     public static void Reset(ref Handle<JobApi> handle)
     {
-        ref var job = ref _jobQueue[handle];
+        Debug.Assert(handle.IsValid());
+        var jobIndex = handle.Value - HandleOffset;
+
+        ref var job = ref _jobQueue[jobIndex];
         if (job.State == JobState.Completed)
         {
             job.State = JobState.Available;
@@ -60,7 +66,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         {
             if (!handle.IsInvalid())
             {
-                ref var job = ref _jobQueue[handle];
+                ref var job = ref _jobQueue[handle - HandleOffset];
                 if (job.State == JobState.Waiting)
                 {
                     job.State = JobState.Ready;
@@ -72,7 +78,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsCompleted(in Handle<JobApi> handle) => _jobQueue[handle].State == JobState.Completed;
+    public static bool IsCompleted(in Handle<JobApi> handle) => _jobQueue[handle.Value - HandleOffset].State == JobState.Completed;
 
     private static void RunWorker(object obj)
     {
@@ -122,12 +128,13 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         {
             _notifier.Release();
         }
-        handle = index;
+        handle = index + HandleOffset;
         return true;
     }
 
 
     // NOTE(Jens): the _nextJob and _nextQueuedJob are volatile fields, we can't create a single method for this unfortunately
+
     private static int GetNextJobIndex()
     {
         var maxIterations = _maxJobs;
@@ -155,6 +162,7 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
     }
 
     // NOTE(Jens): the _nextJob and _nextQueuedJob are volatile fields, we can't create a single method for this unfortunately
+
     private static int GetNextQueuedJob()
     {
         var maxIterations = _maxJobs;
@@ -179,7 +187,6 @@ public readonly struct ManagedThreadPool : IThreadPoolApi
         Logger.Error($"Failed to get the queued job ID after {_maxJobs} iterations.", typeof(ManagedThreadPool));
         return -1;
     }
-
 
     public static void Shutdown()
     {
