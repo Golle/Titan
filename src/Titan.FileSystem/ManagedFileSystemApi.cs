@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Microsoft.Win32.SafeHandles;
 
-namespace Titan.Core.IO.NewFileSystem;
+namespace Titan.FileSystem;
 
 public struct ManagedFileSystemApi : IFileSystemApi
 {

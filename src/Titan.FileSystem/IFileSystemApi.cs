@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Titan.Core.IO.NewFileSystem;
+namespace Titan.FileSystem;
 
 public interface IFileSystemApi
 {

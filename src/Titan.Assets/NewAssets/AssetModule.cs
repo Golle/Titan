@@ -1,19 +1,11 @@
-using System;
 using System.Linq;
-using Titan.Core;
-using Titan.Core.IO.NewFileSystem;
 using Titan.Core.Logging;
 using Titan.ECS.App;
 using Titan.ECS.Scheduler;
+using Titan.FileSystem;
 using Titan.Memory;
 
 namespace Titan.Assets.NewAssets;
-
-public interface IAssetLoader<T> where T : unmanaged
-{
-    static abstract Handle<T> Load(ReadOnlySpan<byte> data);
-    static abstract void Unload(Handle<T> handle);
-}
 
 public static unsafe class SystemInitializerExtensions
 {
@@ -54,6 +46,13 @@ public unsafe struct AssetsModule : IModule
             Logger.Error<AssetsModule>("Failed to initialize the asset registry");
             return;
         }
+
+        if (AssetFile.Open(@"F:\Git\Titan\samples\Titan.Sandbox\assets\bin\data001.titanpak", fileApi, out var file))
+        {
+            Logger.Trace<AssetsModule>($"File opened! Size: {file.GetLength()}.");
+        }
+
+        file.Close();
 
         builder
             .AddResource(registry)

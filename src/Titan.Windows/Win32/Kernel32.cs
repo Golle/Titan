@@ -1,4 +1,6 @@
+using System.Drawing;
 using System.Runtime.InteropServices;
+using Titan.Windows.D3D12;
 
 namespace Titan.Windows.Win32;
 
@@ -73,5 +75,33 @@ public static unsafe class Kernel32
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetDllDirectoryW(
         char* lpPathName
+    );
+
+    [DllImport(DllName, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+    public static extern HANDLE CreateFileW(
+        char* lpFileName,
+        DWORD dwDesiredAccess,
+        DWORD dwShareMode,
+        SECURITY_ATTRIBUTES* lpSecurityAttributes,
+        DWORD dwCreationDisposition,
+        DWORD dwFlagsAndAttributes,
+        HANDLE hTemplateFile
+    );
+
+    [DllImport(DllName, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool ReadFile(
+        HANDLE hFile,
+        void* lpBuffer,
+        DWORD nNumberOfBytesToRead,
+        DWORD* lpNumberOfBytesRead,
+        OVERLAPPED* lpOverlapped
+    );
+
+    [DllImport(DllName, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetFileSizeEx(
+        HANDLE hFile,
+        LARGE_INTEGER* lpFileSize
     );
 }

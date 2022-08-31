@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -12,6 +11,7 @@ namespace Titan.Assets.NewAssets;
 
 internal unsafe struct AssetRegistry : IResource
 {
+    //NOTE(Jens): the handle offset is to allow 0 indexed arrays. Handle<T>.IsInvalid is checking for 0. We could also leave index 0 and have a 1 indexed array. That would remove the addition/subtraction needed to access the assets.
     private const int HandleOffset = 70000;
     private int* _manifestOffsets;
     private Asset* _assets;
@@ -81,8 +81,6 @@ internal unsafe struct AssetRegistry : IResource
     {
         //NOTE(Jens): not sure if we want to free the memory or not.
     }
-
-    public ReadOnlySpan<Asset> GetAssets() => new(_assets, _size);
 
     public ref Asset Get(in Handle<Asset> handle)
     {

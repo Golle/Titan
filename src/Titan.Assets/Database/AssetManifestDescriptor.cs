@@ -15,7 +15,7 @@ namespace Titan.Assets.Database
             Logger.Trace<AssetManifestDescriptor>($"Loading assets manifest from {file}");
             var timer = Stopwatch.StartNew();
             
-            using var fileHandle = FileSystem.OpenReadHandle(file);
+            using var fileHandle = Core.IO.FileSystem.OpenReadHandle(file);
             var bytes = fileHandle.ReadAllBytes();
 
             var manifest = Json.Deserialize<AssetManifestDescriptor>(bytes);

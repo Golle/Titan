@@ -10,14 +10,10 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
-    <DefineConstants></DefineConstants>
-  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
     <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
-    <ProjectReference Include="..\Titan.FileSystem\Titan.FileSystem.csproj" />
   </ItemGroup>
 
 </Project>

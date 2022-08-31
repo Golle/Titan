@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Titan.Core;
 
-namespace Titan.Core.IO.NewFileSystem;
+namespace Titan.FileSystem;
 
 public unsafe struct FileSystemApi : IApi
 {

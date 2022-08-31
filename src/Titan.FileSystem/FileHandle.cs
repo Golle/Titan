@@ -1,11 +1,11 @@
-namespace Titan.Core.IO.NewFileSystem;
+namespace Titan.FileSystem;
 
 public struct FileHandle
 {
     public nint Handle;
-    public bool IsValid => Handle > 0;
+    public bool IsValid => Handle != 0;
 
-    public static readonly FileHandle Invalid = new() { Handle = -1 };
+    public static readonly FileHandle Invalid = default;
 
     public static implicit operator FileHandle(nint handle) => new() { Handle = handle };
 
