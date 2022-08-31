@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using Titan.Core.Memory;
 
 namespace Titan.Memory.Arenas;
@@ -38,7 +37,7 @@ public unsafe struct DynamicPoolArena
         _freeList = _freeList->Next;
         if (zeroMemory)
         {
-            MemoryUtils.Init(nextBlock, _blockSize);
+            MemoryUtils.Init(nextBlock, (uint)_blockSize);
         }
         return nextBlock;
     }

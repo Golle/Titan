@@ -18,7 +18,7 @@ public unsafe struct FileSystemApi : IApi
             _openFile = &T.OpenFile,
             _closeFile = &T.CloseFile,
             _read = &T.Read,
-            _readPtr = &T.Read, 
+            _readPtr = &T.Read,
             _length = &T.GetLength
         };
 
@@ -28,6 +28,9 @@ public unsafe struct FileSystemApi : IApi
     public readonly void Close(ref FileHandle handle) => _closeFile(ref handle);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly int Read(in FileHandle handle, Span<byte> buffer, ulong offset = 0ul) => _read(handle, buffer, offset);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly long GeLength(in FileHandle handle) => _length(handle);
+    public readonly int Read(in FileHandle handle, void* buffer, nuint bufferSize, ulong offset = 0ul) => _readPtr(handle, buffer, bufferSize, offset);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly long GetLength(in FileHandle handle) => _length(handle);
 }

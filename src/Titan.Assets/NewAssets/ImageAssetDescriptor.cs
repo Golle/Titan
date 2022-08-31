@@ -38,6 +38,8 @@ public unsafe struct AssetDescriptor
         public ModelAssetDescriptor ModelAssetDescriptor;
     }
 
+    public ulong GetSize() => Reference.Size;
+
 }
 public struct ImageAssetDescriptor
 {

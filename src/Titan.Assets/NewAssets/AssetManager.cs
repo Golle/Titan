@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
@@ -50,5 +51,13 @@ public readonly unsafe struct AssetManager : IApi
         ref readonly var asset = ref _registry->Get(assetHandle);
         Debug.Assert(asset.State == AssetState.Loaded, $"Trying to access an asset that is not loaded. Use {nameof(IsLoaded)}(Handle) to check is an asset is available.");
         return asset.AssetHandle;
+    }
+
+    public Handle<T> GetAssetHandleFromDescriptor<T>(in AssetDescriptor descriptor) where T : unmanaged
+    {
+        //NOTE(Jens): This is a synchronous call to support getting the handle to an asset that has already been loaded. 
+        //NOTE(Jens): Need to figure out how to handle reference counting in this case
+        //NOTE(Jens): what happens if the asset has not been loaded? just return Invalid?
+        throw new NotImplementedException("Implement this to support reading the handle of already loaded asset.");
     }
 }

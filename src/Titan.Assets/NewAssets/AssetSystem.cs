@@ -29,6 +29,19 @@ internal struct AssetSystem : IStructSystem<AssetSystem>
         ref readonly var jobApi = ref system.JobApi.Get();
         ref var registry = ref system.AssetRegistry.Get();
 
+        //NOTE(Jens): Handle cases where Unload and Load are called the same frame. Assert or just "leave" the asset as is?
+        foreach (ref readonly var @event in system.AssetUnload)
+        {
+            ref var asset = ref registry.Get(@event.Handle);
+            if (asset.State != AssetState.Loaded)
+            {
+                Logger.Warning<AssetSystem>($"Asset with handle {@event.Handle} - {asset.State} can't be unloaded.");
+                continue;
+            }
+            Logger.Trace<AssetSystem>($"Unloaded asset {@event.Handle}");
+            asset.State = AssetState.Unloaded;
+        }
+
         foreach (ref readonly var @event in system.AssetLoad)
         {
             ref var asset = ref registry.Get(@event.Handle);
@@ -42,19 +55,9 @@ internal struct AssetSystem : IStructSystem<AssetSystem>
             asset.State = AssetState.Loaded;
         }
 
-        foreach (ref readonly var @event in system.AssetUnload)
-        {
-            ref var asset = ref registry.Get(@event.Handle);
-            if (asset.State != AssetState.Loaded)
-            {
-                Logger.Warning<AssetSystem>($"Asset with handle {@event.Handle} - {asset.State} can't be unloaded.");
-                continue;
-            }
-            Logger.Trace<AssetSystem>($"Unloaded asset {@event.Handle}");
-            asset.State = AssetState.Unloaded;
-        }
+
     }
 
     public static bool ShouldRun(in AssetSystem system)
-    => system.AssetLoad.HasEvents() || system.AssetUnload.HasEvents();
+        => system.AssetLoad.HasEvents() || system.AssetUnload.HasEvents();
 }

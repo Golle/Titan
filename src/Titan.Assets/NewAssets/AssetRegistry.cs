@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,7 +15,7 @@ internal unsafe struct AssetRegistry : IResource
     //NOTE(Jens): the handle offset is to allow 0 indexed arrays. Handle<T>.IsInvalid is checking for 0. We could also leave index 0 and have a 1 indexed array. That would remove the addition/subtraction needed to access the assets.
     private const int HandleOffset = 70000;
     private int* _manifestOffsets;
-    private Asset* _assets;
+    private AssetContext* _assets;
     private int _size;
     private uint _highestManifestId;
 
@@ -28,14 +29,14 @@ internal unsafe struct AssetRegistry : IResource
 
         //NOTE(Jens): Size of all assets + the maninfest offsets
         var manifestIndexSize = highestManifestId * sizeof(int);
-        var totalSize = sizeof(Asset) * assetCount + manifestIndexSize;
+        var totalSize = sizeof(AssetContext) * assetCount + manifestIndexSize;
 
         var mem = (byte*)allocator->Allocate((nuint)totalSize, initialize: true);
         Debug.Assert(mem != null, $"Failed to allocate {totalSize} bytes of memory.");
         var manifestOffsets = (int*)mem;
-        var assets = (Asset*)(mem + manifestIndexSize);
+        var assets = (AssetContext*)(mem + manifestIndexSize);
         var offset = 0;
-         
+
         //NOTE(Jens): Set offsets to -1. This is to detect request with descriptors that have not been registered at startup.
         MemoryUtils.Init(manifestOffsets, manifestIndexSize, byte.MaxValue);
         foreach (var config in configs)
@@ -43,7 +44,7 @@ internal unsafe struct AssetRegistry : IResource
             manifestOffsets[config.Id] = offset;
             for (var i = 0; i < config.AssetDescriptors.Length; ++i)
             {
-                assets[i + offset] = new Asset
+                assets[i + offset] = new AssetContext
                 {
                     AssetHandle = Handle.Null,
                     Descriptor = config.AssetDescriptors[i],
@@ -82,7 +83,9 @@ internal unsafe struct AssetRegistry : IResource
         //NOTE(Jens): not sure if we want to free the memory or not.
     }
 
-    public ref Asset Get(in Handle<Asset> handle)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Span<AssetContext> GetAssets() => new(_assets, _size);
+    public ref AssetContext Get(in Handle<Asset> handle)
     {
         var index = handle - HandleOffset;
         Debug.Assert(index >= 0 && index < _size, "Out of bounds");

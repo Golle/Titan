@@ -51,6 +51,7 @@ public unsafe struct PlatformAllocator : IApi
         if (fixedSizeMemory > 0)
         {
             Logger.Trace<PlatformAllocator>($"Creating a {nameof(Win32VirtualAllocFixedSizeAllocator)} allocator with {fixedSizeMemory} bytes pre-allocated.");
+            Logger.Warning<PlatformAllocator>("The fixed size allocator does not support Free, this means that any code that tries to free the memory will have a memory leak.");
             return Allocator.Create<Win32VirtualAllocFixedSizeAllocator, FixedSizeArgs>(new FixedSizeArgs(fixedSizeMemory));
         }
         // Use VirtualAlloc on windows environment
