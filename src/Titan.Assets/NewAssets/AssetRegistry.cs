@@ -18,9 +18,13 @@ internal unsafe struct AssetRegistry : IResource
     private AssetContext* _assets;
     private int _size;
     private uint _highestManifestId;
+    private PlatformAllocator* _allocator;
 
-    public static bool Create(PlatformAllocator* allocator, AssetsConfiguration[] configs, out AssetRegistry registry)
+    public bool Init(PlatformAllocator* allocator, AssetsConfiguration[] configs)
     {
+        Debug.Assert(_manifestOffsets == null);
+        Debug.Assert(_assets == null);
+
         var assetCount = configs.Sum(c => c.AssetDescriptors.Length);
         var highestManifestId = configs.Max(c => c.Id);
 
@@ -56,15 +60,14 @@ internal unsafe struct AssetRegistry : IResource
             offset += config.AssetDescriptors.Length;
         }
 
-        registry = new AssetRegistry
-        {
-            _size = assetCount,
-            _manifestOffsets = manifestOffsets,
-            _assets = assets,
-            _highestManifestId = highestManifestId
-        };
+        _size = assetCount;
+        _manifestOffsets = manifestOffsets;
+        _assets = assets;
+        _highestManifestId = highestManifestId;
+        _allocator = allocator;
         return true;
     }
+
 
     public Handle<Asset> GetHandleFromDescriptor(in AssetDescriptor descriptor)
     {
@@ -80,7 +83,8 @@ internal unsafe struct AssetRegistry : IResource
 
     public void Release()
     {
-        //NOTE(Jens): not sure if we want to free the memory or not.
+        _allocator->Free(_manifestOffsets);
+        this = default;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

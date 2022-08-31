@@ -23,12 +23,8 @@ public unsafe struct AssetsModule : IModule
 {
     public static bool Build(AppBuilder builder)
     {
-        var allocator = builder.GetResourcePointer<PlatformAllocator>();
-        var fileApi = builder.GetResourcePointer<FileSystemApi>();
-        var assetConfigs = builder
-            .GetConfigurations<AssetsConfiguration>()
-            ;
 
+        var assetConfigs = builder.GetConfigurations<AssetsConfiguration>();
         //set up paths where the assets will be loaded from
 #if !SHIPPING
         // never use paths for shipping config
@@ -44,22 +40,34 @@ public unsafe struct AssetsModule : IModule
             });
         }
 #endif
+
         var configs = assetConfigs.ToArray();
-        if (!AssetRegistry.Create(allocator, configs, out var registry))
+
+        // Register the resources needed by this module
+        builder
+            .AddResource<AssetFileAccessor>()
+            .AddResource<AssetRegistry>();
+
+
+        // Get pointers to the resources
+        var allocator = builder.GetResourcePointer<PlatformAllocator>();
+        var fileSystemApi = builder.GetResourcePointer<FileSystemApi>();
+        var assetRegistry = builder.GetResourcePointer<AssetRegistry>();
+        var fileAccessor = builder.GetResourcePointer<AssetFileAccessor>();
+
+        if (!assetRegistry->Init(allocator, configs))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetRegistry)}");
             return false;
         }
-
-        if (!AssetFileAccessor.Create(allocator, fileApi, configs, out var accessor))
+;
+        if (!fileAccessor->Init(allocator, fileSystemApi, configs))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetFileAccessor)}");
             return false;
         }
 
         builder
-            .AddResource(registry)
-            .AddResource(accessor)
             .AddSystemToStage<AssetSystem>(Stage.PreUpdate)
             .AddShutdownSystem<AssetModuleTearDown>(RunCriteria.Always);
 

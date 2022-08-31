@@ -12,44 +12,39 @@ internal unsafe struct AssetFileAccessor
     private int _count;
 
     private PlatformAllocator* _allocator;
-    public static bool Create(PlatformAllocator* allocator, FileSystemApi* fileSystem, AssetsConfiguration[] configs, out AssetFileAccessor accessor)
+
+    public bool Init(PlatformAllocator* allocator, FileSystemApi* fileSystem, AssetsConfiguration[] configs)
     {
-        accessor = default;
-        var files = allocator->Allocate<ManifestToFile>(configs.Length);
-        if (files == null)
+        Debug.Assert(_files == null);
+        _files = allocator->Allocate<ManifestToFile>(configs.Length);
+        if (_files == null)
         {
             Logger.Error<AssetFileAccessor>($"Failed to allocate a block for {nameof(ManifestToFile)} with size {sizeof(ManifestToFile) * configs.Length} bytes");
             return false;
         }
+        _allocator = allocator;
+        _count = configs.Length;
 
-        for (var i = 0; i < configs.Length; ++i)
+
+        for (var i = 0; i < _count; ++i)
         {
-            ref var fileRef = ref files[i];
+            ref var fileRef = ref _files[i];
             fileRef.Id = configs[i].Id;
             if (!AssetFile.Open(configs[i].TitanPakFile, fileSystem, out fileRef.File))
             {
                 Logger.Error<AssetFileAccessor>($"Failed to open file {configs[i].TitanPakFile}");
                 goto Error;
             }
-            Logger.Trace<AssetFileAccessor>($"Opened file {configs[i].TitanPakFile} with size {files[i].File.GetLength()} bytes");
+            Logger.Trace<AssetFileAccessor>($"Opened file {configs[i].TitanPakFile} with size {_files[i].File.GetLength()} bytes");
         }
-        accessor = new AssetFileAccessor
-        {
-            _allocator = allocator,
-            _files = files,
-            _count = configs.Length
-        };
+
+
         return true;
 Error:
-
-//NOTE(Jens): if there's an error, close all open file handles.
-        for (var i = 0; i < configs.Length; ++i)
-        {
-            files[i].File.Close();
-        }
+        //NOTE(Jens): if there's an error, close all open file handles.
+        Release();
         return false;
     }
-
 
     public int Read(Span<byte> buffer, in AssetDescriptor descriptor)
     {
@@ -81,8 +76,7 @@ Error:
             _files[i].File.Close();
         }
         _allocator->Free(_files);
-        _files = null;
-        _count = 0;
+        this = default;
     }
 
     private struct ManifestToFile
