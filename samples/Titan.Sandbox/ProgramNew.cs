@@ -25,8 +25,8 @@ var baseDir = GetBaseDirectory();
 var assetsFolder = Path.Combine(baseDir, "assets");
 var titanPakFolder = Path.Combine(assetsFolder, "bin");
 
-AppBuilder
-    .Create()
+
+App.SetupAndRun(builder => builder
     .AddResource(new LoggingConfiguration
     {
         Enabled = true,
@@ -44,6 +44,7 @@ AppBuilder
     .AddModule<D3D12RenderModule1>()
     .AddModule<InputModule>()
     .UseRunner<WindowRunner>()
+    //.UseRunner<HeadlessRunner>()
 
     .AddSystem<SampleSystem1>()
     .AddSystem<SampleSystem2>()
@@ -52,9 +53,7 @@ AppBuilder
     .AddComponents<Transform3DComponent>(maxComponents: 10_000)
     .AddComponents<TestComponent>(maxComponents: 1000)
     .AddResource<GlobalFrameCounter>()
-    .AddResource<SharedAssets>()
-    .Build()
-    .Run();
+    .AddResource<SharedAssets>());
 
 
 static string GetBaseDirectory()
@@ -312,7 +311,7 @@ namespace Titan.Sandbox
         }
 
         public static bool ShouldRun(in AssetLoadingSampleSystem system) => !system.IsDone;
-            //=> system.SharedAssets.Get().Texture1.IsInvalid();
+        //=> system.SharedAssets.Get().Texture1.IsInvalid();
     }
 }
 
