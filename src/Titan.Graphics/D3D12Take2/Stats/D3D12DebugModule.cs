@@ -6,9 +6,10 @@ namespace Titan.Graphics.D3D12Take2.Stats;
 
 internal struct D3D12DebugModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         builder
             .AddSystemToStage<GPUMemoryStatsSystem>(Stage.PreUpdate, RunCriteria.Always);
+        return true;
     }
 }

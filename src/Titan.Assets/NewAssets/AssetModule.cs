@@ -21,17 +21,13 @@ public static unsafe class SystemInitializerExtensions
 
 public unsafe struct AssetsModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
-
-        var s = sizeof(AssetContext);
-        var b = s * 1000;
         var allocator = builder.GetResourcePointer<PlatformAllocator>();
         var fileApi = builder.GetResourcePointer<FileSystemApi>();
         var assetConfigs = builder
             .GetConfigurations<AssetsConfiguration>()
             ;
-
 
         //set up paths where the assets will be loaded from
 #if !SHIPPING
@@ -39,28 +35,26 @@ public unsafe struct AssetsModule : IModule
         var devSettings = builder.GetConfiguration<AssetsDevConfiguration>();
         if (devSettings != null)
         {
+            Logger.Trace<AssetsModule>($"Development Assets Folder: {devSettings.AssetsFolder}");
+            Logger.Trace<AssetsModule>($"Development TitanPak Folder: {devSettings.TitanPakFolder}");
             assetConfigs = assetConfigs.Select(c => c with
             {
                 ManifestFile = Path.Combine(devSettings.AssetsFolder, c.ManifestFile),
                 TitanPakFile = Path.Combine(devSettings.TitanPakFolder, c.TitanPakFile)
             });
         }
-
-        //
-#else 
-    
 #endif
         var configs = assetConfigs.ToArray();
         if (!AssetRegistry.Create(allocator, configs, out var registry))
         {
-            Logger.Error<AssetsModule>("Failed to initialize the asset registry");
-            return;
+            Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetRegistry)}");
+            return false;
         }
 
         if (!AssetFileAccessor.Create(allocator, fileApi, configs, out var accessor))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetFileAccessor)}");
-            return;
+            return false;
         }
 
         builder
@@ -68,9 +62,9 @@ public unsafe struct AssetsModule : IModule
             .AddResource(accessor)
             .AddSystemToStage<AssetSystem>(Stage.PreUpdate)
             .AddShutdownSystem<AssetModuleTearDown>(RunCriteria.Always);
+
+        return true;
     }
-
-
 
     private struct AssetModuleTearDown : IStructSystem<AssetModuleTearDown>
     {

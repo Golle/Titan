@@ -1,6 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Titan.Core.Logging;
 using Titan.ECS.App;
 using Titan.FileSystem.Platform;
@@ -9,7 +6,7 @@ namespace Titan.FileSystem;
 
 public struct FileSystemModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         bool win32 = true;
 
@@ -27,8 +24,6 @@ public struct FileSystemModule : IModule
 
             builder.AddResource(api);
         }
-
-        
-
+        return true;
     }
 }

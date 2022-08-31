@@ -1,6 +1,5 @@
-using Titan.Assets.NewAssets;
+using System.Reflection.Metadata.Ecma335;
 using Titan.ECS.App;
-using Titan.ECS.Entities;
 using Titan.ECS.Memory;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
@@ -12,7 +11,7 @@ namespace Titan.Modules;
 public unsafe struct MemoryModule : IModule
 {
     // NOTE(Jens): This will only add support for a transient memory allocation (resets every frame). We want a permanent memory allocator and a "buffer" where we can borrow/return memory blocks.
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         var config = builder.GetResourceOrDefault<MemoryConfiguration>();
 
@@ -25,6 +24,7 @@ public unsafe struct MemoryModule : IModule
                 .AddResource(new TransientMemory(arena))
                 .AddSystemToStage<TransientMemorySystem>(Stage.First, RunCriteria.Always);
         }
+        return true;
     }
 
 

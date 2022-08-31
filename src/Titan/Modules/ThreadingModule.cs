@@ -7,7 +7,7 @@ using Titan.ECS.Systems;
 namespace Titan.Modules;
 public struct ThreadingModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         ref readonly var config = ref builder.GetResourceOrDefault<ThreadPoolConfiguration>();
 
@@ -16,6 +16,7 @@ public struct ThreadingModule : IModule
         builder
             .AddResource(JobApi.CreateAndInitJobApi<ManagedThreadPool>(config))
             .AddSystemToStage<JobApiTeardown>(Stage.PostShutdown);
+        return true;
     }
 
     private struct JobApiTeardown : IStructSystem<JobApiTeardown>

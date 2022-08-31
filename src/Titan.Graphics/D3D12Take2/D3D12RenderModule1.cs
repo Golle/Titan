@@ -17,7 +17,7 @@ namespace Titan.Graphics.D3D12Take2;
 public unsafe struct D3D12RenderModule1 : IModule
 {
     private const uint BufferCount = 3;
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         ref readonly var window = ref builder.GetResource<Window>();
 
@@ -113,7 +113,7 @@ public unsafe struct D3D12RenderModule1 : IModule
 
         //TestHeap.TestThis(device);
 
-        return;
+        return true;
 
 Error:
         Logger.Error<D3D12RenderModule1>("Failed to inialize the D3D12 renderer module.");
@@ -124,6 +124,7 @@ Error:
         adapter.Shutdown();
         factory.Shutdown();
 
+        return false;
     }
 
 

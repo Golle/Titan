@@ -6,10 +6,11 @@ namespace Titan.Input.Modules;
 
 public readonly struct KeyboardInputModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         builder
             .AddResource<KeyboardState>()
             .AddSystemToStage<KeyboardInputSystem>(Stage.PreUpdate, RunCriteria.Always);
+        return true;
     }
 }

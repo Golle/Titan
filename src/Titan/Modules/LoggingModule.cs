@@ -8,7 +8,7 @@ namespace Titan.Modules;
 //NOTE(Jens): Move this to Core
 public readonly struct LoggingModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         ref readonly var config = ref builder.GetResourceOrDefault<LoggingConfiguration>();
         if (config.Enabled)
@@ -23,6 +23,8 @@ public readonly struct LoggingModule : IModule
                 .AddSystemToStage<LoggerTeardown>(Stage.PostShutdown, priority: int.MaxValue)// Set Priority to Max to it's executed after all other systems have run their shutdown
                 ;
         }
+
+        return true;
     }
 
     private struct LoggerTeardown : IStructSystem<LoggerTeardown>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Titan.Core;
+using Titan.Core.Logging;
 using Titan.ECS.Components;
 using Titan.ECS.Events;
 using Titan.ECS.Modules;
@@ -112,7 +113,10 @@ public unsafe class AppBuilder
 
     public AppBuilder AddModule<T>() where T : IModule
     {
-        T.Build(this);
+        if (!T.Build(this))
+        {
+            throw new Exception($"Failed to add the {typeof(T).FullName} module");
+        }
         return this;
     }
 

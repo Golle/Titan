@@ -5,8 +5,11 @@ namespace Titan.ECS.Modules;
 
 public readonly struct SchedulerModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         var _ = builder.GetResourceOrDefault<SchedulerConfiguration>();
+
+        return true;
+
     }
 }

@@ -280,6 +280,7 @@ static string GenerateCSharpIndex(uint manifestId, string packageFile, string ma
     builder.AppendLine($"\tpublic struct {manifestName} : {typeof(IManifestDescriptor).FullName}")
         .AppendLine("\t{");
 
+    //NOTE(Jens): We should add a "hash/checksum" of the file, if we want to validate that it's the same one. Could affect performance though.
     builder
         .AppendLine($"\t\tpublic static uint {nameof(IManifestDescriptor.Id)} => {manifestId};")
         .AppendLine($"\t\tpublic static string {nameof(IManifestDescriptor.ManifestFile)} => \"{Path.GetFileName(manifestPath)}\";")
