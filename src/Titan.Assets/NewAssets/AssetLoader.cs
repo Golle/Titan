@@ -71,6 +71,7 @@ internal unsafe struct AssetLoader : IResource
 
     public void Update()
     {
+        //NOTE(Jens): If there's a lot of assets it might be faster to have an array/queue of "active" items. Could be pointers or indexes (indexes will be half the size)
         foreach (ref var asset in _registry->GetAssets())
         {
             switch (asset.State)
@@ -107,7 +108,6 @@ internal unsafe struct AssetLoader : IResource
                     break;
             }
         }
-
     }
 
     private static void AsyncReadFile(ref AssetContext asset)
