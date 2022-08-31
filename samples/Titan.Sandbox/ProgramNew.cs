@@ -235,39 +235,6 @@ namespace Titan.Sandbox
         public long FrameCounter;
     }
 
-    //internal class SandboxGame : Game
-    //{
-    //    public override EngineConfiguration ConfigureEngine(EngineConfiguration config) => config with
-    //    {
-    //        AssetsPath = "assets",
-    //        BasePathSearchPattern = "Titan.Sandbox.csproj"
-    //    };
-
-    //    public override WindowConfiguration ConfigureWindow(WindowConfiguration config) =>
-    //        config with
-    //        {
-    //            Height = 300,
-    //            Width = 400,
-    //            RawInput = false,
-    //            Resizable = false,
-    //            Windowed = true
-    //        };
-
-    //    public override SystemsConfiguration ConfigureSystems(SystemsBuilder builder) =>
-    //        builder
-    //            .Build();
-
-    //    public override IEnumerable<WorldConfiguration> ConfigureWorlds()
-    //    {
-    //        yield return new WorldConfigurationBuilder(10_000)
-    //            .WithComponent<Transform3DComponent>()
-    //            .WithSystem<Transform3DSystem>()
-    //            .Build("Game");
-
-    //    }
-    //}
-
-
     internal struct TextureSample { } // Fake texture just to test AssetManagement
     internal struct SharedAssets : IResource
     {

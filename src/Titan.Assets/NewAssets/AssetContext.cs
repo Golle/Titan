@@ -14,12 +14,11 @@ internal unsafe struct AssetContext
     public AssetState State;
     public Handle<JobApi> JobHandle;
     public Handle AssetHandle;
-    public volatile int ReferenceCount;
+    public int ReferenceCount;
 
     //File loading
     public void* FileBuffer;
-    public FileSystemApi* FileSystemApi;
-    public FileHandle FileHandle;
+    public AssetFileAccessor* FileAccessor;
 
     
     public AssetDescriptor Descriptor;

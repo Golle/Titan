@@ -7,10 +7,12 @@ public enum AssetState
     ReadingFile,
     ReadFileCompleted,
     Loading,
+    LoadingCompleted,
     Loaded,
     /*
      * Add states for resolving dependencies
      */
     UnloadRequested,
-    Unloading
+    Unloading,
+    Error
 }

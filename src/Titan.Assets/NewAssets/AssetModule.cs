@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Titan.Core.Logging;
+using Titan.Core.Threading2;
 using Titan.ECS.App;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
@@ -23,7 +24,6 @@ public unsafe struct AssetsModule : IModule
 {
     public static bool Build(AppBuilder builder)
     {
-
         var assetConfigs = builder.GetConfigurations<AssetsConfiguration>();
         //set up paths where the assets will be loaded from
 #if !SHIPPING
@@ -46,14 +46,18 @@ public unsafe struct AssetsModule : IModule
         // Register the resources needed by this module
         builder
             .AddResource<AssetFileAccessor>()
-            .AddResource<AssetRegistry>();
+            .AddResource<AssetRegistry>()
+            .AddResource<AssetLoader>()
+            ;
 
 
         // Get pointers to the resources
         var allocator = builder.GetResourcePointer<PlatformAllocator>();
+        var jobApi = builder.GetResourcePointer<JobApi>();
         var fileSystemApi = builder.GetResourcePointer<FileSystemApi>();
         var assetRegistry = builder.GetResourcePointer<AssetRegistry>();
         var fileAccessor = builder.GetResourcePointer<AssetFileAccessor>();
+        var loader = builder.GetResourcePointer<AssetLoader>();
 
         if (!assetRegistry->Init(allocator, configs))
         {
@@ -64,6 +68,12 @@ public unsafe struct AssetsModule : IModule
         if (!fileAccessor->Init(allocator, fileSystemApi, configs))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetFileAccessor)}");
+            return false;
+        }
+
+        if (!loader->Init(assetRegistry, jobApi, fileAccessor))
+        {
+            Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetLoader)}");
             return false;
         }
 
