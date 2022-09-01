@@ -64,7 +64,6 @@ internal unsafe struct AssetRegistry : IResource
         return true;
     }
 
-
     public Handle<Asset> GetHandleFromDescriptor(in AssetDescriptor descriptor)
     {
         Debug.Assert(_manifestOffsets[descriptor.ManifestId] != -1, $"Manifest with ID {descriptor.ManifestId} has not been added to the registry");

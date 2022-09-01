@@ -1,6 +1,6 @@
 namespace Titan.Assets.NewAssets;
 
-public enum AssetState
+internal enum AssetState
 {
     Unloaded,
     LoadRequested,

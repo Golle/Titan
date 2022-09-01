@@ -9,7 +9,7 @@ public unsafe struct ResourceCreatorRegistry : IResource
 {
     private TitanArray<ResourceContext> _resourceContexts;
     private PlatformAllocator* _allocator;
-    public bool Init(PlatformAllocator* allocator, uint maxResourceCreators)
+    internal bool Init(PlatformAllocator* allocator, uint maxResourceCreators)
     {
         Debug.Assert(_allocator == null);
         Debug.Assert(_resourceContexts.Length == 0);
@@ -36,9 +36,10 @@ public unsafe struct ResourceCreatorRegistry : IResource
         return true;
     }
 
-    public ResourceContext* Get(AssetDescriptorType type)
+    internal ResourceContext* Get(AssetDescriptorType type)
         => _resourceContexts.GetPointer((uint)type);
-    public void Release()
+
+    internal void Release()
     {
         _allocator->Free(_resourceContexts);
     }

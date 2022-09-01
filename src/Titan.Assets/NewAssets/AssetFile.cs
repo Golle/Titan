@@ -5,7 +5,7 @@ using Titan.FileSystem;
 
 namespace Titan.Assets.NewAssets;
 
-public unsafe struct AssetFile
+internal unsafe struct AssetFile
 {
     private FileHandle _handle;
     private FileSystemApi* _fileSystem;

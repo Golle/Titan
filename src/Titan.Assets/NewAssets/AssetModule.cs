@@ -63,6 +63,9 @@ public unsafe struct AssetsModule : IModule
         var resourceCreatorRegistry = builder.GetResourcePointer<ResourceCreatorRegistry>();
         var loader = builder.GetResourcePointer<AssetLoader>();
 
+
+
+        // Initialize the resources assosicated with this module
         if (!assetRegistry->Init(allocator, configs))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetRegistry)}");
@@ -87,6 +90,8 @@ public unsafe struct AssetsModule : IModule
             return false;
         }
 
+
+        // add the systems
         builder
             .AddSystemToStage<AssetSystem>(Stage.PreUpdate)
             .AddShutdownSystem<AssetModuleTearDown>(RunCriteria.Always);
@@ -100,12 +105,14 @@ public unsafe struct AssetsModule : IModule
         private AssetRegistry* Registry;
         private AssetFileAccessor* Accessor;
         private ResourceCreatorRegistry* Creator;
+        private AssetLoader* Loader;
 
         public static void Init(ref AssetModuleTearDown system, in SystemsInitializer init)
         {
             system.Registry = init.GetResourcePointer<AssetRegistry>();
             system.Accessor = init.GetResourcePointer<AssetFileAccessor>();
             system.Creator = init.GetResourcePointer<ResourceCreatorRegistry>();
+            system.Loader = init.GetResourcePointer<AssetLoader>();
         }
 
         public static void Update(ref AssetModuleTearDown system)
@@ -113,6 +120,7 @@ public unsafe struct AssetsModule : IModule
             system.Registry->Release();
             system.Accessor->Release();
             system.Creator->Release();
+            //system.Loader->Release();
         }
 
         public static bool ShouldRun(in AssetModuleTearDown system)

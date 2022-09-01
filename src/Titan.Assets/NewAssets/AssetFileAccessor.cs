@@ -35,11 +35,8 @@ internal unsafe struct AssetFileAccessor
             }
             Logger.Trace<AssetFileAccessor>($"Opened file {configs[i].TitanPakFile} with size {_files[i].File.GetLength()} bytes");
         }
-
-
         return true;
 
-//NOTE(Jens): if there's an error, close all open file handles.
 Error:
         Release();
         return false;
