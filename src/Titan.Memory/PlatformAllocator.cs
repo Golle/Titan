@@ -12,7 +12,6 @@ public unsafe struct PlatformAllocator : IApi
     private Allocator _allocator;
     internal Allocator* UnderlyingAllocator => MemoryUtils.AsPointer(ref _allocator);
 
-
     public readonly T* Allocate<T>(int count = 1, bool initialize = true) where T : unmanaged
         => Allocate<T>((uint)count, initialize);
 

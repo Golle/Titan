@@ -33,6 +33,8 @@ public struct D3D12RenderModule : IModule
             .AddResource(new RenderContext { Context = context })
             .AddSystemToStage<D3D12RenderSystem>(Stage.PostUpdate, RunCriteria.Always)
             .AddSystemToStage<D3D12ResizeSystem>(Stage.PreUpdate);
+
+        
         return true;
     }
     private struct D3D12RenderSystem : IStructSystem<D3D12RenderSystem>

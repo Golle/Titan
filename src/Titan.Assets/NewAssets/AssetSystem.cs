@@ -1,4 +1,3 @@
-using System.Diagnostics.Tracing;
 using Titan.Core.Logging;
 using Titan.ECS.Events;
 using Titan.ECS.Scheduler;
@@ -8,7 +7,6 @@ namespace Titan.Assets.NewAssets;
 
 internal struct AssetSystem : IStructSystem<AssetSystem>
 {
-    private MutableResource<AssetRegistry> AssetRegistry;
     private MutableResource<AssetLoader> AssetLoader;
 
     private EventsReader<AssetLoadRequested> AssetLoad;

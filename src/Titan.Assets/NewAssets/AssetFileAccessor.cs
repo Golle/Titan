@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.FileSystem;
 using Titan.Memory;
@@ -8,25 +9,22 @@ namespace Titan.Assets.NewAssets;
 
 internal unsafe struct AssetFileAccessor
 {
-    private ManifestToFile* _files;
-    private int _count;
-
+    private TitanArray<ManifestToFile> _files;
     private PlatformAllocator* _allocator;
 
     public bool Init(PlatformAllocator* allocator, FileSystemApi* fileSystem, AssetsConfiguration[] configs)
     {
-        Debug.Assert(_files == null);
-        _files = allocator->Allocate<ManifestToFile>(configs.Length);
-        if (_files == null)
+        Debug.Assert(_files.Length == 0);
+        var files = allocator->Allocate<ManifestToFile>(configs.Length);
+        if (files == null)
         {
             Logger.Error<AssetFileAccessor>($"Failed to allocate a block for {nameof(ManifestToFile)} with size {sizeof(ManifestToFile) * configs.Length} bytes");
             return false;
         }
         _allocator = allocator;
-        _count = configs.Length;
+        _files = new TitanArray<ManifestToFile>(files, configs.Length);
 
-
-        for (var i = 0; i < _count; ++i)
+        for (var i = 0; i < configs.Length; ++i)
         {
             ref var fileRef = ref _files[i];
             fileRef.Id = configs[i].Id;
@@ -40,8 +38,9 @@ internal unsafe struct AssetFileAccessor
 
 
         return true;
+
+//NOTE(Jens): if there's an error, close all open file handles.
 Error:
-        //NOTE(Jens): if there's an error, close all open file handles.
         Release();
         return false;
     }
@@ -58,22 +57,22 @@ Error:
 
     private AssetFile* GetFileForManifest(uint manifestId)
     {
-        for (var i = 0; i < _count; ++i)
+        for (var i = 0; i < _files.Length; ++i)
         {
-            if (_files[i].Id == manifestId)
+            var manifestToFile = _files.GetPointer() + i;
+            if (manifestToFile->Id == manifestId)
             {
-                return &_files[i].File;
+                return &manifestToFile->File;
             }
         }
         return null;
     }
 
-
     public void Release()
     {
-        for (var i = 0; i < _count; ++i)
+        foreach (ref var file in _files)
         {
-            _files[i].File.Close();
+            file.File.Close();
         }
         _allocator->Free(_files);
         this = default;

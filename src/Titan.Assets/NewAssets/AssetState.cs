@@ -14,5 +14,6 @@ public enum AssetState
      */
     UnloadRequested,
     Unloading,
+    UnloadCompleted,
     Error
 }

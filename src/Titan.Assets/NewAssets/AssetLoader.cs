@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
@@ -15,13 +14,15 @@ internal unsafe struct AssetLoader : IResource
     private AssetRegistry* _registry;
     private JobApi* _jobApi;
     private AssetFileAccessor* _fileAccessor;
+    private ResourceCreatorRegistry* _creatorRegistry;
 
     private int _assetsInProgress;
-    public bool Init(AssetRegistry* registry, JobApi* jobApi, AssetFileAccessor* fileAccessor)
+    public bool Init(AssetRegistry* registry, JobApi* jobApi, AssetFileAccessor* fileAccessor, ResourceCreatorRegistry* creatorRegistry)
     {
         Debug.Assert(_jobApi is null);
         Debug.Assert(_fileAccessor is null);
         Debug.Assert(_registry is null);
+        Debug.Assert(_creatorRegistry is null);
 
         if (!BestFitFixedArena.Create(4096, MemoryUtils.MegaBytes(64), out var allocator))
         {
@@ -33,6 +34,7 @@ internal unsafe struct AssetLoader : IResource
         _registry = registry;
         _allocator = allocator;
         _fileAccessor = fileAccessor;
+        _creatorRegistry = creatorRegistry;
         return true;
     }
 
@@ -74,6 +76,7 @@ internal unsafe struct AssetLoader : IResource
         //NOTE(Jens): If there's a lot of assets it might be faster to have an array/queue of "active" items. Could be pointers or indexes (indexes will be half the size)
         foreach (ref var asset in _registry->GetAssets())
         {
+            //NOTE(Jens): could extract each state to functions and for them to not be inlined, might improve performance since most functions wont be called in an update. 
             switch (asset.State)
             {
                 case AssetState.Loaded:
@@ -83,6 +86,7 @@ internal unsafe struct AssetLoader : IResource
                 case AssetState.Unloading:
                     //we don't care about these states
                     break;
+
                 case AssetState.LoadRequested:
                     // start read file
                     asset.State = AssetState.ReadingFile;
@@ -93,8 +97,18 @@ internal unsafe struct AssetLoader : IResource
 
                 case AssetState.ReadFileCompleted:
                     asset.State = AssetState.Loading;
-                    _jobApi->Enqueue(JobItem.Create(ref asset, &AsyncLoadAsset));
+                    asset.ResourceContext = _creatorRegistry->Get(asset.Descriptor.Type);
+                    if (asset.ResourceContext == null)
+                    {
+                        Logger.Error<AssetLoader>($"No loader found for {asset.Descriptor.Type}");
+                        asset.State = AssetState.Error;
+                    }
+                    else
+                    {
+                        _jobApi->Enqueue(JobItem.Create(ref asset, &AsyncLoadAsset));
+                    }
                     break;
+
                 case AssetState.LoadingCompleted:
                     if (asset.FileBuffer != null)
                     {
@@ -103,9 +117,25 @@ internal unsafe struct AssetLoader : IResource
                         asset.FileAccessor = null;
                     }
                     asset.State = AssetState.Loaded;
-
                     _assetsInProgress--;
                     break;
+
+
+                case AssetState.UnloadRequested:
+                    //NOTE(Jens): implement deferred releases (maybe have a counter and a different state?)
+                    _jobApi->Enqueue(JobItem.Create(ref asset, &AsyncUnloadAsset));
+                    asset.State = AssetState.Unloading;
+                    break;
+
+                case AssetState.UnloadCompleted:
+                    asset.State = AssetState.Unloaded;
+                    break;
+                case AssetState.Error:
+                    Logger.Error<AssetLoader>($"Asset {asset.Descriptor.Id} (Manifest: {asset.Descriptor.ManifestId}) is in an Error state. (Not sure how to handle this. retry count?)");
+                    _assetsInProgress--;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }
@@ -129,11 +159,24 @@ internal unsafe struct AssetLoader : IResource
 
     private static void AsyncLoadAsset(ref AssetContext asset)
     {
-        Logger.Trace<AssetLoader>("Loading asset (NYI)");
-        Thread.Sleep(1000);
-        Logger.Trace<AssetLoader>("Loading completed (NYI)");
-        asset.AssetHandle = 122;
-
-        asset.State = AssetState.LoadingCompleted;
+        var dataSize = asset.Descriptor.GetSize();
+        var buffer = new ReadOnlySpan<byte>(asset.FileBuffer, (int)dataSize);
+        asset.AssetHandle = asset.ResourceContext->Create(buffer);
+        if (asset.AssetHandle.IsInvalid())
+        {
+            Logger.Error<AssetLoader>($"An invalid handle was returned for type {asset.Descriptor.Type} with asset ID {asset.Descriptor.Id} (ManifestID: {asset.Descriptor.ManifestId})");
+            asset.State = AssetState.Error;
+        }
+        else
+        {
+            asset.State = AssetState.LoadingCompleted;
+        }
     }
+
+    private static void AsyncUnloadAsset(ref AssetContext asset)
+    {
+        asset.ResourceContext->Destroy(asset.AssetHandle);
+        asset.State = AssetState.UnloadCompleted;
+    }
+
 }

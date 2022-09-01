@@ -51,6 +51,7 @@ internal unsafe struct D3D12Device
     private ID3D12Device4* _device;
 
 
+
     public bool CreateBuffer(ID3D12Heap* heap)
     {
         return true;

@@ -10,7 +10,6 @@ using Titan.ECS.Entities;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
-using Titan.Graphics.D3D12Take2;
 using Titan.Graphics.Modules;
 using Titan.Input;
 using Titan.Input.Modules;
@@ -18,6 +17,7 @@ using Titan.Modules;
 using Titan.Runner;
 using Titan.Sandbox;
 using EntityFilter = Titan.ECS.Entities.EntityFilter;
+using Titan.Graphics;
 
 
 // Folders used during development.
@@ -41,8 +41,9 @@ App.SetupAndRun(builder => builder
     .AddModule<CoreModule>()
     .AddModule<AssetsModule>()
     .AddModule<WindowModule>()
-    .AddModule<D3D12RenderModule1>()
+    .AddModule<Graphics3DModule>()
     .AddModule<InputModule>()
+    
     .UseRunner<WindowRunner>()
     //.UseRunner<HeadlessRunner>()
 

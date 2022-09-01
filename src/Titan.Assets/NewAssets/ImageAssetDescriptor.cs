@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,7 +7,10 @@ namespace Titan.Assets.NewAssets;
 public enum AssetDescriptorType
 {
     Texture,
-    Model
+    Model,
+
+
+    Count // Must be the last value
 }
 
 public interface IManifestDescriptor

@@ -1,4 +1,8 @@
-using System.Runtime.CompilerServices;
+using System;
+using System.Diagnostics;
+using System.Threading;
+using Titan.Assets.NewAssets;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.App;
@@ -7,12 +11,14 @@ using Titan.ECS.Systems;
 using Titan.Graphics.D3D12Take2.Stats;
 using Titan.Graphics.D3D12Take2.Systems;
 using Titan.Graphics.Modules;
+using Titan.Graphics.NewRender;
 using Titan.Windows;
 using Titan.Windows.D3D;
 using Titan.Windows.D3D12;
 using Titan.Windows.DXGI;
 
 namespace Titan.Graphics.D3D12Take2;
+
 
 public unsafe struct D3D12RenderModule1 : IModule
 {
@@ -27,7 +33,7 @@ public unsafe struct D3D12RenderModule1 : IModule
         {
             EnableDebugLayer();
         }
-        
+
 
         DXGIFactory factory = default;
         DXGIAdapter adapter = default;
@@ -106,6 +112,8 @@ public unsafe struct D3D12RenderModule1 : IModule
             ;
 
 
+        
+
 
         builder
             .AddModule<D3D12DebugModule>();
@@ -155,10 +163,6 @@ Error:
 
 public unsafe struct TestHeap
 {
-    private static ulong KB(uint count) => 1024UL * count;
-    private static ulong MB(uint count) => 1024UL * KB(count);
-    private static ulong GB(uint count) => 1024UL * MB(count);
-
     public static void TestThis(ID3D12Device4* device)
     {
         ComPtr<ID3D12Heap> textureHeap = default;
@@ -175,7 +179,7 @@ public unsafe struct TestHeap
                     Type = D3D12_HEAP_TYPE.D3D12_HEAP_TYPE_DEFAULT, // this is video memory
                     VisibleNodeMask = 0
                 },
-                SizeInBytes = GB(1)
+                SizeInBytes = MemoryUtils.GigaBytes(1u)
             };
             var hr = device->CreateHeap(&desc, typeof(ID3D12Heap).GUID, (void**)textureHeap.GetAddressOf());
             if (Common.FAILED(hr))
@@ -199,7 +203,7 @@ public unsafe struct TestHeap
                     Type = D3D12_HEAP_TYPE.D3D12_HEAP_TYPE_UPLOAD,
                     VisibleNodeMask = 0
                 },
-                SizeInBytes = MB(128)
+                SizeInBytes = MemoryUtils.MegaBytes(128u)
             };
             var hr = device->CreateHeap(&desc, typeof(ID3D12Heap).GUID, (void**)uploadHeap.GetAddressOf());
             if (Common.FAILED(hr))
@@ -210,7 +214,6 @@ public unsafe struct TestHeap
         }
 
         ComPtr<ID3D12Resource> textureResource = default;
-
         {
             var resourceDesc = new D3D12_RESOURCE_DESC
             {
@@ -235,8 +238,6 @@ public unsafe struct TestHeap
                 Logger.Error<TestHeap>($"{nameof(ID3D12Device4.CreatePlacedResource)} failed with HRESULT {hr}");
                 return;
             }
-
-
         }
 
         ComPtr<ID3D12Resource> uploadResource = default;

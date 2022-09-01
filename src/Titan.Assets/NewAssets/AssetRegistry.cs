@@ -14,16 +14,14 @@ internal unsafe struct AssetRegistry : IResource
 {
     //NOTE(Jens): the handle offset is to allow 0 indexed arrays. Handle<T>.IsInvalid is checking for 0. We could also leave index 0 and have a 1 indexed array. That would remove the addition/subtraction needed to access the assets.
     private const int HandleOffset = 70000;
-    private int* _manifestOffsets;
-    private AssetContext* _assets;
-    private int _size;
-    private uint _highestManifestId;
+    private TitanArray<int> _manifestOffsets;
+    private TitanArray<AssetContext> _assets;
     private PlatformAllocator* _allocator;
 
     public bool Init(PlatformAllocator* allocator, AssetsConfiguration[] configs)
     {
-        Debug.Assert(_manifestOffsets == null);
-        Debug.Assert(_assets == null);
+        Debug.Assert(_manifestOffsets.Length == 0);
+        Debug.Assert(_assets.Length == 0);
 
         var assetCount = configs.Sum(c => c.AssetDescriptors.Length);
         var highestManifestId = configs.Max(c => c.Id);
@@ -60,10 +58,8 @@ internal unsafe struct AssetRegistry : IResource
             offset += config.AssetDescriptors.Length;
         }
 
-        _size = assetCount;
-        _manifestOffsets = manifestOffsets;
-        _assets = assets;
-        _highestManifestId = highestManifestId;
+        _assets = new TitanArray<AssetContext>(assets, assetCount);
+        _manifestOffsets = new TitanArray<int>(manifestOffsets, highestManifestId);
         _allocator = allocator;
         return true;
     }
@@ -72,7 +68,7 @@ internal unsafe struct AssetRegistry : IResource
     public Handle<Asset> GetHandleFromDescriptor(in AssetDescriptor descriptor)
     {
         Debug.Assert(_manifestOffsets[descriptor.ManifestId] != -1, $"Manifest with ID {descriptor.ManifestId} has not been added to the registry");
-        Debug.Assert(descriptor.ManifestId <= _highestManifestId, $"Manifest with ID {descriptor.ManifestId} is out of range. Did you register the manifest?");
+        Debug.Assert(descriptor.ManifestId <= _manifestOffsets.Length, $"Manifest with ID {descriptor.ManifestId} is out of range. Did you register the manifest?");
 
         return (int)(_manifestOffsets[descriptor.ManifestId] + descriptor.Id) + HandleOffset;
     }
@@ -88,11 +84,11 @@ internal unsafe struct AssetRegistry : IResource
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Span<AssetContext> GetAssets() => new(_assets, _size);
+    public Span<AssetContext> GetAssets() => _assets.AsSpan();
     public ref AssetContext Get(in Handle<Asset> handle)
     {
         var index = handle - HandleOffset;
-        Debug.Assert(index >= 0 && index < _size, "Out of bounds");
+        Debug.Assert(index >= 0 && index < _assets.Length, "Out of bounds");
         return ref _assets[index];
     }
 }
