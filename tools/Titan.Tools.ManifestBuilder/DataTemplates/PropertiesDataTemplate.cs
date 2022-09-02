@@ -8,7 +8,6 @@ using Avalonia.Controls.Templates;
 using Avalonia.Media;
 using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;
 using Titan.Tools.ManifestBuilder.DataTemplates.Descriptors;
-using Titan.Tools.ManifestBuilder.ViewModels.Manifests;
 
 namespace Titan.Tools.ManifestBuilder.DataTemplates;
 
@@ -108,6 +107,16 @@ public class PropertiesDataTemplate : IDataTemplate
                         TypeName = propertyInfo.PropertyType.Name
                     };
                     break;
+                case EditorFileAttribute file:
+                    yield return new BrowseFileEditorDescriptor
+                    {
+                        Name = name,
+                        PropertyName = propertyName,
+                        Accessor = accessor,
+                        Order = order, 
+                        Watermark = file.Watermark
+                    };
+                    break;
             }
             
         }
@@ -129,5 +138,5 @@ public class PropertiesDataTemplate : IDataTemplate
     }
 
     public bool Match(object? data)
-        => data?.GetType().IsAssignableTo(typeof(IManifestTreeNode)) ?? false;
+        => data?.GetType().IsAssignableTo(typeof(IPropertyEditor)) ?? false;
 }

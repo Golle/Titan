@@ -63,7 +63,7 @@ public class CookAssetsViewModel : ViewModelBase
             }
 
             //NOTE(Jens): This should be downloaded and set by the packager
-            const string libPath = @"F:\Git\Titan\tmp";
+            const string libPath = @"d:\Git\Titan\tmp";
             var args = $"run --project {GlobalConfiguration.PackagerProjectPath} -- package {string.Join(' ', manifests.Select(m => $"-m {m}"))} -l \"{libPath}\" -o \"{_packagePath}\" -g \"{_generatedPath}\" {(_namespace != null ? $"-n {_namespace}" : string.Empty)}";
             var dialog = new ExternalProcessWindow
             {

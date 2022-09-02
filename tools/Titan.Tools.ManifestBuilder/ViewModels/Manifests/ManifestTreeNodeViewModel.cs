@@ -3,12 +3,12 @@ using System.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using Titan.Tools.Core.Manifests;
+using Titan.Tools.ManifestBuilder.DataTemplates;
 using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;
-using Titan.Tools.ManifestBuilder.Models;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels.Manifests;
 
-public class ManifestTreeNodeViewModel<TItem> : ViewModelBase, IManifestTreeNode where TItem : ManifestItem
+public class ManifestTreeNodeViewModel<TItem> : ViewModelBase, IManifestTreeNode, IPropertyEditor where TItem : ManifestItem
 {
     public TItem Item => _item;
     protected TItem _item;
@@ -35,7 +35,7 @@ public class ManifestTreeNodeViewModel<TItem> : ViewModelBase, IManifestTreeNode
     }
 }
 
-public class ManifestTreeNodeViewModel : ViewModelBase, IManifestTreeNode
+public class ManifestTreeNodeViewModel : ViewModelBase, IManifestTreeNode, IPropertyEditor
 {
     [EditorReadOnly]
     [Order(int.MaxValue)]

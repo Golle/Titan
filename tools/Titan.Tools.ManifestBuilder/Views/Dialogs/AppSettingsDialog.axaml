@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
+        xmlns:dataTemplates="clr-namespace:Titan.Tools.ManifestBuilder.DataTemplates"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
+        x:Class="Titan.Tools.ManifestBuilder.Views.Dialogs.AppSettingsDialog"
+        Title="AppSettings"
+        Width="1000" Height="500"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True">
+
+  <Design.DataContext>
+    <viewModels:SettingsDialogViewModel/>
+  </Design.DataContext>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.8" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <DockPanel LastChildFill="True" Margin="10">
+      <TextBlock DockPanel.Dock="Top" FontSize="20" Height="40">Manifest Tool Settings</TextBlock>
+        <ScrollViewer>
+            <ContentControl Content="{Binding Settings}">
+                <ContentControl.DataTemplates>
+                    <dataTemplates:PropertiesDataTemplate/>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+        </ScrollViewer>
+    </DockPanel>
+  </Panel>
+</Window>

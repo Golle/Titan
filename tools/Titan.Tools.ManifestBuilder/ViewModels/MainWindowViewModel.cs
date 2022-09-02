@@ -17,6 +17,7 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand ExitApplication { get; }
     public ICommand SaveAll { get; }
     public ICommand OpenCookAssetsDialog { get; }
+    public ICommand OpenSettingsDialog { get; }
     public MainWindowViewModel(IDialogService? dialogService)
     {
         dialogService ??= Registry.GetRequiredService<IDialogService>();
@@ -55,6 +56,12 @@ public class MainWindowViewModel : ViewModelBase
         OpenCookAssetsDialog = ReactiveCommand.CreateFromTask(async () =>
         {
             var dialog = new CookAssetsDialog();
+            await dialog.ShowDialog(App.MainWindow);
+        });
+
+        OpenSettingsDialog = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var dialog = new AppSettingsDialog();
             await dialog.ShowDialog(App.MainWindow);
         });
     }

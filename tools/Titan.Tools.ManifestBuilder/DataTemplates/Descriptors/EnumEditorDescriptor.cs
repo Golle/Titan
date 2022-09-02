@@ -10,9 +10,8 @@ internal class EnumEditorDescriptor : EditorPropertyDescriptor
 {
     public required Array Values { get; init; }
     public required string TypeName { get; init; }
-    public override IControl Build()
-    {
-        return new StackPanel
+    public override IControl Build() =>
+        new StackPanel
         {
             Spacing = 10,
             Children =
@@ -26,7 +25,4 @@ internal class EnumEditorDescriptor : EditorPropertyDescriptor
                 }
             }
         };
-
-
-    }
 }

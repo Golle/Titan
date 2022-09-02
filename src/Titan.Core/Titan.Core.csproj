@@ -12,7 +12,4 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
     <DefineConstants></DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="IO\NewFileSystem\" />
-  </ItemGroup>
 </Project>

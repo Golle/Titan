@@ -7,3 +7,9 @@ public class EditorStringAttribute : EditorNodeAttribute
 {
     public string? Watermark { get; set; }
 }
+
+[AttributeUsage(AttributeTargets.Property)]
+public class EditorFileAttribute : EditorNodeAttribute
+{
+    public string? Watermark { get; set; }
+}
