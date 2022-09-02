@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
+             xmlns:local="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels.Manifests"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Titan.Tools.ManifestBuilder.Views.PreviewView">
+
+  <Design.DataContext>
+    <viewModels:PreviewViewModel/>
+  </Design.DataContext>
+
+  <UserControl.DataTemplates>
+    <DataTemplate DataType="{x:Type local:ShaderNodeViewModel}">
+      <ScrollViewer>
+        <TextBox IsReadOnly="True" Padding="10" Background="#11ffffff" BorderThickness="1" CornerRadius="2" BorderBrush="#888" Text="{Binding $parent[UserControl].DataContext.FileContents}"/>
+      </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:IManifestTreeNode}">
+      <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">No supported preview for the selected node</TextBlock>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <Border Padding="10">
+    <Panel>
+      <TextBlock IsVisible="{Binding Node, Converter={x:Static ObjectConverters.IsNull}}" VerticalAlignment="Center" HorizontalAlignment="Center">Select a node to get started</TextBlock>
+      <ScrollViewer IsVisible="{Binding Node, Converter={x:Static ObjectConverters.IsNotNull}}" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ContentControl Content="{Binding Node}"/>
+      </ScrollViewer>
+    </Panel>
+  </Border>
+</UserControl>

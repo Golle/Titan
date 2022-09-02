@@ -19,5 +19,37 @@
     }
   ],
   "models": [],
-  "materials": []
+  "materials": [],
+  "shaders": [
+    {
+      "path": "shaders\\sample_01_computeshader.hlsl",
+      "shaderModel": "CS_6_7",
+      "entryPoint": "main",
+      "name": "sample_01_computeshader"
+    },
+    {
+      "path": "builtin\\shaders\\debug_line_ps.hlsl",
+      "shaderModel": "PS_6_7",
+      "entryPoint": "main",
+      "name": "debug_line_ps"
+    },
+    {
+      "path": "builtin\\shaders\\debug_line_vs.hlsl",
+      "shaderModel": "VS_6_7",
+      "entryPoint": "main",
+      "name": "debug_line_vs"
+    },
+    {
+      "path": "builtin\\shaders\\fullscreen_ps.hlsl",
+      "shaderModel": "PS_6_7",
+      "entryPoint": "main",
+      "name": "fullscreen_ps"
+    },
+    {
+      "path": "builtin\\shaders\\fullscreen_vs.hlsl",
+      "shaderModel": "VS_6_7",
+      "entryPoint": "main",
+      "name": "fullscreen_vs"
+    }
+  ]
 }

@@ -8,7 +8,7 @@ public enum AssetDescriptorType
 {
     Texture,
     Model,
-
+    Shader,
 
     Count // Must be the last value
 }
@@ -30,6 +30,7 @@ public unsafe struct AssetDescriptor
     private AssetDescriptorUnion _union;
     public ref ImageAssetDescriptor Image => ref ((AssetDescriptorUnion*)Unsafe.AsPointer(ref _union))->ImageAssetDescriptor;
     public ref ModelAssetDescriptor Model => ref ((AssetDescriptorUnion*)Unsafe.AsPointer(ref _union))->ModelAssetDescriptor;
+    public ref ShaderAssetDescriptor Shader => ref ((AssetDescriptorUnion*)Unsafe.AsPointer(ref _union))->ShaderAssetDescriptor;
 
     [StructLayout(LayoutKind.Explicit)]
     private struct AssetDescriptorUnion
@@ -38,6 +39,8 @@ public unsafe struct AssetDescriptor
         public ImageAssetDescriptor ImageAssetDescriptor;
         [FieldOffset(0)]
         public ModelAssetDescriptor ModelAssetDescriptor;
+        [FieldOffset(0)]
+        public ShaderAssetDescriptor ShaderAssetDescriptor;
     }
 
     public ulong GetSize() => Reference.Size;
@@ -56,4 +59,9 @@ public struct ModelAssetDescriptor
     public uint Vertices;
     public uint Indices;
     public byte IndexSize;
+}
+
+public struct ShaderAssetDescriptor
+{
+
 }

@@ -1,6 +1,7 @@
 using System.Text;
 using Titan.Assets.NewAssets;
 using Titan.Core.Logging;
+using Titan.Shaders;
 using Titan.Tools.Core.CommandLine;
 using Titan.Tools.Core.Common;
 using Titan.Tools.Core.Images;
@@ -56,6 +57,14 @@ try
                 Validate = s => !string.IsNullOrWhiteSpace(s),
                 Description = "The namespace for the generated C# file."
             })
+            .WithOption(new Option<PipelineContext>("libpath")
+            {
+                Alias = "l",
+                Description = "The path to the external libraries used for packaging, for example DXC(DirectX Shader Compiler)",
+                RequiresArguments = true,
+                Validate = s => !string.IsNullOrWhiteSpace(s),
+                Callback = (context, path) => context with { LibraryPath = path }
+            })
             .OnCommand(RunPipeline)
         )
         .Execute(args);
@@ -93,8 +102,14 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
         return context with { Failed = true, Reason = "Validation failed." };
     }
 
+    if (context.LibraryPath != null)
+    {
+        Logger.Info($"Using library path {context.LibraryPath} for shader compilation.");
+        ShaderCompiler.SetShaderCompilerDllFolder(context.LibraryPath);
+    }
+
     var outputPath = context.OutputPath!;
-    //NOTE(Jens): this can be separated into different threads later (if needed). Just the C# code gen that should be single threaded.
+    //NOTE(Jens): this can be separated into different threads later (if needed). 
 
     Logger.Info($"Manifests: {context.ManifestPaths.Length}");
 
@@ -143,6 +158,20 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
             foreach (var material in manifest.Materials)
             {
                 Logger.Warning($"Exporting material {material.Name}. (material exporting has not been implemented yet.)");
+            }
+        }
+        // export shaders
+        {
+            foreach (var shader in manifest.Shaders)
+            {
+                var path = Path.Combine(basePath, shader.Path);
+                var descriptor = CompileShader(path, shader, packageExporter);
+                if (descriptor == null)
+                {
+                    return context with { Failed = true, Reason = $"Failed to compile the shader from path {path}" };
+                }
+                assetDescriptors.Add((shader.Name, descriptor.Value));
+                Logger.Info($"Shader {shader.Name} completed");
             }
         }
         var outputFile = Path.Combine(outputPath, titanPakFilename);
@@ -206,6 +235,10 @@ static bool ValidateContext(PipelineContext context)
         Logger.Error($"{nameof(PipelineContext.ManifestPaths)} has null or empty paths.");
         result = false;
     }
+    if (context.LibraryPath is null)
+    {
+        Logger.Warning("No library path has been set, compilation might not work.");
+    }
     return result;
 }
 
@@ -235,6 +268,25 @@ static AssetDescriptor? ExportImage(string path, ImageReader imageReader, Packag
             Width = image.Width,
             Stride = image.Stride
         }
+    };
+}
+
+static AssetDescriptor? CompileShader(string path, ShaderItem shader, PackageStream packageStream)
+{
+    var result = ShaderCompiler.Compile(path, shader.EntryPoint, shader.ShaderModel);
+    if (!result.Succeeded)
+    {
+        Logger.Error($"Failed to compile the shader at path {path}, with error message: {result.Error}");
+        return null;
+    }
+    var offset = packageStream.Offset;
+    var byteCode = result.GetByteCode();
+    packageStream.Write(byteCode);
+    return new AssetDescriptor
+    {
+        Reference = { Offset = offset, Size = (ulong)byteCode.Length },
+        Type = AssetDescriptorType.Shader,
+        Shader = default
     };
 }
 
@@ -301,6 +353,7 @@ static string GenerateCSharpIndex(uint manifestId, string packageFile, string ma
 
     {
         //NOTE(Jens): add the Textures (and other assets?)
+        //NOTE(Jens): This needs to be refactored and split up into components now, wont be nice with the different types of assets.
         builder
             .AppendLine("\t\tpublic static class Textures")
             .AppendLine("\t\t{");
@@ -335,6 +388,7 @@ static string GenerateCSharpIndex(uint manifestId, string packageFile, string ma
         descriptor switch
         {
             { Type: AssetDescriptorType.Texture } => $"new() {{ Id = {id}, ManifestId = {manifestId}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }}",
+            { Type: AssetDescriptorType.Shader } => $"new() {{ Id = {id}, ManifestId = {manifestId}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Shader = new() }}",
             _ => throw new NotImplementedException($"Type {descriptor.Type} has not been implemented yet.")
         };
 }

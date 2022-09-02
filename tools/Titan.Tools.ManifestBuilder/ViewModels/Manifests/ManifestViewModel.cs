@@ -35,6 +35,7 @@ public class ManifestViewModel : ViewModelBase
 
     private readonly ManifestTreeNodeViewModel _textures;
     private readonly ManifestTreeNodeViewModel _models;
+    private readonly ManifestTreeNodeViewModel _shaders;
     private readonly ManifestTreeNodeViewModel _materials;
 
     public Manifest Manifest { get; }
@@ -44,9 +45,10 @@ public class ManifestViewModel : ViewModelBase
 
         _textures = new ManifestTreeNodeViewModel(nameof(manifest.Textures), manifest.Textures.Select(m => CheckForDirty(new TextureNodeViewModel(m))));
         _models = new ManifestTreeNodeViewModel(nameof(manifest.Models), manifest.Models.Select(m => CheckForDirty(new ModelNodeViewModel(m))));
+        _shaders = new ManifestTreeNodeViewModel(nameof(manifest.Shaders), manifest.Shaders.Select(m => CheckForDirty(new ShaderNodeViewModel(m))));
         _materials = new ManifestTreeNodeViewModel(nameof(manifest.Materials), manifest.Materials.Select(m => CheckForDirty(new MaterialNodeViewModel(m))));
 
-        Nodes = new IManifestTreeNode[] { _textures, _models, _materials };
+        Nodes = new IManifestTreeNode[] { _textures, _models, _shaders, _materials };
 
         _selectedNodeChanged = ReactiveCommand.CreateFromTask<IManifestTreeNode>(node => messenger.SendAsync(new ManifestNodeSelected(node)));
 
@@ -88,6 +90,10 @@ public class ManifestViewModel : ViewModelBase
             case ModelItem model:
                 Manifest.Models.Add(model);
                 _models.Children.Add(new ModelNodeViewModel(model));
+                break;
+            case ShaderItem shader:
+                Manifest.Shaders.Add(shader);
+                _shaders.Children.Add(new ShaderNodeViewModel(shader));
                 break;
             case MaterialItem material:
                 Manifest.Materials.Add(material);

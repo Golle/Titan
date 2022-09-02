@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Titan.Core\Titan.Core.csproj" />
+    <ProjectReference Include="..\..\src\Titan.Shaders\Titan.Shaders.csproj" />
     <ProjectReference Include="..\..\src\Titan.Windows\Titan.Windows.csproj" />
   </ItemGroup>
 

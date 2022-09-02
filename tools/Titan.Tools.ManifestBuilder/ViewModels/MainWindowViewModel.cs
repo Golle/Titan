@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
@@ -13,6 +12,7 @@ public class MainWindowViewModel : ViewModelBase
     public ContentViewModel Content { get; }
     public ProjectExplorerViewModel Project { get; }
     public NodePropertiesViewModel Properties { get; }
+    public PreviewViewModel Preview { get; }
 
     public ICommand ExitApplication { get; }
     public ICommand SaveAll { get; }
@@ -23,6 +23,7 @@ public class MainWindowViewModel : ViewModelBase
         Content = new ContentViewModel();
         Project = new ProjectExplorerViewModel();
         Properties = new NodePropertiesViewModel();
+        Preview = new PreviewViewModel();
 
         SaveAll = ReactiveCommand.CreateFromTask(async () =>
         {

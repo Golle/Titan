@@ -14,5 +14,6 @@
       "name": null
     }
   ],
-  "materials": []
+  "materials": [],
+  "shaders": []
 }
