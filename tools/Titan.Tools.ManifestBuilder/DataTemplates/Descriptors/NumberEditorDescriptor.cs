@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Data;
+using Titan.Tools.ManifestBuilder.DataTemplates.Controls;
 
 namespace Titan.Tools.ManifestBuilder.DataTemplates.Descriptors;
 
@@ -16,7 +17,7 @@ internal class NumberEditorDescriptor : EditorPropertyDescriptor
             (_, int.MaxValue) => $"Number greater than {Min}",
             _ => $"Number between {Min} and {Max}"
         };
-        return new StackPanel
+        var panel = new StackPanel
         {
             Spacing = 10,
             Children =
@@ -29,5 +30,10 @@ internal class NumberEditorDescriptor : EditorPropertyDescriptor
                 }
             }
         };
+        if (Description != null)
+        {
+            panel.Children.Insert(1, new DescriptionTextBlock(Description));
+        }
+        return panel;
     }
 }

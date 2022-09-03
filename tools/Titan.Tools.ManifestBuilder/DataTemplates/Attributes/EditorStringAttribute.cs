@@ -12,4 +12,5 @@ public class EditorStringAttribute : EditorNodeAttribute
 public class EditorFileAttribute : EditorNodeAttribute
 {
     public string? Watermark { get; set; }
+    public string? ButtonText { get; set; }
 }

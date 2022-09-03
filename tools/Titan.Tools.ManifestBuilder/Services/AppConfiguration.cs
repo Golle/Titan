@@ -38,6 +38,8 @@ public record struct WindowSize(double Width, double Height, int X, int Y)
 
 public record Settings(WindowSize WindowSize, PanelSize ManifestPanelSize, PanelSize PropertiesPanelSize, PanelSize ContentPanelSize, CookAssetSettings CookAssetSettings, RecentProjects RecentProjects)
 {
+    public string? EditorPath { get; init; }
+    public string? EditorArgumentsFormat { get; init; }
     public static Settings Default() => new(default, default, default, default, default, new RecentProjects());
 }
 

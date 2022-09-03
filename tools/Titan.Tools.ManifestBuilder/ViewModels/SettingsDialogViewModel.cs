@@ -1,5 +1,7 @@
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Controls;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.DataTemplates;
 using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;
@@ -9,36 +11,46 @@ namespace Titan.Tools.ManifestBuilder.ViewModels;
 
 public class SettingsViewModel : ViewModelBase, IPropertyEditor
 {
-    private readonly Settings _settings;
-
     public SettingsViewModel(Settings settings)
     {
-        _settings = settings;
+        Path = settings.EditorPath;
+        ArgumentsFormat = settings.EditorArgumentsFormat;
     }
 
-    [EditorString]
-    public string? Test { get; set; }
-
-    [EditorFile(Watermark = "Path to your editor")]
+    [EditorFile(Watermark = "Editor path", ButtonText = "Browse")]
+    [DisplayName("Editor executable path")]
+    [Description("The absolute path to your editor of choice, for example Visual Studio Code")]
     public string? Path { get; set; }
+
+    [EditorString(Watermark = "Editor arguments")]
+    [DisplayName("Editor arguments format")]
+    [Description("Use %d for folder and %f for the current file.")]
+    public string? ArgumentsFormat { get; set; }
 }
 
 public class SettingsDialogViewModel : ViewModelBase
 {
-
     public SettingsViewModel Settings { get; }
     public ICommand SaveChanges { get; }
-    public SettingsDialogViewModel(IAppSettings? appSettings)
+    public SettingsDialogViewModel(Window window, IAppSettings? appSettings = null)
     {
         appSettings ??= Registry.GetRequiredService<IAppSettings>();
 
         Settings = new SettingsViewModel(appSettings.GetSettings());
-        SaveChanges = ReactiveCommand.CreateFromTask(() => Task.Delay(1000));
+        SaveChanges = ReactiveCommand.Create(() =>
+        {
+            var settings = appSettings.GetSettings();
+            appSettings.Save(settings with
+            {
+                EditorArgumentsFormat = Settings.ArgumentsFormat,
+                EditorPath = Settings.Path
+            });
+            window.Close();
+        });
     }
 
     public SettingsDialogViewModel()
-    : this(null)
+    : this(null!)
     {
-
     }
 }

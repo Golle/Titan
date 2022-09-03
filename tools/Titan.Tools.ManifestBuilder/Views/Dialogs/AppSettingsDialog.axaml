@@ -4,10 +4,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
         xmlns:dataTemplates="clr-namespace:Titan.Tools.ManifestBuilder.DataTemplates"
-        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
         x:Class="Titan.Tools.ManifestBuilder.Views.Dialogs.AppSettingsDialog"
         Title="AppSettings"
-        Width="1000" Height="500"
+        Width="600" Height="450"
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
@@ -25,13 +25,19 @@
     </ExperimentalAcrylicBorder>
     <DockPanel LastChildFill="True" Margin="10">
       <TextBlock DockPanel.Dock="Top" FontSize="20" Height="40">Manifest Tool Settings</TextBlock>
-        <ScrollViewer>
-            <ContentControl Content="{Binding Settings}">
-                <ContentControl.DataTemplates>
-                    <dataTemplates:PropertiesDataTemplate/>
-                </ContentControl.DataTemplates>
-            </ContentControl>
-        </ScrollViewer>
+
+      <StackPanel DockPanel.Dock="Bottom"  Spacing="10">
+        <Separator Height="1" Background="{StaticResource SeparatorLight}"></Separator>
+        <Button HorizontalAlignment="Right" Command="{Binding SaveChanges}">Save changes</Button>
+      </StackPanel>
+
+      <ScrollViewer>
+        <ContentControl Content="{Binding Settings}">
+          <ContentControl.DataTemplates>
+            <dataTemplates:PropertiesDataTemplate/>
+          </ContentControl.DataTemplates>
+        </ContentControl>
+      </ScrollViewer>
     </DockPanel>
   </Panel>
 </Window>

@@ -9,7 +9,7 @@ public partial class AppSettingsDialog : Window
     public AppSettingsDialog()
     {
         InitializeComponent();
-        DataContext = new SettingsDialogViewModel();
+        DataContext = new SettingsDialogViewModel(this);
     }   
 
     private void InitializeComponent()
