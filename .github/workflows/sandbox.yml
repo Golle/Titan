@@ -19,9 +19,7 @@ jobs:
       run: dotnet build tools/Titan.Tools.Packager -c Shipping
 
     - name: Package assets
-      run: |
-        dotnet run --project tools/Titan.Tools.Packager -c Shipping -- package -m samples\Titan.Sandbox\assets\anothermanifest.tmanifest -o release/ -g samples\Titan.Sandbox -n Titan.Sandbox
-        dotnet run --project tools/Titan.Tools.Packager -c Shipping -- package -m samples\Titan.Sandbox\assets\sample_01.tmanifest -o release/ -g samples\Titan.Sandbox -n Titan.Sandbox
+      run: dotnet run --project tools/Titan.Tools.Packager -c Shipping -- package -m samples\Titan.Sandbox\assets\sample_01.tmanifest -m samples\Titan.Sandbox\assets\anothermanifest.tmanifest -o release/ -g samples\Titan.Sandbox -n Titan.Sandbox
 
     # this step should be replaced with a proper build tool that will package the build
     - name: Package game

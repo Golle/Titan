@@ -3,6 +3,7 @@ Titan, Game Engine in .NET 7 C# 11 and DirectX 12
 
 ### Build status
 [![Titan](https://github.com/Golle/Titan/actions/workflows/titan.yml/badge.svg)](https://github.com/Golle/Titan/actions/workflows/titan.yml)
+[![Titan.Sandbox](https://github.com/Golle/Titan/actions/workflows/sandbox.yml/badge.svg)](https://github.com/Golle/Titan/actions/workflows/sandbox.yml)
 
 
 # Work in progress
