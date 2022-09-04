@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Titan.Tools.ManifestBuilder.Common;
+using Titan.Tools.Core.Common;
 
 namespace Titan.Tools.ManifestBuilder.Services;
 

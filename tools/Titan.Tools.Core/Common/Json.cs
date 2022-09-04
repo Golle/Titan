@@ -17,6 +17,7 @@ public static class Json
 
     public static T? Deserialize<T>(ReadOnlySpan<byte> bytes) => JsonSerializer.Deserialize<T>(bytes, Options);
     public static ValueTask<T?> DeserializeAsync<T>(Stream utf8Stream) => JsonSerializer.DeserializeAsync<T>(utf8Stream, Options);
+    public static ValueTask<T?> DeserializeAsync<T>(Stream utf8Stream, JsonSerializerOptions options) => JsonSerializer.DeserializeAsync<T>(utf8Stream, options);
     public static Task SerializeAsync<T>(Stream stream, in T value, bool writeIndented = false) => JsonSerializer.SerializeAsync(stream, value, writeIndented ? OptionsPrettyPrint : Options);
     public static string Serialize<T>(in T value) => JsonSerializer.Serialize(value, Options);
     public static byte[] SerializeToUtf8<T>(in T value, bool writeIndented)

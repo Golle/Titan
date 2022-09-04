@@ -4,7 +4,6 @@ using System.Windows.Input;
 using Avalonia.Controls;
 using ReactiveUI;
 using Titan.Tools.Core.Manifests;
-using Titan.Tools.ManifestBuilder.Models;
 using Titan.Tools.ManifestBuilder.Services;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels.Manifests;

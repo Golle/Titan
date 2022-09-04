@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Data;
-using Avalonia.Layout;
 using ReactiveUI;
 using Titan.Tools.ManifestBuilder.DataTemplates.Controls;
 

@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.IO;
-using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;

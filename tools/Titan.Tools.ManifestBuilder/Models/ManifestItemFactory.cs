@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Titan.Shaders.Windows;
+using Titan.Tools.Core.Common;
 using Titan.Tools.Core.Manifests;
-using Titan.Tools.ManifestBuilder.Common;
 
 namespace Titan.Tools.ManifestBuilder.Models;
 

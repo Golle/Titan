@@ -1,4 +1,4 @@
-namespace Titan.Tools.ManifestBuilder.Common;
+namespace Titan.Tools.Core.Common;
 
 
 public record struct Result(string? Error)

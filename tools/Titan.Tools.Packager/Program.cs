@@ -7,6 +7,7 @@ using Titan.Tools.Core.Common;
 using Titan.Tools.Core.Images;
 using Titan.Tools.Core.Manifests;
 using Titan.Tools.Packager;
+using Titan.Tools.Packager.PreReqs;
 
 Logger.Start<ConsoleLogger>();
 
@@ -100,6 +101,17 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
     if (!ValidateContext(context))
     {
         return context with { Failed = true, Reason = "Validation failed." };
+    }
+
+    if (context.LibraryPath == null)
+    {
+        Logger.Info("No library path specified, will download DXC.");
+        var result = await DownloadDXCCompiler.Download();
+        if (result.Failed)
+        {
+            return context with { Failed = true, Reason = result.Error };
+        }
+        context = context with { LibraryPath = result.Data };
     }
 
     if (context.LibraryPath != null)
@@ -234,10 +246,6 @@ static bool ValidateContext(PipelineContext context)
     {
         Logger.Error($"{nameof(PipelineContext.ManifestPaths)} has null or empty paths.");
         result = false;
-    }
-    if (context.LibraryPath is null)
-    {
-        Logger.Warning("No library path has been set, compilation might not work.");
     }
     return result;
 }

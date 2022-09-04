@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -63,8 +62,7 @@ public class CookAssetsViewModel : ViewModelBase
             }
 
             //NOTE(Jens): This should be downloaded and set by the packager
-            const string libPath = @"d:\Git\Titan\tmp";
-            var args = $"run --project {GlobalConfiguration.PackagerProjectPath} -- package {string.Join(' ', manifests.Select(m => $"-m {m}"))} -l \"{libPath}\" -o \"{_packagePath}\" -g \"{_generatedPath}\" {(_namespace != null ? $"-n {_namespace}" : string.Empty)}";
+            var args = $"run --project {GlobalConfiguration.PackagerProjectPath} -- package {string.Join(' ', manifests.Select(m => $"-m {m}"))} -o \"{_packagePath}\" -g \"{_generatedPath}\" {(_namespace != null ? $"-n {_namespace}" : string.Empty)}";
             var dialog = new ExternalProcessWindow
             {
                 DataContext = new ExternalProcessViewModel(new ExternalProcess("dotnet", args))
