@@ -73,10 +73,7 @@ internal class DownloadDXCCompiler
             Logger.Info<DownloadDXCCompiler>("delete old directory");
             Directory.Delete(libPath, true);
         }
-        else
-        {
-            Directory.CreateDirectory(libPath);
-        }
+        Directory.CreateDirectory(libPath);
 
         await using var assetStream = await Client.GetStreamAsync(asset.BrowserDownloadUrl);
         var zipFileName = Path.Combine(libPath, $"{asset.Name.Replace(' ', '_')}");

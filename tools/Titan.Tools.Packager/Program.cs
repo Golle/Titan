@@ -29,7 +29,7 @@ try
             .WithOption(new Option<PipelineContext>("manifest")
             {
                 Alias = "m",
-                Description = "The absolute path to the manifest (Multiple manifests are allowed)",
+                Description = "The path to the manifest (Multiple manifests are allowed)",
                 Callback = (context, path) => context with { ManifestPaths = context.ManifestPaths.Concat(new[] { path }).ToArray() },
                 RequiresArguments = true,
                 Validate = s => !string.IsNullOrWhiteSpace(s)
