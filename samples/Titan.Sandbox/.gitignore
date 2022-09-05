@@ -1,0 +1,3 @@
+
+# exclude the generated asset files, they are generated in the CI. Might be better way to do this, but this have to do for now.
+AssetRegistry00*.cs
