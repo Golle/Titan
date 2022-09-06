@@ -12,7 +12,6 @@ internal unsafe struct ResourceContext
     private delegate*<void*, in Handle, void> _destroy;
     public Handle Create(ReadOnlySpan<byte> data) => _create(_context, data);
     public void Destroy(in Handle handle) => _destroy(_context, handle);
-
     public bool IsInitialized() => _create != null && _destroy != null;
     public static ResourceContext Create<TResourceType, TCreatorType>(void* context)
         where TResourceType : unmanaged

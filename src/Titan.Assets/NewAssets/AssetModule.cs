@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Threading2;
 using Titan.ECS.App;
@@ -8,6 +10,7 @@ using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 using Titan.FileSystem;
 using Titan.Memory;
+using Titan.Memory.Arenas;
 
 namespace Titan.Assets.NewAssets;
 
@@ -63,8 +66,6 @@ public unsafe struct AssetsModule : IModule
         var resourceCreatorRegistry = builder.GetResourcePointer<ResourceCreatorRegistry>();
         var loader = builder.GetResourcePointer<AssetLoader>();
 
-
-
         // Initialize the resources assosicated with this module
         if (!assetRegistry->Init(allocator, configs))
         {
@@ -99,7 +100,6 @@ public unsafe struct AssetsModule : IModule
         Logger.Info<AssetsModule>($"Init complete");
         return true;
     }
-
     private struct AssetModuleTearDown : IStructSystem<AssetModuleTearDown>
     {
         private AssetRegistry* Registry;
