@@ -11,7 +11,7 @@ public record struct WindowClosed : IEvent;
 
 public struct WindowModule : IModule
 {
-    public static unsafe void Build(AppBuilder builder)
+    public static unsafe bool Build(AppBuilder builder)
     {
         var windowFunctions = WindowFunctions.Create<Win32WindowFunctions>();
         var api = new WindowApi(windowFunctions);
@@ -30,7 +30,7 @@ public struct WindowModule : IModule
         if (!api.CreateWindow(descriptor, eventQueue, out var window))
         {
             Logger.Error<WindowModule>("Failed to create the Window.");
-            throw new Exception($"{nameof(WindowModule)} failed to initialize the window.");
+            return false;
         }
 
         builder.AddResource(window);
@@ -38,5 +38,7 @@ public struct WindowModule : IModule
         // NOTE(Jens): Add the Window translation system at the end of the frame so all Window events are available in the next frame to reduce the "lag" between an event and when it actually gets processed by the game loop.
         builder
             .AddSystemToStage<WindowMessageSystem>(Stage.PostUpdate);
+
+        return true;
     }
 }

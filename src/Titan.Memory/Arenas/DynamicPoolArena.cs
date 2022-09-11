@@ -1,6 +1,6 @@
-using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
+using System.Threading;
+using Titan.Core.Logging;
 using Titan.Core.Memory;
 
 namespace Titan.Memory.Arenas;
@@ -12,12 +12,14 @@ public static class DynamicPoolArenaExtensions
 
 public unsafe struct DynamicPoolArena
 {
-    private Allocator* _allocator; // used to free and expand the pool
+    private PlatformAllocator* _allocator; // used to free and expand the pool
     private byte* _mem;
     private Block* _freeList;
     private ushort _blockSize;
     private ushort _count;
-    public static DynamicPoolArena Create(Allocator* allocator, uint count, uint blockSize) =>
+
+    private volatile int _lock;
+    public static DynamicPoolArena Create(PlatformAllocator* allocator, uint count, uint blockSize) =>
         new()
         {
             _allocator = allocator,
@@ -38,18 +40,58 @@ public unsafe struct DynamicPoolArena
         _freeList = _freeList->Next;
         if (zeroMemory)
         {
-            MemoryUtils.Init(nextBlock, _blockSize);
+            MemoryUtils.Init(nextBlock, (uint)_blockSize);
         }
         return nextBlock;
     }
 
+    /// <summary>
+    /// Thread safe version of Allocate that uses CompareaExchange and SpinWait for synchronization
+    /// </summary>
+    /// <param name="zeroMemory"></param>
+    /// <returns></returns>
+    public void* SafeAllocate(bool zeroMemory = true)
+    {
+        WaitForAccess();
+        var mem = Allocate(zeroMemory);
+        _lock = 0;
+        return mem;
+    }
+
+    /// <summary>
+    /// Thread safe version of Free that uses CompareaExchange and SpinWait for synchronization
+    /// </summary>
+    /// <param name="ptr">The pointer to the memory allocated in this pool</param>
+    public void SafeFree(void* ptr)
+    {
+        Logger.Info($"SafeFree - Wait");
+        WaitForAccess();
+        Logger.Info($"SafeFree - Free");
+        Free(ptr);
+        Logger.Info($"SafeFree - Free Completed");
+        _lock = 0;
+    }
+
+
     public void Free(void* ptr)
     {
         IsInRange(ptr);
-        Console.WriteLine($"Free {(nuint)ptr}");
         var block = ((Block*)ptr);
         block->Next = _freeList;
         _freeList = block;
+    }
+
+    private void WaitForAccess()
+    {
+        var sw = new SpinWait();
+        while (true)
+        {
+            if (Interlocked.CompareExchange(ref _lock, 1, 0) == 0)
+            {
+                break;
+            }
+            sw.SpinOnce();
+        }
     }
 
     public void Release()

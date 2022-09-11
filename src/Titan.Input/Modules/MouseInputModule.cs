@@ -4,7 +4,7 @@ namespace Titan.Input.Modules;
 
 public readonly struct MouseInputModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         // should we do this?
         //if (!builder.HasResource<Window>())
@@ -13,5 +13,6 @@ public readonly struct MouseInputModule : IModule
         //}
 
         builder.AddSystem<MouseInputSystem>();
+        return true;
     }
 }

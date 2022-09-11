@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
+    <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
+    <ProjectReference Include="..\Titan.FileSystem\Titan.FileSystem.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Titan.Core;
+using Titan.Core.Logging;
 using Titan.ECS.Components;
 using Titan.ECS.Events;
 using Titan.ECS.Modules;
@@ -13,16 +14,18 @@ using Titan.Memory;
 
 namespace Titan.ECS.App;
 
+
 public unsafe class AppBuilder
 {
     private ResourceCollection _resourceCollection;
     private readonly List<SystemDescriptor> _systems = new();
     private readonly List<ComponentDescriptor> _components = new();
+    private readonly List<IConfiguration> _configs = new();
 
     private AppBuilder(AppCreationArgs args)
     {
         var allocator = PlatformAllocator.Create(args.UnmanagedMemory);
-        
+
         // Resources must be allocated at the start because they are used when modules are built. (configs etc)
         // We might want to change this at some point to allow for better memory alignment. For example configs used for startup/construction might never be used again, but they'll be mixed with other game related resources.
         _resourceCollection = ResourceCollection.Create(args.ResourcesMemory, args.MaxResourceTypes, allocator);
@@ -36,6 +39,18 @@ public unsafe class AppBuilder
 
     public static AppBuilder Create() => new(AppCreationArgs.Default);
     public static AppBuilder Create(AppCreationArgs args) => new(args);
+
+    /// <summary>
+    /// Add manager configuration, these will only be available at startup and disposed by the end of the build.
+    /// The configuration allows multiple configs of the same type, it's up the module to decide what to do with that.
+    /// </summary>
+    /// <param name="config">The managed configuration (usually a record containg managed references like strings)</param>
+    /// <returns></returns>
+    public AppBuilder AddConfiguration(IConfiguration config)
+    {
+        _configs.Add(config);
+        return this;
+    }
 
     public AppBuilder AddStartupSystem<T>() where T : unmanaged, IStructSystem<T>
     {
@@ -98,7 +113,10 @@ public unsafe class AppBuilder
 
     public AppBuilder AddModule<T>() where T : IModule
     {
-        T.Build(this);
+        if (!T.Build(this))
+        {
+            throw new Exception($"Failed to add the {typeof(T).FullName} module");
+        }
         return this;
     }
 
@@ -119,6 +137,12 @@ public unsafe class AppBuilder
 
     public bool HasResource<T>() where T : unmanaged
         => _resourceCollection.HasResource<T>();
+
+    public T GetConfiguration<T>() where T : IConfiguration
+        => (T)_configs.FirstOrDefault(c => c.GetType() == typeof(T));
+
+    public IEnumerable<T> GetConfigurations<T>() where T : IConfiguration
+        => _configs.Where(c => c.GetType() == typeof(T)).Cast<T>();
 
     public App Build()
     {

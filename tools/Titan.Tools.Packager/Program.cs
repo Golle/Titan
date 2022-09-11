@@ -1,12 +1,13 @@
-using System.Diagnostics.Metrics;
 using System.Text;
 using Titan.Assets.NewAssets;
 using Titan.Core.Logging;
+using Titan.Shaders;
 using Titan.Tools.Core.CommandLine;
 using Titan.Tools.Core.Common;
 using Titan.Tools.Core.Images;
 using Titan.Tools.Core.Manifests;
 using Titan.Tools.Packager;
+using Titan.Tools.Packager.PreReqs;
 
 Logger.Start<ConsoleLogger>();
 
@@ -28,7 +29,7 @@ try
             .WithOption(new Option<PipelineContext>("manifest")
             {
                 Alias = "m",
-                Description = "The absolute path to the manifest (Multiple manifests are allowed)",
+                Description = "The path to the manifest (Multiple manifests are allowed)",
                 Callback = (context, path) => context with { ManifestPaths = context.ManifestPaths.Concat(new[] { path }).ToArray() },
                 RequiresArguments = true,
                 Validate = s => !string.IsNullOrWhiteSpace(s)
@@ -56,6 +57,14 @@ try
                 RequiresArguments = true,
                 Validate = s => !string.IsNullOrWhiteSpace(s),
                 Description = "The namespace for the generated C# file."
+            })
+            .WithOption(new Option<PipelineContext>("libpath")
+            {
+                Alias = "l",
+                Description = "The path to the external libraries used for packaging, for example DXC(DirectX Shader Compiler)",
+                RequiresArguments = true,
+                Validate = s => !string.IsNullOrWhiteSpace(s),
+                Callback = (context, path) => context with { LibraryPath = path }
             })
             .OnCommand(RunPipeline)
         )
@@ -87,10 +96,6 @@ finally
 return 0;
 
 
-
-
-
-
 static async Task<PipelineContext> RunPipeline(PipelineContext context)
 {
     if (!ValidateContext(context))
@@ -98,8 +103,25 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
         return context with { Failed = true, Reason = "Validation failed." };
     }
 
+    if (context.LibraryPath == null)
+    {
+        Logger.Info("No library path specified, will download DXC.");
+        var result = await DownloadDXCCompiler.Download();
+        if (result.Failed)
+        {
+            return context with { Failed = true, Reason = result.Error };
+        }
+        context = context with { LibraryPath = result.Data };
+    }
+
+    if (context.LibraryPath != null)
+    {
+        Logger.Info($"Using library path {context.LibraryPath} for shader compilation.");
+        ShaderCompiler.SetShaderCompilerDllFolder(context.LibraryPath);
+    }
+
     var outputPath = context.OutputPath!;
-    //NOTE(Jens): this can be separated into different threads later (if needed). Just the C# code gen that should be single threaded.
+    //NOTE(Jens): this can be separated into different threads later (if needed). 
 
     Logger.Info($"Manifests: {context.ManifestPaths.Length}");
 
@@ -109,7 +131,7 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
     {
         var (assetRegistryFilename, titanPakFilename) = GenerateFileNames(i);
 
-        var manifestPath = context.ManifestPaths[i];
+        var manifestPath = context.ManifestPaths[i]!;
         //NOTE(Jens): this will create different pak files for each manifest. is this what we want?
         using PackageStream packageExporter = new(1 * 1024 * 1024 * 1024); // 1GB 
         List<(string Name, AssetDescriptor Descriptor)> assetDescriptors = new();
@@ -150,6 +172,20 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
                 Logger.Warning($"Exporting material {material.Name}. (material exporting has not been implemented yet.)");
             }
         }
+        // export shaders
+        {
+            foreach (var shader in manifest.Shaders)
+            {
+                var path = Path.Combine(basePath, shader.Path);
+                var descriptor = CompileShader(path, shader, packageExporter);
+                if (descriptor == null)
+                {
+                    return context with { Failed = true, Reason = $"Failed to compile the shader from path {path}" };
+                }
+                assetDescriptors.Add((shader.Name, descriptor.Value));
+                Logger.Info($"Shader {shader.Name} completed");
+            }
+        }
         var outputFile = Path.Combine(outputPath, titanPakFilename);
         {
             CreateIfNotExist(outputPath);
@@ -168,7 +204,8 @@ static async Task<PipelineContext> RunPipeline(PipelineContext context)
         }
         else
         {
-            var fileContents = GenerateCSharpIndex(titanPakFilename, assetDescriptors, manifest.Name, context.Namespace);
+            var manifestId = (uint)(i + 1); //add one so we don't start at 0.
+            var fileContents = GenerateCSharpIndex(manifestId, titanPakFilename, manifestPath, assetDescriptors, manifest.Name, context.Namespace);
             var generatedFilePath = Path.Combine(context.GeneratedCodePath, assetRegistryFilename);
             CreateIfNotExist(context.GeneratedCodePath);
 
@@ -242,6 +279,25 @@ static AssetDescriptor? ExportImage(string path, ImageReader imageReader, Packag
     };
 }
 
+static AssetDescriptor? CompileShader(string path, ShaderItem shader, PackageStream packageStream)
+{
+    var result = ShaderCompiler.Compile(path, shader.EntryPoint, shader.ShaderModel);
+    if (!result.Succeeded)
+    {
+        Logger.Error($"Failed to compile the shader at path {path}, with error message: {result.Error}");
+        return null;
+    }
+    var offset = packageStream.Offset;
+    var byteCode = result.GetByteCode();
+    packageStream.Write(byteCode);
+    return new AssetDescriptor
+    {
+        Reference = { Offset = offset, Size = (ulong)byteCode.Length },
+        Type = AssetDescriptorType.Shader,
+        Shader = default
+    };
+}
+
 static async Task<Manifest?> ReadManifest(string? path)
 {
     if (string.IsNullOrWhiteSpace(path))
@@ -263,7 +319,7 @@ static async Task<Manifest?> ReadManifest(string? path)
 }
 
 
-static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string manifestName, string? @namespace)
+static string GenerateCSharpIndex(uint manifestId, string packageFile, string manifestPath, IReadOnlyList<(string Name, AssetDescriptor descriptor)> descriptors, string manifestName, string? @namespace)
 {
     //NOTE(Jens): use a name that can be compiled in C#
     manifestName = ToPropertyName(manifestName);
@@ -281,41 +337,66 @@ static string GenerateCSharpIndex(string packageFile, IReadOnlyList<(string Name
         .AppendLine("public static partial class AssetRegistry")
         .AppendLine("{");
 
-    builder.AppendLine($"\tpublic static class {manifestName}")
+    builder.AppendLine($"\tpublic struct {manifestName} : {typeof(IManifestDescriptor).FullName}")
         .AppendLine("\t{");
 
-    builder.AppendLine($"\t\tpublic const string PackageFile =\"{Path.GetFileName(packageFile)}\";");
+    //NOTE(Jens): We should add a "hash/checksum" of the file, if we want to validate that it's the same one. Could affect performance though.
+    builder
+        .AppendLine($"\t\tpublic static uint {nameof(IManifestDescriptor.Id)} => {manifestId};")
+        .AppendLine($"\t\tpublic static string {nameof(IManifestDescriptor.ManifestFile)} => \"{Path.GetFileName(manifestPath)}\";")
+        .AppendLine($"\t\tpublic static string {nameof(IManifestDescriptor.TitanPackageFile)} => \"{Path.GetFileName(packageFile)}\";")
+        .AppendLine($"\t\tpublic static uint {nameof(IManifestDescriptor.AssetCount)} => {descriptors.Count};");
+
+
+    {
+        //NOTE(Jens): add the managed array of AssetDescriptors
+        builder.AppendLine($"\t\tpublic static {typeof(AssetDescriptor).FullName}[] {nameof(IManifestDescriptor.AssetDescriptors)} {{ get; }} =")
+            .AppendLine("\t\t{");
+        for (var i = 0; i < descriptors.Count; ++i)
+        {
+            builder.AppendLine($"\t\t\t{DescriptorToString(i, manifestId, descriptors[i].descriptor)},");
+        }
+        builder.AppendLine("\t\t};");
+    }
+
+    {
+        //NOTE(Jens): add the Textures (and other assets?)
+        //NOTE(Jens): This needs to be refactored and split up into components now, wont be nice with the different types of assets.
+        builder
+            .AppendLine("\t\tpublic static class Textures")
+            .AppendLine("\t\t{");
+
+        //foreach (var (name, descriptor) in descriptors)
+        for (var i = 0; i < descriptors.Count; ++i)
+        {
+            var (name, descriptor) = descriptors[i];
+            string propertyName;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                Logger.Warning($"Unnamed {descriptor.Type}, will use a default name.");
+                propertyName = $"UnnamedAsset{++unnamedCount,4:D4}";
+            }
+            else
+            {
+                propertyName = ToPropertyName(name);
+            }
+            builder.AppendLine($"\t\t\tpublic static ref readonly {typeof(AssetDescriptor).FullName} {propertyName} => ref {nameof(IManifestDescriptor.AssetDescriptors)}[{i}];");
+        }
+        builder.AppendLine("\t\t}");
+    }
 
     builder
-        .AppendLine("\t\tpublic static partial class Textures")
-        .AppendLine("\t\t{");
-
-    foreach (var (name, descriptor) in descriptors)
-    {
-        string propertyName;
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            Logger.Warning($"Unnamed {descriptor.Type}, will use a default name.");
-            propertyName = $"UnnamedAsset{++unnamedCount,4:D4}";
-        }
-        else
-        {
-            propertyName = ToPropertyName(name);
-        }
-
-        builder.AppendLine($"\t\t\tpublic static readonly {typeof(AssetDescriptor).FullName} {propertyName} = {DescriptorToString(descriptor)}");
-    }
-    builder.AppendLine("\t\t}")
         .AppendLine("\t}")
         .AppendLine("}");
 
 
     builder.Replace("\t", new string(' ', 4));
     return builder.ToString();
-    static string DescriptorToString(in AssetDescriptor descriptor) =>
+    static string DescriptorToString(int id, uint manifestId, in AssetDescriptor descriptor) =>
         descriptor switch
         {
-            { Type: AssetDescriptorType.Texture } => $"new() {{ Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }};",
+            { Type: AssetDescriptorType.Texture } => $"new() {{ Id = {id}, ManifestId = {manifestId}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Image = new() {{ Format = {descriptor.Image.Format}, Height = {descriptor.Image.Height}, Width = {descriptor.Image.Width}, Stride = {descriptor.Image.Stride} }} }}",
+            { Type: AssetDescriptorType.Shader } => $"new() {{ Id = {id}, ManifestId = {manifestId}, Reference = {{ Offset = {descriptor.Reference.Offset}, Size = {descriptor.Reference.Size}}}, Type = {typeof(AssetDescriptorType).FullName}.{descriptor.Type}, Shader = new() }}",
             _ => throw new NotImplementedException($"Type {descriptor.Type} has not been implemented yet.")
         };
 }

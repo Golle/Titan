@@ -10,13 +10,13 @@ namespace Titan.Graphics.D3D12;
 
 public struct D3D12RenderModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         ref readonly var window = ref builder.GetResource<Window>();
         if (!D3D12Device.CreateAndInit(window.Handle, window.Width, window.Height, true, out var device))
         {
             Logger.Error<D3D12RenderModule>($"Failed to create {nameof(D3D12Device)} :(");
-            return;
+            return false;
         }
          
         Logger.Info<D3D12RenderModule>($"Created the {nameof(D3D12Device)} with feature level {device.FeatureLevel}!");
@@ -25,7 +25,7 @@ public struct D3D12RenderModule : IModule
         if (!D3D12RenderContext.CreateAndInit(allocator, device, out var context))
         {
             Logger.Error<D3D12RenderModule>($"Failed to create the {nameof(D3D12RenderContext)}. ");
-            return;
+            return false;
         }
         builder
             .AddShutdownSystem<D3D12DeviceTearDown>(RunCriteria.Always)
@@ -33,6 +33,9 @@ public struct D3D12RenderModule : IModule
             .AddResource(new RenderContext { Context = context })
             .AddSystemToStage<D3D12RenderSystem>(Stage.PostUpdate, RunCriteria.Always)
             .AddSystemToStage<D3D12ResizeSystem>(Stage.PreUpdate);
+
+        
+        return true;
     }
     private struct D3D12RenderSystem : IStructSystem<D3D12RenderSystem>
     {

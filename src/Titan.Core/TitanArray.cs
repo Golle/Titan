@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Titan.Core;
@@ -5,14 +7,19 @@ namespace Titan.Core;
 public unsafe struct TitanArray<T> where T : unmanaged
 {
     private readonly T* _mem;
-    private readonly nuint _size;
-    internal TitanArray(void* mem, nuint size)
+    private readonly int _size;
+    public TitanArray(void* mem, uint size) 
+        : this(mem, (int)size)
     {
+    }
+
+    public TitanArray(void* mem, int size)
+    {
+        Debug.Assert(size >= 0);
         _size = size;
         _mem = (T*)mem;
     }
 
-    
     public readonly int Length
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -25,6 +32,26 @@ public unsafe struct TitanArray<T> where T : unmanaged
         get => ref _mem[index];
     }
 
+    public ref T this[int index]
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => ref _mem[index];
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Span<T> AsSpan() => new(_mem, (int)_size);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly T* GetPointer(uint index = 0u)
+    {
+        Debug.Assert(index < _size);
+        return _mem + index;
+    }
+
+    public static implicit operator T*(in TitanArray<T> array) => array.GetPointer();
+    public static implicit operator void*(in TitanArray<T> array) => array.GetPointer();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Enumerator GetEnumerator() => new(ref this);
 
     public ref struct Enumerator
@@ -49,7 +76,7 @@ public unsafe struct TitanArray<T> where T : unmanaged
             return _next < _array.Length;
         }
 
-        public readonly ref readonly T Current
+        public readonly ref T Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => ref _array[(uint)_next];

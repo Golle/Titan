@@ -9,4 +9,7 @@ public readonly unsafe struct ApiResource<T> where T : unmanaged
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref T Get() => ref *_api;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T* AsPointer() => _api;
 }

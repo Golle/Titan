@@ -2,6 +2,8 @@ namespace Titan.Shaders.Windows;
 
 public enum ShaderModels
 {
+    Unknown,
+
     // FXC (d3dcompiler_47)
     VS_5_0,
     VS_5_1,

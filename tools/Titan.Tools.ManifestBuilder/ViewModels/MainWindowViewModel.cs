@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
@@ -13,16 +12,19 @@ public class MainWindowViewModel : ViewModelBase
     public ContentViewModel Content { get; }
     public ProjectExplorerViewModel Project { get; }
     public NodePropertiesViewModel Properties { get; }
+    public PreviewViewModel Preview { get; }
 
     public ICommand ExitApplication { get; }
     public ICommand SaveAll { get; }
     public ICommand OpenCookAssetsDialog { get; }
+    public ICommand OpenSettingsDialog { get; }
     public MainWindowViewModel(IDialogService? dialogService)
     {
         dialogService ??= Registry.GetRequiredService<IDialogService>();
         Content = new ContentViewModel();
         Project = new ProjectExplorerViewModel();
         Properties = new NodePropertiesViewModel();
+        Preview = new PreviewViewModel();
 
         SaveAll = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -54,6 +56,12 @@ public class MainWindowViewModel : ViewModelBase
         OpenCookAssetsDialog = ReactiveCommand.CreateFromTask(async () =>
         {
             var dialog = new CookAssetsDialog();
+            await dialog.ShowDialog(App.MainWindow);
+        });
+
+        OpenSettingsDialog = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var dialog = new AppSettingsDialog();
             await dialog.ShowDialog(App.MainWindow);
         });
     }

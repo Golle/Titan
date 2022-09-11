@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -62,6 +61,7 @@ public class CookAssetsViewModel : ViewModelBase
                 return;
             }
 
+            //NOTE(Jens): This should be downloaded and set by the packager
             var args = $"run --project {GlobalConfiguration.PackagerProjectPath} -- package {string.Join(' ', manifests.Select(m => $"-m {m}"))} -o \"{_packagePath}\" -g \"{_generatedPath}\" {(_namespace != null ? $"-n {_namespace}" : string.Empty)}";
             var dialog = new ExternalProcessWindow
             {

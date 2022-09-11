@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Threading;
+using Titan.Core.Logging;
 using Titan.Windows.Win32;
 
 namespace Titan.Memory.Allocators;
@@ -43,6 +44,7 @@ public unsafe struct Win32VirtualAllocFixedSizeAllocator : IAllocator<FixedSizeA
 
     public static void Free(void* context, void* ptr)
     {
+        Logger.Warning<Win32VirtualAllocFixedSizeAllocator>($"Free is not supported in {nameof(Win32VirtualAllocFixedSizeAllocator)} yet. This means that the code calling this function does have a memory leak.");
         // noop, can't free memory in the fixed context (can be solved with a FreeList)
     }
 }

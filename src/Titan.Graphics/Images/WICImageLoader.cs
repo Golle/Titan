@@ -46,7 +46,7 @@ namespace Titan.Graphics.Images
 
         public Image Load(string identifier)
         {
-            var fullPath = FileSystem.GetFullPath(identifier);
+            var fullPath = Titan.Core.IO.FileSystem.GetFullPath(identifier);
 
             using ComPtr<IWICBitmapDecoder> decoder = default;
             fixed (char* wzFilename = fullPath)

@@ -1,8 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Windows.D3D11;
-using static Titan.Windows.D3D11.D3D11_SHADER_RESOURCE_VIEW_DESC;
 
 namespace Titan.Windows.D3D12;
 

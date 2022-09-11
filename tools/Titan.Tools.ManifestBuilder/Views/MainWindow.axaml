@@ -34,6 +34,7 @@
               </Grid>
             </MenuItem.Header>
           </MenuItem>
+          <MenuItem Header="_Settings" Command="{Binding OpenSettingsDialog}"/>
           <Separator/>
           <MenuItem Header="_Exit" Command="{Binding ExitApplication}"/>
         </MenuItem>
@@ -59,7 +60,7 @@
         <!--<ContentControl Grid.Row="0" Grid.Column="0" DockPanel.Dock="Left" Content="{Binding Project}"/>-->
         <views:ProjectExplorerView Grid.Row="0" Grid.Column="0" DockPanel.Dock="Left" DataContext="{Binding Project}" />
         <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns"/>
-        <ContentControl Grid.Row="0" Grid.Column="2" Background="Magenta" DockPanel.Dock="Right" Content="{Binding Middle}"/>
+        <ContentControl Grid.Row="0" Grid.Column="2" DockPanel.Dock="Right" Content="{Binding Preview}"/>
         <GridSplitter Grid.Row="0" Grid.Column="3" ResizeDirection="Columns"/>
         <ContentControl Grid.Row="0" Grid.Column="4" Content="{Binding Properties}"/>
 

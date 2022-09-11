@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Titan.Core.Memory;
 
@@ -62,5 +61,14 @@ public static unsafe class MemoryUtils
             return pptr;
         }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint GigaBytes(uint size) => MegaBytes(size) * OneKiloByte;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint MegaBytes(uint size) => KiloBytes(size) * OneKiloByte;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint KiloBytes(uint size) => size * OneKiloByte;
+
+    private const uint OneKiloByte = 1024u;
 }
 

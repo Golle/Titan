@@ -1,3 +1,5 @@
+using System;
+using Titan.Core.Logging;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Worlds;
 
@@ -30,15 +32,34 @@ public struct App
 {
     private ResourceCollection _resources;
     private World _world;
+    public static void SetupAndRun(Action<AppBuilder> setup) => SetupAndRun(setup, AppCreationArgs.Default);
+    public static void SetupAndRun(Action<AppBuilder> setup, AppCreationArgs args)
+    {
+        var appBuilder = AppBuilder.Create(args);
+        try
+        {
+            setup(appBuilder);
+            appBuilder
+                .Build()
+                .Run();
 
-    public static App Create(ResourceCollection resources) =>
+        }
+        catch (Exception e)
+        {
+            Logger.Error<App>($"Build failed with {e.GetType().Name} and message {e.Message}");
+            Logger.Shutdown();
+        }
+    }
+
+
+    internal static App Create(ResourceCollection resources) =>
         new()
         {
             _resources = resources,
             _world = World.Create(resources)
         };
 
-    public void Run()
+    internal void Run()
     {
         ref var scheduler = ref _resources.GetResource<Scheduler.Scheduler>();
         scheduler.Init(_resources, ref _world);

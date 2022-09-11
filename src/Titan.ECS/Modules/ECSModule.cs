@@ -10,7 +10,7 @@ namespace Titan.ECS.Modules;
 
 public struct ECSModule : IModule
 {
-    public static void Build(AppBuilder builder)
+    public static bool Build(AppBuilder builder)
     {
         if (!CheckPrerequisites(builder)) { }
 
@@ -40,6 +40,9 @@ public struct ECSModule : IModule
             //.AddEvent<ComponentBeingDestroyed>(MaxEvents)
             //.AddEvent<ComponentAdded>(MaxEvents)
             ;
+
+        return true;
+
 
         static bool CheckPrerequisites(AppBuilder builder)
         {

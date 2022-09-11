@@ -3,7 +3,6 @@ using System;
 using System.Runtime.InteropServices;
 using Titan.Windows.D3D;
 using Titan.Windows.DXGI;
-using System.Xml.Linq;
 
 namespace Titan.Windows.D3D12;
 
@@ -48,7 +47,7 @@ public unsafe struct ID3D12GraphicsCommandList
         => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppvDevice);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public D3D12_COMMAND_LIST_TYPE GetType()
+    public new D3D12_COMMAND_LIST_TYPE GetType()
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_COMMAND_LIST_TYPE>)_vtbl[8])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

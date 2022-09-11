@@ -15,8 +15,13 @@ jobs:
         dotnet-version: 7.0.x
         include-prerelease: true
         
-    - name: Build
-      run: dotnet build
+    - name: Build Engine
+      run: dotnet build src/Titan/Titan.csproj -c Shipping
     
+    - name: Build Tools
+      run: |
+        dotnet build tools/Titan.Tools.ManifestBuilder/Titan.Tools.ManifestBuilder.csproj -c Shipping
+        dotnet build tools/Titan.Tools.Packager/Titan.Tools.Packager.csproj -c Shipping
+
     - name: Test
       run: dotnet test

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading;
@@ -207,7 +206,7 @@ namespace Titan.Assets
                 for(var i = 0; i < asset.Files.Length; ++i)
                 {
                     var path = asset.Files[i];
-                    using var fileHandle = FileSystem.OpenReadHandle(path);
+                    using var fileHandle = Core.IO.FileSystem.OpenReadHandle(path);
                     var length = fileHandle.Length;
                     var block = MemoryUtilsOld.AllocateBlock<byte>((uint)length);
 

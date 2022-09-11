@@ -21,13 +21,11 @@
     <ProjectReference Include="..\Titan.Assets\Titan.Assets.csproj" />
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
     <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
+    <ProjectReference Include="..\Titan.FileSystem\Titan.FileSystem.csproj" />
     <ProjectReference Include="..\Titan.Graphics\Titan.Graphics.csproj" />
     <ProjectReference Include="..\Titan.Input\Titan.Input.csproj" />
     <ProjectReference Include="..\Titan.Physics\Titan.Physics.csproj" />
     <ProjectReference Include="..\Titan.Sound\Titan.Sound.csproj" />
     <ProjectReference Include="..\Titan.UI\Titan.UI.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Memory\" />
   </ItemGroup>
 </Project>

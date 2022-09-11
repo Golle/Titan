@@ -8,7 +8,6 @@ using Avalonia.Controls.Templates;
 using Avalonia.Media;
 using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;
 using Titan.Tools.ManifestBuilder.DataTemplates.Descriptors;
-using Titan.Tools.ManifestBuilder.ViewModels.Manifests;
 
 namespace Titan.Tools.ManifestBuilder.DataTemplates;
 
@@ -54,11 +53,13 @@ public class PropertiesDataTemplate : IDataTemplate
                 continue;
             }
             var orderAttribute = Attribute.GetCustomAttribute(propertyInfo, typeof(OrderAttribute)) as OrderAttribute;
+            var descriptionAttribute = Attribute.GetCustomAttribute(propertyInfo, typeof(DescriptionAttribute)) as DescriptionAttribute;
             var nameAttribute = Attribute.GetCustomAttribute(propertyInfo, typeof(DisplayNameAttribute)) as DisplayNameAttribute;
             var accessor = () => propertyInfo.GetMethod?.Invoke(obj, null);
             var propertyName = propertyInfo.Name;
             var name = nameAttribute?.DisplayName ?? ToNameWithWhiteSpace(propertyName);
             var order = orderAttribute?.Order ?? 0;
+            var description = descriptionAttribute?.Description;
 
             switch (attr)
             {
@@ -69,7 +70,8 @@ public class PropertiesDataTemplate : IDataTemplate
                         PropertyName = propertyName,
                         Accessor = accessor, //NOTE(Jens): Add check for missing getter?
                         Order = order,
-                        Watermark = strAttr.Watermark
+                        Watermark = strAttr.Watermark,
+                        Description = description
                     };
                     break;
                 case EditorReadOnlyAttribute:
@@ -78,7 +80,8 @@ public class PropertiesDataTemplate : IDataTemplate
                         Name = name,
                         PropertyName = propertyName,
                         Accessor = accessor,
-                        Order = order
+                        Order = order,
+                        Description = description
                     };
                     break;
                 case EditorNumberAttribute numAttr:
@@ -89,7 +92,8 @@ public class PropertiesDataTemplate : IDataTemplate
                         Accessor = accessor,
                         Order = order,
                         Min = numAttr.Min,
-                        Max = numAttr.Max
+                        Max = numAttr.Max,
+                        Description = description
                     };
                     break;
                 case EditorEnumAttribute:
@@ -105,11 +109,23 @@ public class PropertiesDataTemplate : IDataTemplate
                         Accessor = accessor,
                         Order = order,
                         Values = Enum.GetValues(propertyInfo.PropertyType),
-                        TypeName = propertyInfo.PropertyType.Name
+                        TypeName = propertyInfo.PropertyType.Name,
+                        Description = description
+                    };
+                    break;
+                case EditorFileAttribute file:
+                    yield return new BrowseFileEditorDescriptor
+                    {
+                        Name = name,
+                        PropertyName = propertyName,
+                        Accessor = accessor,
+                        Order = order,
+                        Watermark = file.Watermark,
+                        Description = description
                     };
                     break;
             }
-            
+
         }
 
         static string ToNameWithWhiteSpace(string name)
@@ -129,5 +145,5 @@ public class PropertiesDataTemplate : IDataTemplate
     }
 
     public bool Match(object? data)
-        => data?.GetType().IsAssignableTo(typeof(IManifestTreeNode)) ?? false;
+        => data?.GetType().IsAssignableTo(typeof(IPropertyEditor)) ?? false;
 }

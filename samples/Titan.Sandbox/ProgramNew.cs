@@ -1,4 +1,7 @@
+using System.IO;
+using System;
 using System.Numerics;
+using Titan.Assets.NewAssets;
 using Titan.Components;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -7,7 +10,6 @@ using Titan.ECS.Entities;
 using Titan.ECS.Modules;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
-using Titan.Graphics.D3D12Take2;
 using Titan.Graphics.Modules;
 using Titan.Input;
 using Titan.Input.Modules;
@@ -15,31 +17,65 @@ using Titan.Modules;
 using Titan.Runner;
 using Titan.Sandbox;
 using EntityFilter = Titan.ECS.Entities.EntityFilter;
+using Titan.Graphics;
 
-AppBuilder
-    .Create()
+
+// Folders used during development.
+var baseDir = GetBaseDirectory();
+var assetsFolder = Path.Combine(baseDir, "assets");
+var titanPakFolder = Path.Combine(assetsFolder, "bin");
+
+
+App.SetupAndRun(builder => builder
     .AddResource(new LoggingConfiguration
     {
         Enabled = true,
         Type = LoggerType.Console,
         FilePath = @"c:\tmp\titan.log"
     })
+    .AddConfiguration(new AssetsDevConfiguration(assetsFolder, titanPakFolder))
+    .AddConfiguration(AssetsConfiguration.CreateFromRegistry<AssetRegistry.SampleManifest01>())
+    .AddConfiguration(AssetsConfiguration.CreateFromRegistry<AssetRegistry.AnotherManifest>())
     .AddResource(new ECSConfiguration { MaxEntities = 1_000_000 })
     //.AddResource(SchedulerConfiguration.SingleThreaded)
     .AddModule<CoreModule>()
+    .AddModule<AssetsModule>()
     .AddModule<WindowModule>()
-    .AddModule<D3D12RenderModule1>()
+    .AddModule<Graphics3DModule>()
     .AddModule<InputModule>()
+    
     .UseRunner<WindowRunner>()
+    //.UseRunner<HeadlessRunner>()
 
     .AddSystem<SampleSystem1>()
     .AddSystem<SampleSystem2>()
+    .AddSystem<AssetLoadingSampleSystem>()
     .AddSystemExperimental<SampleSystemInstance>()
     .AddComponents<Transform3DComponent>(maxComponents: 10_000)
     .AddComponents<TestComponent>(maxComponents: 1000)
     .AddResource<GlobalFrameCounter>()
-    .Build()
-    .Run();
+    .AddResource<SharedAssets>());
+
+
+static string GetBaseDirectory()
+{
+    var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+    const string BaseFileName = "Titan.Sandbox.csproj";
+    return FindParentWithFile(BaseFileName, baseDirectory, 7)
+           ?? baseDirectory;
+
+    static string FindParentWithFile(string filename, string? path, int steps)
+    {
+        if (steps == 0 || path == null)
+        {
+            return null;
+        }
+        return File.Exists(Path.Combine(path, filename))
+            ? path
+            : FindParentWithFile(filename, Directory.GetParent(path)?.FullName, steps - 1);
+    }
+}
+
 
 namespace Titan.Sandbox
 {
@@ -200,35 +236,51 @@ namespace Titan.Sandbox
         public long FrameCounter;
     }
 
-    //internal class SandboxGame : Game
-    //{
-    //    public override EngineConfiguration ConfigureEngine(EngineConfiguration config) => config with
-    //    {
-    //        AssetsPath = "assets",
-    //        BasePathSearchPattern = "Titan.Sandbox.csproj"
-    //    };
+    internal struct TextureSample { } // Fake texture just to test AssetManagement
+    internal struct SharedAssets : IResource
+    {
+        public Handle<Asset> Texture1;
+        public Handle<Asset> Texture2;
+        public Handle<Asset> Texture3;
+    }
+    internal struct AssetLoadingSampleSystem : IStructSystem<AssetLoadingSampleSystem>
+    {
+        private AssetManager AssetManager;
+        private MutableResource<SharedAssets> SharedAssets;
+        private bool IsDone;
+        public static void Init(ref AssetLoadingSampleSystem system, in SystemsInitializer init)
+        {
+            system.AssetManager = init.GetAssetManager();
+            system.SharedAssets = init.GetMutableResource<SharedAssets>();
+        }
 
-    //    public override WindowConfiguration ConfigureWindow(WindowConfiguration config) =>
-    //        config with
-    //        {
-    //            Height = 300,
-    //            Width = 400,
-    //            RawInput = false,
-    //            Resizable = false,
-    //            Windowed = true
-    //        };
+        public static void Update(ref AssetLoadingSampleSystem system)
+        {
+            ref var assetManager = ref system.AssetManager;
+            ref var assets = ref system.SharedAssets.Get();
 
-    //    public override SystemsConfiguration ConfigureSystems(SystemsBuilder builder) =>
-    //        builder
-    //            .Build();
+            if (assets.Texture1.IsInvalid())
+            {
+                assets.Texture1 = assetManager.Load(AssetRegistry.AnotherManifest.Textures.Redsheet);
+                Logger.Trace<AssetLoadingSampleSystem>($"Load Texture1");
+            }
+            else
+            {
+                if (assetManager.IsLoaded(assets.Texture1))
+                {
+                    var handle = assetManager.GetAssetHandle<TextureSample>(assets.Texture1);
+                    Logger.Trace<AssetLoadingSampleSystem>($"Texture 1 handle: {handle}");
+                    Logger.Trace<AssetLoadingSampleSystem>($"Unload Texture1 and load Texture2");
+                    assetManager.Unload(ref assets.Texture1);
+                    assets.Texture2 = assetManager.Load(AssetRegistry.AnotherManifest.Textures.SeqoeUiLight);
+                    system.IsDone = true;
+                }
+            }
+        }
 
-    //    public override IEnumerable<WorldConfiguration> ConfigureWorlds()
-    //    {
-    //        yield return new WorldConfigurationBuilder(10_000)
-    //            .WithComponent<Transform3DComponent>()
-    //            .WithSystem<Transform3DSystem>()
-    //            .Build("Game");
-
-    //    }
-    //}
+        public static bool ShouldRun(in AssetLoadingSampleSystem system) => !system.IsDone;
+        //=> system.SharedAssets.Get().Texture1.IsInvalid();
+    }
 }
+
+

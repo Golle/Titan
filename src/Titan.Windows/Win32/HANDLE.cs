@@ -14,4 +14,10 @@ public struct HANDLE
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator HANDLE(nuint handle) => new() { Value = handle };
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator HANDLE(nint handle) => new() { Value = (nuint)handle };
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsValid() => Value != 0xFFFFFFFFFFFFFFFFUL;
 }

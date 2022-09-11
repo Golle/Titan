@@ -17,7 +17,6 @@ namespace Titan.ECS.Scheduler;
 /// </summary>
 public unsafe struct Scheduler
 {
-    private int Apa;
     private NodeStage* _stages;
     private StageExecutor* _executors;
     private const int _stageCount = (int)Stage.Count;

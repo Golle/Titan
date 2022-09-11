@@ -184,7 +184,7 @@ public enum RenderAPI
 }
 public struct RenderModule : IModule
 {
-    public static unsafe void Build(AppBuilder builder)
+    public static unsafe bool Build(AppBuilder builder)
     {
         ref readonly var window = ref builder.GetResource<Window>();
 
@@ -193,6 +193,7 @@ public struct RenderModule : IModule
 
         var device = GraphicsDevice.Create(RenderAPI.D3D11, window.Height, window.Width);
 
+        return true;
         //var swapChain = device.CreateSwapChain(window.Handle);
 
         //var device = GraphicsDevice.Create(RenderAPI.D3D11, window.Height, window.Width);

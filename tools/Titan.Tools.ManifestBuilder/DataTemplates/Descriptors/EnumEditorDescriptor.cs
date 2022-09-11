@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Titan.Tools.ManifestBuilder.DataTemplates.Controls;
 
 namespace Titan.Tools.ManifestBuilder.DataTemplates.Descriptors;
 
@@ -12,7 +13,7 @@ internal class EnumEditorDescriptor : EditorPropertyDescriptor
     public required string TypeName { get; init; }
     public override IControl Build()
     {
-        return new StackPanel
+        var panel = new StackPanel
         {
             Spacing = 10,
             Children =
@@ -27,6 +28,10 @@ internal class EnumEditorDescriptor : EditorPropertyDescriptor
             }
         };
 
-
+        if (Description != null)
+        {
+            panel.Children.Insert(1, new DescriptionTextBlock(Description));
+        }
+        return panel;
     }
 }
