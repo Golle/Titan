@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
         <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     </PropertyGroup>
     <!-- STATS is used for timers and stats about the engine -->
