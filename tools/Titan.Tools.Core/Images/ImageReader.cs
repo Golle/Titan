@@ -1,11 +1,11 @@
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
-using Titan.Windows;
-using Titan.Windows.DXGI;
-using Titan.Windows.WIC;
-using Titan.Windows.Win32;
-using static Titan.Windows.Common;
-using static Titan.Windows.Win32.Ole32;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.DXGI;
+using Titan.Platform.Win32.WIC;
+using Titan.Platform.Win32.Win32;
+using static Titan.Platform.Win32.Common;
+using static Titan.Platform.Win32.Win32.Ole32;
 
 namespace Titan.Tools.Core.Images;
 

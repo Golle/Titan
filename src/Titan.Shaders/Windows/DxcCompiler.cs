@@ -2,10 +2,10 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
+using Titan.Platform.Win32;
 using Titan.Shaders.Windows.DXC;
-using Titan.Windows;
 using static Titan.Shaders.Windows.DXC.DxcCompilerCommon;
-using static Titan.Windows.Common;
+using static Titan.Platform.Win32.Common;
 
 namespace Titan.Shaders.Windows;
 

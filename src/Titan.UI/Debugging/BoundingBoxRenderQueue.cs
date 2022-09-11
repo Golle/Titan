@@ -9,7 +9,7 @@ using Titan.Core.Services;
 using Titan.Graphics;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Buffers;
-using Titan.Windows.D3D11;
+using Titan.Platform.Win32.D3D11;
 
 namespace Titan.UI.Debugging
 {

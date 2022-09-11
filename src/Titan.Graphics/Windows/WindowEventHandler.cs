@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using Titan.Core.Messaging;
 using Titan.Graphics.Windows.Events;
-using Titan.Windows.Win32;
+using Titan.Platform.Win32.Win32;
 
 namespace Titan.Graphics.Windows
 {

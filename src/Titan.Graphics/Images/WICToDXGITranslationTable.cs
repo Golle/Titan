@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Titan.Windows.DXGI;
-using static Titan.Windows.DXGI.DXGI_FORMAT;
-using static Titan.Windows.WIC.WICPixelFormats;
+using Titan.Platform.Win32.DXGI;
+using static Titan.Platform.Win32.DXGI.DXGI_FORMAT;
+using static Titan.Platform.Win32.WIC.WICPixelFormats;
 
 // ReSharper disable InconsistentNaming
 

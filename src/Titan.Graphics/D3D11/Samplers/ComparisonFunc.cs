@@ -1,4 +1,4 @@
-using static Titan.Windows.D3D11.D3D11_COMPARISON_FUNC;
+using static Titan.Platform.Win32.D3D11.D3D11_COMPARISON_FUNC;
 
 namespace Titan.Graphics.D3D11.Samplers
 {

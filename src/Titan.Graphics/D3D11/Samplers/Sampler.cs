@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using Titan.Windows.D3D11;
+using Titan.Platform.Win32.D3D11;
 
 namespace Titan.Graphics.D3D11.Samplers
 {

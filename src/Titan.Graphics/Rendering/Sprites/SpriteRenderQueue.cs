@@ -12,7 +12,7 @@ using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Loaders.Atlas;
 using Titan.Graphics.Loaders.Fonts;
 using Titan.Graphics.Rendering.Text;
-using Titan.Windows.D3D11;
+using Titan.Platform.Win32.D3D11;
 
 namespace Titan.Graphics.Rendering.Sprites;
 

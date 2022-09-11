@@ -1,9 +1,9 @@
 using System.Text;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.Windows.D3D;
-using static Titan.Windows.Common;
-using static Titan.Windows.D3D.D3DCompiler;
+using Titan.Platform.Win32.D3D;
+using static Titan.Platform.Win32.Common;
+using static Titan.Platform.Win32.D3D.D3DCompiler;
 
 namespace Titan.Graphics.D3D11.Shaders;
 

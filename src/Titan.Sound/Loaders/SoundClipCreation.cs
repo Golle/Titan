@@ -1,5 +1,5 @@
 ﻿using System;
-using Titan.Windows.XAudio2;
+using Titan.Platform.Win32.XAudio2;
 
 namespace Titan.Sound.Loaders;
 

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Titan.Windows;
-using Titan.Windows.Win32;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.Win32;
 
 namespace Titan.FileSystem.Platform;
 /// <summary>

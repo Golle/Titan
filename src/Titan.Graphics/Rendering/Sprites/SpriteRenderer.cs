@@ -1,5 +1,5 @@
 using Titan.Graphics.D3D11;
-using Titan.Windows.D3D;
+using Titan.Platform.Win32.D3D;
 
 namespace Titan.Graphics.Rendering.Sprites
 {

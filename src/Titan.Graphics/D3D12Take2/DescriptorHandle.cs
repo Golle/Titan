@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using Titan.Windows.D3D12;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Graphics.D3D12Take2;
 

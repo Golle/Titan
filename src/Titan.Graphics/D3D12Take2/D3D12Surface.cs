@@ -2,10 +2,10 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.Windows;
-using Titan.Windows.D3D12;
-using Titan.Windows.DXGI;
-using static Titan.Windows.Common;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D12;
+using Titan.Platform.Win32.DXGI;
+using static Titan.Platform.Win32.Common;
 
 namespace Titan.Graphics.D3D12Take2;
 

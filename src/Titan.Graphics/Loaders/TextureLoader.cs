@@ -6,7 +6,7 @@ using Titan.Core.Memory;
 using Titan.Graphics.D3D11;
 using Titan.Graphics.D3D11.Textures;
 using Titan.Graphics.Images;
-using Titan.Windows.D3D11;
+using Titan.Platform.Win32.D3D11;
 
 namespace Titan.Graphics.Loaders
 {

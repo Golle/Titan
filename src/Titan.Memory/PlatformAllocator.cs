@@ -47,19 +47,20 @@ public unsafe struct PlatformAllocator : IApi
 
     private static Allocator CreateAllocator(nuint fixedSizeMemory)
     {
-        if (fixedSizeMemory > 0)
-        {
-            Logger.Trace<PlatformAllocator>($"Creating a {nameof(Win32VirtualAllocFixedSizeAllocator)} allocator with {fixedSizeMemory} bytes pre-allocated.");
-            Logger.Warning<PlatformAllocator>("The fixed size allocator does not support Free, this means that any code that tries to free the memory will have a memory leak.");
-            return Allocator.Create<Win32VirtualAllocFixedSizeAllocator, FixedSizeArgs>(new FixedSizeArgs(fixedSizeMemory));
-        }
-        // Use VirtualAlloc on windows environment
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            Logger.Trace<PlatformAllocator>($"Creating a {nameof(Win32VirtualAllocAllocator)}.");
-            return Allocator.Create<Win32VirtualAllocAllocator>();
-        }
+        //if (fixedSizeMemory > 0)
+        //{
+        //    Logger.Trace<PlatformAllocator>($"Creating a {nameof(Win32VirtualAllocFixedSizeAllocator)} allocator with {fixedSizeMemory} bytes pre-allocated.");
+        //    Logger.Warning<PlatformAllocator>("The fixed size allocator does not support Free, this means that any code that tries to free the memory will have a memory leak.");
+        //    return Allocator.Create<Win32VirtualAllocFixedSizeAllocator, FixedSizeArgs>(new FixedSizeArgs(fixedSizeMemory));
+        //}
+        //// Use VirtualAlloc on windows environment
+        //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        //{
+        //    Logger.Trace<PlatformAllocator>($"Creating a {nameof(Win32VirtualAllocAllocator)}.");
+        //    return Allocator.Create<Win32VirtualAllocAllocator>();
+        //}
 
+        throw new NotImplementedException("woops");
         // Use the built in NativeMemory on any other platforms
         Logger.Trace<PlatformAllocator>($"Creating a {nameof(NativeMemoryAllocator)}.");
         return Allocator.Create<NativeMemoryAllocator>();

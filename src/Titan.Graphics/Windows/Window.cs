@@ -2,10 +2,10 @@ using System;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
 using Titan.Graphics.Windows.Input.Raw;
-using Titan.Windows;
-using Titan.Windows.Win32;
-using static Titan.Windows.Win32.User32;
-using static Titan.Windows.Win32.WindowsMessage;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.Win32;
+using static Titan.Platform.Win32.Win32.User32;
+using static Titan.Platform.Win32.Win32.WindowsMessage;
 
 namespace Titan.Graphics.Windows;
 

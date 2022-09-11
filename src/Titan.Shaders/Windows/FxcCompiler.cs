@@ -1,10 +1,10 @@
 using System;
 using System.Text;
 using Titan.Core.Logging;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D;
 using Titan.Shaders.Windows.FXC;
-using Titan.Windows;
-using Titan.Windows.D3D;
-using static Titan.Windows.Common;
+using static Titan.Platform.Win32.Common;
 using D3D_SHADER_MACRO = Titan.Shaders.Windows.FXC.D3D_SHADER_MACRO; //NOTE(Jens): remove this when the old shader code has been deleted
 
 namespace Titan.Shaders.Windows;
