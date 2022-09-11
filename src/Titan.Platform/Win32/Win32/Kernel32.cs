@@ -102,4 +102,9 @@ public static unsafe class Kernel32
         HANDLE hFile,
         LARGE_INTEGER* lpFileSize
     );
+
+    [DllImport("kernel32", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+    public static extern void GetSystemInfo(
+        SYSTEM_INFO* lpSystemInfo
+    );
 }

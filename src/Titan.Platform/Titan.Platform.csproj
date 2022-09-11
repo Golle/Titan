@@ -15,7 +15,7 @@
     <DefineConstants></DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Titan.Memory\Titan.Memory.csproj" />
+    <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
   </ItemGroup>
 
 </Project>

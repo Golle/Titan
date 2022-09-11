@@ -1,4 +1,4 @@
-namespace Titan.Memory;
+namespace Titan.Memory.Platform;
 
 public unsafe interface IPlatformAllocator
 {

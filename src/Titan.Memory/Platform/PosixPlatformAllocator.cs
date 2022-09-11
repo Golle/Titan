@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using Titan.Memory;
+using Titan.Platform.Posix;
 
-namespace Titan.Platform.Posix;
+namespace Titan.Memory.Platform;
 
 internal unsafe struct PosixPlatformAllocator : IPlatformAllocator
 {

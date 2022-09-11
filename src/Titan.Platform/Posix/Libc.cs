@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Platform.Posix;
 
-internal unsafe class Libc
+public unsafe class Libc
 {
     //https://sites.uclouvain.be/SystInfo/usr/include/bits/mman.h.html
     [DllImport("libc", CallingConvention = CallingConvention.Cdecl)]
