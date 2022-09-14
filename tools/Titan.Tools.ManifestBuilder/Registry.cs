@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using Titan.Tools.ManifestBuilder.Models;
 using Titan.Tools.ManifestBuilder.Services;

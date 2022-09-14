@@ -4,7 +4,7 @@ using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.Worlds;
 using Titan.Memory;
-using Titan.Memory.Allocators2;
+using Titan.Memory.Allocators;
 
 namespace Titan.ECS.Events;
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Titan.Graphics.Modules;
+﻿namespace Titan.Graphics.Modules;
 
 internal unsafe struct WindowFunctions
 {

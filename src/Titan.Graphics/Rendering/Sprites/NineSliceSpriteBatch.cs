@@ -1,7 +1,5 @@
-using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core.Memory;
 using Titan.Graphics.Loaders.Atlas;
 

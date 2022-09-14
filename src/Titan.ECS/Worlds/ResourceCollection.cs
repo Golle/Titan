@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Memory;
-using Titan.Memory.Allocators2;
+using Titan.Memory.Allocators;
 
 namespace Titan.ECS.Worlds;
 

@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core.Logging;
 
 namespace Titan.Core.Threading

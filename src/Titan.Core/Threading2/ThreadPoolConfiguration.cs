@@ -1,5 +1,3 @@
-using System;
-
 namespace Titan.Core.Threading2;
 
 public struct ThreadPoolConfiguration : IDefault<ThreadPoolConfiguration>

@@ -1,4 +1,3 @@
-using System;
 using System.Numerics;
 using Titan.Core;
 using Titan.Graphics.D3D11;

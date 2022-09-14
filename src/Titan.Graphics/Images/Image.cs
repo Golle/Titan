@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 using Titan.Platform.Win32.DXGI;
 

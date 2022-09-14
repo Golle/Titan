@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;

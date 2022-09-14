@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 
-namespace Titan.Memory.Allocators2;
+namespace Titan.Memory.Allocators;
 
 public unsafe struct DynamicLinearAllocator : ILinearAllocator
 {

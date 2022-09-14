@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.InteropServices.ComTypes;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Platform.Win32;

@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System;
-using System.Threading;
 using Titan.Assets.NewAssets;
 using Titan.Core;
 using Titan.Core.Logging;

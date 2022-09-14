@@ -1,5 +1,3 @@
-using System;
-
 namespace Titan.Graphics.Modules;
 
 internal interface IWindowFunctions

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Titan.Platform.Win32.DXGI;
 using static Titan.Platform.Win32.DXGI.DXGI_FORMAT;

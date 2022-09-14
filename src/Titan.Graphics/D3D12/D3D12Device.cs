@@ -15,7 +15,6 @@ using static Titan.Platform.Win32.DXGI.DXGI_GPU_PREFERENCE;
 using static Titan.Platform.Win32.DXGI.DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS;
 using static Titan.Platform.Win32.DXGI.DXGI_SWAP_EFFECT;
 using static Titan.Platform.Win32.DXGI.DXGI_USAGE;
-using System.IO;
 using System.Runtime.InteropServices;
 using Titan.Core.Memory;
 using Titan.Platform.Win32;

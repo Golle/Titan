@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Titan.Core.Logging;
 using Titan.Platform.Win32;

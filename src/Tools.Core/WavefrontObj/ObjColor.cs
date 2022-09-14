@@ -1,5 +1,3 @@
-using System;
-
 namespace Tools.Core.WavefrontObj
 {
     public readonly struct ObjColor

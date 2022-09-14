@@ -6,7 +6,7 @@ using Titan.Core.Threading2;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Memory;
-using Titan.Memory.Allocators2;
+using Titan.Memory.Allocators;
 
 namespace Titan.ECS.Scheduler;
 

@@ -1,6 +1,3 @@
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Titan.Tools.ManifestBuilder.Common;
 using Titan.Tools.ManifestBuilder.ViewModels.Dialogs;

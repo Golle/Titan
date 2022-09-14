@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using Titan.Tools.Core.Manifests;

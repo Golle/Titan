@@ -1,4 +1,3 @@
-using System;
 using Titan.Core.Logging;
 using Titan.Core.Threading;
 

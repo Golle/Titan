@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using Titan.Platform.Win32.Win32;
 using Titan.Shaders.Windows;

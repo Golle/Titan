@@ -1,6 +1,4 @@
-using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Platform.Win32;

@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Titan.Core.Memory;
 using Titan.ECS.Events;
 using Titan.ECS.Scheduler;

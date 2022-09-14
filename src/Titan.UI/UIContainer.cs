@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Titan.UI
 {
     public class UIContainer : UIComponent

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Memory;
 
-namespace Titan.Memory.Allocators2;
+namespace Titan.Memory.Allocators;
 public unsafe interface ILinearAllocator
 {
     static abstract void* CreateAndInit(MemoryManager* memoryManager, uint size);

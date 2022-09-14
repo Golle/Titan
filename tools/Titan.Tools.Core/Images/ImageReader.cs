@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Titan.Core.Logging;
 using Titan.Platform.Win32;
 using Titan.Platform.Win32.DXGI;

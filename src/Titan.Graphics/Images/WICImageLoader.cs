@@ -1,6 +1,4 @@
-using System;
 using System.Runtime.InteropServices;
-using Titan.Core.IO;
 using Titan.Platform.Win32;
 using Titan.Platform.Win32.DXGI;
 using Titan.Platform.Win32.WIC;

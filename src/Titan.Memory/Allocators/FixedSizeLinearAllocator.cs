@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Titan.Core.Memory;
 
-namespace Titan.Memory.Allocators2;
+namespace Titan.Memory.Allocators;
 
 internal unsafe struct FixedSizeLinearAllocator : ILinearAllocator
 {

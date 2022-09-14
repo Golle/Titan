@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
-using Titan.Memory.Allocators2;
+using Titan.Memory.Allocators;
 
 namespace Titan.ECS.Entities;
 

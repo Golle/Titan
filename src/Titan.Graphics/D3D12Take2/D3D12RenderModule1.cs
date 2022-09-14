@@ -1,8 +1,3 @@
-using System;
-using System.Diagnostics;
-using System.Threading;
-using Titan.Assets.NewAssets;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.App;
@@ -11,7 +6,6 @@ using Titan.ECS.Systems;
 using Titan.Graphics.D3D12Take2.Stats;
 using Titan.Graphics.D3D12Take2.Systems;
 using Titan.Graphics.Modules;
-using Titan.Graphics.NewRender;
 using Titan.Platform.Win32;
 using Titan.Platform.Win32.D3D;
 using Titan.Platform.Win32.D3D12;

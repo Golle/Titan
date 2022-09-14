@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
 using Titan.Graphics.Windows.Input.Raw;

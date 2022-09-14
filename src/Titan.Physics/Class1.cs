@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Titan.Physics;
 
 // TODO:optimize this if possible, naive solution and might be slower than just doing the bounds check.

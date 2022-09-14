@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.CompilerServices;
 using Titan.Platform.Win32;
 using Titan.Platform.Win32.DXGI;
