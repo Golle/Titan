@@ -1,18 +1,25 @@
+using Titan.Core.Memory;
+
 namespace Titan.ECS.App;
 
 public record struct AppCreationArgs
 {
-    public const uint DefaultResourcesMemory = 32 * 1024 * 1024;      // 32Mb
-    public const uint DefaultMaxResourceTypes = 1_000;
-    public nuint UnmanagedMemory { get; init; }
-    public uint ResourcesMemory { get; init; }
+    public static readonly uint DefaultResourcesMemory = MemoryUtils.MegaBytes(64);
+    public static readonly uint DefaultMaxReservedMemory = MemoryUtils.GigaBytes(2);
+    public static readonly uint DefaultMaxGeneralPurposeMemory = MemoryUtils.MegaBytes(512);
+    public static readonly uint DefaultMaxResourceTypes = 1_000;
+    public nuint MaxReservedMemory { get; init; }
+    public nuint MaxGeneralPurposeMemory { get; init; }
+    
+    // do we need these?
+    public uint MaxResourcesMemory { get; init; }
     public uint MaxResourceTypes { get; init; }
-
 
     public static AppCreationArgs Default => new()
     {
-        ResourcesMemory = DefaultResourcesMemory,
-        UnmanagedMemory = 0u,
-        MaxResourceTypes = DefaultMaxResourceTypes
+        MaxResourcesMemory = DefaultResourcesMemory,
+        MaxReservedMemory = DefaultMaxReservedMemory,
+        MaxResourceTypes = DefaultMaxResourceTypes,
+        MaxGeneralPurposeMemory = DefaultMaxGeneralPurposeMemory
     };
 }

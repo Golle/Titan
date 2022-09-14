@@ -1,8 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Threading2;
 using Titan.ECS.App;
@@ -10,7 +5,6 @@ using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 using Titan.FileSystem;
 using Titan.Memory;
-using Titan.Memory.Arenas;
 
 namespace Titan.Assets.NewAssets;
 
@@ -58,7 +52,7 @@ public unsafe struct AssetsModule : IModule
 
 
         // Get pointers to the resources
-        var allocator = builder.GetResourcePointer<PlatformAllocator>();
+        var memoryManager = builder.GetResourcePointer<MemoryManager>();
         var jobApi = builder.GetResourcePointer<JobApi>();
         var fileSystemApi = builder.GetResourcePointer<FileSystemApi>();
         var assetRegistry = builder.GetResourcePointer<AssetRegistry>();
@@ -67,25 +61,25 @@ public unsafe struct AssetsModule : IModule
         var loader = builder.GetResourcePointer<AssetLoader>();
 
         // Initialize the resources assosicated with this module
-        if (!assetRegistry->Init(allocator, configs))
+        if (!assetRegistry->Init(memoryManager, configs))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetRegistry)}");
             return false;
         }
 ;
-        if (!fileAccessor->Init(allocator, fileSystemApi, configs))
+        if (!fileAccessor->Init(memoryManager, fileSystemApi, configs))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetFileAccessor)}");
             return false;
         }
 
-        if (!resourceCreatorRegistry->Init(allocator, (uint)AssetDescriptorType.Count))
+        if (!resourceCreatorRegistry->Init(memoryManager, (uint)AssetDescriptorType.Count))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(ResourceCreatorRegistry)}");
             return false;
         }
 
-        if (!loader->Init(assetRegistry, jobApi, fileAccessor, resourceCreatorRegistry))
+        if (!loader->Init(memoryManager, assetRegistry, jobApi, fileAccessor, resourceCreatorRegistry))
         {
             Logger.Error<AssetsModule>($"Failed to initialize the {nameof(AssetLoader)}");
             return false;

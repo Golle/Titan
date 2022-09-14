@@ -54,7 +54,9 @@ App.SetupAndRun(builder => builder
     .AddComponents<Transform3DComponent>(maxComponents: 10_000)
     .AddComponents<TestComponent>(maxComponents: 1000)
     .AddResource<GlobalFrameCounter>()
-    .AddResource<SharedAssets>());
+    .AddResource<SharedAssets>()
+
+);
 
 
 static string GetBaseDirectory()

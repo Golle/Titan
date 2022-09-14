@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace Titan.ECS.Worlds;
 
 internal readonly struct IdGenerator<T>

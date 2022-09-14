@@ -181,7 +181,7 @@ Error:
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                var ptr = MemoryUtils.AsPointer(ref _resource1) + index;
+                var ptr = MemoryUtils.AsPointer(_resource1) + index;
                 return ref MemoryUtils.ToRef(ptr);
             }
         }

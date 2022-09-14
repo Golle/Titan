@@ -1,18 +1,20 @@
-using System;
+using System.Runtime.CompilerServices;
+using Titan.Core;
 using Titan.Memory;
 
 namespace Titan.ECS.Systems;
 
 internal unsafe struct SystemsRegistry
 {
-    private SystemDescriptor* _systems;
+    private TitanArray<SystemDescriptor> _systems;
     private int _count;
 
-    public void Init(in PlatformAllocator allocator, ReadOnlySpan<SystemDescriptor> systems)
+    public void Init(MemoryManager* memoryManager, ReadOnlySpan<SystemDescriptor> systems)
     {
         _count = systems.Length;
-        _systems = allocator.Allocate<SystemDescriptor>((uint)_count);
+        _systems = memoryManager->AllocArray<SystemDescriptor>((uint)_count);
         systems.CopyTo(new Span<SystemDescriptor>(_systems, _count));
     }
-    public readonly ReadOnlySpan<SystemDescriptor> GetDescriptors() => new(_systems, _count);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly ReadOnlySpan<SystemDescriptor> GetDescriptors() => _systems;
 }

@@ -7,50 +7,32 @@ namespace Titan.Memory.Allocators;
 /// <summary>
 /// The general purpose allocator will allow any size allocations (8 byte aligns).
 /// It uses best-fit (O(N)) and a free list to decide where to put the allocation, making it slower than a more restrictive allocator.
-/// Uses this for temporary(or permanent) big buffers that last several frames or use this as the base for other Allocators like Linear/Stack/Pool.
+/// Uses this for temporary(or permanent) big buffers that last several frames or use this as the base for other Allocators like Linear/Stack/Pool that is smaller than 4kb.
 /// </summary>
 public unsafe struct GeneralAllocator
 {
     private const uint MinBlockSize = 64;
     private static readonly uint HeaderSize = (uint)sizeof(Header);
 
-    private VirtualMemory _memory;
-    private nuint _offset;
+    private VirtualMemoryBlock _memoryBlock;
     private Header* _allocations;
     private Header* _lastAllocation;
 
-    public static bool Create(PlatformAllocator* platformAllocator, nuint minReserveSize, nuint initialSize, out GeneralAllocator allocator)
+
+    internal GeneralAllocator(VirtualMemoryBlock memoryBlock)
     {
-        Debug.Assert(platformAllocator != null);
-        Debug.Assert(minReserveSize != 0);
-        Debug.Assert(initialSize <= minReserveSize);
-        allocator = default;
-        if (!VirtualMemory.Create(platformAllocator, minReserveSize, out var memory))
-        {
-            Console.WriteLine("Failed to create the virtual memory");
-            return false;
-        }
-
-        allocator = new()
-        {
-            _memory = memory,
-            _offset = 0,
-            _allocations = null
-        };
-
-        if (initialSize != 0u)
-        {
-            allocator.Expand(initialSize);
-        }
-        return true;
+        //NOTE(Jens): we can add a initial size if needed, but we would probably need a create function with a bool return type then.
+        _memoryBlock = memoryBlock;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T* Allocate<T>(uint count) where T : unmanaged => (T*)Allocate((uint)sizeof(T) * count);
 
-    public T* Allocate<T>() where T : unmanaged
-        => (T*)Allocate((uint)sizeof(T));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T* Allocate<T>() where T : unmanaged => (T*)Allocate((uint)sizeof(T));
     public void* Allocate(uint size)
     {
-        Debug.Assert(_memory.MaxSize > 0);
+        Debug.Assert(_memoryBlock.MaxSize > 0);
         var totalSize = MemoryUtils.AlignToUpper(size) + HeaderSize;
 
         var node = GetFreeNode(totalSize);
@@ -60,7 +42,6 @@ public unsafe struct GeneralAllocator
         // if the remaining size is greater than MinBlockSize, split the node into 2. 
         if (remainingSize > MinBlockSize)
         {
-            Console.WriteLine($"Split the memory block into 2 pieces: {totalSize} and {remainingSize}");
             var header = (Header*)((byte*)node + totalSize);
             header->State = AllocationState.Free;
             header->Previous = node;
@@ -78,16 +59,9 @@ public unsafe struct GeneralAllocator
                 _lastAllocation = header;
             }
         }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Block size mismatch but less than {MinBlockSize} bytes. {remainingSize} bytes lost.");
-            Console.ResetColor();
-        }
         node->State = AllocationState.Allocated;
         var data = (void*)(node + 1);
         Debug.Assert((nuint)data == MemoryUtils.Align((nuint)data), "The data pointer returned should be aligned at 8 bytes. Not sure why this happened.");
-        Console.WriteLine($"Allocated node with requested size: {totalSize} bytes (Data size of allocated block: {size} bytes)");
         return data;
     }
 
@@ -102,7 +76,6 @@ public unsafe struct GeneralAllocator
             {
                 if (header->State == AllocationState.Free && header->BlockSize >= totalSize)
                 {
-                    Console.WriteLine($"Found a matching block: {header->BlockSize} bytes. Requested size: {totalSize}");
                     return header;
                 }
                 header = header->Next;
@@ -116,29 +89,29 @@ public unsafe struct GeneralAllocator
         if (_allocations == null)
         {
             // first allocation
-            _memory.Resize(requestedBlockSize); // set the size to the requested size (aligned with the page size)
-            _allocations = (Header*)_memory.Mem;
+            _memoryBlock.Resize(requestedBlockSize); // set the size to the requested size (aligned with the page size)
+            _allocations = (Header*)_memoryBlock.Mem;
             _allocations->Next = null;
             _allocations->Previous = null;
-            _allocations->BlockSize = _memory.Size;
+            _allocations->BlockSize = _memoryBlock.Size;
             _allocations->State = AllocationState.Free;
             _lastAllocation = _allocations;
             return;
         }
 
-        var newSize = _memory.Size;
+        var newSize = _memoryBlock.Size;
         do
         {
-            newSize = Math.Min(newSize * 2, _memory.MaxSize);
-            if (_offset + requestedBlockSize < newSize)
+            newSize = Math.Min(newSize * 2, _memoryBlock.MaxSize);
+            if (requestedBlockSize < newSize)
             {
-                var previousSize = _memory.Size;
-                _memory.Resize(newSize);
+                var previousSize = _memoryBlock.Size;
+                _memoryBlock.Resize(newSize);
                 Debug.Assert(_lastAllocation != null, "This should not happen, since this can't be reached without any allocations occuring.");
                 var mem = (Header*)((byte*)_lastAllocation + _lastAllocation->BlockSize);
                 mem->Next = null;
                 mem->Previous = _lastAllocation;
-                mem->BlockSize = _memory.Size - previousSize;
+                mem->BlockSize = _memoryBlock.Size - previousSize;
                 mem->State = AllocationState.Free;
                 _lastAllocation->Next = mem;
                 _lastAllocation = mem;
@@ -146,7 +119,7 @@ public unsafe struct GeneralAllocator
                 MergeWithNext(mem->Previous);
                 return;
             }
-        } while (newSize < _memory.MaxSize);
+        } while (newSize < _memoryBlock.MaxSize);
 
         Debug.Assert(true, "ran out of memory.");
     }
@@ -154,17 +127,15 @@ public unsafe struct GeneralAllocator
     public void Free(void* ptr)
     {
         Debug.Assert(ptr != null);
-        Debug.Assert(_memory.MaxSize > 0);
+        Debug.Assert(_memoryBlock.MaxSize > 0);
         var header = (Header*)ptr - 1;
         // Check bounds
-        Debug.Assert(header >= _memory.Mem);
-        Debug.Assert(header < (byte*)_memory.Mem + _memory.Size);
+        Debug.Assert(header >= _memoryBlock.Mem);
+        Debug.Assert(header < (byte*)_memoryBlock.Mem + _memoryBlock.Size);
         if (header->State != AllocationState.Allocated)
         {
-            Console.WriteLine("Memory has already been freed or was not allocated with this allocator.");
             return;
         }
-        Console.WriteLine($"Freeing memory with size: {header->BlockSize} bytes");
         header->State = AllocationState.Free;
 
         // See if we can merge blocks that are nearby
@@ -181,7 +152,6 @@ public unsafe struct GeneralAllocator
             var next = current->Next;
             var nextNext = next->Next;
             current->Next = nextNext;
-            Console.WriteLine($"Merge block with size: {current->BlockSize} bytes and {next->BlockSize} bytes. ({current->BlockSize + next->BlockSize} bytes)");
             current->BlockSize += next->BlockSize;
             if (nextNext != null)
             {
@@ -198,8 +168,8 @@ public unsafe struct GeneralAllocator
     }
     public void Release()
     {
-        _memory.Release();
-        _memory = default;
+        _memoryBlock.Release();
+        _memoryBlock = default;
     }
 
     //NOTE(Jens): Current header size is 24 bytes, we can reduce that by packing and doing some extra calculations. Memory/Performance trade. 
@@ -222,35 +192,5 @@ public unsafe struct GeneralAllocator
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool IsWithinMemoryBlock(void* ptr)
-        => ptr >= _memory.Mem && ptr < (byte*)_memory.Mem + _memory.Size;
-
-    public void PrintDebugInfo()
-    {
-        var header = _allocations;
-        var memoryAllocated = 0u;
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine();
-        Console.WriteLine($"Memory: 0x{(nuint)_memory.Mem}. Committed: {_memory.Size} bytes. Reserved: {_memory.MaxSize} bytes");
-
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"{"Address",-18} | {"State",-10} | {"Next",-18} | {"Previous",-18} | Size");
-        while (header != null)
-        {
-            Console.ForegroundColor = header->State == AllocationState.Free ? ConsoleColor.Green : ConsoleColor.Red;
-
-            Console.WriteLine($"0x{(nuint)header,-16} | {header->State,-10} | 0x{(nuint)header->Next,-16} | 0x{(nuint)header->Previous,-16} | {header->BlockSize} bytes");
-            memoryAllocated += header->BlockSize;
-            header = header->Next;
-        }
-
-        var diff = (int)memoryAllocated - _memory.Size;
-        if (diff != 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Total Memory: {memoryAllocated} bytes. Difference between blocks and allocated in virtual mem: {diff} bytes");
-        }
-
-        Console.ResetColor();
-        Console.WriteLine();
-    }
+        => ptr >= _memoryBlock.Mem && ptr < (byte*)_memoryBlock.Mem + _memoryBlock.Size;
 }

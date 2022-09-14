@@ -1,56 +1,61 @@
-using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.ECS.Worlds;
 using Titan.Memory;
-using Titan.Memory.Arenas;
+using Titan.Memory.Allocators2;
 
 namespace Titan.ECS.Events;
 
 internal unsafe struct EventsRegistry : IResource
 {
-    private const uint MinEventStreamSize = 1024 * 10; // 10KB
+    private static readonly uint MinEventStreamSize = MemoryUtils.KiloBytes(8);
 
-    private DynamicLinearArena _arena1;
-    private DynamicLinearArena _arena2;
+    private MemoryManager* _memoryManager;
 
-    private DynamicLinearArena* _current;
-    private DynamicLinearArena* _previous;
+    private LinearAllocator _allocator1;
+    private LinearAllocator _allocator2;
 
-    private InternalState* _internal;
+    private LinearAllocator* _current;
+    private LinearAllocator* _previous;
 
-    private uint _count;
+    private TitanArray<InternalState> _internal;
 
-    public void Init(in PlatformAllocator allocator, uint size, uint maxEventCount)
+    public bool Init(MemoryManager* memoryManager, uint size, uint maxEventCount)
     {
         Logger.Trace<EventsRegistry>($"Creating the event stream with initial size: {size} bytes and a max event count of {maxEventCount}");
 
         // Split the size in 2 since we just want to allocate the amount of memory that was set in the config.
         var halfSize = Math.Max(size / 2, MinEventStreamSize);
 
-        _count = maxEventCount;
-        _internal = allocator.Allocate<InternalState>(_count, true);
-
+        _internal = memoryManager->AllocArray<InternalState>(maxEventCount);
         // Allocate 2 arenas that we'll swap between.
-        _arena1 = DynamicLinearArena.Create(allocator, halfSize);
-        _arena2 = DynamicLinearArena.Create(allocator, halfSize);
+        var result = memoryManager->CreateLinearAllocator(AllocatorArgs.Permanent(halfSize), out _allocator1) &&
+                     memoryManager->CreateLinearAllocator(AllocatorArgs.Permanent(halfSize), out _allocator2);
 
-        _current = MemoryUtils.AsPointer(ref _arena1);
-        _previous = MemoryUtils.AsPointer(ref _arena2);
+        if (!result)
+        {
+            Logger.Error<EventsRegistry>("Failed to init the allocator");
+            return false;
+        }
+
+        _current = MemoryUtils.AsPointer(_allocator1);
+        _previous = MemoryUtils.AsPointer(_allocator2);
+        _memoryManager = memoryManager;
+        return true;
     }
 
 
     public EventsReader<T> GetReader<T>() where T : unmanaged, IEvent
     {
-        var state = _internal + EventId.Id<T>();
+        var state = _internal.GetPointer(EventId.Id<T>());
         var previous = state->GetPreviousPointer();
         return new(&previous->FirstEvent, &previous->Count);
     }
 
     public EventsWriter<T> GetWriter<T>() where T : unmanaged, IEvent
-        => new(MemoryUtils.AsPointer(ref this));
+        => new(MemoryUtils.AsPointer(this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void Send<T>(in T @event) where T : unmanaged, IEvent
@@ -63,17 +68,17 @@ internal unsafe struct EventsRegistry : IResource
         _previous = tmp;
         _current->Reset();
 
-        for (var i = 0; i < _count; ++i)
+        foreach (ref var state in _internal.AsSpan())
         {
-            _internal[i].Swap();
+            state.Swap();
         }
     }
 
-    internal void Release(in PlatformAllocator allocator)
+    internal void Release()
     {
-        _arena1.Release();
-        _arena2.Release();
-        allocator.Free(_internal);
+        _allocator1.Release();
+        _allocator2.Release();
+        _memoryManager->Free(_internal);
     }
 
     private struct InternalState
@@ -86,16 +91,16 @@ internal unsafe struct EventsRegistry : IResource
             _current = default;
         }
 
-        public void Send<T>(DynamicLinearArena* arena, in T @event) where T : unmanaged
+        public void Send<T>(LinearAllocator* allocator, in T @event) where T : unmanaged
         {
             var size = sizeof(T) + sizeof(EventHeader);
-            var header = (EventHeader*)arena->Allocate((nuint)size);
+            var header = (EventHeader*)allocator->Alloc(size);
             header->Next = null; // make sure the header doesn't point to something that doesn't exist.
             var mem = (T*)(header + 1);
             *mem = @event;
             _current.Push(header);
         }
-        public EventState* GetPreviousPointer() => MemoryUtils.AsPointer(ref _previous);
+        public EventState* GetPreviousPointer() => MemoryUtils.AsPointer(_previous);
     }
 
     private struct EventState

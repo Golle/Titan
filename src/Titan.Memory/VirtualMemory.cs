@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using Titan.Core.Logging;
 using Titan.Core.Memory;
 
 namespace Titan.Memory;
@@ -6,67 +6,54 @@ namespace Titan.Memory;
 internal unsafe struct VirtualMemory
 {
     private readonly PlatformAllocator* _allocator;
-    private void* _mem;
-    private uint _pages;
-    private readonly uint _maxPages;
+    private readonly void* _startAddress;
+    private readonly uint _reservedPages;
+    private uint _claimedPages;
 
-    public void* Mem => _mem;
-    public uint Size => _pages * _allocator->PageSize;
-    public uint MaxSize => _maxPages * _allocator->PageSize;
-    public uint PageSize => _allocator->PageSize;
-
-    public VirtualMemory(PlatformAllocator* allocator, void* mem, uint maxPages)
+    private VirtualMemory(PlatformAllocator* allocator, void* startAddress, uint reservedPages)
     {
         _allocator = allocator;
-        _mem = mem;
-        _maxPages = maxPages;
-        _pages = 0;
+        _startAddress = startAddress;
+        _reservedPages = reservedPages;
     }
 
-    public static bool Create(PlatformAllocator* platformAllocator, nuint minReserveSize, out VirtualMemory memory)
+    public static bool Create(PlatformAllocator* allocator, nuint minReserveSize, out VirtualMemory memory)
     {
         memory = default;
-        var pages = GetPageCount(minReserveSize, platformAllocator->PageSize);
-        var mem = platformAllocator->Reserve(null, pages);
-        if (mem == null)
+        var pages = (uint)MemoryUtils.AlignToUpper(minReserveSize, allocator->PageSize) / allocator->PageSize;
+        var memoryBlock = allocator->Reserve(null, pages);
+        if (memoryBlock == null)
         {
+            Logger.Error<VirtualMemory>($"Failed to reserve {pages} pages (size: {pages*allocator->PageSize} bytes)");
             return false;
         }
-        memory = new(platformAllocator, mem, pages);
+        memory = new VirtualMemory(allocator, memoryBlock, pages);
+        return true;
+    }
+
+
+    public bool TryReserveBlock(nuint minReserveSize, out VirtualMemoryBlock block)
+    {
+        block = default;
+        var alignedReserveBytes = MemoryUtils.AlignToUpper(minReserveSize, _allocator->PageSize);
+        var pages = (uint)alignedReserveBytes / _allocator->PageSize;
+        if (_claimedPages + pages > _reservedPages)
+        {
+            Logger.Error<VirtualMemory>("Trying to reserve a bigger block than fits the original reservation.");
+            return false;
+        }
+        var mem = (byte*)_startAddress + _claimedPages * _allocator->PageSize;
+        block = new VirtualMemoryBlock(_allocator, mem, pages);
+        _claimedPages += pages;
 
         return true;
     }
 
     public void Release()
     {
-        if (_mem != null && _allocator != null)
+        if (_startAddress != null && _allocator != null)
         {
-            _allocator->Release(_mem, _pages);
+            _allocator->Release(_startAddress, _reservedPages);
         }
     }
-
-    public void Resize(nuint newSize)
-    {
-        Debug.Assert(_mem != null);
-        var pages = GetPageCount(newSize, _allocator->PageSize);
-        var pageDiff = (int)pages - _pages;
-
-        Console.WriteLine($"Resize {newSize} bytes ({pages}). Page diff {pageDiff}");
-        if (pageDiff > 0)
-        {
-            var startAddress = (byte*)_mem + _pages * _allocator->PageSize;
-            _allocator->Commit(startAddress, (uint)pageDiff);
-        }
-        else if (pageDiff < 0)
-        {
-            var startAddress = (byte*)_mem + pages * _allocator->PageSize;
-            _allocator->Decommit(startAddress, (uint)-pageDiff);
-        }
-        _pages = pages;
-
-        Console.WriteLine($"Updated size: {Size} bytes (Max: {MaxSize} bytes) Pages: {_pages}");
-        // if pageDiff is 0 , do nothing
-    }
-
-    private static uint GetPageCount(nuint size, uint pageSize) => (uint)(MemoryUtils.AlignToUpper(size, pageSize) / pageSize);
 }

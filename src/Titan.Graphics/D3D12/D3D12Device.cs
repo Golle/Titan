@@ -58,8 +58,8 @@ public unsafe struct D3D12Device
     private D3D12_VIEWPORT _viewPort;
     private D3D12_RECT _scissorRect;
 
-    private ref ComPtr<ID3D12Resource> GetRenderTarget(int index) => ref *(ComPtr<ID3D12Resource>*)MemoryUtils.AsPointer(ref _renderTargets[index]);
-    private ref ComPtr<ID3D12Fence> GetFence(int index) => ref *(ComPtr<ID3D12Fence>*)MemoryUtils.AsPointer(ref _fences[index]);
+    private ref ComPtr<ID3D12Resource> GetRenderTarget(int index) => ref *(ComPtr<ID3D12Resource>*)MemoryUtils.AsPointer(_renderTargets[index]);
+    private ref ComPtr<ID3D12Fence> GetFence(int index) => ref *(ComPtr<ID3D12Fence>*)MemoryUtils.AsPointer(_fences[index]);
     public D3D_FEATURE_LEVEL FeatureLevel => _fatureLevel;
 
     public static bool CreateAndInit(HWND windowHandle, uint width, uint height, bool debug, out D3D12Device device)

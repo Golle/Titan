@@ -8,6 +8,10 @@ public static unsafe class MemoryUtils
     private const uint OneKiloByte = 1024u;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Init(void* mem, long sizeInBytes, byte value = 0)
+        => Init(mem, (nuint)sizeInBytes, value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Init(void* mem, int sizeInBytes, byte value = 0)
         => Init(mem, (nuint)sizeInBytes, value);
 
@@ -40,11 +44,12 @@ public static unsafe class MemoryUtils
     {
         Debug.Assert(sizeInBytes < uint.MaxValue, $"Can't copy memory that has a size bigger size than {uint.MaxValue} bytes.");
         Unsafe.CopyBlockUnaligned(dst, src, (uint)sizeInBytes);
+
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T* AsPointer<T>(ref T value) where T : unmanaged
-        => (T*)Unsafe.AsPointer(ref value);
+    public static T* AsPointer<T>(in T value) where T : unmanaged
+        => (T*)Unsafe.AsPointer(ref Unsafe.AsRef(value));
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -71,7 +76,7 @@ public static unsafe class MemoryUtils
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint KiloBytes(uint size) => size * OneKiloByte;
 
-    
+
 
 
     /// <summary>
@@ -88,9 +93,16 @@ public static unsafe class MemoryUtils
         => size & ~7u;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint AlignToUpper(int size)
+    {
+        Debug.Assert(size >= 0);
+        return AlignToUpper((uint)size);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint AlignToUpper(uint size)
     {
-        var alignedSize = (size & ~7u);
+        var alignedSize = Align(size);
         return alignedSize < size ? alignedSize + 8u : alignedSize;
     }
 

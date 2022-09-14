@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
@@ -10,16 +9,17 @@ namespace Titan.ECS.Components;
 
 internal unsafe struct ComponentRegistry : IApi
 {
+    private MemoryManager* _memoryManager;
     private ComponentsInternal* _components;
     private uint _count;
-    public void Init(in PlatformAllocator allocator, uint maxEntities, ReadOnlySpan<ComponentDescriptor> descriptors)
+    public void Init(MemoryManager* memoryManager, uint maxEntities, ReadOnlySpan<ComponentDescriptor> descriptors)
     {
         Logger.Warning<ComponentRegistry>("The allocations for the components are not memory aligned, this needs to be fixed.");
         _count = (uint)descriptors.Length;
 
         var internalsSize = (nuint)(sizeof(ComponentsInternal) * _count);
         var componentSize = CalculateComponentSize(descriptors, maxEntities); // TODD: Not aligned
-        var mem = allocator.Allocate(internalsSize + componentSize);
+        var mem = memoryManager->Alloc((uint)(internalsSize + componentSize));
         _components = (ComponentsInternal*)mem;
         var components = (byte*)(_components + _count);
 
@@ -36,6 +36,8 @@ internal unsafe struct ComponentRegistry : IApi
             // move the pointer to the next block
             components += desc.CalculateSize(maxEntities); // Align this move.
         }
+
+        _memoryManager = memoryManager;
 
         static nuint CalculateComponentSize(ReadOnlySpan<ComponentDescriptor> descriptors, uint maxEntities)
         {
@@ -89,9 +91,13 @@ internal unsafe struct ComponentRegistry : IApi
     }
 
 
-    public void Release(in PlatformAllocator allocator)
+    public void Release()
     {
-        allocator.Free(_components);
+        if (_components != null)
+        {
+            _memoryManager->Free(_components);
+            _components = null;
+        }
     }
     private struct ComponentsInternal
     {

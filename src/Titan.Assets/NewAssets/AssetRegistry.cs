@@ -1,6 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -16,9 +14,9 @@ internal unsafe struct AssetRegistry : IResource
     private const int HandleOffset = 70000;
     private TitanArray<int> _manifestOffsets;
     private TitanArray<AssetContext> _assets;
-    private PlatformAllocator* _allocator;
+    private MemoryManager* _memoryManager;
 
-    public bool Init(PlatformAllocator* allocator, AssetsConfiguration[] configs)
+    public bool Init(MemoryManager* memoryManager, AssetsConfiguration[] configs)
     {
         Debug.Assert(_manifestOffsets.Length == 0);
         Debug.Assert(_assets.Length == 0);
@@ -33,7 +31,7 @@ internal unsafe struct AssetRegistry : IResource
         var manifestIndexSize = highestManifestId * sizeof(int);
         var totalSize = sizeof(AssetContext) * assetCount + manifestIndexSize;
 
-        var mem = (byte*)allocator->Allocate((nuint)totalSize, initialize: true);
+        var mem = (byte*)memoryManager->Alloc((uint)totalSize, initialize: true);
         Debug.Assert(mem != null, $"Failed to allocate {totalSize} bytes of memory.");
         var manifestOffsets = (int*)mem;
         var assets = (AssetContext*)(mem + manifestIndexSize);
@@ -60,7 +58,7 @@ internal unsafe struct AssetRegistry : IResource
 
         _assets = new TitanArray<AssetContext>(assets, assetCount);
         _manifestOffsets = new TitanArray<int>(manifestOffsets, highestManifestId);
-        _allocator = allocator;
+        _memoryManager = memoryManager;
         return true;
     }
 
@@ -78,7 +76,7 @@ internal unsafe struct AssetRegistry : IResource
 
     public void Release()
     {
-        _allocator->Free(_manifestOffsets);
+        _memoryManager->Free(_manifestOffsets);
         this = default;
     }
 
