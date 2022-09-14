@@ -30,7 +30,6 @@ public unsafe class AppBuilder
         {
             throw new Exception($"Failed to create the {nameof(ResourceCollection)}");
         }
-        Thread.Sleep(2000);
         // Add the PlatformAllocator as a resource so we can use it when setting up the modules (This must be done after it's been used to create the resource collection or the _next in the pool will be wrong.
         AddResource(memoryManager);
         
