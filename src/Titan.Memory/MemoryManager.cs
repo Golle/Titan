@@ -36,7 +36,7 @@ public unsafe struct MemoryManager
     }
     public static bool Create(in MemoryConfiguration config, out MemoryManager manager)
     {
-        var platformAllocator = PlatformAllocatorHelper.CreateAllocator();
+        var platformAllocator = PlatformAllocatorHelper.GetPlatformAllocator();
         manager = default;
         if (!VirtualMemory.Create(platformAllocator, config.MaxVirtualMemory, out var virtualMemory))
         {
@@ -55,7 +55,6 @@ public unsafe struct MemoryManager
         var state = generalAllocator.Allocate<InternalState>();
         state->GeneralAllocator = generalAllocator;
         state->VirtualMemory = virtualMemory;
-        state->PlatformAllocator = platformAllocator;
 
         manager = new MemoryManager(state);
 
@@ -185,7 +184,6 @@ public unsafe struct MemoryManager
             stateCopy.GeneralAllocator.Release();
             stateCopy.VirtualMemory.Release();
             
-            PlatformAllocatorHelper.ReleaseAllocator(stateCopy.PlatformAllocator);
             _state = null;
         }
     }
@@ -194,6 +192,5 @@ public unsafe struct MemoryManager
     {
         public VirtualMemory VirtualMemory;
         public GeneralAllocator GeneralAllocator;
-        public PlatformAllocator* PlatformAllocator;
     }
 }

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Platform.Win32.Win32;
 
@@ -6,6 +7,14 @@ namespace Titan.Memory.Platform;
 
 internal unsafe struct Win32PlatformAllocator : IPlatformAllocator
 {
+    public static readonly PlatformAllocator* Instance;
+
+    static Win32PlatformAllocator()
+    {
+        Instance = (PlatformAllocator*)RuntimeHelpers.AllocateTypeAssociatedMemory(typeof(Win32PlatformAllocator), sizeof(PlatformAllocator));
+        *Instance = PlatformAllocator.Create<Win32PlatformAllocator>();
+    }
+
     public static uint PageSize { get; } = GetPageSize();
     public static void* Reserve(void* startAddress, uint pages)
     {

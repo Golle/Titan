@@ -11,23 +11,12 @@ public static class PlatformAllocatorHelper
     /// This will create a Heap Allocated PlatformAllocator. This is the only place the NativeMemory class will be used within the engine.
     /// </summary>
     /// <returns>Pointer to the allocator</returns>
-    public static unsafe PlatformAllocator* CreateAllocator()
-    {
-        var allocator = (PlatformAllocator*)NativeMemory.Alloc((nuint)sizeof(PlatformAllocator));
-        Debug.Assert(allocator != null);
-
-        *allocator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) switch
+    public static unsafe PlatformAllocator* GetPlatformAllocator() =>
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) switch
         {
-            true => PlatformAllocator.Create<Win32PlatformAllocator>(),
-            _ => PlatformAllocator.Create<PosixPlatformAllocator>()
+            true => Win32PlatformAllocator.Instance,
+            false or _ => PosixPlatformAllocator.Instance
         };
-        return allocator;
-    }
-
-    public static unsafe void ReleaseAllocator(PlatformAllocator* allocator)
-    {
-        NativeMemory.Free(allocator);
-    }
 }
 
 

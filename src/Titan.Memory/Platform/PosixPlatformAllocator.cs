@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Titan.Platform.Posix;
 
 namespace Titan.Memory.Platform;
@@ -6,6 +7,15 @@ namespace Titan.Memory.Platform;
 internal unsafe struct PosixPlatformAllocator : IPlatformAllocator
 {
     public static uint PageSize { get; } = (uint)Libc.getpagesize();
+
+    public static readonly PlatformAllocator* Instance;
+
+    static PosixPlatformAllocator()
+    {
+        Instance = (PlatformAllocator*)RuntimeHelpers.AllocateTypeAssociatedMemory(typeof(PosixPlatformAllocator), sizeof(PlatformAllocator));
+        *Instance = PlatformAllocator.Create<PosixPlatformAllocator>();
+    }
+
     public static void* Reserve(void* startAddress, uint pages)
     {
         var mem = Libc.mmap(startAddress, pages * PageSize, PageProtection.PROT_NONE, PageFlags.MAP_ANON | PageFlags.MAP_SHARED, -1, 0);
