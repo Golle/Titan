@@ -24,7 +24,7 @@ public unsafe struct ECSModule : IModule
         var allocatorSize = MemoryUtils.MegaBytes(512);
 
         //TODO(Jens): need a way to handle the life time of this allocator
-        if (!memoryManager->CreateLinearAllocator(AllocatorArgs.Permanent(allocatorSize), out var allocator))
+        if (!memoryManager->CreateLinearAllocator(LinearAllocatorArgs.Permanent(allocatorSize), out var allocator))
         {
             Logger.Error<ECSModule>($"Failed to create an allocator with {allocatorSize} bytes.");
             return false;

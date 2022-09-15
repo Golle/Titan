@@ -31,8 +31,8 @@ internal unsafe struct EventsRegistry : IResource
 
         _internal = memoryManager->AllocArray<InternalState>(maxEventCount);
         // Allocate 2 arenas that we'll swap between.
-        var result = memoryManager->CreateLinearAllocator(AllocatorArgs.Permanent(halfSize), out _allocator1) &&
-                     memoryManager->CreateLinearAllocator(AllocatorArgs.Permanent(halfSize), out _allocator2);
+        var result = memoryManager->CreateLinearAllocator(LinearAllocatorArgs.Permanent(halfSize), out _allocator1) &&
+                     memoryManager->CreateLinearAllocator(LinearAllocatorArgs.Permanent(halfSize), out _allocator2);
 
         if (!result)
         {

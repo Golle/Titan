@@ -25,7 +25,7 @@ public unsafe struct ResourceCollection
         resourceCollection = default;
         var indicesSize = (uint)sizeof(void*) * maxTypes;
         var totalSize = maxSize + indicesSize;
-        if (!memoryManager->CreateLinearAllocator(AllocatorArgs.Permanent(totalSize), out var allocator))
+        if (!memoryManager->CreateLinearAllocator(LinearAllocatorArgs.Permanent(totalSize), out var allocator))
         {
             Logger.Error<ResourceCollection>("Failed to create the allocator.");
             return false;

@@ -21,10 +21,16 @@ public enum AllocatorStrategy
     Temporary
 }
 
-public record struct AllocatorArgs(uint Size, AllocatorStrategy Strategy)
+public record struct LinearAllocatorArgs(uint Size, AllocatorStrategy Strategy)
 {
-    public static AllocatorArgs Temporary(uint size) => new(size, AllocatorStrategy.Temporary);
-    public static AllocatorArgs Permanent(uint size) => new(size, AllocatorStrategy.Permanent);
+    public static LinearAllocatorArgs Temporary(uint size) => new(size, AllocatorStrategy.Temporary);
+    public static LinearAllocatorArgs Permanent(uint size) => new(size, AllocatorStrategy.Permanent);
+}
+
+public record struct PoolAllocatorArgs(uint Count, AllocatorStrategy Strategy)
+{
+    public static PoolAllocatorArgs Temporary(uint count) => new(count, AllocatorStrategy.Temporary);
+    public static PoolAllocatorArgs Permanent(uint count) => new(count, AllocatorStrategy.Permanent);
 }
 
 public unsafe struct MemoryManager
@@ -119,7 +125,7 @@ public unsafe struct MemoryManager
     /// <param name="args">LinearAllocator configuration</param>
     /// <param name="allocator">The linear allocator</param>
     /// <returns>true on success</returns>
-    public readonly bool CreateLinearAllocator(in AllocatorArgs args, out LinearAllocator allocator)
+    public readonly bool CreateLinearAllocator(in LinearAllocatorArgs args, out LinearAllocator allocator)
     {
         var memoryManagerPtr = MemoryUtils.AsPointer(this);
         return args.Strategy switch
@@ -138,13 +144,13 @@ public unsafe struct MemoryManager
     /// <param name="args">PoolAllocator configuration</param>
     /// <param name="allocator">The pool allocator</param>
     /// <returns>true on success</returns>
-    public readonly bool CreatePoolAllocator<T>(in AllocatorArgs args, out PoolAllocator<T> allocator) where T : unmanaged
+    public readonly bool CreatePoolAllocator<T>(in PoolAllocatorArgs args, out PoolAllocator<T> allocator) where T : unmanaged
     {
         var memoryManagerPtr = MemoryUtils.AsPointer(this);
         return args.Strategy switch
         {
-            AllocatorStrategy.Permanent => PoolAllocator<T>.Create<DynamicPoolAllocator<T>>(memoryManagerPtr, args.Size, out allocator),
-            AllocatorStrategy.Temporary or _ => PoolAllocator<T>.Create<FixedSizePoolAllocator<T>>(memoryManagerPtr, args.Size, out allocator)
+            AllocatorStrategy.Permanent => PoolAllocator<T>.Create<DynamicPoolAllocator<T>>(memoryManagerPtr, args.Count, out allocator),
+            AllocatorStrategy.Temporary or _ => PoolAllocator<T>.Create<FixedSizePoolAllocator<T>>(memoryManagerPtr, args.Count, out allocator)
         };
     }
 
@@ -178,13 +184,13 @@ public unsafe struct MemoryManager
         {
             //NOTE(Jens): we copy the state variable onto the stack to prevent memory corruption. (when Release is called the memory pointers are set to null, if the allocator is in the same memory we'll get a memory access violation)
             var stateCopy = *_state;
-            _state->GeneralAllocator.Free(_state);
+            stateCopy.GeneralAllocator.Free(_state);
 
             // release the allocators
             stateCopy.GeneralAllocator.Release();
             stateCopy.VirtualMemory.Release();
 
-            _state = null;
+            //NOTE(Jens): releasing the VirtualMemory will invalidate this entire struct, accessing any private members after that call will result in AccessViolation
         }
     }
 

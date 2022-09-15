@@ -65,13 +65,13 @@ public unsafe struct Scheduler
 
         ref var memory = ref resources.GetResource<MemoryManager>();
         //NOTE(Jens): 10Mb temporary allocator
-        if (!memory.CreateLinearAllocator(AllocatorArgs.Temporary(MemoryUtils.MegaBytes(10)), out var transient))
+        if (!memory.CreateLinearAllocator(LinearAllocatorArgs.Temporary(MemoryUtils.MegaBytes(10)), out var transient))
         {
             Logger.Error<Scheduler>("Failed to create a temporary allocator");
             return false;
         }
         
-        if (!memory.CreateLinearAllocator(AllocatorArgs.Permanent(DefaultMaxSystemMemory), out _systemsAllocator))
+        if (!memory.CreateLinearAllocator(LinearAllocatorArgs.Permanent(DefaultMaxSystemMemory), out _systemsAllocator))
         {
             Logger.Error<Scheduler>("Failed to create the system memory allocator");
             transient.Release();
