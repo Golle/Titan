@@ -7,7 +7,7 @@ namespace Titan.Memory.Allocators;
 internal unsafe struct FixedSizePoolAllocator<T> : IPoolAllocator<T> where T : unmanaged
 {
     private MemoryManager* _memoryManager;
-    private T* _mem;
+    private byte* _mem;
     private Header* _freeList;
     private uint _maxCount;
 
@@ -25,19 +25,19 @@ internal unsafe struct FixedSizePoolAllocator<T> : IPoolAllocator<T> where T : u
         }
         var allocator = (FixedSizePoolAllocator<T>*)mem;
         allocator->_memoryManager = memoryManager;
-        allocator->_mem = (T*)(mem + alignedAllocatorSize);
+        allocator->_mem = mem + alignedAllocatorSize;
         allocator->_maxCount = maxCount;
-        InitFreeList(allocator);
+        InitFreeList(allocator, alignedSize);
 
         return mem;
 
-        static void InitFreeList(FixedSizePoolAllocator<T>* allocator)
+        static void InitFreeList(FixedSizePoolAllocator<T>* allocator, uint alignedSize)
         {
             //NOTE(Jens): Initialize the free list in reverse order to put the first element in the array on the last spot (which is accessed first)
             Header* header = null;
             for (var i = (int)allocator->_maxCount - 1; i >= 0; --i)
             {
-                var next = (Header*)(allocator->_mem + i);
+                var next = (Header*)(allocator->_mem + i * alignedSize);
                 next->Previous = header;
                 header = next;
             }
