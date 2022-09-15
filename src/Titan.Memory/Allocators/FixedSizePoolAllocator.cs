@@ -1,82 +1,86 @@
-//using System.Diagnostics;
-//using Titan.Core.Logging;
-//using Titan.Core.Memory;
+using System.Diagnostics;
+using Titan.Core.Logging;
+using Titan.Core.Memory;
 
-//namespace Titan.Memory.Allocators;
+namespace Titan.Memory.Allocators;
 
-//public unsafe struct FixedSizePoolAllocator<T> where T : unmanaged
-//{
-//    private static readonly uint Size = (uint)sizeof(T);
-//    private static readonly uint AlignedSize = MemoryUtils.AlignToUpper((uint)sizeof(T));
-//    private readonly GeneralAllocator* _allocator;
-//    private T* _mem;
-//    private Header* _freeList;
-//    private readonly uint _maxCount;
+internal unsafe struct FixedSizePoolAllocator<T> : IPoolAllocator<T> where T : unmanaged
+{
+    private MemoryManager* _memoryManager;
+    private T* _mem;
+    private Header* _freeList;
+    private uint _maxCount;
 
-//    public int _count;
-//    private FixedSizePoolAllocator(GeneralAllocator* allocator, void* mem, uint maxCount)
-//    {
-//        _allocator = allocator;
-//        _maxCount = maxCount;
-//        _mem = (T*)mem;
+    public static void* CreateAndInit(MemoryManager* memoryManager, uint maxCount)
+    {
+        var alignedSize = MemoryUtils.AlignToUpper(sizeof(T));
+        var alignedAllocatorSize = MemoryUtils.AlignToUpper(sizeof(FixedSizePoolAllocator<T>));
+        var totalSize = alignedAllocatorSize + alignedSize * maxCount;
 
-//        Header* header = null;
-//        for (var i = (int)_maxCount - 1; i >= 0; --i)
-//        {
-//            var next = (Header*)(_mem + i);
-//            next->Previous = header;
-//            header = next;
-//        }
-//        _freeList = header;
-//    }
+        var mem = (byte*)memoryManager->Alloc(totalSize, initialize: true);
+        if (mem == null)
+        {
+            Logger.Error<FixedSizePoolAllocator<T>>($"Failed to allocate {totalSize} bytes of memory.");
+            return null;
+        }
+        var allocator = (FixedSizePoolAllocator<T>*)mem;
+        allocator->_memoryManager = memoryManager;
+        allocator->_mem = (T*)(mem + alignedAllocatorSize);
+        allocator->_maxCount = maxCount;
+        InitFreeList(allocator);
 
-//    public static bool Create(GeneralAllocator* allocator, uint maxCount, out FixedSizePoolAllocator<T> poolAllocator)
-//        => Create(allocator, maxCount, true, out poolAllocator);
+        return mem;
 
-//    public static bool Create(GeneralAllocator* allocator, uint maxCount, bool alignedPerObject, out FixedSizePoolAllocator<T> poolAllocator)
-//    {
-//        poolAllocator = default;
+        static void InitFreeList(FixedSizePoolAllocator<T>* allocator)
+        {
+            //NOTE(Jens): Initialize the free list in reverse order to put the first element in the array on the last spot (which is accessed first)
+            Header* header = null;
+            for (var i = (int)allocator->_maxCount - 1; i >= 0; --i)
+            {
+                var next = (Header*)(allocator->_mem + i);
+                next->Previous = header;
+                header = next;
+            }
+            allocator->_freeList = header;
+        }
+    }
 
-//        var typeSize = alignedPerObject ? AlignedSize : Size;
-//        var mem = allocator->Allocate(typeSize * maxCount);
-//        if (mem == null)
-//        {
-//            Logger.Error<FixedSizePoolAllocator<T>>($"Failed to allocate {typeSize * maxCount} bytes of memory.");
-//            return false;
-//        }
-//        poolAllocator = new(allocator, mem, maxCount);
-//        return true;
-//    }
+    public static T* Alloc(void* context, bool initialize)
+    {
+        var instance = (FixedSizePoolAllocator<T>*)context;
+        Debug.Assert(instance != null);
+        var mem = (T*)instance->_freeList;
+        if (mem == null)
+        {
+            //NOTE(Jens): not sure what we should do here. if this happens all memory in the pool has been allocated.
+            return null;
+        }
+        instance->_freeList = instance->_freeList->Previous;
+        if (initialize)
+        {
+            *mem = default;
+        }
+        return mem;
+    }
 
-//    public T* Allocate()
-//    {
-//        Debug.Assert(_freeList != null, "Pool max size reached.");
-//        var mem = _freeList;
-//        _freeList = _freeList->Previous;
-//        _count++;
-//        return (T*)mem;
-//    }
+    public static void Free(void* context, T* ptr)
+    {
+        var instance = (FixedSizePoolAllocator<T>*)context;
+        Debug.Assert(instance != null);
 
-//    public void Free(T* ptr)
-//    {
-//        //NOTE(Jens): this allows multiple frees of the same object. How can that be prevented?
-//        var header = (Header*)ptr;
-//        header->Previous = _freeList;
-//        _freeList = header;
-//        _count--;
-//    }
+        var header = (Header*)ptr;
+        header->Previous = instance->_freeList;
+        instance->_freeList = header;
+    }
 
-//    public void Release()
-//    {
-//        if (_mem != null)
-//        {
-//            _allocator->Free(_mem);
-//            _mem = null;
-//        }
-//    }
+    public static void Release(void* context)
+    {
+        var instance = (FixedSizePoolAllocator<T>*)context;
+        instance->_memoryManager->Free(context);
+    }
 
-//    private struct Header
-//    {
-//        public Header* Previous;
-//    }
-//}
+    private struct Header
+    {
+        public Header* Previous;
+    }
+}

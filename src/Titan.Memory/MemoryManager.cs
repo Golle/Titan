@@ -117,7 +117,8 @@ public unsafe struct MemoryManager
     /// Temporary will allocate all memory att creation from the GeneralAllocator
     /// </summary>
     /// <param name="args">LinearAllocator configuration</param>
-    /// <returns>The LinearAllocator</returns>
+    /// <param name="allocator">The linear allocator</param>
+    /// <returns>true on success</returns>
     public readonly bool CreateLinearAllocator(in AllocatorArgs args, out LinearAllocator allocator)
     {
         var memoryManagerPtr = MemoryUtils.AsPointer(this);
@@ -127,26 +128,25 @@ public unsafe struct MemoryManager
             AllocatorStrategy.Temporary or _ => LinearAllocator.Create<FixedSizeLinearAllocator>(memoryManagerPtr, args.Size, out allocator)
         };
     }
-    
-    //public readonly bool CreateFixedSizePoolAllocator<T>(uint count, bool alignPerObject, out FixedSizePoolAllocator<T> allocator) where T : unmanaged
-    //{
-    //    if (!FixedSizePoolAllocator<T>.Create(&_state->GeneralAllocator, count, alignPerObject, out allocator))
-    //    {
-    //        Logger.Error<MemoryManager>($"Failed to create the {nameof(FixedSizePoolAllocator<T>)} with type {typeof(T).Name}");
-    //        return false;
-    //    }
-    //    return true;
-    //}
 
-    //public readonly bool CreateDynamicPoolAllocator<T>(uint count, bool alignPerObject, out DynamicPoolAllocator<T> allocator) where T : unmanaged
-    //{
-    //    if (!DynamicPoolAllocator<T>.Create(_platformAllocator, count, alignPerObject, out allocator))
-    //    {
-    //        Logger.Error<MemoryManager>($"Failed to create the {nameof(DynamicPoolAllocator<T>)} with type {typeof(T).Name}");
-    //        return false;
-    //    }
-    //    return true;
-    //}
+    /// <summary>
+    /// Creates a PoolAllocator&lt;T&gt;
+    /// Permanent strategey will reserve a VirtualMemory block and only allocate pages when needed.
+    /// Temporary will allocate all memory att creation from the GeneralAllocator
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="args">PoolAllocator configuration</param>
+    /// <param name="allocator">The pool allocator</param>
+    /// <returns>true on success</returns>
+    public readonly bool CreatePoolAllocator<T>(in AllocatorArgs args, out PoolAllocator<T> allocator) where T : unmanaged
+    {
+        var memoryManagerPtr = MemoryUtils.AsPointer(this);
+        return args.Strategy switch
+        {
+            AllocatorStrategy.Permanent => PoolAllocator<T>.Create<DynamicPoolAllocator<T>>(memoryManagerPtr, args.Size, out allocator),
+            AllocatorStrategy.Temporary or _ => PoolAllocator<T>.Create<FixedSizePoolAllocator<T>>(memoryManagerPtr, args.Size, out allocator)
+        };
+    }
 
     public readonly bool CreateGeneralPurposeAllocator(nuint reserveSize, out GeneralAllocator allocator)
     {
@@ -183,7 +183,7 @@ public unsafe struct MemoryManager
             // release the allocators
             stateCopy.GeneralAllocator.Release();
             stateCopy.VirtualMemory.Release();
-            
+
             _state = null;
         }
     }
