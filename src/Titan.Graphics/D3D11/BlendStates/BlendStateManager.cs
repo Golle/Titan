@@ -1,11 +1,10 @@
-using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Graphics.D3D11.Buffers;
-using Titan.Windows.D3D11;
-using static Titan.Windows.Common;
+using Titan.Platform.Win32.D3D11;
+using static Titan.Platform.Win32.Common;
 
 namespace Titan.Graphics.D3D11.BlendStates
 {

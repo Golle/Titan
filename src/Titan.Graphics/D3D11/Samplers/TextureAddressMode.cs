@@ -1,4 +1,4 @@
-using static Titan.Windows.D3D11.D3D11_TEXTURE_ADDRESS_MODE;
+using static Titan.Platform.Win32.D3D11.D3D11_TEXTURE_ADDRESS_MODE;
 
 namespace Titan.Graphics.D3D11.Samplers
 {

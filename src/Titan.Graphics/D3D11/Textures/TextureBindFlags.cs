@@ -1,5 +1,3 @@
-using System;
-
 namespace Titan.Graphics.D3D11.Textures
 {
     [Flags]

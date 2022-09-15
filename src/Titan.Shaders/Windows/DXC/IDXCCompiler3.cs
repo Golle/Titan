@@ -1,7 +1,6 @@
-using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Windows;
+using Titan.Platform.Win32;
 
 namespace Titan.Shaders.Windows.DXC;
 

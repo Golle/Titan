@@ -10,7 +10,7 @@ public unsafe struct JobItem
     internal bool IsReady;
 
     public static JobItem Create<T>(ref T context, delegate*<ref T, void> callback, bool isReady = true, bool autoReset = true) where T : unmanaged
-        => Create(MemoryUtils.AsPointer(ref context), (delegate*<void*, void>)callback, isReady, autoReset);
+        => Create(MemoryUtils.AsPointer(context), (delegate*<void*, void>)callback, isReady, autoReset);
 
     public static JobItem Create(void* context, delegate*<void*, void> callback, bool isReady = true, bool autoReset = true)
         => new()

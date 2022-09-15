@@ -1,6 +1,5 @@
-using System;
 using System.Runtime.InteropServices;
-using Titan.Windows.DXGI;
+using Titan.Platform.Win32.DXGI;
 
 namespace Titan.Graphics.Images
 {

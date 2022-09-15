@@ -1,70 +1,56 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Core;
-using Titan.Core.Logging;
-using Titan.Core.Memory;
-using Titan.Memory.Allocators;
+using Titan.Memory.Platform;
 
 namespace Titan.Memory;
 
-public unsafe struct PlatformAllocator : IApi
+public static class PlatformAllocatorHelper
 {
-    private Allocator _allocator;
-    internal Allocator* UnderlyingAllocator => MemoryUtils.AsPointer(ref _allocator);
-
-    public readonly T* Allocate<T>(int count = 1, bool initialize = true) where T : unmanaged
-        => Allocate<T>((uint)count, initialize);
-
-    //NOTE(Jens): Should we introduce some kind of MemoryBlock in addition to raw pointers?
-    public readonly T* Allocate<T>(uint count = 1u, bool initialize = true) where T : unmanaged
-    {
-        Debug.Assert(count != 0, "Must allocate at least 1 item");
-        return (T*)Allocate(count * (nuint)sizeof(T), initialize);
-    }
-
-    public readonly void* Allocate(nuint size, bool initialize = true)
-    {
-        var memory = _allocator.Allocate(size);
-        if (initialize)
-        {
-            MemoryUtils.Init(memory, size);
-            return memory;
-        }
-        return memory;
-    }
-
     /// <summary>
-    /// Release the underlying memory pool. This will only release allocaters that have a context. For example <see cref="Win32VirtualAllocFixedSizeAllocator"/>
+    /// This will create a Heap Allocated PlatformAllocator. This is the only place the NativeMemory class will be used within the engine.
     /// </summary>
-    internal void Release()
-        => _allocator.Release();
-
-    public static PlatformAllocator Create(nuint fixedSizeMemory = 0u) =>
-        new()
+    /// <returns>Pointer to the allocator</returns>
+    public static unsafe PlatformAllocator* GetPlatformAllocator() =>
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) switch
         {
-            _allocator = CreateAllocator(fixedSizeMemory)
+            true => Win32PlatformAllocator.Instance,
+            false or _ => PosixPlatformAllocator.Instance
+        };
+}
+
+
+public unsafe struct PlatformAllocator
+{
+    public readonly uint PageSize;
+    private delegate*<void*, uint, void*> _reserve;
+    private delegate*<void*, uint, uint, void> _commit;
+    private delegate*<void*, uint, uint, void> _decommit;
+    private delegate*<void*, uint, void> _release;
+    public PlatformAllocator(uint pageSize)
+    {
+        PageSize = pageSize;
+        _reserve = null;
+        _commit = null;
+        _decommit = null;
+        _release = null;
+    }
+
+    public static PlatformAllocator Create<T>() where T : IPlatformAllocator =>
+        new(T.PageSize)
+        {
+            _reserve = &T.Reserve,
+            _commit = &T.Commit,
+            _decommit = &T.Decommit,
+            _release = &T.Release
         };
 
-    private static Allocator CreateAllocator(nuint fixedSizeMemory)
-    {
-        if (fixedSizeMemory > 0)
-        {
-            Logger.Trace<PlatformAllocator>($"Creating a {nameof(Win32VirtualAllocFixedSizeAllocator)} allocator with {fixedSizeMemory} bytes pre-allocated.");
-            Logger.Warning<PlatformAllocator>("The fixed size allocator does not support Free, this means that any code that tries to free the memory will have a memory leak.");
-            return Allocator.Create<Win32VirtualAllocFixedSizeAllocator, FixedSizeArgs>(new FixedSizeArgs(fixedSizeMemory));
-        }
-        // Use VirtualAlloc on windows environment
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            Logger.Trace<PlatformAllocator>($"Creating a {nameof(Win32VirtualAllocAllocator)}.");
-            return Allocator.Create<Win32VirtualAllocAllocator>();
-        }
-
-        // Use the built in NativeMemory on any other platforms
-        Logger.Trace<PlatformAllocator>($"Creating a {nameof(NativeMemoryAllocator)}.");
-        return Allocator.Create<NativeMemoryAllocator>();
-    }
-
-    public readonly void Free(void* ptr)
-        => _allocator.Free(ptr);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void* Reserve(void* startAddress, uint pages) => _reserve(startAddress, pages);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Commit(void* startAddress, uint pages, uint pageOffset = 0) => _commit(startAddress, pages, pageOffset);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Decommit(void* startAddress, uint pages, uint pageOffset = 0) => _decommit(startAddress, pages, pageOffset);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Release(void* startAddress, uint pages) => _release(startAddress, pages);
 }

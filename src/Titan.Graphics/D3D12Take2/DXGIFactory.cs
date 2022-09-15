@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
-using Titan.Windows;
-using Titan.Windows.DXGI;
-using static Titan.Windows.Common;
-using static Titan.Windows.DXGI.DXGI_CREATE_FACTORY_FLAGS;
-using static Titan.Windows.DXGI.DXGICommon;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.DXGI;
+using static Titan.Platform.Win32.Common;
+using static Titan.Platform.Win32.DXGI.DXGI_CREATE_FACTORY_FLAGS;
+using static Titan.Platform.Win32.DXGI.DXGICommon;
 
 namespace Titan.Graphics.D3D12Take2;
 

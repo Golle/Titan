@@ -1,44 +1,49 @@
-using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Memory;
-using Titan.Memory.Arenas;
+using Titan.Memory.Allocators;
 
 namespace Titan.ECS.Worlds;
 
 public unsafe struct ResourceCollection
 {
-    private FixedSizeLinearArena _arena;
+    private LinearAllocator _allocator;
     private readonly void** _indices;
-    private readonly uint _indicesCount;
+    private readonly uint _maxTypes;
 
-    private ResourceCollection(in FixedSizeLinearArena arena, void** indices, uint indicesCount)
+    private ResourceCollection(LinearAllocator allocator, void** indices, uint maxTypes)
     {
-        _arena = arena;
+        _allocator = allocator;
         _indices = indices;
-        _indicesCount = indicesCount;
+        _maxTypes = maxTypes;
     }
 
-    public static ResourceCollection Create(uint initialSize, uint maxTypes, in PlatformAllocator allocator)
+    public static bool Create(MemoryManager* memoryManager, uint maxSize, uint maxTypes, out ResourceCollection resourceCollection)
     {
-        var indicesSize = (nuint)sizeof(void*) * maxTypes;
-        var totalSize = initialSize + indicesSize;
-        var backingBuffer = allocator.Allocate(totalSize);
-        Debug.Assert(backingBuffer != null, $"Failed to create the backing buffer for {nameof(ResourceCollection)}");
-        var arena = FixedSizeLinearArena.Create(backingBuffer, totalSize);
-        var indices = (void**)arena.Allocate(indicesSize);
-        return new ResourceCollection(arena, indices, maxTypes);
+        resourceCollection = default;
+        var indicesSize = (uint)sizeof(void*) * maxTypes;
+        var totalSize = maxSize + indicesSize;
+        if (!memoryManager->CreateLinearAllocator(LinearAllocatorArgs.Permanent(totalSize), out var allocator))
+        {
+            Logger.Error<ResourceCollection>("Failed to create the allocator.");
+            return false;
+        }
+        var indices = (void**)allocator.Alloc(indicesSize);
+        Debug.Assert(indices != null);
+        resourceCollection = new ResourceCollection(allocator, indices, maxTypes);
+        return true;
     }
 
     public void InitResource<T>(in T value = default) where T : unmanaged
     {
         var id = ResourceId.Id<T>();
+        Debug.Assert(id <= _maxTypes);
         if (_indices[id] == null)
         {
             Logger.Trace<ResourceCollection>($"Resource type: {typeof(T).FormattedName()} with Id {id} does not exist, creating.");
-            _indices[id] = _arena.Allocate<T>();
+            _indices[id] = _allocator.Alloc<T>();
             *(T*)_indices[id] = value;
         }
         else

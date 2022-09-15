@@ -1,12 +1,12 @@
-using System;
 using System.Runtime.CompilerServices;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;
-using Titan.ECS.Memory;
 using Titan.ECS.Systems;
 using Titan.ECS.Worlds;
 using Titan.Memory;
+using Titan.Memory.Allocators;
 
 namespace Titan.ECS.Scheduler;
 
@@ -17,9 +17,11 @@ namespace Titan.ECS.Scheduler;
 /// </summary>
 public unsafe struct Scheduler
 {
-    private NodeStage* _stages;
-    private StageExecutor* _executors;
-    private const int _stageCount = (int)Stage.Count;
+    private static readonly uint DefaultMaxSystemMemory = MemoryUtils.MegaBytes(10);
+
+    private TitanArray<NodeStage> _stages;
+    private TitanArray<StageExecutor> _executors;
+    private LinearAllocator _systemsAllocator;
 
     public void Update(ref JobApi jobApi, ref World world)
     {
@@ -45,51 +47,67 @@ public unsafe struct Scheduler
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void Execute(int stage, in JobApi jobApi) 
+    private void Execute(int stage, in JobApi jobApi)
         => _executors[stage].Run(_stages[stage], jobApi);
 
-    internal void Init(in ResourceCollection resources, ref World world)
+    internal bool Init(in ResourceCollection resources, ref World world)
     {
         //NOTE(Jens): Rewrite this method to something more readable
         //NOTE(Jens): it currently allocates new memory for each system when they are initialized, we should calculate the size needed and allocate everything in a single call. This is to prevent memory being allocated in different places.
-
         var config = resources.GetResource<SchedulerConfiguration>();
 
         var descriptors = resources
             .GetResource<SystemsRegistry>()
             .GetDescriptors();
-        Logger.Trace<Scheduler>($"Found {descriptors.Length} {nameof(SystemDescriptor)}.");
 
+        Logger.Trace<Scheduler>($"Found {descriptors.Length} {nameof(SystemDescriptor)}.");
         var count = (uint)descriptors.Length;
 
-        ref var pool = ref resources.GetResource<PlatformAllocator>();
-        ref var transient = ref resources.GetResource<TransientMemory>();
+        ref var memory = ref resources.GetResource<MemoryManager>();
+        //NOTE(Jens): 10Mb temporary allocator
+        if (!memory.CreateLinearAllocator(LinearAllocatorArgs.Temporary(MemoryUtils.MegaBytes(10)), out var transient))
+        {
+            Logger.Error<Scheduler>("Failed to create a temporary allocator");
+            return false;
+        }
+        
+        if (!memory.CreateLinearAllocator(LinearAllocatorArgs.Permanent(DefaultMaxSystemMemory), out _systemsAllocator))
+        {
+            Logger.Error<Scheduler>("Failed to create the system memory allocator");
+            transient.Release();
+            return false;
+        }
 
-        // We sort the descriptors before we initialize them so we can easily access them in the correct Stage order
-        var sortedDescriptors = new Span<SystemDescriptor>(transient.AllocateArray<SystemDescriptor>(count), (int)count);
-        descriptors.CopyTo(sortedDescriptors);
-        sortedDescriptors.Sort(CompareDescriptor);
+        var sortedDescriptors = transient.AllocateArray<SystemDescriptor>(count, initialize: false);
+        {
+            // We sort the descriptors before we initialize them so we can easily access them in the correct Stage order
+            //var sortedDescriptors = new Span<SystemDescriptor>(transient.AllocateArray<SystemDescriptor>(count), (int)count);
+            //var descriptorSpan = sortedDescriptors.AsSpan();
+            descriptors.CopyTo(sortedDescriptors);
+            sortedDescriptors.AsSpan().Sort(CompareDescriptor);
+        }
+
+        const uint stageCount = (uint)Stage.Count;
 
         // allocate memory for the nodes
-        _stages = pool.Allocate<NodeStage>(_stageCount);
-        _executors = pool.Allocate<StageExecutor>(_stageCount);
-        config.Get().CopyTo(new Span<StageExecutor>(_executors, _stageCount));
+        _stages = _systemsAllocator.AllocateArray<NodeStage>(stageCount);
+        _executors = _systemsAllocator.AllocateArray<StageExecutor>(stageCount);
+        config.Get().CopyTo(_executors);
 
-        var nodes = pool.Allocate<Node>(count, true);
+        var nodes = _systemsAllocator.AllocateArray<Node>(count);
         var states = transient.AllocateArray<SystemDependencyState>(count, true);
+        var stageCounter = transient.AllocateArray<int>(stageCount, true);
 
-        var stageCounter = transient.AllocateArray<int>(_stageCount);
-        
         // Create and initialize the systems (and record the dependencies)
         for (var i = 0; i < count; ++i)
         {
             var initializer = new SystemsInitializer(ref states[i], ref world);
-            nodes[i] = CreateAndInit(pool, sortedDescriptors[i], initializer);
+            nodes[i] = CreateAndInit(ref _systemsAllocator, sortedDescriptors[i], initializer);
             stageCounter[(int)nodes[i].Stage]++;
         }
 
         // Calculate the dependencies
-        var dependencies = transient.AllocateArray<int>(count);
+        var dependencies = transient.AllocateArray<int>(count, true);
         for (var i = 0; i < count; ++i)
         {
             var dependenciesCount = 0;
@@ -119,7 +137,7 @@ public unsafe struct Scheduler
                 ref var systemNode = ref nodes[i];
                 systemNode.DependenciesCount = dependenciesCount;
                 //NOTE(Jens): THIS WILL ALLOCATE MORE MEMORY, possible Fragmentation 
-                systemNode.Dependencies = pool.Allocate<int>((uint)dependenciesCount);
+                systemNode.Dependencies = _systemsAllocator.Alloc<int>((uint)dependenciesCount);
                 MemoryUtils.Copy(systemNode.Dependencies, dependencies, sizeof(int) * dependenciesCount);
                 Logger.Trace<Scheduler>($"{systemNode.Stage}: System {nodes[i].Id} has {dependenciesCount} dependencies");
                 for (var a = 0; a < systemNode.DependenciesCount; ++a)
@@ -130,15 +148,13 @@ public unsafe struct Scheduler
             else
             {
                 Logger.Trace<Scheduler>($"{nodes[i].Stage}: System {nodes[i].Id} has no dependencies");
-
             }
-
         }
 
         // Group the systems in Stages so they can easily be executed
         var offset = 0;
-        var node = nodes;
-        for (var i = 0; i < _stageCount; ++i)
+        var node = nodes.GetPointer();
+        for (var i = 0; i < stageCount; ++i)
         {
             var numberOfNodes = stageCounter[i];
             _stages[i] = new NodeStage(node, numberOfNodes);
@@ -146,8 +162,11 @@ public unsafe struct Scheduler
 
             node += numberOfNodes;
             offset += numberOfNodes;
-
         }
+
+        transient.Release();
+        
+        return true;
 
         static void UpdateNodeDependenciesIndex(Node* nodes, int count, int offset)
         {
@@ -160,11 +179,10 @@ public unsafe struct Scheduler
                 }
             }
         }
-        static Node CreateAndInit(in PlatformAllocator allocator, in SystemDescriptor descriptor, in SystemsInitializer initializer)
+        static Node CreateAndInit(ref LinearAllocator allocator, in SystemDescriptor descriptor, in SystemsInitializer initializer)
         {
-            //NOTE(Jens): THIS WILL ALLOCATE NEW  MEMORY FOR EACH SYSTEM. We dont want that. TODO: Fix this asap, it should be taken from the same memory (FixedSizeLinearArena)
             //NOTE(Jens): add try/catch since it will be calling user code?
-            var context = allocator.Allocate(descriptor.Size);
+            var context = allocator.Alloc(descriptor.Size, true);
             descriptor.Init(context, initializer);
             return new Node
             {

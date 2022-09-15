@@ -1,4 +1,5 @@
 using Titan.Core.Logging;
+using Titan.Core.Memory;
 using Titan.ECS.App;
 using Titan.ECS.Components;
 using Titan.ECS.Entities;
@@ -8,12 +9,10 @@ using Titan.Memory;
 
 namespace Titan.ECS.Modules;
 
-public struct ECSModule : IModule
+public unsafe struct ECSModule : IModule
 {
     public static bool Build(AppBuilder builder)
     {
-        if (!CheckPrerequisites(builder)) { }
-
         ref readonly var config = ref builder.GetResourceOrDefault<ECSConfiguration>();
 
         Logger.Trace<ECSModule>($"MaxEntities: {config.MaxEntities}");
@@ -21,12 +20,21 @@ public struct ECSModule : IModule
         Logger.Trace<ECSModule>($"Event max types count: {config.MaxEventTypes}");
         // Create entity manager?
 
-        ref readonly var allocator = ref builder.GetResource<PlatformAllocator>();
+        var memoryManager = builder.GetResourcePointer<MemoryManager>();
+        var allocatorSize = MemoryUtils.MegaBytes(512);
 
+        //TODO(Jens): need a way to handle the life time of this allocator
+        if (!memoryManager->CreateLinearAllocator(LinearAllocatorArgs.Permanent(allocatorSize), out var allocator))
+        {
+            Logger.Error<ECSModule>($"Failed to create an allocator with {allocatorSize} bytes.");
+            return false;
+        }
+
+        //NOTE(Jens): rework these create methods, to detect failures
         builder
-            .AddResource(EntityInfoRegistry.Create(allocator, config.MaxEntities))
-            .AddResource(EntityIdContainer.Create(allocator, config.MaxEntities))
-            .AddResource(EntityFilterRegistry.Create(allocator, 100, config.MaxEntities, 5000))
+            .AddResource(EntityInfoRegistry.Create(&allocator, config.MaxEntities))
+            .AddResource(EntityIdContainer.Create(&allocator, config.MaxEntities))
+            .AddResource(EntityFilterRegistry.Create(memoryManager, 100, config.MaxEntities, 5000))
             ;
 
         builder
@@ -42,16 +50,5 @@ public struct ECSModule : IModule
             ;
 
         return true;
-
-
-        static bool CheckPrerequisites(AppBuilder builder)
-        {
-            if (!builder.HasResource<PlatformAllocator>())
-            {
-                Logger.Error<ECSModule>($"Failed to find the resource {nameof(PlatformAllocator)}. Make sure you've added the CoreModule");
-                return false;
-            }
-            return true;
-        }
     }
 }

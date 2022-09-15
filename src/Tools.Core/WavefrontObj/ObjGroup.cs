@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Tools.Core.WavefrontObj
 {
     public class ObjGroup

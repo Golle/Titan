@@ -1,5 +1,4 @@
 using Avalonia.Data.Converters;
-using System;
 
 namespace Titan.Tools.ManifestBuilder.Converters;
 

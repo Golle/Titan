@@ -1,6 +1,6 @@
-using Titan.Windows;
-using Titan.Windows.D3D12;
-using Titan.Windows.DXGI;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D12;
+using Titan.Platform.Win32.DXGI;
 
 namespace Titan.Graphics.D3D12Take2;
 

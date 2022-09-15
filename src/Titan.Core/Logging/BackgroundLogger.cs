@@ -1,4 +1,3 @@
-using System.Threading;
 using System.Threading.Channels;
 
 namespace Titan.Core.Logging;

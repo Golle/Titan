@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Titan.Graphics.Windows.Input.Raw;
 
 public static class DeviceTranslation

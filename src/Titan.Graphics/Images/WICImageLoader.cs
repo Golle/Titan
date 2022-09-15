@@ -1,16 +1,14 @@
-using System;
 using System.Runtime.InteropServices;
-using Titan.Core.IO;
-using Titan.Windows;
-using Titan.Windows.DXGI;
-using Titan.Windows.WIC;
-using static Titan.Windows.Common;
-using static Titan.Windows.Win32.CLSCTX;
-using static Titan.Windows.Win32.GENERIC_RIGHTS;
-using static Titan.Windows.Win32.Ole32;
-using static Titan.Windows.WIC.WICBitmapDitherType;
-using static Titan.Windows.WIC.WICBitmapPaletteType;
-using static Titan.Windows.WIC.WICDecodeOptions;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.DXGI;
+using Titan.Platform.Win32.WIC;
+using static Titan.Platform.Win32.Common;
+using static Titan.Platform.Win32.Win32.CLSCTX;
+using static Titan.Platform.Win32.Win32.GENERIC_RIGHTS;
+using static Titan.Platform.Win32.Win32.Ole32;
+using static Titan.Platform.Win32.WIC.WICBitmapDitherType;
+using static Titan.Platform.Win32.WIC.WICBitmapPaletteType;
+using static Titan.Platform.Win32.WIC.WICDecodeOptions;
 
 // ReSharper disable InconsistentNaming
 

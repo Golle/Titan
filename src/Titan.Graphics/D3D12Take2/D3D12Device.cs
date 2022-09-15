@@ -1,13 +1,11 @@
-using System;
-using System.Runtime.InteropServices.ComTypes;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.Windows;
-using Titan.Windows.D3D;
-using Titan.Windows.D3D12;
-using Titan.Windows.DXGI;
-using static Titan.Windows.Common;
-using static Titan.Windows.D3D12.D3D12Common;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D;
+using Titan.Platform.Win32.D3D12;
+using Titan.Platform.Win32.DXGI;
+using static Titan.Platform.Win32.Common;
+using static Titan.Platform.Win32.D3D12.D3D12Common;
 
 namespace Titan.Graphics.D3D12Take2;
 internal struct D3D12DeviceCreationArgs

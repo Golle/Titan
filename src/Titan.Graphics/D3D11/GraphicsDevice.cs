@@ -1,4 +1,3 @@
-using System;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D11.BlendStates;
@@ -7,18 +6,18 @@ using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
-using Titan.Windows;
-using Titan.Windows.D3D;
-using Titan.Windows.D3D11;
-using Titan.Windows.DXGI;
-using static Titan.Windows.Common;
-using static Titan.Windows.D3D11.D3D11Common;
-using static Titan.Windows.DXGI.DXGI_FORMAT;
-using static Titan.Windows.DXGI.DXGI_MODE_SCALING;
-using static Titan.Windows.DXGI.DXGI_MODE_SCANLINE_ORDER;
-using static Titan.Windows.DXGI.DXGI_SWAP_CHAIN_FLAG;
-using static Titan.Windows.DXGI.DXGI_SWAP_EFFECT;
-using static Titan.Windows.DXGI.DXGI_USAGE;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D;
+using Titan.Platform.Win32.D3D11;
+using Titan.Platform.Win32.DXGI;
+using static Titan.Platform.Win32.Common;
+using static Titan.Platform.Win32.D3D11.D3D11Common;
+using static Titan.Platform.Win32.DXGI.DXGI_FORMAT;
+using static Titan.Platform.Win32.DXGI.DXGI_MODE_SCALING;
+using static Titan.Platform.Win32.DXGI.DXGI_MODE_SCANLINE_ORDER;
+using static Titan.Platform.Win32.DXGI.DXGI_SWAP_CHAIN_FLAG;
+using static Titan.Platform.Win32.DXGI.DXGI_SWAP_EFFECT;
+using static Titan.Platform.Win32.DXGI.DXGI_USAGE;
 
 namespace Titan.Graphics.D3D11;
 

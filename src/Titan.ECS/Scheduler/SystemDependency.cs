@@ -1,4 +1,3 @@
-using System;
 using Titan.ECS.Worlds;
 
 namespace Titan.ECS.Scheduler;

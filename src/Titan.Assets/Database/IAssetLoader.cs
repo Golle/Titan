@@ -1,4 +1,3 @@
-using System;
 using Titan.Core.Memory;
 
 namespace Titan.Assets.Database

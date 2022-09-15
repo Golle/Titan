@@ -1,4 +1,4 @@
-using static Titan.Windows.D3D11.D3D11_FILTER;
+using static Titan.Platform.Win32.D3D11.D3D11_FILTER;
 
 namespace Titan.Graphics.D3D11.Samplers
 {

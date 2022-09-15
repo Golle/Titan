@@ -1,5 +1,3 @@
-using System;
-
 namespace Titan.UI.Common
 {
     [Flags]

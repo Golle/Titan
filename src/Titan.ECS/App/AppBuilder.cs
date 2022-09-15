@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Titan.Core;
-using Titan.Core.Logging;
 using Titan.ECS.Components;
 using Titan.ECS.Events;
 using Titan.ECS.Modules;
@@ -14,7 +10,6 @@ using Titan.Memory;
 
 namespace Titan.ECS.App;
 
-
 public unsafe class AppBuilder
 {
     private ResourceCollection _resourceCollection;
@@ -24,15 +19,20 @@ public unsafe class AppBuilder
 
     private AppBuilder(AppCreationArgs args)
     {
-        var allocator = PlatformAllocator.Create(args.UnmanagedMemory);
+        if (!MemoryManager.Create(new MemoryConfiguration(args.MaxReservedMemory, args.MaxGeneralPurposeMemory), out var memoryManager))
+        {
+            throw new Exception($"Failed to create the {nameof(MemoryManager)}");
+        }
 
         // Resources must be allocated at the start because they are used when modules are built. (configs etc)
         // We might want to change this at some point to allow for better memory alignment. For example configs used for startup/construction might never be used again, but they'll be mixed with other game related resources.
-        _resourceCollection = ResourceCollection.Create(args.ResourcesMemory, args.MaxResourceTypes, allocator);
-
+        if (!ResourceCollection.Create(&memoryManager, args.MaxResourcesMemory, args.MaxResourceTypes, out _resourceCollection))
+        {
+            throw new Exception($"Failed to create the {nameof(ResourceCollection)}");
+        }
         // Add the PlatformAllocator as a resource so we can use it when setting up the modules (This must be done after it's been used to create the resource collection or the _next in the pool will be wrong.
-        AddResource(allocator);
-
+        AddResource(memoryManager);
+        
         // The event system should always be added. Run it before anything else.
         AddSystemToStage<EventSystem>(Stage.First, RunCriteria.Always, int.MaxValue - 1);
     }
@@ -156,22 +156,23 @@ public unsafe class AppBuilder
             throw new InvalidOperationException($"Failed to find {nameof(ECSConfiguration)} resource. Make sure you've added the CoreModule before calling build.");
         }
 
-        ref readonly var allocator = ref _resourceCollection.GetResource<PlatformAllocator>();
+        var memoryManager = _resourceCollection.GetResourcePointer<MemoryManager>();
+
         // Initialize the Compoenent pools (this is done at build because we want all components to be in the same place)
         ref readonly var config = ref _resourceCollection.GetResource<ECSConfiguration>();
         _resourceCollection
             .GetOrCreateResource<ComponentRegistry>()
-            .Init(allocator, config.MaxEntities, _components.ToArray());
+            .Init(memoryManager, config.MaxEntities, _components.ToArray());
         //NOTE(Jens): Add a clenaup system for component registry that runs on shutdown (just for completeness, might disable it in release builds)
 
 
         _resourceCollection
             .GetOrCreateResource<EventsRegistry>()
-            .Init(allocator, config.EventStreamSize, config.MaxEventTypes);
+            .Init(memoryManager, config.EventStreamSize, config.MaxEventTypes);
 
         _resourceCollection
             .GetOrCreateResource<SystemsRegistry>()
-            .Init(allocator, _systems.ToArray());
+            .Init(memoryManager, _systems.ToArray());
 
         _resourceCollection
             .InitResource<Scheduler.Scheduler>();

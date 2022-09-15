@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
-    <ProjectReference Include="..\Titan.Windows\Titan.Windows.csproj" />
+    <ProjectReference Include="..\Titan.Platform\Titan.Platform.csproj" />
   </ItemGroup>
 
 </Project>

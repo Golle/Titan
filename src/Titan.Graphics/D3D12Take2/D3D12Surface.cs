@@ -2,10 +2,10 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.Windows;
-using Titan.Windows.D3D12;
-using Titan.Windows.DXGI;
-using static Titan.Windows.Common;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D12;
+using Titan.Platform.Win32.DXGI;
+using static Titan.Platform.Win32.Common;
 
 namespace Titan.Graphics.D3D12Take2;
 
@@ -181,7 +181,7 @@ Error:
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                var ptr = MemoryUtils.AsPointer(ref _resource1) + index;
+                var ptr = MemoryUtils.AsPointer(_resource1) + index;
                 return ref MemoryUtils.ToRef(ptr);
             }
         }

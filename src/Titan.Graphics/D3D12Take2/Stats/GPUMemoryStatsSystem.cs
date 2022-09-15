@@ -1,4 +1,3 @@
-using System;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Systems;
 

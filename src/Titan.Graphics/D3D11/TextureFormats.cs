@@ -1,4 +1,4 @@
-using static Titan.Windows.DXGI.DXGI_FORMAT;
+using static Titan.Platform.Win32.DXGI.DXGI_FORMAT;
 
 // ReSharper disable InconsistentNaming
 

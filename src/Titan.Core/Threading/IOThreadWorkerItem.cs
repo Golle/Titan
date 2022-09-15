@@ -1,5 +1,3 @@
-using System;
-
 namespace Titan.Core.Threading
 {
     public abstract class IOThreadWorkerItem

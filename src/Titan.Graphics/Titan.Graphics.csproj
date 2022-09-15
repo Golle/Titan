@@ -22,7 +22,7 @@
     <ProjectReference Include="..\Titan.Assets\Titan.Assets.csproj" />
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
     <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
-    <ProjectReference Include="..\Titan.Windows\Titan.Windows.csproj" />
+    <ProjectReference Include="..\Titan.Platform\Titan.Platform.csproj" />
   </ItemGroup>
 
 </Project>

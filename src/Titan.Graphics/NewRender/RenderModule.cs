@@ -1,4 +1,3 @@
-using System;
 using Titan.Core;
 using Titan.ECS.App;
 using Titan.Graphics.Modules;

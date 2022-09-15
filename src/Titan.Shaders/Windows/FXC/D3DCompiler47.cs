@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
-using Titan.Windows;
-using Titan.Windows.D3D;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D;
 
 namespace Titan.Shaders.Windows.FXC;
 

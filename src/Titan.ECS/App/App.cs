@@ -1,7 +1,7 @@
-using System;
 using Titan.Core.Logging;
 using Titan.ECS.Scheduler;
 using Titan.ECS.Worlds;
+using Titan.Memory;
 
 namespace Titan.ECS.App;
 
@@ -56,7 +56,7 @@ public struct App
         new()
         {
             _resources = resources,
-            _world = World.Create(resources)
+            _world = World.Create(resources),
         };
 
     internal void Run()
@@ -74,7 +74,11 @@ public struct App
 
     private void Cleanup()
     {
+        ref var memory = ref _resources.GetResource<MemoryManager>();
+        memory.Shutdown();
         //NOTE(Jens): release all resources and world maybe?
         //_resources.Reset();
+
+        Logger.Shutdown();
     }
 }

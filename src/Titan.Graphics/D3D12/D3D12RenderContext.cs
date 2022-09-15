@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Memory;
-using Titan.Windows;
-using Titan.Windows.D3D12;
-using Titan.Windows.DXGI;
-using Titan.Windows.Win32;
-using static Titan.Windows.Common;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D12;
+using Titan.Platform.Win32.DXGI;
+using Titan.Platform.Win32.Win32;
+using static Titan.Platform.Win32.Common;
 
 namespace Titan.Graphics.D3D12;
 
@@ -26,21 +27,20 @@ public unsafe struct D3D12RenderContext
     private HANDLE _fenceEvent;
 
 
-    private CommandFrame* _commandFrames; // This is the number of frames that we support.
-    private int _maxCommandFrameCount;
+    private TitanArray<CommandFrame> _commandFrames; // This is the number of frames that we support.
     private int _frameIndex;
 
-    private PlatformAllocator _allocator;
+    private MemoryManager* _memoryManager;
 
 
 
-    public static bool CreateAndInit(in PlatformAllocator allocator, in D3D12Device device, out D3D12RenderContext context)
+    public static bool CreateAndInit(MemoryManager* memoryManager, in D3D12Device device, out D3D12RenderContext context)
     {
         //NOTE(Jens): Should we use the same struct for Compute shaders? lets 
         var type = D3D12_COMMAND_LIST_TYPE.D3D12_COMMAND_LIST_TYPE_DIRECT;
 
         context = default;
-        context._allocator = allocator;
+        context._memoryManager = memoryManager;
 
 
         // copy the pointers and increase the ref count
@@ -69,9 +69,8 @@ public unsafe struct D3D12RenderContext
         }
 
         // Construct command allocators
-        context._commandFrames = allocator.Allocate<CommandFrame>(BufferCount);
-        context._maxCommandFrameCount = BufferCount;
-        for (var i = 0; i < context._maxCommandFrameCount; ++i)
+        context._commandFrames = memoryManager->AllocArray<CommandFrame>(BufferCount);
+        for (var i = 0; i < context._commandFrames.Length; ++i)
         {
             ref var frame = ref context._commandFrames[i];
             var hr = devicePtr->CreateCommandAllocator(type, typeof(ID3D12CommandAllocator).GUID, (void**)frame.CommandAllocator.GetAddressOf());
@@ -179,24 +178,23 @@ Error:
         _swapChain.Reset();
         _device.Reset();
 
-        for (var i = 0; i < _maxCommandFrameCount; ++i)
+        foreach (ref var commandFrame in _commandFrames.AsSpan())
         {
-            _commandFrames[i].Release();
+            commandFrame.Release();
         }
-
-        if (_commandFrames != null)
+        if (_commandFrames.GetPointer() != null)
         {
-            _allocator.Free(_commandFrames);
-            _commandFrames = null;
+            _memoryManager->Free(_commandFrames);
+            _commandFrames = default;
         }
     }
 
 
     private void FlushGPU()
     {
-        for (var i = 0; i > _maxCommandFrameCount; ++i)
+        foreach (ref var commandFrame in _commandFrames.AsSpan())
         {
-            _commandFrames[i].Wait(_fenceEvent, _fence);
+            commandFrame.Wait(_fenceEvent, _fence);
         }
         _frameIndex = 0;
     }

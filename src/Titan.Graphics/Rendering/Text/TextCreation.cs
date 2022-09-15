@@ -1,5 +1,3 @@
-using System;
-
 namespace Titan.Graphics.Rendering.Text
 {
     public ref struct TextCreation

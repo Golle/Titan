@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using Microsoft.Win32.SafeHandles;
 
 namespace Titan.FileSystem;

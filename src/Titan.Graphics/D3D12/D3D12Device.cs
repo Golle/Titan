@@ -2,27 +2,26 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Titan.Core.Logging;
-using Titan.Windows;
-using Titan.Windows.D3D;
-using Titan.Windows.D3D12;
-using Titan.Windows.DXGI;
-using static Titan.Windows.Common;
-using static Titan.Windows.D3D12.D3D12_COMMAND_LIST_TYPE;
-using static Titan.Windows.D3D12.D3D12_COMMAND_QUEUE_FLAGS;
-using static Titan.Windows.D3D12.D3D12_DESCRIPTOR_HEAP_FLAGS;
-using static Titan.Windows.D3D12.D3D12_DESCRIPTOR_HEAP_TYPE;
-using static Titan.Windows.D3D12.D3D12Common;
-using static Titan.Windows.DXGI.DXGICommon;
-using static Titan.Windows.DXGI.DXGI_ADAPTER_FLAG;
-using static Titan.Windows.DXGI.DXGI_FORMAT;
-using static Titan.Windows.DXGI.DXGI_GPU_PREFERENCE;
-using static Titan.Windows.DXGI.DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS;
-using static Titan.Windows.DXGI.DXGI_SWAP_EFFECT;
-using static Titan.Windows.DXGI.DXGI_USAGE;
-using System.IO;
+using static Titan.Platform.Win32.Common;
+using static Titan.Platform.Win32.D3D12.D3D12_COMMAND_LIST_TYPE;
+using static Titan.Platform.Win32.D3D12.D3D12_COMMAND_QUEUE_FLAGS;
+using static Titan.Platform.Win32.D3D12.D3D12_DESCRIPTOR_HEAP_FLAGS;
+using static Titan.Platform.Win32.D3D12.D3D12_DESCRIPTOR_HEAP_TYPE;
+using static Titan.Platform.Win32.D3D12.D3D12Common;
+using static Titan.Platform.Win32.DXGI.DXGICommon;
+using static Titan.Platform.Win32.DXGI.DXGI_ADAPTER_FLAG;
+using static Titan.Platform.Win32.DXGI.DXGI_FORMAT;
+using static Titan.Platform.Win32.DXGI.DXGI_GPU_PREFERENCE;
+using static Titan.Platform.Win32.DXGI.DXGI_MAKE_WINDOW_ASSOCIATION_FLAGS;
+using static Titan.Platform.Win32.DXGI.DXGI_SWAP_EFFECT;
+using static Titan.Platform.Win32.DXGI.DXGI_USAGE;
 using System.Runtime.InteropServices;
 using Titan.Core.Memory;
-using Titan.Windows.Win32;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D;
+using Titan.Platform.Win32.D3D12;
+using Titan.Platform.Win32.DXGI;
+using Titan.Platform.Win32.Win32;
 
 namespace Titan.Graphics.D3D12;
 
@@ -58,8 +57,8 @@ public unsafe struct D3D12Device
     private D3D12_VIEWPORT _viewPort;
     private D3D12_RECT _scissorRect;
 
-    private ref ComPtr<ID3D12Resource> GetRenderTarget(int index) => ref *(ComPtr<ID3D12Resource>*)MemoryUtils.AsPointer(ref _renderTargets[index]);
-    private ref ComPtr<ID3D12Fence> GetFence(int index) => ref *(ComPtr<ID3D12Fence>*)MemoryUtils.AsPointer(ref _fences[index]);
+    private ref ComPtr<ID3D12Resource> GetRenderTarget(int index) => ref *(ComPtr<ID3D12Resource>*)MemoryUtils.AsPointer(_renderTargets[index]);
+    private ref ComPtr<ID3D12Fence> GetFence(int index) => ref *(ComPtr<ID3D12Fence>*)MemoryUtils.AsPointer(_fences[index]);
     public D3D_FEATURE_LEVEL FeatureLevel => _fatureLevel;
 
     public static bool CreateAndInit(HWND windowHandle, uint width, uint height, bool debug, out D3D12Device device)

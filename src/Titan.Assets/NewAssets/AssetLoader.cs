@@ -1,32 +1,32 @@
-using System;
 using System.Diagnostics;
 using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Threading2;
-using Titan.Memory.Arenas;
+using Titan.Memory;
+using Titan.Memory.Allocators;
 
 namespace Titan.Assets.NewAssets;
 
 internal unsafe struct AssetLoader : IResource
 {
-    private BestFitFixedArena _allocator;
+    private GeneralAllocator _allocator;
     private AssetRegistry* _registry;
     private JobApi* _jobApi;
     private AssetFileAccessor* _fileAccessor;
     private ResourceCreatorRegistry* _creatorRegistry;
 
     private int _assetsInProgress;
-    public bool Init(AssetRegistry* registry, JobApi* jobApi, AssetFileAccessor* fileAccessor, ResourceCreatorRegistry* creatorRegistry)
+    public bool Init(MemoryManager* memoryManager, AssetRegistry* registry, JobApi* jobApi, AssetFileAccessor* fileAccessor, ResourceCreatorRegistry* creatorRegistry)
     {
         Debug.Assert(_jobApi is null);
         Debug.Assert(_fileAccessor is null);
         Debug.Assert(_registry is null);
         Debug.Assert(_creatorRegistry is null);
 
-        if (!BestFitFixedArena.Create(4096, MemoryUtils.MegaBytes(64), out var allocator))
+        if (!memoryManager->CreateGeneralPurposeAllocator(MemoryUtils.MegaBytes(64), out var allocator))
         {
-            Logger.Error<AssetLoader>($"Failed to create the {nameof(BestFitFixedArena)}.");
+            Logger.Error<AssetLoader>($"Failed to create the allocator");
             return false;
         }
 
@@ -90,7 +90,7 @@ internal unsafe struct AssetLoader : IResource
                 case AssetState.LoadRequested:
                     // start read file
                     asset.State = AssetState.ReadingFile;
-                    asset.FileBuffer = _allocator.Allocate((nuint)asset.Descriptor.GetSize());
+                    asset.FileBuffer = _allocator.Allocate((uint)asset.Descriptor.GetSize());
                     asset.FileAccessor = _fileAccessor;
                     _jobApi->Enqueue(JobItem.Create(ref asset, &AsyncReadFile));
                     break;

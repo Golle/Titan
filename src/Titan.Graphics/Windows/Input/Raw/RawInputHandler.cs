@@ -1,10 +1,9 @@
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Core.Logging;
-using Titan.Windows;
-using Titan.Windows.Win32;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.Win32;
 
 namespace Titan.Graphics.Windows.Input.Raw;
 

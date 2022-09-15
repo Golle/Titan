@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Titan.Core;
 using Titan.Core.Memory;
 using Titan.ECS.Components;
@@ -16,8 +15,8 @@ public readonly unsafe ref struct SystemsInitializer
 
     internal SystemsInitializer(ref SystemDependencyState state, ref World world)
     {
-        _world = MemoryUtils.AsPointer(ref world);
-        _state = MemoryUtils.AsPointer(ref state);
+        _world = MemoryUtils.AsPointer(world);
+        _state = MemoryUtils.AsPointer(state);
     }
 
     public EntityHandler GetEntityHandler()

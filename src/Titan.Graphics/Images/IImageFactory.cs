@@ -1,5 +1,3 @@
-using System;
-
 namespace Titan.Graphics.Images
 {
     public interface IImageLoader : IDisposable

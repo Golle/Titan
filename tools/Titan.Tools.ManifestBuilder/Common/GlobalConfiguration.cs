@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace Titan.Tools.ManifestBuilder.Common;
 
 internal static class GlobalConfiguration

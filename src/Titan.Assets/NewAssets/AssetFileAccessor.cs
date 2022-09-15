@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using Titan.Core;
 using Titan.Core.Logging;
@@ -10,18 +9,18 @@ namespace Titan.Assets.NewAssets;
 internal unsafe struct AssetFileAccessor
 {
     private TitanArray<ManifestToFile> _files;
-    private PlatformAllocator* _allocator;
+    private MemoryManager* _memoryManager;
 
-    public bool Init(PlatformAllocator* allocator, FileSystemApi* fileSystem, AssetsConfiguration[] configs)
+    public bool Init(MemoryManager* memoryManager, FileSystemApi* fileSystem, AssetsConfiguration[] configs)
     {
         Debug.Assert(_files.Length == 0);
-        var files = allocator->Allocate<ManifestToFile>(configs.Length);
-        if (files == null)
+        var files = memoryManager->AllocArray<ManifestToFile>((uint)configs.Length);
+        if (files.Length == 0)
         {
             Logger.Error<AssetFileAccessor>($"Failed to allocate a block for {nameof(ManifestToFile)} with size {sizeof(ManifestToFile) * configs.Length} bytes");
             return false;
         }
-        _allocator = allocator;
+        _memoryManager = memoryManager;
         _files = new TitanArray<ManifestToFile>(files, configs.Length);
 
         for (var i = 0; i < configs.Length; ++i)
@@ -67,11 +66,11 @@ Error:
 
     public void Release()
     {
-        foreach (ref var file in _files)
+        foreach (ref var file in _files.AsSpan())
         {
             file.File.Close();
         }
-        _allocator->Free(_files);
+        _memoryManager->Free(_files);
         this = default;
     }
 

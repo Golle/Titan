@@ -8,19 +8,19 @@ namespace Titan.Assets.NewAssets;
 public unsafe struct ResourceCreatorRegistry : IResource
 {
     private TitanArray<ResourceContext> _resourceContexts;
-    private PlatformAllocator* _allocator;
-    internal bool Init(PlatformAllocator* allocator, uint maxResourceCreators)
+    private MemoryManager* _memoryManager;
+    internal bool Init(MemoryManager* memoryManager, uint maxResourceContexts)
     {
-        Debug.Assert(_allocator == null);
+        Debug.Assert(_memoryManager == null);
         Debug.Assert(_resourceContexts.Length == 0);
-        var mem = allocator->Allocate<ResourceContext>(maxResourceCreators, initialize: true);
-        if (mem == null)
+        var resourceContexts = memoryManager->AllocArray<ResourceContext>(maxResourceContexts, initialize: true);
+        if (resourceContexts.Length == 0)
         {
-            Logger.Error<ResourceCreatorRegistry>($"Failed to allocate {maxResourceCreators} {nameof(ResourceContext)}.");
+            Logger.Error<ResourceCreatorRegistry>($"Failed to allocate {maxResourceContexts} {nameof(ResourceContext)}.");
             return false;
         }
-        _allocator = allocator;
-        _resourceContexts = new TitanArray<ResourceContext>(mem, maxResourceCreators);
+        _memoryManager = memoryManager;
+        _resourceContexts = resourceContexts;
         return true;
     }
 
@@ -41,6 +41,6 @@ public unsafe struct ResourceCreatorRegistry : IResource
 
     internal void Release()
     {
-        _allocator->Free(_resourceContexts);
+        _memoryManager->Free(_resourceContexts);
     }
 }

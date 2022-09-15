@@ -8,7 +8,7 @@ using Titan.Memory;
 
 namespace Titan.Graphics.D3D12;
 
-public struct D3D12RenderModule : IModule
+public unsafe struct D3D12RenderModule : IModule
 {
     public static bool Build(AppBuilder builder)
     {
@@ -21,8 +21,8 @@ public struct D3D12RenderModule : IModule
          
         Logger.Info<D3D12RenderModule>($"Created the {nameof(D3D12Device)} with feature level {device.FeatureLevel}!");
 
-        ref readonly var allocator = ref builder.GetResource<PlatformAllocator>();
-        if (!D3D12RenderContext.CreateAndInit(allocator, device, out var context))
+        var memoryManager = builder.GetResourcePointer<MemoryManager>();
+        if (!D3D12RenderContext.CreateAndInit(memoryManager, device, out var context))
         {
             Logger.Error<D3D12RenderModule>($"Failed to create the {nameof(D3D12RenderContext)}. ");
             return false;

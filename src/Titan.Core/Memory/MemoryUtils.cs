@@ -5,6 +5,12 @@ namespace Titan.Core.Memory;
 
 public static unsafe class MemoryUtils
 {
+    private const uint OneKiloByte = 1024u;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Init(void* mem, long sizeInBytes, byte value = 0)
+        => Init(mem, (nuint)sizeInBytes, value);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Init(void* mem, int sizeInBytes, byte value = 0)
         => Init(mem, (nuint)sizeInBytes, value);
@@ -38,11 +44,12 @@ public static unsafe class MemoryUtils
     {
         Debug.Assert(sizeInBytes < uint.MaxValue, $"Can't copy memory that has a size bigger size than {uint.MaxValue} bytes.");
         Unsafe.CopyBlockUnaligned(dst, src, (uint)sizeInBytes);
+
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T* AsPointer<T>(ref T value) where T : unmanaged
-        => (T*)Unsafe.AsPointer(ref value);
+    public static T* AsPointer<T>(in T value) where T : unmanaged
+        => (T*)Unsafe.AsPointer(ref Unsafe.AsRef(value));
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -69,6 +76,49 @@ public static unsafe class MemoryUtils
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint KiloBytes(uint size) => size * OneKiloByte;
 
-    private const uint OneKiloByte = 1024u;
+
+
+
+    /// <summary>
+    /// Aligns to 8 bytes.
+    /// </summary>
+    /// <param name="size">The size of the memory block</param>
+    /// <returns>The 8 bytes aligned size</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static nuint Align(nuint size)
+        => size & ~(nuint)7u;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint Align(uint size)
+        => size & ~7u;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint AlignToUpper(int size)
+    {
+        Debug.Assert(size >= 0);
+        return AlignToUpper((uint)size);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint AlignToUpper(uint size)
+    {
+        var alignedSize = Align(size);
+        return alignedSize < size ? alignedSize + 8u : alignedSize;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static nuint Align(nuint size, uint alignment)
+    {
+        var mask = alignment - 1u;
+        var alignedMemory = size & ~mask;
+        return alignedMemory;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static nuint AlignToUpper(nuint size, uint alignment)
+    {
+        var alignedMemory = Align(size, alignment);
+        return alignedMemory < size ? alignedMemory + alignment : alignedMemory;
+    }
 }
 

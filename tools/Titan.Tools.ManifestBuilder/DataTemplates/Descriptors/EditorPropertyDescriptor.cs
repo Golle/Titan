@@ -1,4 +1,3 @@
-using System;
 using Avalonia.Controls;
 
 namespace Titan.Tools.ManifestBuilder.DataTemplates.Descriptors;

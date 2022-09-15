@@ -1,4 +1,3 @@
-using System;
 using Titan.Assets;
 using Titan.Assets.Database;
 using Titan.Core.Memory;

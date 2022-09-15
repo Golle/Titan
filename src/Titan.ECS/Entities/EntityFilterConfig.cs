@@ -1,4 +1,3 @@
-using System;
 using Titan.Core;
 using Titan.ECS.Components;
 

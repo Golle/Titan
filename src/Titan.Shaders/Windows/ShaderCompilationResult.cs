@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Titan.Shaders.Windows;
+﻿namespace Titan.Shaders.Windows;
 
 public abstract class ShaderCompilationResult : IDisposable
 {

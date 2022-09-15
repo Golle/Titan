@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.CompilerServices;
 using Titan.Core;
 using Titan.Graphics.D3D11.Buffers;

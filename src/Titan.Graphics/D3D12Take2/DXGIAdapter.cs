@@ -1,13 +1,13 @@
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
-using Titan.Windows;
-using Titan.Windows.D3D;
-using Titan.Windows.D3D12;
-using Titan.Windows.DXGI;
-using static Titan.Windows.Common;
-using static Titan.Windows.D3D12.D3D12Common;
-using static Titan.Windows.DXGI.DXGI_ADAPTER_FLAG;
-using static Titan.Windows.DXGI.DXGI_GPU_PREFERENCE;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D;
+using Titan.Platform.Win32.D3D12;
+using Titan.Platform.Win32.DXGI;
+using static Titan.Platform.Win32.Common;
+using static Titan.Platform.Win32.D3D12.D3D12Common;
+using static Titan.Platform.Win32.DXGI.DXGI_ADAPTER_FLAG;
+using static Titan.Platform.Win32.DXGI.DXGI_GPU_PREFERENCE;
 
 namespace Titan.Graphics.D3D12Take2;
 

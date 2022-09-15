@@ -1,5 +1,3 @@
-using System.IO;
-using System;
 using System.Numerics;
 using Titan.Assets.NewAssets;
 using Titan.Components;
@@ -18,6 +16,7 @@ using Titan.Runner;
 using Titan.Sandbox;
 using EntityFilter = Titan.ECS.Entities.EntityFilter;
 using Titan.Graphics;
+using Titan.Memory;
 
 
 // Folders used during development.
@@ -54,7 +53,9 @@ App.SetupAndRun(builder => builder
     .AddComponents<Transform3DComponent>(maxComponents: 10_000)
     .AddComponents<TestComponent>(maxComponents: 1000)
     .AddResource<GlobalFrameCounter>()
-    .AddResource<SharedAssets>());
+    .AddResource<SharedAssets>()
+
+);
 
 
 static string GetBaseDirectory()

@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Titan.Windows.Win32;
-using static Titan.Windows.Win32.SystemMetricsCode;
+using Titan.Platform.Win32.Win32;
+using static Titan.Platform.Win32.Win32.SystemMetricsCode;
 
 namespace Titan.Graphics;
 

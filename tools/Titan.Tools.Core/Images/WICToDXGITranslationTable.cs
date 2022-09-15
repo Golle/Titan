@@ -1,10 +1,11 @@
 using System.Runtime.CompilerServices;
-using Titan.Windows.DXGI;
+using Titan.Platform.Win32.DXGI;
+using Titan.Platform.Win32.WIC;
 
 namespace Titan.Tools.Core.Images;
 
 using static DXGI_FORMAT;
-using static Windows.WIC.WICPixelFormats;
+using static WICPixelFormats;
 
 internal class WICToDXGITranslationTable
 {

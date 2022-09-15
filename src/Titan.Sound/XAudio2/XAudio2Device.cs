@@ -1,11 +1,9 @@
-using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
-using Titan.Windows;
-using Titan.Windows.XAudio2;
-using static Titan.Windows.Common;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.XAudio2;
+using static Titan.Platform.Win32.Common;
 
 namespace Titan.Sound.XAudio2;
 

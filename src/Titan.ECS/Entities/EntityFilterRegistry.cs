@@ -42,7 +42,7 @@ internal unsafe struct EntityFilterRegistry : IApi
         }
     }
 
-    public static EntityFilterRegistry Create(in PlatformAllocator allocator, uint maxFilters, uint maxEntities, uint maxEntitiesPerFilter)
+    public static EntityFilterRegistry Create(MemoryManager* memoryManager, uint maxFilters, uint maxEntities, uint maxEntitiesPerFilter)
     {
         //TODO: Implement this in virtual address space, and only allocate memory when it's needed.
         //NOTE(Jens): This allocates a lot of memory up-front. We should replace this with VirtualAlloc tha can RESERVE a big chunk of memory(worst case for a filter), and just COMMIT small parts of it and expand that when needed.
@@ -53,7 +53,7 @@ internal unsafe struct EntityFilterRegistry : IApi
         var totalSize = maxFilters * filterSize;
         Logger.Info<EntityFilterRegistry>($"Allocating {totalSize} bytes for {nameof(EntityFilter)}s. Each filter is {filterSize} bytes");
 
-        var filters = (byte*)allocator.Allocate((nuint)totalSize, true);
+        var filters = (byte*)memoryManager->Alloc((uint)totalSize, initialize: true);
         return new EntityFilterRegistry(filters, (uint)filterSize, maxFilters, maxEntities, maxEntitiesPerFilter);
     }
 

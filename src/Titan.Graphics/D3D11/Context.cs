@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
@@ -9,10 +8,10 @@ using Titan.Graphics.D3D11.Rasterizer;
 using Titan.Graphics.D3D11.Samplers;
 using Titan.Graphics.D3D11.Shaders;
 using Titan.Graphics.D3D11.Textures;
-using Titan.Windows;
-using Titan.Windows.D3D;
-using Titan.Windows.D3D11;
-using Titan.Windows.DXGI;
+using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D;
+using Titan.Platform.Win32.D3D11;
+using Titan.Platform.Win32.DXGI;
 
 namespace Titan.Graphics.D3D11
 {
