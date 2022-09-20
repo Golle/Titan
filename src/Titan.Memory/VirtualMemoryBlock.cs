@@ -37,13 +37,15 @@ internal unsafe struct VirtualMemoryBlock
         Logger.Trace<VirtualMemoryBlock>($"Resize {newSize} bytes ({pages}). Page diff {pageDiff}");
         if (pageDiff > 0)
         {
-            var startAddress = (byte*)_startAddress + _committedPages * _allocator->PageSize;
-            _allocator->Commit(startAddress, (uint)pageDiff);
+            //NOTE(Jens): Verify that the offset is used correctly
+            //var startAddress = (byte*)_startAddress + _committedPages * _allocator->PageSize;
+            _allocator->Commit(_startAddress, (uint)pageDiff, _committedPages);
         }
         else if (pageDiff < 0)
         {
-            var startAddress = (byte*)_startAddress + pages * _allocator->PageSize;
-            _allocator->Decommit(startAddress, (uint)-pageDiff);
+            //NOTE(Jens): Verify that the offset is used correctly
+            //var startAddress = (byte*)_startAddress + pages * _allocator->PageSize;
+            _allocator->Decommit(_startAddress, (uint)-pageDiff, pages);
         }
         _committedPages = pages;
         return true;
