@@ -1,10 +1,10 @@
 ## Titan
-This is a C# (.NET 8) only Game Engine (Reboot #56)
-Titan currently uses DirectX 12 for graphics and XAudio2 for audio.
+This is a C# (.NET 8) only Game Engine (Reboot #56)   
+Titan currently uses DirectX 12 for graphics and XAudio2 for audio.   
 
-Keep in mind that the development of this engine is in a very early stage and will have a lot of breaking changes.
+Keep in mind that the development of this engine is in a very early stage and will have a lot of breaking changes.   
 
-The engine is built with cross platform in mind but all parts have not been implemented.
+The engine is built with cross platform in mind but all parts have not been implemented.  
 Missing features:
 * Wayland/X11 window implementation
 * Vulkan rendering API
@@ -39,7 +39,7 @@ See [Space.sln](https://github.com/Golle/TitanInSpace/blob/main/Space.sln) for a
 
 3. Run manifest builder and open the built.tmanifest and run Cook Assets from the menu. This will build the engine shaders and put them in the titanpak file.
 4. Create an assets folder in your project, open the manifest tool and select "Open or Create" and select that folder. It will create a .tmanifest  and a .tconfig file in that folder.
-5. Add textures, audio and whatever you need for your game into the manifest, run "Cook assets" and fill out the Namespace, target directory etc for the generated files. 
+5. Add textures, audio and whatever you need for your game into the manifest, run "Cook assets" and fill out the Namespace, target directory etc for the generated files.   
 Sample from the Space Invaders project
     ```json
     {
