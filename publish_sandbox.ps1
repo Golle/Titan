@@ -1,0 +1,2 @@
+&dotnet publish samples/Titan.Sandbox -c Release -o release/ -r win-x64 --self-contained true -p:PublishTrimmed=True -p:PublishAot=True -p:DebugType=None -p:DebugSymbols=false
+Copy-Item assets/bin/builtin.titanpak release/ -Force

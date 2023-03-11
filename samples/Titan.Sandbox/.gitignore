@@ -1,0 +1,3 @@
+
+# exclude this from git in the sandbox so we can run the code generation in the CI
+AssetRegistry0*.cs

@@ -1,0 +1,63 @@
+name: Titan
+
+on: 
+  push:
+    paths:
+      - src/**
+      - tests/**
+      - assets/**
+  workflow_dispatch:
+
+jobs:
+  build-engine:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install .NET 8.0.x
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+        dotnet-quality: 'preview'
+
+    - name: Build Engine
+      run: dotnet build src/Titan -c Release
+
+    - name: Test Engine
+      run: dotnet test -c Release
+
+  build-sandbox:
+    if: ${{ false }} # Disable this for now since it's not very reliable. downloading DXC fails for an unkown reason.
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install .NET 8.0.x
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+        dotnet-quality: 'preview'
+
+    - name: Build packager
+      run: dotnet publish src/Titan.Tools.Packager -p:PublishSingleFile=True --self-contained true -r win-x64 -c release -o tools/ -p:DebugType=None -p:DebugSymbols=false
+
+    - name: Package Engine Assets
+      run: ./tools/Titan.Tools.Packager.exe package -m assets\builtin.tmanifest -o release/ -g src\Titan\Graphics -n Titan.Graphics -id 0
+
+    - name: Package Sandbox Assets
+      run: ./tools/Titan.Tools.Packager.exe package -m samples\Titan.Sandbox\assets\sample_manifest_01.tmanifest -m samples\Titan.Sandbox\assets\sample_manifest_02.tmanifest -o release/ -g samples\Titan.Sandbox -n Titan.Sandbox
+
+    - name: Package Sandbox
+      run: dotnet publish samples/Titan.Sandbox -c Release -o release/ -r win-x64 --self-contained true -p:PublishTrimmed=True -p:PublishAot=True -p:DebugType=None -p:DebugSymbols=false
+
+    - name: Upload Sandbox
+      uses: actions/upload-artifact@v3
+      with:
+        name: Titan.Sandbox
+        path: release/
+

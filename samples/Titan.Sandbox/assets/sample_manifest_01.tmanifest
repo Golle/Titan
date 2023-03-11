@@ -1,0 +1,25 @@
+{
+  "order": 0,
+  "name": "sample_manifest_01",
+  "textures": [
+    {
+      "path": "textures\\bluesheet.png",
+      "type": "PNG",
+      "name": "bluesheet"
+    },
+    {
+      "path": "textures\\greensheet.png",
+      "type": "PNG",
+      "name": "greensheet"
+    }
+  ],
+  "models": [],
+  "materials": [],
+  "shaders": [],
+  "audio": [
+    {
+      "path": "sounds\\boom.wav",
+      "name": "boom"
+    }
+  ]
+}

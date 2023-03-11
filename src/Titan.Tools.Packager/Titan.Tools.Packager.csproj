@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsTrimmable>true</IsTrimmable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Titan\Assets\AssetDescriptor.cs" Link="Deps\AssetDescriptor.cs" />
+    <Compile Include="..\Titan\Assets\AssetDescriptorType.cs" Link="Deps\AssetDescriptorType.cs" />
+    <Compile Include="..\Titan\Assets\AssetReference.cs" Link="Deps\AssetReference.cs" />
+    <Compile Include="..\Titan\Assets\AudioAssetDescriptor.cs" Link="Deps\AudioAssetDescriptor.cs" />
+    <Compile Include="..\Titan\Assets\ImageAssetDescriptor.cs" Link="Deps\ImageAssetDescriptor.cs" />
+    <Compile Include="..\Titan\Assets\IManifestDescriptor.cs" Link="Deps\IManifestDescriptor.cs" />
+    <Compile Include="..\Titan\Assets\ModelAssetDescriptor.cs" Link="Deps\ModelAssetDescriptor.cs" />
+    <Compile Include="..\Titan\Assets\ShaderAssetDescriptor.cs" Link="Deps\ShaderAssetDescriptor.cs" />
+    <Compile Include="..\Titan\Assets\ShaderType.cs" Link="Deps\ShaderType.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Titan.Tools.Core\Titan.Tools.Core.csproj" />
+  </ItemGroup>
+
+</Project>

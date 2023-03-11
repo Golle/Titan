@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels"
+        xmlns:dataTemplates="clr-namespace:Titan.Tools.ManifestBuilder.DataTemplates"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+        x:Class="Titan.Tools.ManifestBuilder.Views.Dialogs.AppSettingsDialog"
+        Title="AppSettings"
+        Width="600" Height="450"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True">
+
+  <Design.DataContext>
+    <viewModels:SettingsDialogViewModel/>
+  </Design.DataContext>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.8" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <DockPanel LastChildFill="True" Margin="10">
+      <TextBlock DockPanel.Dock="Top" FontSize="20" Height="40">Manifest Tool Settings</TextBlock>
+
+      <StackPanel DockPanel.Dock="Bottom"  Spacing="10">
+        <Separator Height="1" Background="{StaticResource SeparatorLight}"></Separator>
+        <Button HorizontalAlignment="Right" Command="{Binding SaveChanges}">Save changes</Button>
+      </StackPanel>
+
+      <ScrollViewer>
+        <ContentControl Content="{Binding Settings}">
+          <ContentControl.DataTemplates>
+            <dataTemplates:PropertiesDataTemplate/>
+          </ContentControl.DataTemplates>
+        </ContentControl>
+      </ScrollViewer>
+    </DockPanel>
+  </Panel>
+</Window>
