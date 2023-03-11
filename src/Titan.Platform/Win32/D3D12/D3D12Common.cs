@@ -1,8 +1,6 @@
 using System.Runtime.InteropServices;
 using Titan.Platform.Win32.D3D;
 
-// ReSharper disable InconsistentNaming
-
 namespace Titan.Platform.Win32.D3D12;
 
 public static unsafe class D3D12Common
@@ -31,6 +29,13 @@ public static unsafe class D3D12Common
     public static extern HRESULT D3D12SerializeRootSignature(
         D3D12_ROOT_SIGNATURE_DESC* pRootSignature,
         D3D_ROOT_SIGNATURE_VERSION Version,
+        ID3DBlob** ppBlob,
+        ID3DBlob** ppErrorBlob
+    );
+
+    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    public static extern HRESULT D3D12SerializeVersionedRootSignature(
+        D3D12_VERSIONED_ROOT_SIGNATURE_DESC* pRootSignature,
         ID3DBlob** ppBlob,
         ID3DBlob** ppErrorBlob
     );

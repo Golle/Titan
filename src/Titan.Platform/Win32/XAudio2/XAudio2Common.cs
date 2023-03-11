@@ -11,5 +11,6 @@ public unsafe class XAudio2Common
     public static extern HRESULT XAudio2Create(
         IXAudio2** ppXAudio2,
         uint Flags = 0,
-        XAUDIO2_PROCESSOR XAudio2Processor = XAUDIO2_PROCESSOR.XAUDIO2_DEFAULT_PROCESSOR);
+        XAUDIO2_PROCESSOR XAudio2Processor = XAUDIO2_PROCESSOR.XAUDIO2_DEFAULT_PROCESSOR
+    );
 }

@@ -1,4 +1,3 @@
-// ReSharper disable InconsistentNaming
 namespace Titan.Platform.Win32.DXGI;
 
 

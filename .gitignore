@@ -1,27 +1,9 @@
-# User-specific files
-*.user
-
-# Build results
-# [Dd]ebug/ # enable this if needed. but we might want a namespace called "Debug" inside Titan, and this will ignore that. (Debug is usually a sub dir in bin or obj)
-[Rr]elease/
-x64/
-x86/
-[Bb]in/
-[Oo]bj/
+bin/
+obj/
 
 .vs/
+release/
 
-tmp/
-
-# Generated models
-/resources/models*/
-/assets/*
-/resources/bundles/
-!/assets/README.md
-
-# A lot of temp textures, dont put on git yet.
-/resources/textures/
-
-
-/assetsv2/*
-/assetsV3/*
+*.user
+tools/
+libs/

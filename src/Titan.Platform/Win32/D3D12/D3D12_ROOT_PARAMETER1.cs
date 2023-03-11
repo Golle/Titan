@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Titan.Platform.Win32.D3D12;
@@ -6,10 +6,15 @@ namespace Titan.Platform.Win32.D3D12;
 public struct D3D12_ROOT_PARAMETER1
 {
     public D3D12_ROOT_PARAMETER_TYPE ParameterType;
-    private D3D12_ROOT_PARAMETER1_UNION UnionMembers;
-    public unsafe ref D3D12_ROOT_DESCRIPTOR_TABLE1 DescriptorTable => ref ((D3D12_ROOT_PARAMETER1_UNION*)Unsafe.AsPointer(ref UnionMembers))->DescriptorTable;
-    public unsafe ref D3D12_ROOT_CONSTANTS Constants => ref ((D3D12_ROOT_PARAMETER1_UNION*)Unsafe.AsPointer(ref UnionMembers))->Constants;
-    public unsafe ref D3D12_ROOT_DESCRIPTOR1 Descriptor => ref ((D3D12_ROOT_PARAMETER1_UNION*)Unsafe.AsPointer(ref UnionMembers))->Descriptor;
+    private D3D12_ROOT_PARAMETER1_UNION _union;
+
+    [UnscopedRef]
+    public ref D3D12_ROOT_DESCRIPTOR_TABLE1 DescriptorTable => ref _union.DescriptorTable;
+    [UnscopedRef]
+    public ref D3D12_ROOT_CONSTANTS Constants => ref _union.Constants;
+    [UnscopedRef]
+    public ref D3D12_ROOT_DESCRIPTOR1 Descriptor => ref _union.Descriptor;
+
     public D3D12_SHADER_VISIBILITY ShaderVisibility;
     [StructLayout(LayoutKind.Explicit)]
     private struct D3D12_ROOT_PARAMETER1_UNION

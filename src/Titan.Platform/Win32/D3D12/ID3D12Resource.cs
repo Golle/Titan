@@ -34,9 +34,9 @@ public unsafe struct ID3D12Resource
     // _In_ REFGUID guid,
     // _In_opt_  const IUnknown* pData);
 
-    //HRESULT(STDMETHODCALLTYPE* SetName)(
-    // ID3D12Resource* This,
-    // _In_z_ LPCWSTR Name);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT SetName(char* Name)
+        => ((delegate* unmanaged[Stdcall]<void*, char*, HRESULT>)_vtbl[6])(Unsafe.AsPointer(ref this), Name);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT GetDevice(in Guid riid, void** ppvDevice)

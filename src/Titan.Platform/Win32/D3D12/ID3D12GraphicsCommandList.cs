@@ -120,11 +120,11 @@ public unsafe struct ID3D12GraphicsCommandList
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void OMSetStencilRef(uint StencilRef)
-        => ((delegate* unmanaged[Stdcall]<void*, uint, void>)_vtbl[23])(Unsafe.AsPointer(ref this), StencilRef);
+        => ((delegate* unmanaged[Stdcall]<void*, uint, void>)_vtbl[24])(Unsafe.AsPointer(ref this), StencilRef);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetPipelineState(ID3D12PipelineState* pPipelineState)
-        => ((delegate* unmanaged[Stdcall]<void*, ID3D12PipelineState*, void>)_vtbl[24])(Unsafe.AsPointer(ref this), pPipelineState);
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12PipelineState*, void>)_vtbl[25])(Unsafe.AsPointer(ref this), pPipelineState);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ResourceBarrier(uint NumBarriers, D3D12_RESOURCE_BARRIER* pBarriers)

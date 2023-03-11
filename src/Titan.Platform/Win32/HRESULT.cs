@@ -1,11 +1,8 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// ReSharper disable InconsistentNaming
-
 namespace Titan.Platform.Win32;
 
-[SkipLocalsInit]
 [StructLayout(LayoutKind.Explicit)]
 public struct HRESULT
 {
@@ -18,7 +15,7 @@ public struct HRESULT
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator int(HRESULT hresult) => hresult.Value;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator HRESULT(int hresult) => new() {Value = hresult};
+    public static implicit operator HRESULT(int hresult) => new() { Value = hresult };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator HRESULT(uint hresult) => new() { Value = (int)hresult };

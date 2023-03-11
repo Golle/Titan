@@ -1,7 +1,4 @@
 using System.Runtime.CompilerServices;
-
-// ReSharper disable InconsistentNaming
-
 namespace Titan.Platform.Win32.D3D;
 
 public unsafe struct ID3DBlob

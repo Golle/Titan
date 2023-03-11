@@ -4,5 +4,5 @@ public struct D3D12_ROOT_DESCRIPTOR1
 {
     public uint ShaderRegister;
     public uint RegisterSpace;
-    D3D12_ROOT_DESCRIPTOR_FLAGS Flags;
+    public D3D12_ROOT_DESCRIPTOR_FLAGS Flags;
 }

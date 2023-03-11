@@ -67,8 +67,11 @@ public static class XAudio2Constants
 
 // XAudio2 error codes
     public const uint FACILITY_XAUDIO2 = 0x896;
-    public static readonly HRESULT XAUDIO2_E_INVALID_CALL = ((HRESULT)0x88960001); // An API call or one of its arguments was illegal
-    public static readonly HRESULT XAUDIO2_E_XMA_DECODER_ERROR = ((HRESULT)0x88960002); // The XMA hardware suffered an unrecoverable error
-    public static readonly HRESULT XAUDIO2_E_XAPO_CREATION_FAILED = ((HRESULT)0x88960003); // XAudio2 failed to initialize an XAPO effect
-    public static readonly HRESULT XAUDIO2_E_DEVICE_INVALIDATED = ((HRESULT)0x88960004); // An audio device became unusable (unplugged, etc)
+    public static readonly HRESULT XAUDIO2_E_INVALID_CALL = 0x88960001; // An API call or one of its arguments was illegal
+    public static readonly HRESULT XAUDIO2_E_XMA_DECODER_ERROR = 0x88960002; // The XMA hardware suffered an unrecoverable error
+    public static readonly HRESULT XAUDIO2_E_XAPO_CREATION_FAILED = 0x88960003; // XAudio2 failed to initialize an XAPO effect
+    public static readonly HRESULT XAUDIO2_E_DEVICE_INVALIDATED = 0x88960004; // An audio device became unusable (unplugged, etc)
+
+
+    public const ushort WAVE_FORMAT_PCM = 1;
 }

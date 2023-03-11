@@ -1,19 +1,32 @@
-using Titan.ECS.App;
-using Titan.ECS.Modules;
-using Titan.FileSystem;
+using Titan.Assets;
+using Titan.BuiltIn;
+using Titan.ECS;
+using Titan.Memory;
+using Titan.Setup;
 
 namespace Titan.Modules;
 
 public struct CoreModule : IModule
 {
-    public static bool Build(AppBuilder app)
+    public static bool Build(IAppBuilder builder)
     {
-        app
-            .AddModule<FileSystemModule>()
-            .AddModule<LoggingModule>()
+        builder
+            .AddModule<EventsModule>()
+            .AddModule<IOModule>()
             .AddModule<ThreadingModule>()
             .AddModule<ECSModule>()
-            .AddModule<SchedulerModule>();
+            .AddModule<SchedulerModule>()
+            .AddModule<MemoryModule>()
+            .AddModule<AssetsModule>()
+#if DEBUG
+            .AddModule<Editor.EditorModule>()
+#endif
+            .AddModule<BuiltInModule>()
+            
+            ;
+
         return true;
     }
+    public static bool Init(IApp app) => true;
+    public static bool Shutdown(IApp app) => true;
 }

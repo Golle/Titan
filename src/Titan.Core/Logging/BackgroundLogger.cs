@@ -1,40 +1,46 @@
+using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 
 namespace Titan.Core.Logging;
 
-internal static class BackgroundLogger
+internal class BackgroundLogger : IDisposable
 {
-    private const int MaxMessages = 1000;
-    private static readonly Channel<LogMessage> LogChannel = Channel.CreateBounded<LogMessage>(MaxMessages);
+    private const int MinMessageCount = 50;
+    private readonly Channel<LogMessage> _channel;
+    private readonly ChannelWriter<LogMessage> _writer;
+    private readonly Thread _logThread;
 
-    private static bool _active;
-    private static readonly Thread LogThread;
-    private static ILogger _logger;
-    internal static ChannelWriter<LogMessage> Writer => LogChannel.Writer;
+    private readonly ILogger _logger;
+    private bool _active;
 
-    static BackgroundLogger()
+    public BackgroundLogger(ILogger logger, uint maxMessages)
     {
-        LogThread = new Thread(Run) { Priority = ThreadPriority.Lowest };
-    }
-
-    public static void Start(ILogger instance)
-    {
-        _logger = instance;
+        _logger = logger;
         _active = true;
-        LogThread.Start();
+        _channel = Channel.CreateBounded<LogMessage>(Math.Max(MinMessageCount, (int)maxMessages));
+        _writer = _channel.Writer;
+        _logThread = new Thread(Run) { Priority = ThreadPriority.Lowest };
+        _logThread.Start();
     }
 
-    public static void Shutdown()
+    public void Shutdown()
     {
-        _active = false;
-        LogChannel.Writer.Complete();
-        LogThread.Join();
+        if (_active)
+        {
+            _active = false;
+            _channel.Writer.Complete();
+            _logThread.Join();
+        }
     }
 
-    private static void Run()
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryWrite(in LogMessage logMessage) 
+        => _writer.TryWrite(logMessage);
+
+    private void Run()
     {
         _logger.OnStart();
-        var reader = LogChannel.Reader;
+        var reader = _channel.Reader;
         while (_active)
         {
             if (reader.TryRead(out var logMessage))
@@ -55,4 +61,7 @@ internal static class BackgroundLogger
 
         _logger.OnShutdown();
     }
+
+    public void Dispose() 
+        => Shutdown();
 }

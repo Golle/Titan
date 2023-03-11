@@ -1,9 +1,7 @@
-// ReSharper disable InconsistentNaming
-namespace Titan.Platform.Win32.DXGI
+namespace Titan.Platform.Win32.DXGI;
+
+public struct DXGI_RATIONAL
 {
-    public struct DXGI_RATIONAL
-    {
-        public uint Numerator;
-        public uint Denominator;
-    }
+    public uint Numerator;
+    public uint Denominator;
 }

@@ -1,3 +1,4 @@
+
 namespace Titan.Platform.Win32.D3D12;
 
 public enum D3D12_HEAP_TYPE

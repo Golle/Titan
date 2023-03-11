@@ -1,9 +1,7 @@
-// ReSharper disable InconsistentNaming
-namespace Titan.Platform.Win32.DXGI
+namespace Titan.Platform.Win32.DXGI;
+
+public struct DXGI_SAMPLE_DESC
 {
-    public struct DXGI_SAMPLE_DESC
-    {
-        public uint Count;
-        public uint Quality;
-    }
+    public uint Count;
+    public uint Quality;
 }

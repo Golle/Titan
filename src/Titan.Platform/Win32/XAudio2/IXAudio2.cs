@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace Titan.Platform.Win32.XAudio2;
 
@@ -29,4 +30,13 @@ public unsafe struct IXAudio2
         AUDIO_STREAM_CATEGORY streamCategory = AUDIO_STREAM_CATEGORY.AudioCategory_GameEffects
     )
         => ((delegate* unmanaged[Stdcall]<void*, IXAudio2MasteringVoice**, uint, uint, uint, char*, XAUDIO2_EFFECT_CHAIN*, AUDIO_STREAM_CATEGORY, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), ppMasteringVoice, inputChannels, inputSampleRate, flags, szDeviceId, pEffectChain, streamCategory);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetDebugConfiguration(
+        IXAudio2MasteringVoice** ppMasteringVoice,
+        XAUDIO2_DEBUG_CONFIGURATION* pDebugConfiguration,
+        void* pReserved = null
+    )
+        => ((delegate* unmanaged[Stdcall]<void*, IXAudio2MasteringVoice**, XAUDIO2_DEBUG_CONFIGURATION*, void*, void>)_vtbl[12])(Unsafe.AsPointer(ref this), ppMasteringVoice, pDebugConfiguration, pReserved);
+
 }

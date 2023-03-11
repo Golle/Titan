@@ -1,0 +1,4 @@
+# Editor/Debug only files
+
+All files in this folder/namespace will be excluded when the project is built in Release mode.
+Use `#if DEBUG` wherever you use the classes/structs.

@@ -1,0 +1,57 @@
+{
+  "order": 0,
+  "name": "BuiltIn",
+  "textures": [
+    {
+      "path": "textures\\splash.png",
+      "type": "PNG",
+      "name": "splash"
+    },
+    {
+      "path": "textures\\ui.png",
+      "type": "PNG",
+      "name": "ui"
+    }
+  ],
+  "models": [],
+  "materials": [],
+  "shaders": [
+    {
+      "path": "shaders\\simple_ps_01.hlsl",
+      "shaderModel": "PS_6_5",
+      "entryPoint": "main",
+      "name": "simple_ps_01"
+    },
+    {
+      "path": "shaders\\simple_vs_01.hlsl",
+      "shaderModel": "VS_6_5",
+      "entryPoint": "main",
+      "name": "simple_vs_01"
+    },
+    {
+      "path": "shaders\\sprites.hlsl",
+      "shaderModel": "VS_6_5",
+      "entryPoint": "VSMain",
+      "name": "SpriteVS"
+    },
+    {
+      "path": "shaders\\sprites.hlsl",
+      "shaderModel": "PS_6_5",
+      "entryPoint": "PSMain",
+      "name": "SpritePS"
+    },
+    {
+      "path": "shaders\\spritesv2.hlsl",
+      "shaderModel": "VS_6_5",
+      "entryPoint": "VSMain",
+      "name": "Sprite2VS"
+    },
+    {
+      "path": "shaders\\spritesv2.hlsl",
+      "shaderModel": "PS_6_5",
+      "entryPoint": "PSMain",
+      "name": "Sprite2PS"
+    }
+  ],
+  "audio": []
+}

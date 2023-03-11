@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// ReSharper disable InconsistentNaming
 
 namespace Titan.Platform.Win32.DXGI;
 
@@ -49,7 +48,7 @@ public unsafe struct IDXGISwapChain3
     // _In_ REFIID riid,
     // /* [annotation][retval][out] */
     // _COM_Outptr_  void** ppParent);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT GetDevice(in Guid riid, void** ppDevice)
         => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppDevice);
@@ -69,10 +68,12 @@ public unsafe struct IDXGISwapChain3
         ((delegate* unmanaged[Stdcall]<void*, bool*, IDXGIOutput**, HRESULT>)_vtbl[11])(Unsafe.AsPointer(ref this), pFullscreen, ppTarget);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT GetDesc(DXGI_SWAP_CHAIN_DESC* pDesc) => ((delegate* unmanaged[Stdcall]<void*, DXGI_SWAP_CHAIN_DESC*, HRESULT>)_vtbl[12])(Unsafe.AsPointer(ref this), pDesc);
+    public HRESULT GetDesc(DXGI_SWAP_CHAIN_DESC* pDesc)
+        => ((delegate* unmanaged[Stdcall]<void*, DXGI_SWAP_CHAIN_DESC*, HRESULT>)_vtbl[12])(Unsafe.AsPointer(ref this), pDesc);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT ResizeBuffers(uint bufferCount, uint width, uint height, DXGI_FORMAT newFormat, uint swapChainFlags) => ((delegate* unmanaged[Stdcall]<void*, uint, uint, uint, DXGI_FORMAT, uint, HRESULT>)_vtbl[13])(Unsafe.AsPointer(ref this), bufferCount, width, height, newFormat, swapChainFlags);
+    public HRESULT ResizeBuffers(uint bufferCount, uint width, uint height, DXGI_FORMAT newFormat, uint swapChainFlags)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, uint, DXGI_FORMAT, uint, HRESULT>)_vtbl[13])(Unsafe.AsPointer(ref this), bufferCount, width, height, newFormat, swapChainFlags);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT ResizeTarget(DXGI_MODE_DESC* pNewTargetParameters) => ((delegate* unmanaged[Stdcall]<void*, DXGI_MODE_DESC*, HRESULT>)_vtbl[14])(Unsafe.AsPointer(ref this), pNewTargetParameters);
@@ -92,10 +93,9 @@ public unsafe struct IDXGISwapChain3
     // /* [annotation][out] */
     // _Out_ UINT * pLastPresentCount);
 
-    //HRESULT(STDMETHODCALLTYPE* GetDesc1)(
-    // IDXGISwapChain1* This,
-    // /* [annotation][out] */
-    // _Out_ DXGI_SWAP_CHAIN_DESC1 * pDesc);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT GetDesc1(DXGI_SWAP_CHAIN_DESC1* pDesc) 
+        => ((delegate* unmanaged[Stdcall]<void*, DXGI_SWAP_CHAIN_DESC1*, HRESULT>)_vtbl[18])(Unsafe.AsPointer(ref this), pDesc);
 
     //HRESULT(STDMETHODCALLTYPE* GetFullscreenDesc)(
     // IDXGISwapChain1* This,

@@ -1,18 +1,19 @@
+using System.Runtime.CompilerServices;
+
 namespace Titan.Core;
 
-/// <summary>
-/// We could use this to reduce the usage of raw pointers
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public readonly unsafe struct Ref<T> where T : unmanaged
+public unsafe struct Ref<T> where T : unmanaged
 {
-    private readonly T* _ptr;
-    public Ref(T* ptr)
-    {
-        _ptr = ptr;
-    }
+    //NOTE(Jens): We can explore using this as a wrapper around unmanaged resources. This would make it easier IF we want to put everything in unmanaged memory
+    private T* _ptr;
+    public Ref(T* ptr) => _ptr = ptr;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref T AsRef() => ref *_ptr;
-    public ref readonly T AsReadOnlyRef() => ref *_ptr;
-    public static implicit operator Ref<T>(T* ptr) => new(ptr);
-    public static implicit operator T*(in Ref<T> ptr) => ptr._ptr;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T* AsPointer() => _ptr;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator T*(in Ref<T> r) => r._ptr;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Ref<T>(T* ptr) => new() { _ptr = ptr };
 }

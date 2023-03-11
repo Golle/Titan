@@ -1,7 +1,5 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Platform.Win32.Win32;
-
 namespace Titan.Platform.Win32.D3D12;
 
 [Guid("e865df17-a9ee-46f9-a463-3098315aa2e5")]
@@ -137,8 +135,8 @@ public unsafe struct ID3D12Device4
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_RESOURCE_DESC*, D3D12_RESOURCE_STATES, D3D12_CLEAR_VALUE*, in Guid, void**, HRESULT>)_vtbl[30])(Unsafe.AsPointer(ref this), pDesc, InitialState, pOptimizedClearValue, riid, ppvResource);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT CreateSharedHandle(ID3D12DeviceChild* pObject, SECURITY_ATTRIBUTES* pAttributes, DWORD Access, char* Name, HANDLE* pHandle)
-        => ((delegate* unmanaged[Stdcall]<void*, ID3D12DeviceChild*, SECURITY_ATTRIBUTES*, DWORD, char*, HANDLE*, HRESULT>)_vtbl[31])(Unsafe.AsPointer(ref this), pObject, pAttributes, Access, Name, pHandle);
+    public HRESULT CreateSharedHandle(ID3D12DeviceChild* pObject, SECURITY_ATTRIBUTES* pAttributes, uint Access, char* Name, HANDLE* pHandle)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12DeviceChild*, SECURITY_ATTRIBUTES*, uint, char*, HANDLE*, HRESULT>)_vtbl[31])(Unsafe.AsPointer(ref this), pObject, pAttributes, Access, Name, pHandle);
 
     //    HRESULT(STDMETHODCALLTYPE* OpenSharedHandle)(
     //     ID3D12Device* This,

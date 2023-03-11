@@ -1,6 +1,3 @@
-
-
-// ReSharper disable InconsistentNaming
 namespace Titan.Platform.Win32.D3D;
 
 [Flags]

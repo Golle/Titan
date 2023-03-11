@@ -1,27 +1,16 @@
 using System.Runtime.CompilerServices;
-using Microsoft.Win32.SafeHandles;
 
-namespace Titan.Core.IO
+namespace Titan.Core.IO;
+
+public readonly struct FileHandle
 {
-    public readonly struct FileHandle : IDisposable
-    {
-        private readonly SafeFileHandle _fileHandle;
+    public readonly nuint Handle;
+    internal FileHandle(nuint handle) => Handle = handle;
+    public bool IsValid() => Handle != 0;
+    public bool IsInvalid() => Handle == 0;
+    public static readonly FileHandle Invalid = new(0);
 
-        public FileHandle(SafeFileHandle fileHandle) => _fileHandle = fileHandle;
-
-        public long Length => RandomAccess.GetLength(_fileHandle);
-        public int Read(in Span<byte> buffer) => RandomAccess.Read(_fileHandle, buffer, 0);
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] ReadAllBytes()
-        {
-            var buffer = new byte[Length];
-            RandomAccess.Read(_fileHandle, buffer, 0);
-            return buffer;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose() => _fileHandle.Dispose();
-
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator nuint(FileHandle handle) => handle.Handle;
+    public override string ToString() => Handle.ToString();
 }

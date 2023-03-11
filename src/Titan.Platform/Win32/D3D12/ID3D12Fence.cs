@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Titan.Platform.Win32.Win32;
 
 namespace Titan.Platform.Win32.D3D12;
 

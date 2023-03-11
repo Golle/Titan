@@ -1,19 +1,29 @@
 using System.Diagnostics;
-using System.Threading.Channels;
 
 namespace Titan.Core.Logging;
 
+public record struct LogMessage(LogLevel Level, string Message, string Scope);
+
 public static class Logger
 {
-    private static readonly ChannelWriter<LogMessage> Writer = BackgroundLogger.Writer;
-
+    private static BackgroundLogger _backgroundLogger;
     /// <summary>
     /// Start the logger with a Default Console Logger.
     /// </summary>
-    public static void Start() => Start<ConsoleLogger>();
-    public static void Start<TLogger>() where TLogger : ILogger, new() => Start(new TLogger());
-    public static void Start(ILogger logger) => BackgroundLogger.Start(logger);
-    public static void Shutdown() => BackgroundLogger.Shutdown();
+    public static IDisposable Start() => Start<ConsoleLogger>();
+    public static IDisposable Start<TLogger>(uint maxMessages = 0) where TLogger : ILogger, new() => Start(new TLogger(), maxMessages);
+    public static IDisposable Start(ILogger logger, uint maxMessages)
+    {
+        System.Diagnostics.Debug.Assert(_backgroundLogger == null);
+        _backgroundLogger = new BackgroundLogger(logger, maxMessages);
+        return new DisposableLogger();
+    }
+
+    public static void Shutdown()
+    {
+        System.Diagnostics.Debug.Assert(_backgroundLogger != null);
+        _backgroundLogger.Shutdown();
+    }
 
     [Conditional("DEBUG")]
     public static void Debug(string message) => Log(LogLevel.Debug, message);
@@ -51,12 +61,17 @@ public static class Logger
 
     private static void Log(LogLevel level, string message, string scope = null)
     {
-        var result = Writer.TryWrite(new LogMessage(level, message, scope));
-
+        System.Diagnostics.Debug.Assert(_backgroundLogger != null);
+        var result = _backgroundLogger.TryWrite(new LogMessage(level, message, scope));
         if (!result)
         {
             Console.Error.WriteLine("Failed to write to log channel because it's been closed. (Use Assert later.)");
         }
         //System.Diagnostics.Debug.Assert(result, "Failed to write to channel.");
+    }
+
+    private struct DisposableLogger : IDisposable
+    {
+        public void Dispose() => Shutdown();
     }
 }

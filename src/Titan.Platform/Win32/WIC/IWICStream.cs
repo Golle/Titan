@@ -1,16 +1,14 @@
 using System.Runtime.CompilerServices;
 
-// ReSharper disable InconsistentNaming
+namespace Titan.Platform.Win32.WIC;
 
-namespace Titan.Platform.Win32.WIC
+public unsafe struct IStream
 {
-    public unsafe struct IStream
-    {
-        private void** _vtbl;
-    }
-    public unsafe struct IWICStream
-    {
-        private void** _vtbl;
+    private void** _vtbl;
+}
+public unsafe struct IWICStream
+{
+    private void** _vtbl;
 
 //        HRESULT(STDMETHODCALLTYPE* QueryInterface)(
 //        __RPC__in IWICStream * This,
@@ -27,29 +25,29 @@ namespace Titan.Platform.Win32.WIC
 //        /* [local] */
 //        HRESULT(STDMETHODCALLTYPE* Read)(
 //IWICStream* This,
-        ///* [annotation] */
+    ///* [annotation] */
 //_Out_writes_bytes_to_(cb, * pcbRead) void* pv,
-        ///* [annotation][in] */
+    ///* [annotation][in] */
 //_In_  ULONG cb,
-        ///* [annotation] */
+    ///* [annotation] */
 //_Out_opt_  ULONG* pcbRead);
 
 //        /* [local] */
 //        HRESULT(STDMETHODCALLTYPE* Write)(
 //IWICStream* This,
-        ///* [annotation] */
+    ///* [annotation] */
 //_In_reads_bytes_(cb) const void* pv,
-        ///* [annotation][in] */
+    ///* [annotation][in] */
 //_In_  ULONG cb,
-        ///* [annotation] */
+    ///* [annotation] */
 //_Out_opt_  ULONG* pcbWritten);
 
 //        /* [local] */
 //        HRESULT(STDMETHODCALLTYPE* Seek)(
 //IWICStream* This,
-        ///* [in] */ LARGE_INTEGER dlibMove,
-        ///* [in] */ DWORD dwOrigin,
-        ///* [annotation] */
+    ///* [in] */ LARGE_INTEGER dlibMove,
+    ///* [in] */ DWORD dwOrigin,
+    ///* [annotation] */
 //_Out_opt_ ULARGE_INTEGER * plibNewPosition);
 
 //        HRESULT(STDMETHODCALLTYPE* SetSize)(
@@ -103,13 +101,12 @@ namespace Titan.Platform.Win32.WIC
 //         /* [in] */ __RPC__in LPCWSTR wzFileName,
 //         /* [in] */ DWORD dwDesiredAccess);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public HRESULT InitializeFromMemory(byte* pbBuffer, uint cbBufferSize) => ((delegate* unmanaged[Stdcall]<void*, byte*, uint, HRESULT>) _vtbl[16])(Unsafe.AsPointer(ref this), pbBuffer, cbBufferSize);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT InitializeFromMemory(byte* pbBuffer, uint cbBufferSize) => ((delegate* unmanaged[Stdcall]<void*, byte*, uint, HRESULT>) _vtbl[16])(Unsafe.AsPointer(ref this), pbBuffer, cbBufferSize);
 
-        //        HRESULT(STDMETHODCALLTYPE* InitializeFromIStreamRegion)(
-        //         __RPC__in IWICStream * This,
-        //         /* [in] */ __RPC__in_opt IStream* pIStream,
-        //         /* [in] */ ULARGE_INTEGER ulOffset,
-        //            /* [in] */ ULARGE_INTEGER ulMaxSize);
-    }
+    //        HRESULT(STDMETHODCALLTYPE* InitializeFromIStreamRegion)(
+    //         __RPC__in IWICStream * This,
+    //         /* [in] */ __RPC__in_opt IStream* pIStream,
+    //         /* [in] */ ULARGE_INTEGER ulOffset,
+    //            /* [in] */ ULARGE_INTEGER ulMaxSize);
 }

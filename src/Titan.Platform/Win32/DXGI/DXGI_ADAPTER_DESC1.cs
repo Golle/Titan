@@ -1,7 +1,5 @@
 using System.Runtime.InteropServices;
 
-// ReSharper disable InconsistentNaming
-
 namespace Titan.Platform.Win32.DXGI;
 
 [StructLayout(LayoutKind.Sequential)]
@@ -20,9 +18,18 @@ public struct DXGI_ADAPTER_DESC1
 
     public unsafe ReadOnlySpan<char> DescriptionString()
     {
+        var length = 128;
+        for (var i = 0; i < 128; ++i)
+        {
+            if (Description[i] == '\0')
+            {
+                length = i; 
+                break;
+            }
+        }
         fixed (char* pDesc = Description)
         {
-            return new(pDesc, 128);
+            return new(pDesc, length);
         }
     }
 }

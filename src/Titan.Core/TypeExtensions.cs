@@ -1,6 +1,6 @@
 namespace Titan.Core;
 
-public static class TypeExtensions
+internal static class TypeExtensions
 {
     // NOTE(Jens): this allocates memory (select and string format). Decide if we should use it in release/shipping as well.
 #if DEBUG

@@ -1,0 +1,25 @@
+{
+  "order": 0,
+  "name": "sample_manifest_02",
+  "textures": [
+    {
+      "path": "textures\\greensheet.png",
+      "type": "PNG",
+      "name": "greensheet"
+    },
+    {
+      "path": "textures\\greysheet.png",
+      "type": "PNG",
+      "name": "greysheet"
+    },
+    {
+      "path": "textures\\redsheet.png",
+      "type": "PNG",
+      "name": "redsheet"
+    }
+  ],
+  "models": [],
+  "materials": [],
+  "shaders": [],
+  "audio": []
+}

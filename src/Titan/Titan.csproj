@@ -1,31 +1,40 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
     <LangVersion>preview</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>Debug;Release;Shipping</Configurations>
     <IsTrimmable>true</IsTrimmable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
-    <DefineConstants></DefineConstants>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Remove="Old\**" />
-    <EmbeddedResource Remove="Old\**" />
-    <None Remove="Old\**" />
+    <Compile Remove="Audio\AudioPlaybackQueue.cs" />
+    <Compile Remove="Audio\AudioPlaybackSystem.cs" />
+    <Compile Remove="Audio\AudioRegistry.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Titan.Assets\Titan.Assets.csproj" />
     <ProjectReference Include="..\Titan.Core\Titan.Core.csproj" />
-    <ProjectReference Include="..\Titan.ECS\Titan.ECS.csproj" />
-    <ProjectReference Include="..\Titan.FileSystem\Titan.FileSystem.csproj" />
-    <ProjectReference Include="..\Titan.Graphics\Titan.Graphics.csproj" />
-    <ProjectReference Include="..\Titan.Input\Titan.Input.csproj" />
-    <ProjectReference Include="..\Titan.Physics\Titan.Physics.csproj" />
-    <ProjectReference Include="..\Titan.Sound\Titan.Sound.csproj" />
-    <ProjectReference Include="..\Titan.UI\Titan.UI.csproj" />
   </ItemGroup>
+
+
+
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <ProjectReference Include="..\Titan.Tools.Core\Titan.Tools.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' != 'Debug'">
+    <Compile Remove="Editor\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Titan.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>

@@ -1,28 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>preview</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
-    <Configurations>Debug;Release;Shipping</Configurations>
-    <InvariantGlobalization>true</InvariantGlobalization>
     <IsTrimmable>true</IsTrimmable>
+    <InvariantGlobalization>true</InvariantGlobalization>
     <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
-    <!-- <IlcOptimizationPreference>Size</IlcOptimizationPreference> -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    
+    <!--<IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
+    <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
+    <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>-->
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
-    <DefineConstants></DefineConstants>
-    <OutputType>WinExe</OutputType>
-    <Optimize>True</Optimize>
+
+  <!-- NOTE(Jens): This will replace any other DefineConstants which is not what we want. -->
+  <!--<PropertyGroup Condition="'$(IsWindows)'=='true'">
+    <DefineConstants>WIN32</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' != 'Shipping|AnyCPU'">
-    <OutputType>Exe</OutputType>
+  <PropertyGroup Condition="'$(IsOSX)'=='true'">
+    <DefineConstants>OSX</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="FirstPersonCameraSystemTEMP.cs" />
-    <Compile Remove="Program.cs" />
-  </ItemGroup>
-  
+  <PropertyGroup Condition="'$(IsLinux)'=='true'">
+    <DefineConstants>LINUX</DefineConstants>
+  </PropertyGroup>-->
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Titan\Titan.csproj" />
   </ItemGroup>
+
 </Project>

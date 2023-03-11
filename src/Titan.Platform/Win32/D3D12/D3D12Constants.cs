@@ -421,4 +421,12 @@ public static class D3D12Constants
     public const int D3D12_WHQL_CONTEXT_COUNT_FOR_RESOURCE_LIMIT = 10;
     public const int D3D12_WHQL_DRAWINDEXED_INDEX_COUNT_2_TO_EXP = 25;
     public const int D3D12_WHQL_DRAW_VERTEX_COUNT_2_TO_EXP = 25;
+
+
+
+
+    /// <summary>
+    /// This is a macro in C++, if we want to support additional mapping we need to mimic that macro in C#.
+    /// </summary>
+    public const uint D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING = 0x1688;
 }

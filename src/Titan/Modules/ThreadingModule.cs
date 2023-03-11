@@ -1,29 +1,57 @@
+using Titan.Core;
 using Titan.Core.Logging;
-using Titan.Core.Threading2;
-using Titan.ECS.App;
-using Titan.ECS.Scheduler;
-using Titan.ECS.Systems;
+using Titan.Core.Memory;
+using Titan.Core.Threading;
+using Titan.Core.Threading.Platform;
+using Titan.Jobs;
+using Titan.Setup;
 
 namespace Titan.Modules;
-public struct ThreadingModule : IModule
+
+internal struct ThreadingModule : IModule
 {
-    public static bool Build(AppBuilder builder)
+    public static bool Build(IAppBuilder builder)
     {
-        ref readonly var config = ref builder.GetResourceOrDefault<ThreadPoolConfiguration>();
+        IThreadManager threadManager = GlobalConfiguration.OperatingSystem switch
+        {
+            OperatingSystem.Windows => new ThreadManager<Win32ThreadApi>(),
+            OperatingSystem.Linux => new ThreadManager<PosixThreadApi>(),
+            _ => null
+        };
 
-        Logger.Trace<ThreadingModule>($"{nameof(ManagedThreadPool)} configuration. Worker threads: {config.WorkerThreads} MaxJobs: {config.MaxJobs} IOThreads: {config.IOThreads} (NYI)");
-
+        if (threadManager == null)
+        {
+            Logger.Error<ThreadingModule>($"OS {GlobalConfiguration.OperatingSystem} is not supported at the moment.");
+            return false;
+        }
+        Logger.Trace<ThreadingModule>($"Using {threadManager.GetType().FormattedName()} for Threading");
         builder
-            .AddResource(JobApi.CreateAndInitJobApi<ManagedThreadPool>(config))
-            .AddSystemToStage<JobApiTeardown>(Stage.PostShutdown);
+            .AddManagedResource(threadManager)
+            .AddManagedResource<IJobApi>(new JobApi());
+
         return true;
     }
 
-    private struct JobApiTeardown : IStructSystem<JobApiTeardown>
+    public static bool Init(IApp app)
     {
-        private ApiResource<JobApi> _jobApi;
-        public static void Init(ref JobApiTeardown system, in SystemsInitializer init) => system._jobApi = init.GetApi<JobApi>();
-        public static void Update(ref JobApiTeardown system) => system._jobApi.Get().Shutdown();
-        public static bool ShouldRun(in JobApiTeardown _) => true;
+        var memoryManager = app.GetManagedResource<IMemoryManager>();
+        var threadManager = app.GetManagedResource<IThreadManager>();
+        var jobApi = (JobApi)app.GetManagedResource<IJobApi>();
+
+        //NOTE(Jens): add config from App
+        if (!jobApi.Init(memoryManager, threadManager, (uint)(Environment.ProcessorCount - 2)))
+        {
+            Logger.Error<ThreadingModule>("Failed to init the JobApi");
+            return false;
+        }
+        return true;
+    }
+
+    public static bool Shutdown(IApp app)
+    {
+        var jobApi = (JobApi)app.GetManagedResource<IJobApi>();
+        jobApi.Shutdown();
+
+        return true;
     }
 }
