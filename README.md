@@ -69,7 +69,7 @@ Sample from the Space Invaders project
 
     var devAssetFolder = Path.GetFullPath($"{AppContext.BaseDirectory}../../../../../assets");
     var devPakFolder = Path.Combine(devAssetFolder, "bin");
-    var devEngineFolder = Path.GetFullPath($"{AppContext.BaseDirectory}../../../../../../TitanEngine/");
+    var devEngineFolder = Path.GetFullPath($"{AppContext.BaseDirectory}../../../../../../Titan/");
     var devConfig = new AssetsDevConfiguration(devAssetFolder, devPakFolder, devEngineFolder, UseRawAssets);
     #else
     using var _ = Logger.Start(new FileLogger(Path.GetFullPath(AppContext.BaseDirectory, "MyAmazingGame", "logs", )), 10_000);
