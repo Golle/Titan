@@ -3,11 +3,13 @@ using System.Runtime.InteropServices;
 
 namespace Titan.Platform.Win32.DXGI;
 
-public unsafe partial struct DXGICommon
+public static unsafe partial class DXGICommon
 {
     private const string DllName = "dxgi";
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HRESULT CreateDXGIFactory1(Guid* riid, void** ppFactory);
+    
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial HRESULT CreateDXGIFactory1(Guid* riid, void** ppFactory);
 
     [LibraryImport(DllName, SetLastError = true)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]

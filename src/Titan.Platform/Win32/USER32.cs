@@ -1,28 +1,32 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Platform.Win32.DBT;
 
 namespace Titan.Platform.Win32;
 
-public static unsafe class USER32
+public static unsafe partial class USER32
 {
     public const int GWLP_USERDATA = -21;
 
-    private const string DllName = "user32";
+    private const string DllName = "User32";
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern ushort RegisterClassExW(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial ushort RegisterClassExW(
         WNDCLASSEXA* wndClassEx
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool UnregisterClassW(
+    public static partial bool UnregisterClassW(
         char* LpszClassName,
         HINSTANCE hInstance
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HWND CreateWindowExW(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial HWND CreateWindowExW(
         WINDOWSTYLES_EX dwExStyle,
         char* lpClassName,
         char* lpWindowName,
@@ -37,57 +41,65 @@ public static unsafe class USER32
         void* lpParam
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool DestroyWindow(
+    public static partial bool DestroyWindow(
         HWND hWnd
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern int SetWindowTextW(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial int SetWindowTextW(
         HWND hWnd,
         char* lpString
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool AdjustWindowRect(
+    public static partial bool AdjustWindowRect(
         RECT* lpRect,
         WINDOWSTYLES dwStyle,
         [MarshalAs(UnmanagedType.Bool)] bool bMenu
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern nint SetWindowLongPtrW(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial nint SetWindowLongPtrW(
         HWND hwnd,
         int nIndex,
         nint dwNewLong
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern nint GetWindowLongPtrW(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial nint GetWindowLongPtrW(
         HWND hwnd,
         int nIndex
     );
 
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern nint GetWindowLongPtrA(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial nint GetWindowLongPtrA(
         HWND hwnd,
         int nIndex
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern nint DefWindowProcW(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial nint DefWindowProcW(
         HWND hWnd,
         WINDOW_MESSAGE msg,
         nuint wParam,
         nuint lParam
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool PeekMessageW(
+    public static partial bool PeekMessageW(
         MSG* lpMsg,
         HWND hWnd,
         uint wMsgFilterMin,
@@ -95,56 +107,65 @@ public static unsafe class USER32
         uint removeMessage
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool TranslateMessage(
+    public static partial bool TranslateMessage(
         MSG* lpMsg
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern nint DispatchMessage(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial nint DispatchMessageW(
         MSG* lpMsg
     );
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern void PostQuitMessage(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial void PostQuitMessage(
         int nExitCode
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern int ShowWindow(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial int ShowWindow(
         HWND hWnd,
         SHOW_WINDOW_COMMANDS nCmdShow
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool GetCursorPos(
+    public static partial bool GetCursorPos(
         POINT* lpPoint
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool ScreenToClient(
+    public static partial bool ScreenToClient(
         HWND hWnd,
         POINT* lpPoint
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool SetCursorPos(
+    public static partial bool SetCursorPos(
         int x,
         int y
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HDEVNOTIFY RegisterDeviceNotificationA(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial HDEVNOTIFY RegisterDeviceNotificationA(
         HANDLE hRecipient,
         void* NotificationFilter,
         DEVICE_NOTIFY_FLAGS Flags
     );
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HDEVNOTIFY RegisterDeviceNotificationW(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial HDEVNOTIFY RegisterDeviceNotificationW(
         HANDLE hRecipient,
         void* NotificationFilter,
         DEVICE_NOTIFY_FLAGS Flags

@@ -5,13 +5,14 @@ using Titan.Platform.Win32;
 
 namespace Titan.Platform.DXC;
 
-public static unsafe class DXCCompilerCommon
+public static unsafe partial class DXCCompilerCommon
 {
     //NOTE(Jens): currently using a hardcoded path, will change when we have something that downloads the latest version
     private const string DllName = "dxcompiler";
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
-    public static extern HRESULT DxcCreateInstance(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial HRESULT DxcCreateInstance(
         Guid* rclsid,
         Guid* riid,
         void** ppv

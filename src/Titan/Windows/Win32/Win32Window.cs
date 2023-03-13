@@ -163,7 +163,7 @@ internal unsafe class Win32Window : IWindow
                 //NOTE(Jens): Add input handling here. it will decrease the input latency by a tiny amount.
             }
             TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            DispatchMessageW(&msg);
         }
         return true;
     }
