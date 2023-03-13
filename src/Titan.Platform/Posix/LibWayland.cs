@@ -1,39 +1,50 @@
-using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Titan.Platform.Posix;
 
-
-
-public unsafe class LibWayland
+public static unsafe partial class LibWayland
 {
     private const string DllName = "libwayland-client.so.0";
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern wl_display* wl_display_connect(byte* name);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void wl_display_disconnect(wl_display* display);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int wl_display_dispatch(wl_display* display);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int wl_event_loop_get_fd(wl_event_loop* loop);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern wl_registry* wl_display_get_registry(wl_display* display);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial wl_display* wl_display_connect(byte* name);
 
 
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int wl_display_roundtrip(wl_display* display);
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern wl_proxy* wl_proxy_marshal_constructor(wl_proxy* proxy, uint opcode, wl_interface* pInterface);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int wl_proxy_add_listener(wl_proxy* proxy, void* implementation, void* data);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial void wl_display_disconnect(wl_display* display);
 
 
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int wl_display_dispatch(wl_display* display);
+
+
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int wl_event_loop_get_fd(wl_event_loop* loop);
+
+
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial wl_registry* wl_display_get_registry(wl_display* display);
+
+
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int wl_display_roundtrip(wl_display* display);
+
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial wl_proxy* wl_proxy_marshal_constructor(wl_proxy* proxy, uint opcode, wl_interface* pInterface);
+
+
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int wl_proxy_add_listener(wl_proxy* proxy, void* implementation, void* data);
+    
     public static int wl_registry_add_listener(wl_registry* registry, wl_registry_listener* listener, void* data)
         => wl_proxy_add_listener((wl_proxy*)registry, listener, data);
 }

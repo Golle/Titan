@@ -1,15 +1,18 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32.DXGI;
 
 [Guid("a4966eed-76db-44da-84c1-ee9a7afb20a8")]
-public unsafe struct IDXGIFactory7
+public unsafe struct IDXGIFactory7 : INativeGuid
 {
+    public static Guid* Guid => IID.IID_IDXGIFactory7;
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(in Guid riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
@@ -185,8 +188,8 @@ public unsafe struct IDXGIFactory7
         => ((delegate* unmanaged[Stdcall]<void*, DXGI_FEATURE, void*, uint, HRESULT>)_vtbl[28])(Unsafe.AsPointer(ref this), Feature, pFeatureSupportData, FeatureSupportDataSize);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT EnumAdapterByGpuPreference(uint Adapter, DXGI_GPU_PREFERENCE GpuPreference, in Guid riid, void** ppvAdapter)
-        => ((delegate* unmanaged[Stdcall]<void*, uint, DXGI_GPU_PREFERENCE, in Guid, void**, HRESULT>)_vtbl[29])(Unsafe.AsPointer(ref this), Adapter, GpuPreference, riid, ppvAdapter);
+    public HRESULT EnumAdapterByGpuPreference(uint Adapter, DXGI_GPU_PREFERENCE GpuPreference, Guid* riid, void** ppvAdapter)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, DXGI_GPU_PREFERENCE, Guid*, void**, HRESULT>)_vtbl[29])(Unsafe.AsPointer(ref this), Adapter, GpuPreference, riid, ppvAdapter);
 
     //HRESULT(STDMETHODCALLTYPE* RegisterAdaptersChangedEvent)(
     //IDXGIFactory7* This,

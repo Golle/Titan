@@ -1,13 +1,13 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32;
 
-public unsafe struct ComPtr<T> : IDisposable where T : unmanaged
+public unsafe struct ComPtr<T> : IDisposable where T : unmanaged, INativeGuid
 {
     private T* _ptr;
-    public Guid UUID => typeof(T).GUID;
-
+    public Guid* UUID => T.Guid;
     public ComPtr(T* ptr)
     {
         _ptr = ptr;

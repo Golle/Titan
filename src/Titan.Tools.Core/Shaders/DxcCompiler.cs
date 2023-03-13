@@ -49,7 +49,7 @@ internal unsafe class DxcCompiler : IShaderCompiler
 
         HRESULT hr;
 
-        hr = DxcCreateInstance(CLSID_DxcUtils, typeof(IDXCUtils).GUID, (void**)utils.GetAddressOf());
+        hr = DxcCreateInstance(CLSID_DxcUtils, IDXCUtils.Guid, (void**)utils.GetAddressOf());
         if (FAILED(hr))
         {
             var errorMessage = $"Failed to create and instance of {nameof(IDXCUtils)} with HRESULT {hr}";
@@ -57,7 +57,7 @@ internal unsafe class DxcCompiler : IShaderCompiler
             return new DxcCompilerResult(errorMessage);
         }
 
-        hr = DxcCreateInstance(CLSID_Compiler, typeof(IDXCCompiler3).GUID, (void**)compiler.GetAddressOf());
+        hr = DxcCreateInstance(CLSID_Compiler, IDXCCompiler3.Guid, (void**)compiler.GetAddressOf());
         if (FAILED(hr))
         {
             var errorMessage = $"Failed to create and instance of {nameof(IDXCCompiler3)} with HRESULT {hr}";
@@ -112,7 +112,7 @@ internal unsafe class DxcCompiler : IShaderCompiler
 
         using ComPtr<IDXCResult> result = default;
         using ComPtr<IDXCBlobWide> compileErrors = default;
-        hr = compiler.Get()->Compile(&buffer, args.GetArguments(), args.GetArgumentsCount(), includeHandler.Get(), typeof(IDXCResult).GUID, (void**)result.GetAddressOf());
+        hr = compiler.Get()->Compile(&buffer, args.GetArguments(), args.GetArgumentsCount(), includeHandler.Get(), IDXCResult.Guid, (void**)result.GetAddressOf());
         if (FAILED(hr))
         {
             Logger.Error<DxcCompiler>($"Compile failed with HRESULT {hr}");

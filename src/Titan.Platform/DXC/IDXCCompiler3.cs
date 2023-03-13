@@ -1,18 +1,20 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.DXC;
 
 
 [Guid("228B4687-5A6A-4730-900C-9702B2203F54")]
-public unsafe struct IDXCCompiler3
+public unsafe struct IDXCCompiler3 : INativeGuid
 {
+    public static Guid* Guid => IID.IID_IDXCCompiler3;
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(in Guid riid, void** ppvObject)
-        => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef()
         => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
@@ -27,10 +29,10 @@ public unsafe struct IDXCCompiler3
         char** pArguments, // Array of pointers to arguments
         uint argCount, // Number of arguments
         IDXCIncludeHandler* pIncludeHandler, // user-provided interface to handle #include directives (optional)
-        in Guid riid,
+        Guid* riid,
         void** ppResult // IDxcResult: status, buffer, and errors
     )
-        => ((delegate* unmanaged[Stdcall]<void*, DXCBuffer*, char**, uint, IDXCIncludeHandler*, in Guid, void**, HRESULT>)_vtbl[3])(Unsafe.AsPointer(ref this), pSource, pArguments, argCount, pIncludeHandler, riid, ppResult);
+        => ((delegate* unmanaged[Stdcall]<void*, DXCBuffer*, char**, uint, IDXCIncludeHandler*, Guid*, void**, HRESULT>)_vtbl[3])(Unsafe.AsPointer(ref this), pSource, pArguments, argCount, pIncludeHandler, riid, ppResult);
 
     //// Disassemble a program.
     //virtual HRESULT STDMETHODCALLTYPE Disassemble(

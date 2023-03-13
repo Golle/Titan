@@ -75,7 +75,7 @@ internal unsafe class WicImageReader : IDisposable
     private ComPtr<IWICImagingFactory> _factory;
     public WicImageReader()
     {
-        var hr = CoCreateInstance(WICCLSID.CLSID_WICImagingFactory2, null, CLSCTX.CLSCTX_INPROC_SERVER, typeof(IWICImagingFactory).GUID, (void**)_factory.GetAddressOf());
+        var hr = CoCreateInstance(WICCLSID.CLSID_WICImagingFactory2, null, CLSCTX.CLSCTX_INPROC_SERVER, IWICImagingFactory.Guid, (void**)_factory.GetAddressOf());
         if (FAILED(hr))
         {
             throw new Exception($"Failed to create the {nameof(IWICImagingFactory)} instance with HRESULT {hr}");

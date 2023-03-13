@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Titan.Platform.Posix;
 
 namespace Titan.Core.Maths;
 

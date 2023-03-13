@@ -22,7 +22,7 @@ internal unsafe class DXGIAdapter : IGraphicsAdapter
 
         var flags = debug ? DXGI_CREATE_FACTORY_DEBUG : 0;
         IDXGIFactory7* factory;
-        var hr = CreateDXGIFactory2(flags, typeof(IDXGIFactory7).GUID, (void**)&factory);
+        var hr = CreateDXGIFactory2(flags, IDXGIFactory7.Guid, (void**)&factory);
         if (FAILED(hr))
         {
             Logger.Error<DXGIAdapter>($"Failed to create a {nameof(IDXGIFactory7)} with {nameof(CreateDXGIFactory2)} with HRESULT: {hr}");
@@ -34,7 +34,7 @@ internal unsafe class DXGIAdapter : IGraphicsAdapter
         while (true)
         {
             IDXGIAdapter3* adapter;
-            hr = factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, typeof(IDXGIAdapter3).GUID, (void**)&adapter);
+            hr = factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IDXGIAdapter3.Guid, (void**)&adapter);
             if (hr == DXGI_ERROR.DXGI_ERROR_NOT_FOUND)
             {
                 // no more adapters
@@ -51,7 +51,7 @@ internal unsafe class DXGIAdapter : IGraphicsAdapter
                 else
                 {
                     Logger.Trace<DXGIAdapter>($"Found a Hardware adapter ({desc.DescriptionString()}), trying to create a {nameof(ID3D12Device)}");
-                    hr = D3D12CreateDevice((IUnknown*)adapter, minFeatureLevel, typeof(ID3D12Device4).GUID, null);
+                    hr = D3D12CreateDevice((IUnknown*)adapter, minFeatureLevel, ID3D12Device4.Guid, null);
                     if (SUCCEEDED(hr))
                     {
                         Adapter = adapter;

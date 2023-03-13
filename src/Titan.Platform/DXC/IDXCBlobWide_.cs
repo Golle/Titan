@@ -1,16 +1,19 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titan.Platform.Win32;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.DXC;
 
 [Guid("A3F84EAB-0FAA-497E-A39C-EE6ED60B2D84")]
-public unsafe struct IDXCBlobWide // : IDxcBlobEncoding
+public unsafe struct IDXCBlobWide : INativeGuid // : IDxcBlobEncoding
 {
+    public static Guid* Guid => IID.IID_IDXCBlobWide;
+
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(in Guid riid, void** ppvObject)
-        => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef()

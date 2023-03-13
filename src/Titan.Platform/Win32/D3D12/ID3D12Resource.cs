@@ -4,12 +4,15 @@ using System.Runtime.InteropServices;
 namespace Titan.Platform.Win32.D3D12;
 
 [Guid("696442be-a72e-4059-bc79-5b5c98040fad")]
-public unsafe struct ID3D12Resource
+public unsafe struct ID3D12Resource : INativeGuid
 {
+    public static Guid* Guid => IID.IID_ID3D12Resource;
+
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(in Guid riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
@@ -39,8 +42,8 @@ public unsafe struct ID3D12Resource
         => ((delegate* unmanaged[Stdcall]<void*, char*, HRESULT>)_vtbl[6])(Unsafe.AsPointer(ref this), Name);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT GetDevice(in Guid riid, void** ppvDevice)
-    => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppvDevice);
+    public HRESULT GetDevice(Guid* riid, void** ppvDevice)
+    => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppvDevice);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT Map(uint Subresource, D3D12_RANGE* pReadRange, void** ppData)

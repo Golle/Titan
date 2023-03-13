@@ -1,36 +1,46 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Titan.Platform.Posix;
 
-public unsafe class Libc
+public static unsafe partial class Libc
 {
     private const string DllName = "libc";
 
     //https://sites.uclouvain.be/SystInfo/usr/include/bits/mman.h.html
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int getpagesize();
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int getpagesize();
 
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void* mmap(void* addr, nuint length, PageProtection prot, PageFlags flags, int fd, ulong offset);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial void* mmap(void* addr, nuint length, PageProtection prot, PageFlags flags, int fd, ulong offset);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int munmap(void* addr, nuint length);
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int mprotect(void* addr, nuint len, PageProtection prot);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int munmap(void* addr, nuint length);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int mprotect(void* addr, nuint len, PageProtection prot);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int open(byte* pathname, int flags, mode_t mode);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int open(byte* pathname, int flags, mode_t mode);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int close(int fd);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int close(int fd);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nuint read(int fd, void* buf, nuint count);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial nuint read(int fd, void* buf, nuint count);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int fstat(int fd, PosixStat* statbuf);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial int fstat(int fd, PosixStat* statbuf);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern long lseek(int fd, long offset, int whence);
+    [LibraryImport(DllName)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    public static partial long lseek(int fd, long offset, int whence);
 }
 

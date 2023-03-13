@@ -1,15 +1,18 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Titan.Platform.Win32;
 
-public static unsafe class Ole32
+public static unsafe partial class Ole32
 {
-    [DllImport("Ole32", CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HRESULT CoCreateInstance(
-        in Guid rclsid,
+    private const string DllName = "Ole32";
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial HRESULT CoCreateInstance(
+        Guid* rclsid,
         void* pUnkOuter,
         CLSCTX dwClsContext,
-        in Guid riid,
-         void** ppv
+        Guid* riid,
+        void** ppv
     );
 }

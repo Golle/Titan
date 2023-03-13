@@ -476,7 +476,7 @@ namespace Titan.Sandbox
             else if (_inputManager.IsKeyPressed(KeyCode.Five))
             {
                 SetVolume(_persistentAudio, 0.5f);
-            }   
+            }
             else if (_inputManager.IsKeyPressed(KeyCode.Six))
             {
                 SetVolume(_persistentAudio, 0.6f);
