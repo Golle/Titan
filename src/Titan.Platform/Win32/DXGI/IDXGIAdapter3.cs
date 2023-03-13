@@ -1,14 +1,17 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32.DXGI;
 [Guid("645967A4-1392-4310-A798-8053CE3E93FD")]
-public unsafe struct IDXGIAdapter3
+public unsafe struct IDXGIAdapter3 : INativeGuid
 {
+    public static Guid* Guid => IID.IID_IDXGIAdapter3;
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(in Guid riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
@@ -112,4 +115,5 @@ public unsafe struct IDXGIAdapter3
     //        IDXGIAdapter3* This,
     //        /* [annotation][in] */
     //        _In_ DWORD dwCookie);
+    
 }

@@ -1,9 +1,13 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32.WIC;
 
-public unsafe struct IWICBitmapFrameDecode
+[Guid("3B16811B-6A43-4ec9-A813-3D930C13B940")]
+public unsafe struct IWICBitmapFrameDecode : INativeGuid
 {
+    public static Guid* Guid => IID.IID_IWICBitmapFrameDecode;
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT QueryInterface(Guid* riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);

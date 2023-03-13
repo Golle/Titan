@@ -1,16 +1,20 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 
 namespace Titan.Platform.Win32.DXGI;
 
-public unsafe struct IDXGISwapChain3
+[Guid("94d99bdb-f1f8-4ab0-b236-7da0170edab1")]
+public unsafe struct IDXGISwapChain3 : INativeGuid
 {
-    public static readonly Guid UUId = new("94d99bdb-f1f8-4ab0-b236-7da0170edab1");
+    public static Guid* Guid => IID.IID_IDXGISwapChain3;
+    public static readonly Guid UUId = new();
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(in Guid riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
@@ -50,14 +54,14 @@ public unsafe struct IDXGISwapChain3
     // _COM_Outptr_  void** ppParent);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT GetDevice(in Guid riid, void** ppDevice)
-        => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppDevice);
+    public HRESULT GetDevice(Guid* riid, void** ppDevice)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[7])(Unsafe.AsPointer(ref this), riid, ppDevice);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT Present(uint syncInterval, uint flags) => ((delegate* unmanaged[Stdcall]<void*, uint, uint, HRESULT>)_vtbl[8])(Unsafe.AsPointer(ref this), syncInterval, flags);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT GetBuffer(uint buffer, in Guid riid, void** ppSurface) => ((delegate* unmanaged[Stdcall]<void*, uint, in Guid, void**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), buffer, riid, ppSurface);
+    public HRESULT GetBuffer(uint buffer, Guid* riid, void** ppSurface) => ((delegate* unmanaged[Stdcall]<void*, uint, Guid*, void**, HRESULT>)_vtbl[9])(Unsafe.AsPointer(ref this), buffer, riid, ppSurface);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT SetFullscreenState([MarshalAs(UnmanagedType.Bool)] bool Fullscreen, IDXGIOutput* pTarget) =>
@@ -94,7 +98,7 @@ public unsafe struct IDXGISwapChain3
     // _Out_ UINT * pLastPresentCount);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT GetDesc1(DXGI_SWAP_CHAIN_DESC1* pDesc) 
+    public HRESULT GetDesc1(DXGI_SWAP_CHAIN_DESC1* pDesc)
         => ((delegate* unmanaged[Stdcall]<void*, DXGI_SWAP_CHAIN_DESC1*, HRESULT>)_vtbl[18])(Unsafe.AsPointer(ref this), pDesc);
 
     //HRESULT(STDMETHODCALLTYPE* GetFullscreenDesc)(

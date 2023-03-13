@@ -4,12 +4,14 @@ using System.Runtime.InteropServices;
 namespace Titan.Platform.Win32.D3D12;
 
 [Guid("6102dee4-af59-4b09-b999-b44d73f09b24")]
-public unsafe struct ID3D12CommandAllocator
+public unsafe struct ID3D12CommandAllocator : INativeGuid
 {
+    public static Guid* Guid => IID.IID_ID3D12CommandAllocator;
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(in Guid riid, void** ppvObject)
-        => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef()
         => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));

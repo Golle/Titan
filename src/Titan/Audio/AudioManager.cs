@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Titan.Assets;
 using Titan.Audio.Playback;
 using Titan.Core;
-using Titan.Core.Logging;
 
 namespace Titan.Audio;
 

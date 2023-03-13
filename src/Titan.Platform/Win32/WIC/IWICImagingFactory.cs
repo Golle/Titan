@@ -1,11 +1,13 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32.WIC;
 
 [Guid("ec5ec8a9-c395-4314-9c77-54d7a935ff70")]
-public unsafe struct IWICImagingFactory
+public unsafe struct IWICImagingFactory : INativeGuid
 {
+    public static Guid* Guid => IID.IID_IWICImagingFactory;
     private void** _vtbl;
 
     //HRESULT(STDMETHODCALLTYPE* QueryInterface)(
@@ -151,4 +153,5 @@ public unsafe struct IWICImagingFactory
     // /* [in] */ __RPC__in_opt IWICMetadataQueryReader* pIQueryReader,
     // /* [unique][in] */ __RPC__in_opt const GUID* pguidVendor,
     // /* [out] */ __RPC__deref_out_opt IWICMetadataQueryWriter** ppIQueryWriter);
+    
 }

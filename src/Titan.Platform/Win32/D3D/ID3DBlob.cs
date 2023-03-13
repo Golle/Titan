@@ -1,8 +1,13 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
+
 namespace Titan.Platform.Win32.D3D;
 
-public unsafe struct ID3DBlob
+[Guid("8BA5FB08-5195-40e2-AC58-0D989C3A0102")]
+public unsafe struct ID3DBlob : INativeGuid
 {
+    public static Guid* Guid => IID.IID_ID3DBlob;
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

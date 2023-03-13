@@ -1,17 +1,19 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Titan.Platform.Win32.DXGI;
 
-public static unsafe class DXGICommon
+public unsafe partial struct DXGICommon
 {
     private const string DllName = "dxgi";
     [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HRESULT CreateDXGIFactory1(in Guid riid, void** ppFactory);
+    public static extern HRESULT CreateDXGIFactory1(Guid* riid, void** ppFactory);
 
-    [DllImport(DllName, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-    public static extern HRESULT CreateDXGIFactory2(
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial HRESULT CreateDXGIFactory2(
         DXGI_CREATE_FACTORY_FLAGS Flags,
-        in Guid riid,
+        Guid* riid,
         void** ppFactory
     );
 }

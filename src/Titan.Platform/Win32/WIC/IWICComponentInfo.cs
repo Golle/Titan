@@ -1,11 +1,13 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32.WIC;
 
 [Guid("23BC3F0A-698B-4357-886B-F24D50671334")]
-public unsafe struct IWICComponentInfo
+public unsafe struct IWICComponentInfo : INativeGuid
 {
+    public static Guid* Guid => IID.IID_IWICComponentInfo;
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT QueryInterface(Guid* riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);

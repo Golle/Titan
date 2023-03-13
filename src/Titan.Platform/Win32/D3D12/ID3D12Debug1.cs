@@ -4,8 +4,9 @@ using System.Runtime.InteropServices;
 namespace Titan.Platform.Win32.D3D12;
 
 [Guid("affaa4ca-63fe-4d8e-b8ad-159000af4304")]
-public unsafe struct ID3D12Debug1
+public unsafe struct ID3D12Debug1 : INativeGuid
 {
+    public static Guid* Guid => IID.IID_ID3D12Debug1;
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT QueryInterface(Guid* riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);

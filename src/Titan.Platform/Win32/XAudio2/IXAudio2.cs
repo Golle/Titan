@@ -1,10 +1,13 @@
-using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32.XAudio2;
 
-public unsafe struct IXAudio2
+[Guid("2B02E3CF-2E0B-4ec3-BE45-1B2A3FE7210D")]
+public unsafe struct IXAudio2 : INativeGuid
 {
+    public static Guid* Guid => IID.IID_IXAudio2;
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

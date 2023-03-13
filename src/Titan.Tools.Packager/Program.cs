@@ -1,7 +1,6 @@
 using System.Text;
 using Titan.Assets;
 using Titan.Core.Logging;
-using Titan.Platform.Posix;
 using Titan.Tools.Core.Audio;
 using Titan.Tools.Core.CommandLine;
 using Titan.Tools.Core.Common;

@@ -1,12 +1,13 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32.WIC;
 
 [Guid("E8EDA601-3D48-431a-AB44-69059BE88BBE")]
-public unsafe struct IWICPixelFormatInfo
+public unsafe struct IWICPixelFormatInfo : INativeGuid
 {
-
+    public static Guid* Guid => IID.IID_IWICPixelFormatInfo;
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT QueryInterface(Guid* riid, void** ppvObject) => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);

@@ -1,11 +1,13 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Titan.Platform.Win32.D3D12;
 
 namespace Titan.Platform.Win32.WIC;
 
 [Guid("9EDDE9E7-8DEE-47ea-99DF-E6FAF2ED44BF")]
-public unsafe struct IWICBitmapDecoder
+public unsafe struct IWICBitmapDecoder : INativeGuid
 {
+    public static Guid* Guid => IID.IID_IWICBitmapDecoder;
     private void** _vtbl;
 
     //HRESULT(STDMETHODCALLTYPE* QueryInterface)(

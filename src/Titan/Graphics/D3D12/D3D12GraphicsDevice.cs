@@ -69,14 +69,14 @@ internal unsafe class D3D12GraphicsDevice : IGraphicsDevice
     {
         using ComPtr<ID3D12Debug> spDebugController0 = default;
         using ComPtr<ID3D12Debug1> spDebugController1 = default;
-        var hr = D3D12GetDebugInterface(typeof(ID3D12Debug).GUID, (void**)spDebugController0.GetAddressOf());
+        var hr = D3D12GetDebugInterface(ID3D12Debug.Guid, (void**)spDebugController0.GetAddressOf());
         if (FAILED(hr))
         {
             Logger.Error<D3D12GraphicsDevice>($"Failed {nameof(D3D12GetDebugInterface)} with HRESULT: {hr}");
             return false;
         }
 
-        hr = spDebugController0.Get()->QueryInterface(typeof(ID3D12Debug1).GUID, (void**)spDebugController1.GetAddressOf());
+        hr = spDebugController0.Get()->QueryInterface(ID3D12Debug1.Guid, (void**)spDebugController1.GetAddressOf());
         if (FAILED(hr))
         {
             Logger.Error<D3D12GraphicsDevice>($"Failed to query {nameof(ID3D12Debug1)} interface with HRESULT: {hr}");

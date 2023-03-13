@@ -1,4 +1,3 @@
-using Titan.Tools.Core;
 using Titan.Tools.Core.Manifests;
 using Titan.Tools.Core.Shaders;
 using Titan.Tools.ManifestBuilder.DataTemplates.Attributes;

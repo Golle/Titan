@@ -10,8 +10,9 @@ public unsafe struct IDXCCompiler2
     private void** _vtbl;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public HRESULT QueryInterface(in Guid riid, void** ppvObject)
-        => ((delegate* unmanaged[Stdcall]<void*, in Guid, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+    public HRESULT QueryInterface(Guid* riid, void** ppvObject)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, void**, HRESULT>)_vtbl[0])(Unsafe.AsPointer(ref this), riid, ppvObject);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public uint AddRef()
         => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
@@ -71,5 +72,5 @@ public unsafe struct IDXCCompiler2
     //    _COM_Outptr_opt_ IDxcBlob** ppDebugBlob       // Debug blob
     //) = 0;
 
-   
+
 }
