@@ -5,6 +5,7 @@ using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
 using Titan.Core.Memory.Allocators;
+using Titan.Events;
 using Titan.Jobs;
 
 namespace Titan.Assets;
@@ -16,15 +17,18 @@ internal unsafe class AssetLoader
     private ObjectHandle<IAssetFileReader> _fileReader;
     private IGeneralAllocator _allocator;
     private IJobApi _jobApi;
+    private IEventsManager _eventsManager;
     // This is used for optimization, so the system doesn't have to be scheduled if there are no assets.
     private int _assetsInProgress;
+
+
     public bool IsActive()
     {
         //NOTE(Jens): used for optimizations, so we can skip scheduling this system if it's not active.
         return _assetsInProgress > 0;
     }
 
-    public bool Init(IMemoryManager memoryManager, AssetsRegistry registry, ResourceCreatorRegistry creatorRegistry, IAssetFileReader fileReader, IJobApi jobApi, uint fileBufferSize)
+    public bool Init(IMemoryManager memoryManager, AssetsRegistry registry, ResourceCreatorRegistry creatorRegistry, IAssetFileReader fileReader, IJobApi jobApi, IEventsManager eventsManager, uint fileBufferSize)
     {
         Debug.Assert(fileBufferSize > 0);
 
@@ -39,6 +43,7 @@ internal unsafe class AssetLoader
         _fileReader = new ObjectHandle<IAssetFileReader>(fileReader);
         _jobApi = jobApi;
         _creatorRegistry = creatorRegistry;
+        _eventsManager = eventsManager;
         return true;
     }
 
@@ -189,12 +194,14 @@ internal unsafe class AssetLoader
                         _jobApi.Enqueue(JobItem.Create(ref asset, &CreateResource));
                     }
                     break;
+
                 case AssetState.ResourceCreationCompleted:
                     Trace($"{asset.State} for Asset: {asset.Descriptor.Id} (Manifest: {asset.Descriptor.ManifestId})");
                     _allocator.Free(ref asset.FileBuffer);
                     asset.FileReader = default;
                     asset.State = AssetState.Loaded;
                     _assetsInProgress--;
+                    _eventsManager.Send(new AssetLoadCompleted(asset.AssetHandle.Value, asset.Descriptor));
                     break;
                 case AssetState.UnloadRequested:
                     Trace($"{asset.State} for Asset: {asset.Descriptor.Id} (Manifest: {asset.Descriptor.ManifestId})");
@@ -205,6 +212,8 @@ internal unsafe class AssetLoader
                     Trace($"{asset.State} for Asset: {asset.Descriptor.Id} (Manifest: {asset.Descriptor.ManifestId})");
                     asset.State = AssetState.Unloaded;
                     _assetsInProgress--;
+                    //NOTE(Jens): The AssetHandle will not be "valid" since it's been destroyed. Not sure if this is a good idea.
+                    _eventsManager.Send(new AssetUnloadCompleted(asset.AssetHandle.Value, asset.Descriptor));
                     break;
 
                 case AssetState.ReloadRequested:
@@ -216,7 +225,15 @@ internal unsafe class AssetLoader
                     asset.ResourceContext = _creatorRegistry.GetPointer(asset.Descriptor.Type);
                     _jobApi.Enqueue(JobItem.Create(ref asset, &AsyncReloadResource));
                     break;
-                
+                case AssetState.ResourceRecreationCompleted:
+                    Trace($"{asset.State} for Asset: {asset.Descriptor.Id} (Manifest: {asset.Descriptor.ManifestId})");
+                    _allocator.Free(ref asset.FileBuffer);
+                    asset.FileReader = default;
+                    asset.State = AssetState.Loaded;
+                    _assetsInProgress--;
+                    _eventsManager.Send(new AssetReloadCompleted(asset.AssetHandle.Value, asset.Descriptor));
+                    break;
+
                 case AssetState.Error:
                     Logger.Error<AssetLoader>("An asset is in state Error. This will make the runtime fail.");
                     Debug.Fail("Asset in failed state.");
@@ -296,7 +313,7 @@ internal unsafe class AssetLoader
                 Logger.Error<AssetLoader>($"Failed to recreate asset {asset.Descriptor.Id} (ManifestId: {asset.Descriptor.ManifestId})");
             }
         }
-        asset.State = AssetState.ResourceCreationCompleted;
+        asset.State = AssetState.ResourceRecreationCompleted;
     }
 
     public void Shutdown()

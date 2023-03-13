@@ -8,6 +8,7 @@ internal enum AssetState
     ReadFileCompleted,
     CreatingResource,
     ResourceCreationCompleted,
+    ResourceRecreationCompleted,
     Loaded,
     /*
      * Add states for resolving dependencies

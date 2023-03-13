@@ -2,6 +2,7 @@ using Titan.Assets.Creators;
 using Titan.Core.IO;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
+using Titan.Events;
 using Titan.Jobs;
 using Titan.Modules;
 using Titan.Resources;
@@ -41,6 +42,8 @@ internal struct AssetsModule : IModule
 
         var fileSystem = app.GetManagedResource<IFileSystem>();
         var memoryManager = app.GetManagedResource<IMemoryManager>();
+        var eventsManager = app.GetManagedResource<IEventsManager>();
+        var jobApi = app.GetManagedResource<IJobApi>();
         var fileBufferSize = MemoryUtils.MegaBytes(64); // Replace this with configuration.
         var devConfig = app.GetConfig<AssetsDevConfiguration>();
 
@@ -86,7 +89,7 @@ internal struct AssetsModule : IModule
             return false;
         }
 
-        if (!assetLoader.Init(memoryManager, assetsRegistry, resourceCreatorRegistry, assetFileReader, app.GetManagedResource<IJobApi>(), fileBufferSize))
+        if (!assetLoader.Init(memoryManager, assetsRegistry, resourceCreatorRegistry, assetFileReader, jobApi, eventsManager, fileBufferSize))
         {
             Logger.Error<AssetsModule>($"Failed to init the {nameof(AssetLoader)}.");
             return false;

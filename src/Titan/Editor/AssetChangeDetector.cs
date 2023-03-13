@@ -76,34 +76,35 @@ internal class AssetChangeDetector
             };
             watcher.Changed += (_, args) =>
             {
-                var asset = _assets.FirstOrDefault(s => s.Path == args.FullPath);
-                if (asset == null)
+                var assets = _assets.Where(s => s.Path == args.FullPath).ToArray();
+                if (!assets.Any())
                 {
                     Logger.Warning<AssetChangeDetector>($"File changed that is not in the asset list. {args.FullPath}");
                     return;
                 }
                 var lastWriteTime = File.GetLastWriteTime(args.FullPath);
-
-
-                try
+                foreach (var asset in assets)
                 {
-                    var lockTaken = false;
-                    _lock.Enter(ref lockTaken);
-                    // we get multiple calls, just notify on the first one and record the date. sometimes we get multiple calls with just 1 ms difference, so we just notify every 100ms.
-                    if (lastWriteTime - asset.LastWriteTime <= TimeSpan.FromMilliseconds(100))
+                    try
                     {
-                        return;
-                    }
+                        var lockTaken = false;
+                        _lock.Enter(ref lockTaken);
+                        // we get multiple calls, just notify on the first one and record the date. sometimes we get multiple calls with just 1 ms difference, so we just notify every 100ms.
+                        if (lastWriteTime - asset.LastWriteTime <= TimeSpan.FromMilliseconds(100))
+                        {
+                            return;
+                        }
 
-                    var handle = registry.GetHandleFromDescriptor(asset.Descriptor);
-                    Logger.Trace<AssetChangeDetector>($"Asset {asset.Descriptor.Id} with handle {handle.Value} changed. ({asset.Path})");
-                    asset.LastWriteTime = lastWriteTime;
-                    // notify
-                    _changes.Enqueue(handle);
-                }
-                finally
-                {
-                    _lock.Exit();
+                        var handle = registry.GetHandleFromDescriptor(asset.Descriptor);
+                        Logger.Trace<AssetChangeDetector>($"Asset {asset.Descriptor.Id} with handle {handle.Value} changed. ({asset.Path})");
+                        asset.LastWriteTime = lastWriteTime;
+                        // notify
+                        _changes.Enqueue(handle);
+                    }
+                    finally
+                    {
+                        _lock.Exit();
+                    }
                 }
             };
             _watchers.Add(watcher);

@@ -5,10 +5,6 @@ using Titan.Events;
 
 namespace Titan.Assets;
 
-public record struct AssetLoadRequested(Handle<Asset> Handle) : IEvent;
-public record struct AssetUnloadRequested(Handle<Asset> Handle) : IEvent;
-public record struct AssetReloadRequested(Handle<Asset> Handle) : IEvent;
-
 public readonly struct AssetsManager
 {
     private readonly ObjectHandle<AssetsRegistry> _registry;
