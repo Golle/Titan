@@ -43,6 +43,11 @@ public class App : IApp
 
     public void Run()
     {
+#if DEBUG
+        var times = new Dictionary<string, double>();
+        var initTimer = Stopwatch.StartNew();
+#endif
+
         foreach (ref readonly var module in _modules.AsSpan())
         {
             Logger.Trace<App>($"Init {module.Type.Name}");
@@ -53,7 +58,16 @@ public class App : IApp
                 return;
             }
             Logger.Trace<App>($"Init {module.Type.Name} Finished");
+#if DEBUG
+            times.Add(module.Type.Name, initTimer.Elapsed.TotalMilliseconds);
+            initTimer.Restart();
+#endif
         }
+
+#if DEBUG
+        PrintTimers(times);
+#endif
+
 
         if (!_runner.Init(this))
         {
@@ -100,7 +114,7 @@ public class App : IApp
 
     public unsafe T* GetResourcePointer<T>() where T : unmanaged => _resources.GetPointer<T>();
 
-    public ObjectHandle<T> GetManagedResourceHandle<T>() where T : class 
+    public ObjectHandle<T> GetManagedResourceHandle<T>() where T : class
         => _resources.GetManaged<T>();
     public T GetManagedResource<T>() where T : class
     {
@@ -111,4 +125,16 @@ public class App : IApp
 
     public T GetConfigOrDefault<T>() where T : IConfiguration, IDefault<T> => GetConfig<T>() ?? T.Default;
     public T GetConfig<T>() where T : IConfiguration => (T)_configs.FirstOrDefault(c => c.GetType() == typeof(T));
+
+
+    [Conditional("DEBUG")]
+    public static void PrintTimers(IDictionary<string, double> timers)
+    {
+        //NOTE(Jens): If we can do this without GC allocated memory it would be nice, then we can enable it for non debug builds.
+        Logger.Trace<App>("System Init time");
+        foreach (var timer in timers)
+        {
+            Logger.Trace<App>($"{timer.Key}: {timer.Value} ms");
+        }
+    }
 }
