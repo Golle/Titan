@@ -17,27 +17,20 @@ public unsafe struct ID3D12GraphicsCommandList : INativeGuid
     public uint AddRef() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[1])(Unsafe.AsPointer(ref this));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public uint Release() => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[2])(Unsafe.AsPointer(ref this));
+    public uint Release()
+        => ((delegate* unmanaged[Stdcall]<void*, uint>)_vtbl[2])(Unsafe.AsPointer(ref this));
 
-    //    DECLSPEC_XFGVIRT(ID3D12Object, GetPrivateData)
-    //    HRESULT(STDMETHODCALLTYPE* GetPrivateData)(
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ REFGUID guid,
-    //        _Inout_  UINT* pDataSize,
-    //        _Out_writes_bytes_opt_( *pDataSize )  void* pData);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT GetPrivateData(Guid* guid, uint* pDataSize, void* pData)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, uint*, void*, HRESULT>)_vtbl[3])(Unsafe.AsPointer(ref this), guid, pDataSize, pData);
 
-    //DECLSPEC_XFGVIRT(ID3D12Object, SetPrivateData)
-    //    HRESULT(STDMETHODCALLTYPE* SetPrivateData)(
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ REFGUID guid,
-    //        _In_  UINT DataSize,
-    //        _In_reads_bytes_opt_( DataSize )  const void* pData);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT SetPrivateData(Guid* guid, uint DataSize, void* pData)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, uint, void*, HRESULT>)_vtbl[4])(Unsafe.AsPointer(ref this), guid, DataSize, pData);
 
-    //DECLSPEC_XFGVIRT(ID3D12Object, SetPrivateDataInterface)
-    //    HRESULT(STDMETHODCALLTYPE* SetPrivateDataInterface)(
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ REFGUID guid,
-    //        _In_opt_  const IUnknown* pData);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public HRESULT SetPrivateDataInterface(Guid* guid, IUnknown* pData)
+        => ((delegate* unmanaged[Stdcall]<void*, Guid*, IUnknown*, HRESULT>)_vtbl[5])(Unsafe.AsPointer(ref this), guid, pData);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public HRESULT SetName(char* Name)
@@ -71,12 +64,9 @@ public unsafe struct ID3D12GraphicsCommandList : INativeGuid
     public void DrawIndexedInstanced(uint IndexCountPerInstance, uint InstanceCount, uint StartIndexLocation, int BaseVertexLocation, uint StartInstanceLocation)
     => ((delegate* unmanaged[Stdcall]<void*, uint, uint, uint, int, uint, void>)_vtbl[13])(Unsafe.AsPointer(ref this), IndexCountPerInstance, InstanceCount, StartIndexLocation, BaseVertexLocation, StartInstanceLocation);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, Dispatch)
-    //    void (STDMETHODCALLTYPE* Dispatch ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ UINT ThreadGroupCountX,
-    //        _In_  UINT ThreadGroupCountY,
-    //        _In_  UINT ThreadGroupCountZ);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Dispatch(uint ThreadGroupCountX, uint ThreadGroupCountY, uint ThreadGroupCountZ)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, uint, uint, void>)_vtbl[14])(Unsafe.AsPointer(ref this), ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void CopyBufferRegion(ID3D12Resource* pDstBuffer, ulong DstOffset, ID3D12Resource* pSrcBuffer, ulong SrcOffset, ulong NumBytes)
@@ -90,15 +80,9 @@ public unsafe struct ID3D12GraphicsCommandList : INativeGuid
     public void CopyResource(ID3D12Resource* pDstResource, ID3D12Resource* pSrcResource)
         => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, ID3D12Resource*, void>)_vtbl[17])(Unsafe.AsPointer(ref this), pDstResource, pSrcResource);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, CopyTiles)
-    //    void (STDMETHODCALLTYPE* CopyTiles ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12Resource * pTiledResource,
-    //        _In_  const D3D12_TILED_RESOURCE_COORDINATE* pTileRegionStartCoordinate,
-    //        _In_  const D3D12_TILE_REGION_SIZE* pTileRegionSize,
-    //        _In_  ID3D12Resource* pBuffer,
-    //        UINT64 BufferStartOffsetInBytes,
-    //        D3D12_TILE_COPY_FLAGS Flags);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CopyTiles(ID3D12Resource* pTiledResource, D3D12_TILED_RESOURCE_COORDINATE* pTileRegionStartCoordinate, D3D12_TILE_REGION_SIZE* pTileRegionSize, ID3D12Resource* pBuffer, ulong BufferStartOffsetInBytes, D3D12_TILE_COPY_FLAGS Flags)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, D3D12_TILED_RESOURCE_COORDINATE*, D3D12_TILE_REGION_SIZE*, ID3D12Resource*, ulong, D3D12_TILE_COPY_FLAGS, void>)_vtbl[18])(Unsafe.AsPointer(ref this), pTiledResource, pTileRegionStartCoordinate, pTileRegionSize, pBuffer, BufferStartOffsetInBytes, Flags);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ResolveSubresource(ID3D12Resource* pDstResource, uint DstSubresource, ID3D12Resource* pSrcResource, uint SrcSubresource, DXGI_FORMAT Format)
@@ -226,49 +210,29 @@ public unsafe struct ID3D12GraphicsCommandList : INativeGuid
     public void ClearUnorderedAccessViewFloat(D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap, D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle, ID3D12Resource* pResource, float* Values, uint NumRects, D3D12_RECT* pRects)
         => ((delegate* unmanaged[Stdcall]<void*, D3D12_GPU_DESCRIPTOR_HANDLE, D3D12_CPU_DESCRIPTOR_HANDLE, ID3D12Resource*, float*, uint, D3D12_RECT*, void>)_vtbl[50])(Unsafe.AsPointer(ref this), ViewGPUHandleInCurrentHeap, ViewCPUHandle, pResource, Values, NumRects, pRects);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, DiscardResource)
-    //    void (STDMETHODCALLTYPE* DiscardResource ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12Resource * pResource,
-    //        _In_opt_  const D3D12_DISCARD_REGION* pRegion);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DiscardResource(ID3D12Resource* pResource, D3D12_DISCARD_REGION* pRegion)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, D3D12_DISCARD_REGION*, void>)_vtbl[51])(Unsafe.AsPointer(ref this), pResource, pRegion);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, BeginQuery)
-    //    void (STDMETHODCALLTYPE* BeginQuery ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12QueryHeap * pQueryHeap,
-    //        _In_  D3D12_QUERY_TYPE Type,
-    //        _In_  UINT Index);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void BeginQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE Type, uint Index)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12QueryHeap*, D3D12_QUERY_TYPE, uint, void>)_vtbl[52])(Unsafe.AsPointer(ref this), pQueryHeap, Type, Index);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, EndQuery)
-    //    void (STDMETHODCALLTYPE* EndQuery ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12QueryHeap * pQueryHeap,
-    //        _In_  D3D12_QUERY_TYPE Type,
-    //        _In_  UINT Index);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void EndQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE Type, uint Index)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12QueryHeap*, D3D12_QUERY_TYPE, uint, void>)_vtbl[53])(Unsafe.AsPointer(ref this), pQueryHeap, Type, Index);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, ResolveQueryData)
-    //    void (STDMETHODCALLTYPE* ResolveQueryData ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_ ID3D12QueryHeap * pQueryHeap,
-    //        _In_  D3D12_QUERY_TYPE Type,
-    //        _In_  UINT StartIndex,
-    //        _In_  UINT NumQueries,
-    //        _In_  ID3D12Resource* pDestinationBuffer,
-    //        _In_  UINT64 AlignedDestinationBufferOffset);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ResolveQueryData(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE Type, uint StartIndex, uint NumQueries, ID3D12Resource* pDestinationBuffer, ulong AlignedDestinationBufferOffset)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12QueryHeap*, D3D12_QUERY_TYPE, uint, uint, ID3D12Resource*, ulong, void>)_vtbl[54])(Unsafe.AsPointer(ref this), pQueryHeap, Type, StartIndex, NumQueries, pDestinationBuffer, AlignedDestinationBufferOffset);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetPredication)
-    //    void (STDMETHODCALLTYPE* SetPredication ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        _In_opt_ ID3D12Resource * pBuffer,
-    //        _In_  UINT64 AlignedBufferOffset,
-    //        _In_  D3D12_PREDICATION_OP Operation);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetPredication(ID3D12Resource* pBuffer, ulong AlignedBufferOffset, D3D12_PREDICATION_OP Operation)
+        => ((delegate* unmanaged[Stdcall]<void*, ID3D12Resource*, ulong, D3D12_PREDICATION_OP, void>)_vtbl[55])(Unsafe.AsPointer(ref this), pBuffer, AlignedBufferOffset, Operation);
 
-    //DECLSPEC_XFGVIRT(ID3D12GraphicsCommandList, SetMarker)
-    //    void (STDMETHODCALLTYPE* SetMarker ) (
-    //        ID3D12GraphicsCommandList* This,
-    //        UINT Metadata,
-    //        _In_reads_bytes_opt_(Size) const void* pData,
-    //        UINT Size);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetMarker(uint Metadata, void* pData, uint Size)
+        => ((delegate* unmanaged[Stdcall]<void*, uint, void*, uint, void>)_vtbl[56])(Unsafe.AsPointer(ref this), Metadata, pData, Size);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void BeginEvent(uint Metadata, void* pData, uint Size)
