@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Titan.Core.Logging;
 using Titan.Core.Memory;
@@ -84,6 +85,20 @@ internal unsafe class D3D12GraphicsDevice : IGraphicsDevice
         }
         spDebugController1.Get()->EnableDebugLayer();
         spDebugController1.Get()->SetEnableGPUBasedValidation(true);
+        return true;
+    }
+
+    public bool TryCheckFeatureSupport<TFeatureType>(D3D12_FEATURE feature, out TFeatureType outFeatureSupport) where TFeatureType : unmanaged
+    {
+        Unsafe.SkipInit(out outFeatureSupport);
+        TFeatureType support = default;
+        var hr = _device.Get()->CheckFeatureSupport(feature, &support, (uint)sizeof(TFeatureType));
+        if (FAILED(hr))
+        {
+            Logger.Error<D3D12GraphicsDevice>($"Failed to check feature support. HRESULT = {hr}");
+            return false;
+        }
+        outFeatureSupport = support;
         return true;
     }
 
@@ -212,6 +227,18 @@ internal unsafe class D3D12GraphicsDevice : IGraphicsDevice
         if (FAILED(hr))
         {
             Logger.Error<D3D12GraphicsDevice>($"Failed to create a {nameof(ID3D12GraphicsCommandList)} wiht HRESULT {hr}");
+            return null;
+        }
+        return commandList;
+    }
+
+    public ID3D12GraphicsCommandList4* CreateCommandList4(D3D12_COMMAND_LIST_TYPE type, D3D12_COMMAND_LIST_FLAGS flags = D3D12_COMMAND_LIST_FLAG_NONE)
+    {
+        ComPtr<ID3D12GraphicsCommandList4> commandList = default;
+        var hr = _device.Get()->CreateCommandList1(0, type, flags, commandList.UUID, (void**)commandList.GetAddressOf());
+        if (FAILED(hr))
+        {
+            Logger.Error<D3D12GraphicsDevice>($"Failed to create a {nameof(ID3D12GraphicsCommandList4)} wiht HRESULT {hr}");
             return null;
         }
         return commandList;

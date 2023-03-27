@@ -18,9 +18,10 @@ internal struct D3D12GraphicsModule : IModule
     private const D3D_FEATURE_LEVEL MinFeatureLevel = D3D_FEATURE_LEVEL_11_1;
     public static bool Build(IAppBuilder builder)
     {
+        var device = new D3D12GraphicsDevice();
         builder
             .AddManagedResource<IGraphicsAdapter>(new DXGIAdapter())
-            .AddManagedResource<IGraphicsDevice>(new D3D12GraphicsDevice())
+            .AddManagedResource<IGraphicsDevice>(device)
             .AddManagedResource<ISwapChain>(new DXGISwapChain())
             .AddManagedResource<IResourceManager>(new D3D12ResourceManager())
             .AddManagedResource(new D3D12CommandQueue())

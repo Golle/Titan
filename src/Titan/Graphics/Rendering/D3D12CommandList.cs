@@ -11,11 +11,11 @@ namespace Titan.Graphics.Rendering;
 
 public readonly unsafe ref struct D3D12CommandList
 {
-    private readonly ID3D12GraphicsCommandList* _commandlist;
+    private readonly ID3D12GraphicsCommandList4* _commandlist;
     private readonly ID3D12CommandAllocator* _allocator;
     private readonly IResourceManager _resourceManager;
 
-    internal D3D12CommandList(ID3D12GraphicsCommandList* commandlist, ID3D12CommandAllocator* allocator, IResourceManager resourceManager)
+    internal D3D12CommandList(ID3D12GraphicsCommandList4* commandlist, ID3D12CommandAllocator* allocator, IResourceManager resourceManager)
     {
         _commandlist = commandlist;
         _allocator = allocator;

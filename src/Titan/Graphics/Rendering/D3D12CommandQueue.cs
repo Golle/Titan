@@ -1,4 +1,3 @@
-#nullable disable
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core.Logging;
@@ -16,7 +15,7 @@ internal unsafe class D3D12CommandQueue
     private IMemoryManager _memoryManager;
     private ComPtr<ID3D12CommandQueue> _commandQueue;
     private TitanArray<ComPtr<ID3D12CommandAllocator>> _commandAllocators;
-    private TitanArray<ComPtr<ID3D12GraphicsCommandList>> _commandLists;
+    private TitanArray<ComPtr<ID3D12GraphicsCommandList4>> _commandLists;
     private volatile uint _next;
 
     private uint _bufferIndex;
@@ -26,7 +25,7 @@ internal unsafe class D3D12CommandQueue
     public bool Init(D3D12GraphicsDevice device, IMemoryManager memoryManager, IResourceManager resourceManager, uint maxCommandLists, uint bufferCount)
     {
         var totalCount = maxCommandLists * bufferCount;
-        Logger.Trace<D3D12CommandQueue>($"Trying to allocate {totalCount} {nameof(ID3D12GraphicsCommandList)} and {nameof(ID3D12CommandAllocator)}");
+        Logger.Trace<D3D12CommandQueue>($"Trying to allocate {totalCount} {nameof(ID3D12GraphicsCommandList4)} and {nameof(ID3D12CommandAllocator)}");
 
         //NOTE(Jens): If there's an error there will be a memory leak. Fix later.
         _commandQueue = device.CreateCommandQueue(D3D12_COMMAND_LIST_TYPE.D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -36,10 +35,10 @@ internal unsafe class D3D12CommandQueue
             return false;
         }
 
-        _commandLists = memoryManager.AllocArray<ComPtr<ID3D12GraphicsCommandList>>(totalCount);
+        _commandLists = memoryManager.AllocArray<ComPtr<ID3D12GraphicsCommandList4>>(totalCount);
         if (!_commandLists.IsValid)
         {
-            Logger.Error<D3D12CommandQueue>($"Failed to allocate memory for {totalCount} {nameof(ID3D12GraphicsCommandList)}s");
+            Logger.Error<D3D12CommandQueue>($"Failed to allocate memory for {totalCount} {nameof(ID3D12GraphicsCommandList4)}s");
             return false;
         }
 
@@ -52,10 +51,10 @@ internal unsafe class D3D12CommandQueue
 
         for (var i = 0; i < totalCount; ++i)
         {
-            var commandList = device.CreateCommandList(D3D12_COMMAND_LIST_TYPE.D3D12_COMMAND_LIST_TYPE_DIRECT);
+            var commandList = device.CreateCommandList4(D3D12_COMMAND_LIST_TYPE.D3D12_COMMAND_LIST_TYPE_DIRECT);
             if (commandList == null)
             {
-                Logger.Error<D3D12CommandQueue>($"Failed to create {nameof(ID3D12GraphicsCommandList)} with index {i}");
+                Logger.Error<D3D12CommandQueue>($"Failed to create {nameof(ID3D12GraphicsCommandList4)} with index {i}");
                 return false;
             }
 
