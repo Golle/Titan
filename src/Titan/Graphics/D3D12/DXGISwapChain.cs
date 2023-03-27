@@ -161,7 +161,7 @@ internal unsafe class DXGISwapChain : ISwapChain
             texture.Texture.Width = width;
             texture.Texture.Height = height;
             texture.Texture.Format = (TextureFormat)DefaultFormat;
-            _device.Device->CreateRenderTargetView(texture.Resource.Get(), null, texture.RTV);
+            _device.CreateRenderTargetView(texture.Resource.Get(), texture.RTV);
             D3D12Helpers.SetName(texture.Resource, $"Backbuffer_{i}");
         }
         return true;
@@ -256,7 +256,7 @@ internal unsafe class DXGISwapChain : ISwapChain
         Debug.Assert(SUCCEEDED(hr));
         hr = swapchain->SetFullscreenState(!fullscreen, null);
         Debug.Assert(SUCCEEDED(hr));
-        
+
         _fullscreen = !fullscreen;
     }
 

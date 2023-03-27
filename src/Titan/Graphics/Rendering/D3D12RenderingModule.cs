@@ -1,3 +1,5 @@
+using Titan.Graphics.Rendering.PostProcessing;
+using Titan.Graphics.Rendering.Sprites;
 using Titan.Modules;
 using Titan.Setup;
 
@@ -9,7 +11,9 @@ internal struct D3D12RenderingModule : IModule
     {
         builder
             .AddAssetsManifest<AssetRegistry.BuiltIn>(builtinAsset: true)
-            .AddModule<D3D12SpriteRenderingModule>();
+            .AddModule<D3D12SpriteRenderingModule>()
+            .AddModule<D3D12PostProcessingModule>()
+            ;
 
         return true;
     }

@@ -20,7 +20,7 @@ public enum BufferType
 }
 
 public record struct CreateBufferArgs(uint Count, uint StrideInBytes, bool CpuVisible = false, bool ShaderVisible = true, BufferType Type = BufferType.Common, TitanBuffer InitialData = default);
-public record struct CreateTextureArgs(uint Width, uint Height, TextureFormat Format, bool ShaderVisible = true, TitanBuffer InitialData = default);
+public record struct CreateTextureArgs(uint Width, uint Height, TextureFormat Format, bool ShaderVisible = true, bool RenderTargetView = false, TitanBuffer InitialData = default);
 public record struct CreateShaderArgs(ShaderType Type, TitanBuffer Data);
 
 public ref struct CreatePipelineStateArgs

@@ -119,14 +119,14 @@ internal unsafe class D3D12GraphicsDevice : IGraphicsDevice
         return resource;
     }
 
-    public ID3D12Resource* CreateTexture(uint width, uint height, DXGI_FORMAT format)
+    public ID3D12Resource* CreateTexture(uint width, uint height, DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE)
     {
         D3D12_RESOURCE_DESC resourceDesc = new()
         {
             Width = width,
             Height = height,
             Format = format,
-            Flags = D3D12_RESOURCE_FLAG_NONE,
+            Flags = flags,
             DepthOrArraySize = 1, // change this when we support other types of textures.
             Alignment = 0,
             Layout = D3D12_TEXTURE_LAYOUT.D3D12_TEXTURE_LAYOUT_UNKNOWN,
@@ -228,6 +228,12 @@ internal unsafe class D3D12GraphicsDevice : IGraphicsDevice
         }
 
         return fence.Get();
+    }
+
+    public void CreateRenderTargetView(ID3D12Resource* resource, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle)
+    {
+        Debug.Assert(resource != null);
+        _device.Get()->CreateRenderTargetView(resource, null, descriptorHandle);
     }
 
     public void CreateShaderResourceView(ID3D12Resource* resource, DXGI_FORMAT format, D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle)

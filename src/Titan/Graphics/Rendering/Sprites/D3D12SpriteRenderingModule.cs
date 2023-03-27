@@ -3,13 +3,12 @@ using Titan.Core;
 using Titan.Core.Logging;
 using Titan.Graphics.D3D12;
 using Titan.Graphics.D3D12.Memory;
-using Titan.Graphics.Rendering.Sprites;
 using Titan.Graphics.Resources;
 using Titan.Modules;
 using Titan.Setup;
 using Titan.Systems;
 
-namespace Titan.Graphics.Rendering;
+namespace Titan.Graphics.Rendering.Sprites;
 internal struct SpriteRendererAssets
 {
     public Handle<Shader> VertexShader;

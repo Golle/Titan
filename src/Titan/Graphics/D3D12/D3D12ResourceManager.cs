@@ -1,3 +1,4 @@
+using System.Data;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
@@ -131,7 +132,13 @@ Error:
         }
 
         ref var texture = ref _textures.Get(handle);
-        var resource = _device.CreateTexture(args.Width, args.Height, args.Format.ToDXGIFormat());
+
+        //NOTE(Jens): This needs to be a bit more sofisticated when we support depth buffers and stencils.
+        var flags = args.RenderTargetView
+            ? D3D12_RESOURCE_FLAGS.D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET
+            : D3D12_RESOURCE_FLAGS.D3D12_RESOURCE_FLAG_NONE;
+
+        var resource = _device.CreateTexture(args.Width, args.Height, args.Format.ToDXGIFormat(), flags);
         if (resource == null)
         {
             Logger.Error<D3D12ResourceManager>("Failed to create the texture resource.");
@@ -162,6 +169,13 @@ Error:
                 return 0;
             }
             _device.CreateShaderResourceView(texture.Resource, (DXGI_FORMAT)args.Format, texture.SRV);
+        }
+
+        if (args.RenderTargetView)
+        {
+            texture.RTV = _d3d12Allocator.Allocate(DescriptorHeapType.RenderTargetView);
+            Debug.Assert(texture.RTV.IsValid);
+            _device.CreateRenderTargetView(resource, texture.RTV);
         }
 
         if (args.InitialData.HasData())

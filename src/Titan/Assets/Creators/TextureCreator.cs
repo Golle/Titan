@@ -29,7 +29,7 @@ internal struct TextureCreator : IResourceCreator<Texture>
         var manager = _resourceManager.Value;
         ref readonly var desc = ref descriptor.Image;
         Logger.Info<TextureCreator>($"Creating texture with Size {desc.Width} x {desc.Height} and format {(TextureFormat)desc.Format}");
-        var args = new CreateTextureArgs(desc.Width, desc.Height, (TextureFormat)desc.Format, true, data);
+        var args = new CreateTextureArgs(desc.Width, desc.Height, (TextureFormat)desc.Format, InitialData: data);
         var handle = manager.CreateTexture(args);
         if (handle.IsInvalid)
         {
