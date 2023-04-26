@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Titan.Core.Memory;
+
 namespace Titan.Core.Maths;
 
 //NOTE(Jens): maybe we should have a color with an uint, and a ColorF for float values. This will occupy 16 bytes, but 4 bytes would be enough.
@@ -35,6 +39,16 @@ public struct Color
     {
         var rgba = rgb << 8 | 0xff;
         return new(rgba);
+    }
+
+    public static Color From(ReadOnlySpan<float> colors)
+    {
+        Unsafe.SkipInit(out Color color);
+        unsafe
+        {
+            MemoryUtils.Copy(&color, colors);
+        }
+        return color;
     }
 
     public static readonly Color White = new(1f, 1f, 1f);
