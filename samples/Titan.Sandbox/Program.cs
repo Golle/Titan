@@ -47,9 +47,9 @@ App.Create(new AppCreationArgs())
         AlwaysOnTop = false
     })
 #if DEBUG
-    .AddConfig(GraphicsConfig.Default with { Debug = true, TripleBuffering = true, Vsync = true, AllowTearing = true, Fullscreen = false })
+    .AddConfig(GraphicsConfig.Default with { Debug = true, TripleBuffering = false, Vsync = true, AllowTearing = false, Fullscreen = false })
 #else 
-    .AddConfig(GraphicsConfig.Default with { Debug = false, TripleBuffering = true })
+    .AddConfig(GraphicsConfig.Default with { Debug = false, TripleBuffering = false, Vsync = false, AllowTearing = true })
 #endif
     .AddModule<GraphicsModule>()
     .AddModule<AudioModule>()

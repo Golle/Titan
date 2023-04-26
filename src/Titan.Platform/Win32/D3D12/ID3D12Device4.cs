@@ -10,7 +10,7 @@ public unsafe interface INativeGuid
 [Guid("e865df17-a9ee-46f9-a463-3098315aa2e5")]
 public unsafe struct ID3D12Device4 : INativeGuid
 {
-    public static Guid* Guid => IID.IID_ID3D12Device4;
+    public static Guid* Guid => IID.IID_ID3D12Device7;
 
     private void** _vtbl;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

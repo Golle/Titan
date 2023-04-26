@@ -144,4 +144,14 @@ public readonly unsafe ref struct D3D12CommandList
 
     public void ClearRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE handle, float* colorRGBA)
         => _commandlist->ClearRenderTargetView(handle, colorRGBA, 0, null);
+
+    public void BeginRenderPass(uint numRenderTargets, D3D12_RENDER_PASS_RENDER_TARGET_DESC* desc, D3D12_RENDER_PASS_FLAGS flags = D3D12_RENDER_PASS_FLAGS.D3D12_RENDER_PASS_FLAG_NONE)
+    {
+        _commandlist->BeginRenderPass(numRenderTargets, desc, null, flags);
+    }
+
+    public void EndRenderPass()
+    {
+        _commandlist->EndRenderPass();
+    }
 }

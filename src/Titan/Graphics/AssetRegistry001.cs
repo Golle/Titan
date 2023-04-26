@@ -8,7 +8,7 @@ internal static partial class AssetRegistry
         public static uint Id => 0;
         public static string ManifestFile => "builtin.tmanifest";
         public static string TitanPackageFile => "builtin.titanpak";
-        public static uint AssetCount => 8;
+        public static uint AssetCount => 10;
         public static Titan.Assets.AssetDescriptor[] AssetDescriptors { get; } =
         {
             new() { Id = 0, ManifestId = 0, Reference = { Offset = 0, Size = 65536}, Type = Titan.Assets.AssetDescriptorType.Texture, Image = new() { Format = 87, Height = 128, Width = 128, Stride = 512 } },
@@ -19,6 +19,8 @@ internal static partial class AssetRegistry
             new() { Id = 5, ManifestId = 0, Reference = { Offset = 137744, Size = 2880}, Type = Titan.Assets.AssetDescriptorType.Shader, Shader = new() { ShaderType = Titan.Assets.ShaderType.Pixel } },
             new() { Id = 6, ManifestId = 0, Reference = { Offset = 140624, Size = 3388}, Type = Titan.Assets.AssetDescriptorType.Shader, Shader = new() { ShaderType = Titan.Assets.ShaderType.Vertex } },
             new() { Id = 7, ManifestId = 0, Reference = { Offset = 144012, Size = 2880}, Type = Titan.Assets.AssetDescriptorType.Shader, Shader = new() { ShaderType = Titan.Assets.ShaderType.Pixel } },
+            new() { Id = 8, ManifestId = 0, Reference = { Offset = 146892, Size = 1952}, Type = Titan.Assets.AssetDescriptorType.Shader, Shader = new() { ShaderType = Titan.Assets.ShaderType.Vertex } },
+            new() { Id = 9, ManifestId = 0, Reference = { Offset = 148844, Size = 2416}, Type = Titan.Assets.AssetDescriptorType.Shader, Shader = new() { ShaderType = Titan.Assets.ShaderType.Pixel } },
         };
 #if DEBUG
         public static object[] RawAssets { get; } =
@@ -31,6 +33,8 @@ internal static partial class AssetRegistry
             new Titan.Tools.Core.Manifests.ShaderItem{ Name = "SpritePS", Path = @"shaders\sprites.hlsl", EntryPoint = "PSMain", ShaderModel = Titan.Tools.Core.Shaders.ShaderModels.PS_6_5 },
             new Titan.Tools.Core.Manifests.ShaderItem{ Name = "Sprite2VS", Path = @"shaders\spritesv2.hlsl", EntryPoint = "VSMain", ShaderModel = Titan.Tools.Core.Shaders.ShaderModels.VS_6_5 },
             new Titan.Tools.Core.Manifests.ShaderItem{ Name = "Sprite2PS", Path = @"shaders\spritesv2.hlsl", EntryPoint = "PSMain", ShaderModel = Titan.Tools.Core.Shaders.ShaderModels.PS_6_5 },
+            new Titan.Tools.Core.Manifests.ShaderItem{ Name = "FullscreenVS", Path = @"shaders\fullscreen.hlsl", EntryPoint = "VSMain", ShaderModel = Titan.Tools.Core.Shaders.ShaderModels.VS_6_5 },
+            new Titan.Tools.Core.Manifests.ShaderItem{ Name = "FullscreenPS", Path = @"shaders\fullscreen.hlsl", EntryPoint = "PSMain", ShaderModel = Titan.Tools.Core.Shaders.ShaderModels.PS_6_5 },
         };
 #else
         public static object[] RawAssets { get; } = System.Array.Empty<object>();
@@ -45,6 +49,8 @@ internal static partial class AssetRegistry
             public static ref readonly Titan.Assets.AssetDescriptor SpritePS => ref AssetDescriptors[5];
             public static ref readonly Titan.Assets.AssetDescriptor Sprite2VS => ref AssetDescriptors[6];
             public static ref readonly Titan.Assets.AssetDescriptor Sprite2PS => ref AssetDescriptors[7];
+            public static ref readonly Titan.Assets.AssetDescriptor FullscreenVS => ref AssetDescriptors[8];
+            public static ref readonly Titan.Assets.AssetDescriptor FullscreenPS => ref AssetDescriptors[9];
         }
     }
 }

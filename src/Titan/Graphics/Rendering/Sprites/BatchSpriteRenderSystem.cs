@@ -3,10 +3,12 @@ using System.Runtime.CompilerServices;
 using Titan.BuiltIn.Components;
 using Titan.Core;
 using Titan.Core.Maths;
+using Titan.Core.Memory;
 using Titan.ECS.Entities;
 using Titan.ECS.Queries;
 using Titan.Graphics.D3D12.Memory;
 using Titan.Platform.Win32.D3D12;
+using Titan.Platform.Win32.DXGI;
 using Titan.Systems;
 
 namespace Titan.Graphics.Rendering.Sprites;
@@ -96,7 +98,7 @@ internal struct BatchSpriteRenderSystem : ISystem
             data.TextureId = texture.TextureId;
             data.TextureSize.X = texture.Width;
             data.TextureSize.Y = texture.Height;
-            
+
             var (sin, cos) = MathF.SinCos(transform.WorldRotation);
             data.SinCosRotation.X = sin;
             data.SinCosRotation.Y = cos;
@@ -106,8 +108,39 @@ internal struct BatchSpriteRenderSystem : ISystem
         var commandQueue = _commandQueue.Value;
         var allocator = _allocator.Value;
 
+        //NOTE(Jens): we should not render to the backbuffer, we should request a separate render target that we can use.
+        ref readonly var backbuffer = ref renderInfo->CurrentBackbuffer;
+
+
         var commandList = commandQueue.GetCommandList();
         commandList.Reset();
+        if(false)
+        {
+            var clearValue = new D3D12_CLEAR_VALUE { Format = DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM };
+            MemoryUtils.Copy(clearValue.Color, pClearColor, sizeof(float) * 4);
+            var begin = new D3D12_RENDER_PASS_BEGINNING_ACCESS
+            {
+                Clear = new D3D12_RENDER_PASS_BEGINNING_ACCESS_CLEAR_PARAMETERS
+                {
+                    ClearValue = clearValue
+                },
+                Type = D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE.D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR
+            };
+            var end = new D3D12_RENDER_PASS_ENDING_ACCESS()
+            {
+                Type = D3D12_RENDER_PASS_ENDING_ACCESS_TYPE.D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE
+            };
+            var desc = new D3D12_RENDER_PASS_RENDER_TARGET_DESC
+            {
+                BeginningAccess = begin,
+                EndingAccess = end,
+                cpuDescriptor = backbuffer.RTV.CPU
+            };
+            commandList.Transition(backbuffer, D3D12_RESOURCE_STATES.D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATES.D3D12_RESOURCE_STATE_RENDER_TARGET);
+            commandList.BeginRenderPass(1, &desc);
+        }
+
+
 
         var windowSize = renderInfo->WindowSize;
         // set the viewport
@@ -127,9 +160,8 @@ internal struct BatchSpriteRenderSystem : ISystem
             commandList.SetScissorRect(&scissorRect);
         }
 
-        //NOTE(Jens): we should not render to the backbuffer, we should request a separate render target that we can use.
-        ref readonly var backbuffer = ref renderInfo->CurrentBackbuffer;
         // set render target, barrier and clear it
+
         commandList.SetRenderTarget(backbuffer);
         commandList.Transition(backbuffer, D3D12_RESOURCE_STATES.D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATES.D3D12_RESOURCE_STATE_RENDER_TARGET);
         commandList.ClearRenderTarget(backbuffer.RTV.CPU, (float*)pClearColor);
@@ -149,7 +181,9 @@ internal struct BatchSpriteRenderSystem : ISystem
             renderer.End(commandList);
         }
         //set the backbuffer to present, close the commandlist.
+        //commandList.EndRenderPass();
         commandList.Transition(backbuffer, D3D12_RESOURCE_STATES.D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATES.D3D12_RESOURCE_STATE_PRESENT);
+
         commandList.Close();
     }
 }

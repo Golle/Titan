@@ -3,13 +3,13 @@
   "name": "BuiltIn",
   "textures": [
     {
-      "path": "textures\\splash.png",
       "type": "PNG",
+      "path": "textures\\splash.png",
       "name": "splash"
     },
     {
-      "path": "textures\\ui.png",
       "type": "PNG",
+      "path": "textures\\ui.png",
       "name": "ui"
     }
   ],
@@ -17,40 +17,52 @@
   "materials": [],
   "shaders": [
     {
-      "path": "shaders\\simple_ps_01.hlsl",
       "shaderModel": "PS_6_5",
       "entryPoint": "main",
+      "path": "shaders\\simple_ps_01.hlsl",
       "name": "simple_ps_01"
     },
     {
-      "path": "shaders\\simple_vs_01.hlsl",
       "shaderModel": "VS_6_5",
       "entryPoint": "main",
+      "path": "shaders\\simple_vs_01.hlsl",
       "name": "simple_vs_01"
     },
     {
-      "path": "shaders\\sprites.hlsl",
       "shaderModel": "VS_6_5",
       "entryPoint": "VSMain",
+      "path": "shaders\\sprites.hlsl",
       "name": "SpriteVS"
     },
     {
-      "path": "shaders\\sprites.hlsl",
       "shaderModel": "PS_6_5",
       "entryPoint": "PSMain",
+      "path": "shaders\\sprites.hlsl",
       "name": "SpritePS"
     },
     {
-      "path": "shaders\\spritesv2.hlsl",
       "shaderModel": "VS_6_5",
       "entryPoint": "VSMain",
+      "path": "shaders\\spritesv2.hlsl",
       "name": "Sprite2VS"
     },
     {
-      "path": "shaders\\spritesv2.hlsl",
       "shaderModel": "PS_6_5",
       "entryPoint": "PSMain",
+      "path": "shaders\\spritesv2.hlsl",
       "name": "Sprite2PS"
+    },
+    {
+      "shaderModel": "VS_6_5",
+      "entryPoint": "VSMain",
+      "path": "shaders\\fullscreen.hlsl",
+      "name": "FullscreenVS"
+    },
+    {
+      "shaderModel": "PS_6_5",
+      "entryPoint": "PSMain",
+      "path": "shaders\\fullscreen.hlsl",
+      "name": "FullscreenPS"
     }
   ],
   "audio": []
