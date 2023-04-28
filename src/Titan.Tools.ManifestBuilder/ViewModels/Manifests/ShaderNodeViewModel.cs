@@ -6,7 +6,6 @@ namespace Titan.Tools.ManifestBuilder.ViewModels.Manifests;
 
 public class ShaderNodeViewModel : ManifestTreeNodeViewModel<ShaderItem>
 {
-
     [EditorString]
     public string EntryPoint { get => _item.EntryPoint; set => SetProperty(() => _item.EntryPoint = value); }
     [EditorEnum]

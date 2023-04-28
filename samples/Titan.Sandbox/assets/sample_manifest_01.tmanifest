@@ -3,17 +3,22 @@
   "name": "sample_manifest_01",
   "textures": [
     {
-      "path": "textures\\bluesheet.png",
       "type": "PNG",
+      "path": "textures\\bluesheet.png",
       "name": "bluesheet"
     },
     {
-      "path": "textures\\greensheet.png",
       "type": "PNG",
+      "path": "textures\\greensheet.png",
       "name": "greensheet"
     }
   ],
-  "models": [],
+  "models": [
+    {
+      "path": "models\\box\\box.obj",
+      "name": "TheBox"
+    }
+  ],
   "materials": [],
   "shaders": [],
   "audio": [

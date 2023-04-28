@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:previews="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels.Previews"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Titan.Tools.ManifestBuilder.Views.Previews.ModelPreviewView">
+  <Design.DataContext>
+    <previews:ModelPreviewViewModel/>
+  </Design.DataContext>
+
+  <StackPanel Spacing="10" IsVisible="{Binding Mesh, Converter={x:Static ObjectConverters.IsNotNull}}">
+    <TextBlock Text="{Binding Mesh.Vertices, StringFormat='Vertices: {0}'}"/>
+    <TextBlock Text="{Binding Mesh.Normals, StringFormat='Normals: {0}'}"/>
+    <TextBlock Text="{Binding Mesh.TextureCoordinates, StringFormat='Texture coordinates: {0}'}"/>
+
+    <TextBlock  FontSize="16" Text="{Binding Mesh.SubMeshes.Length, StringFormat='Sub meshes ({0})'}"/>
+    <ItemsRepeater Items="{Binding Mesh.SubMeshes}" Margin="10 10 0 0">
+      <ItemsRepeater.ItemTemplate>
+        <DataTemplate DataType="{x:Type previews:SubMesh}">
+          <StackPanel Spacing="10">
+            <TextBlock Text="{Binding Name}"/>
+            <TextBlock Text="{Binding Material, StringFormat='Material: {0}'}"/>
+            <TextBlock Text="{Binding Indices, StringFormat='Indices: {0}'}"/>
+            <TextBlock Text="{Binding Smoothing, StringFormat='Smoothing: {0}'}"/>
+          </StackPanel>
+        </DataTemplate>
+      </ItemsRepeater.ItemTemplate>
+    </ItemsRepeater>
+  </StackPanel>
+</UserControl>

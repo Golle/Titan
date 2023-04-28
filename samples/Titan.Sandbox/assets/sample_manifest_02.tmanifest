@@ -3,18 +3,18 @@
   "name": "sample_manifest_02",
   "textures": [
     {
-      "path": "textures\\greensheet.png",
       "type": "PNG",
+      "path": "textures\\greensheet.png",
       "name": "greensheet"
     },
     {
-      "path": "textures\\greysheet.png",
       "type": "PNG",
+      "path": "textures\\greysheet.png",
       "name": "greysheet"
     },
     {
-      "path": "textures\\redsheet.png",
       "type": "PNG",
+      "path": "textures\\redsheet.png",
       "name": "redsheet"
     }
   ],

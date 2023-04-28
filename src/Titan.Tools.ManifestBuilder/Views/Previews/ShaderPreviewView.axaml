@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:previews="clr-namespace:Titan.Tools.ManifestBuilder.ViewModels.Previews"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Titan.Tools.ManifestBuilder.Views.Previews.ShaderPreviewView">
+
+  <Design.DataContext>
+    <previews:ShaderPreviewViewModel/>
+  </Design.DataContext>
+
+  <Grid RowDefinitions="Auto, 10, *">
+    <Button Grid.Row="0" HorizontalAlignment="Right" Command="{Binding OpenInEditor}">Open in Editor</Button>
+    <Button Grid.Row="0" HorizontalAlignment="Left" Command="{Binding LoadContents}">Refresh</Button>
+    <ScrollViewer Grid.Row="2">
+      <TextBox IsReadOnly="True" Padding="10" Background="#11ffffff" BorderThickness="1" CornerRadius="2" BorderBrush="#888" Text="{Binding FileContents}"/>
+    </ScrollViewer>
+  </Grid>
+</UserControl>
