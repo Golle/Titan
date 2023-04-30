@@ -6,7 +6,6 @@ using Titan.Tools.ManifestBuilder.ViewModels.Manifests;
 
 namespace Titan.Tools.ManifestBuilder.ViewModels.Previews;
 
-
 public record MeshInfo(int Vertices, int Normals, int TextureCoordinates, int Materials, SubMesh[] SubMeshes);
 public record SubMesh(string Name, string Material, int Indices, int Smoothing);
 

@@ -22,6 +22,7 @@ public enum BufferType
 public record struct CreateBufferArgs(uint Count, uint StrideInBytes, bool CpuVisible = false, bool ShaderVisible = true, BufferType Type = BufferType.Common, TitanBuffer InitialData = default);
 public record struct CreateTextureArgs(uint Width, uint Height, TextureFormat Format, bool ShaderVisible = true, bool RenderTargetView = false, TitanBuffer InitialData = default);
 public record struct CreateShaderArgs(ShaderType Type, TitanBuffer Data);
+public record struct CreateModel3DArgs(uint Vertices, uint Normals, uint UVs, uint IndexCount, int IndexSize, TitanBuffer Data);
 
 public ref struct CreatePipelineStateArgs
 {
@@ -42,6 +43,9 @@ public unsafe interface IResourceManager
     void Destroy(Handle<Texture> handle);
     Texture* AccessTexture(Handle<Texture> handle);
 
+    Handle<Model3D> CreateModel(in CreateModel3DArgs args);
+    void DestroyModel(Handle<Model3D> handle);
+    Model3D* AccessModel(Handle<Model3D> handle);
 
     Handle<GPUBuffer> CreateBuffer(in CreateBufferArgs args);
     void DestroyBuffer(Handle<GPUBuffer> handle);
@@ -59,4 +63,7 @@ public unsafe interface IResourceManager
     Handle<RootSignature> CreateRootSignature(in CreateRootSignatureArgs args);
     void DestroyRootSignature(Handle<RootSignature> handle);
     RootSignature* AccessRootSignature(Handle<RootSignature> handle);
+
+
+    
 }

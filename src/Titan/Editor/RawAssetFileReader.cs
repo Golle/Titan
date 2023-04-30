@@ -3,6 +3,8 @@ using Titan.Core.Logging;
 using Titan.Tools.Core.Audio;
 using Titan.Tools.Core.Images;
 using Titan.Tools.Core.Manifests;
+using Titan.Tools.Core.Models;
+using Titan.Tools.Core.Models.WavefrontObj;
 using Titan.Tools.Core.Shaders;
 
 namespace Titan.Editor;
@@ -46,8 +48,21 @@ internal class RawAssetFileReader : IAssetFileReader
             AssetDescriptorType.Shader => ReadAndCompileShader(basePath, (ShaderItem)asset, buffer),
             AssetDescriptorType.Audio => ReadAudio(basePath, (AudioItem)asset, buffer),
             AssetDescriptorType.Texture => ReadTexture(basePath, (TextureItem)asset, buffer),
+            AssetDescriptorType.Model => ReadModel(basePath, (ModelItem)asset, buffer),
             _ => throw new NotImplementedException($"The descriptor type {descriptor.Type} has not been implemented yet.")
         };
+    }
+
+    private static int ReadModel(string basePath, ModelItem asset, Span<byte> buffer)
+    {
+        var path = Path.Combine(basePath, asset.Path);
+        var result = ModelConverter.ReadModel(path);
+        if (!result.Success)
+        {
+            Logger.Error<RawAssetFileReader>($"failed to read the model from path {path}, with error {result.Error}");
+            return -1;
+        }
+        return -1;
     }
 
     private static int ReadAudio(string basePath, AudioItem asset, Span<byte> buffer)

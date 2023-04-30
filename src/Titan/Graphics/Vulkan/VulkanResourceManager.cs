@@ -26,6 +26,21 @@ internal class VulkanResourceManager : IResourceManager
         throw new NotImplementedException();
     }
 
+    public Handle<Model3D> CreateModel(in CreateModel3DArgs args)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DestroyModel(Handle<Model3D> handle)
+    {
+        throw new NotImplementedException();
+    }
+
+    public unsafe Model3D* AccessModel(Handle<Model3D> handle)
+    {
+        throw new NotImplementedException();
+    }
+
     public Handle<GPUBuffer> CreateBuffer(in CreateBufferArgs args)
     {
         throw new NotImplementedException();

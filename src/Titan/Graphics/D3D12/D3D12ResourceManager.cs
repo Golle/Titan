@@ -1,4 +1,3 @@
-using System.Data;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Titan.Core;
@@ -32,6 +31,7 @@ internal unsafe class D3D12ResourceManager : IResourceManager
     private IResourcePool<D3D12Texture> _textures;
     private IResourcePool<D3D12Buffer> _buffers;
     private IResourcePool<D3D12Shader> _shaders;
+    private IResourcePool<D3D12Model3D> _models;
     private IResourcePool<D3D12PipelineState> _pipelineState;
     private IResourcePool<D3D12RootSignature> _rootSignatures;
     private D3D12GraphicsDevice _device;
@@ -65,6 +65,12 @@ internal unsafe class D3D12ResourceManager : IResourceManager
             return false;
         }
 
+        if (config.MaxModels == 0)
+        {
+            Logger.Error<D3D12ResourceManager>($"{nameof(config.MaxModels)} is 0");
+            return false;
+        }
+
 
         if (!FixedSizeResourcePool<D3D12Texture>.Create(memoryManager, config.MaxTextures, out _textures))
         {
@@ -75,6 +81,12 @@ internal unsafe class D3D12ResourceManager : IResourceManager
         if (!FixedSizeResourcePool<D3D12Buffer>.Create(memoryManager, config.MaxBuffers, out _buffers))
         {
             Logger.Error<D3D12ResourceManager>($"Failed to create the {nameof(IResourcePool<D3D12Buffer>)} for {nameof(D3D12Buffer)} ({config.MaxBuffers})");
+            goto Error;
+        }
+
+        if (!FixedSizeResourcePool<D3D12Model3D>.Create(memoryManager, config.MaxModels, out _models))
+        {
+            Logger.Error<D3D12ResourceManager>($"Failed to create the {nameof(IResourcePool<D3D12Model3D>)} for {nameof(D3D12Model3D)} ({config.MaxModels})");
             goto Error;
         }
 
@@ -115,6 +127,7 @@ Error:
         _buffers.Release();
         _pipelineState.Release();
         _textures.Release();
+        _models.Release();
         _shaders.Release();
         _rootSignatures.Release();
         _allocator?.Release();
@@ -224,6 +237,39 @@ Error:
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Texture* AccessTexture(Handle<Texture> handle) => (Texture*)_textures.GetPointer(handle.Value);
+
+    public Handle<Model3D> CreateModel(in CreateModel3DArgs args)
+    {
+        var handle = _models.Alloc();
+        if (handle.IsInvalid)
+        {
+            Logger.Error<D3D12ResourceManager>("Failed to create a model3d handle.");
+            return 0;
+        }
+
+        var model = _models.GetPointer(handle);
+        model->Model.IndexCount = args.IndexCount;
+        //create buffer etc.
+
+        //store offset in a vertex buffer
+
+        return handle.Value;
+
+    }
+
+    public void DestroyModel(Handle<Model3D> handle)
+    {
+        ref var model = ref _models.Get(handle.Value);
+        if (model.Resource != null)
+        {
+            model.Resource->Release();
+        }
+        _models.Free(handle.Value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Model3D* AccessModel(Handle<Model3D> handle) => (Model3D*)_models.GetPointer(handle.Value);
+
     public Handle<GPUBuffer> CreateBuffer(in CreateBufferArgs args)
     {
         var handle = _buffers.Alloc();
@@ -477,6 +523,7 @@ Error:
         // Loop through all allocated values?
         _buffers.Release();
         _textures.Release();
+        _models.Release();
         _pipelineState.Release();
         _shaders.Release();
         _rootSignatures.Release();

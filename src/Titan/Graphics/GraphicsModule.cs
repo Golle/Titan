@@ -30,6 +30,7 @@ public struct GraphicsModule : IModule
                 .AddSystemToStage<RenderInfoSystem>(SystemStage.First) // Collect all render info after the frame has been presented.
                 .AddResourceCreator<Texture, TextureCreator>()
                 .AddResourceCreator<Shader, ShaderCreator>()
+                .AddResourceCreator<Model3D, Model3DCreator>()
                 ;
         }
         else if (GlobalConfiguration.OperatingSystem == OperatingSystem.Linux)

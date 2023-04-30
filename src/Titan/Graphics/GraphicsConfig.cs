@@ -6,7 +6,7 @@ using Titan.Setup.Configs;
 namespace Titan.Graphics;
 
 public record struct GPUMemoryConfig(uint SRVCount, uint RTVCount, uint DSVCount, uint UAVCount, uint TempConstantBufferSize, uint TempSRVCount);
-public record struct GraphicsResourcesConfig(uint MaxBuffers, uint MaxTextures, uint MaxPipelineStates, uint UploadFrames, uint MaxShaders, uint MaxResourceBuffersSize, uint MaxRootSignatures);
+public record struct GraphicsResourcesConfig(uint MaxBuffers, uint MaxTextures, uint MaxModels, uint MaxPipelineStates, uint UploadFrames, uint MaxShaders, uint MaxResourceBuffersSize, uint MaxRootSignatures);
 public record GraphicsConfig(bool Debug, bool TripleBuffering, bool Vsync, bool AllowTearing, bool Fullscreen, Color ClearColor) : IConfiguration, IDefault<GraphicsConfig>
 {
     public static readonly uint DefaultMaxResourceBuffersSize = MemoryUtils.MegaBytes(4);
@@ -16,6 +16,7 @@ public record GraphicsConfig(bool Debug, bool TripleBuffering, bool Vsync, bool 
     public const uint DefaultMaxPipelines = 100;
     public const uint DefaultUploadFrames = 4;
     public const uint DefaultMaxShaders = 128;
+    public const uint DefaultMaxModels = 128;
     public const uint DefaultMaxRootSignatures = 16;
 
     public const uint DefaultSRVCount = 1024;
@@ -31,7 +32,7 @@ public record GraphicsConfig(bool Debug, bool TripleBuffering, bool Vsync, bool 
     public GPUMemoryConfig MemoryConfig { get; init; }
     public static GraphicsConfig Default => new(false, true, false, true, false, DefaultClearColor)
     {
-        ResourcesConfig = new(DefaultMaxBuffers, DefaultMaxTextures, DefaultMaxPipelines, DefaultUploadFrames, DefaultMaxShaders, DefaultMaxResourceBuffersSize, DefaultMaxRootSignatures),
+        ResourcesConfig = new(DefaultMaxBuffers, DefaultMaxTextures, DefaultMaxModels, DefaultMaxPipelines, DefaultUploadFrames, DefaultMaxShaders, DefaultMaxResourceBuffersSize, DefaultMaxRootSignatures),
         MemoryConfig = new(DefaultSRVCount, DefaultRTVCount, DefaultDSVCount, DefaultUAVCount, DefaultTempConstantBufferSize, DefaultTempSRVCount)
     };
 }
