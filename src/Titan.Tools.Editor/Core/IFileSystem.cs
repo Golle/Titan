@@ -1,6 +1,8 @@
 namespace Titan.Tools.Editor.Core;
 internal interface IFileSystem
 {
+    FileStream OpenWrite(string path);
+    FileStream OpenRead(string path);
     Task<string> ReadString(string path);
     Task<byte[]> ReadBytes(string path);
     IEnumerable<string> EnumerateFolders(string path, string? searchPattern, SearchOption options);

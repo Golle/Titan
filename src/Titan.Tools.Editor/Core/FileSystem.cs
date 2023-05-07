@@ -2,6 +2,12 @@ namespace Titan.Tools.Editor.Core;
 
 internal class FileSystem : IFileSystem
 {
+    public FileStream OpenWrite(string path) 
+        => File.OpenWrite(path);
+
+    public FileStream OpenRead(string path) 
+        => File.OpenRead(path);
+
     public Task<string> ReadString(string path)
         => File.ReadAllTextAsync(path);
 

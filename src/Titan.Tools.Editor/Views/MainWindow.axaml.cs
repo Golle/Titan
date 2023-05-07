@@ -17,6 +17,10 @@ public partial class MainWindow : Window
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
         (DataContext as MainWindowViewModel)?.Startup();
     }
 }

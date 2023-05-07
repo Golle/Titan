@@ -4,7 +4,7 @@ using Titan.Tools.Editor.ViewModels;
 
 namespace Titan.Tools.Editor.Services;
 
-internal interface IDialogService
+public interface IDialogService
 {
     Task<NewProjectResult?> OpenNewProjectDialog(Window? parent = null);
     Task<SelectProjectResult?> OpenSelectProjectDialog(Window? parent = null);

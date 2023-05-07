@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Titan.Tools.Editor.Configuration;
 using Titan.Tools.Editor.Core;
 using Titan.Tools.Editor.Project;
 using Titan.Tools.Editor.ProjectGeneration.CSharp;
@@ -21,6 +22,8 @@ internal static class Registry
             .AddSingleton<IProjectTemplateService, ProjectTemplateService>()
             .AddSingleton<IProjectGenerationService, ProjectGenerationService>()
             .AddSingleton<ITitanProjectFile, TitanProjectFile>()
+
+            .AddSingleton<IAppConfiguration, LocalAppConfiguration>()
 
             .BuildServiceProvider();
 

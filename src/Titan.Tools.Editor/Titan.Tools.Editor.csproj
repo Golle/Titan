@@ -30,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\ProjectExplorerView.axaml.cs">
+      <DependentUpon>ProjectExplorerView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\SelectProjectWindow.axaml.cs">
       <DependentUpon>SelectProjectWindow.axaml</DependentUpon>
     </Compile>

@@ -4,18 +4,20 @@ using Titan.Tools.Editor.Services;
 
 namespace Titan.Tools.Editor.ViewModels;
 
-internal partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly IDialogService _dialogService;
 
     [ObservableProperty]
     private string _greetings = "Welcome to the Titan Editor!";
 
+    [ObservableProperty]
+    private ProjectExplorerViewModel? _projectExplorer;
+
     public MainWindowViewModel(IDialogService dialogService)
     {
         _dialogService = dialogService;
     }
-
 
     public async void Startup()
     {
@@ -23,10 +25,12 @@ internal partial class MainWindowViewModel : ViewModelBase
         if (result == null)
         {
             App.Exit();
+            return;
         }
 
+        //NOTE(Jens): implement the rest of the view models. should we maybe use service collection here?
+        ProjectExplorer = new ProjectExplorerViewModel();
         Greetings = $"Path: {result.ProjectPath}";
-
     }
 
     public MainWindowViewModel()
