@@ -1,0 +1,43 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Titan.Tools.Editor.Controls">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <StackPanel Spacing="10">
+        <controls:ProjectTemplateItem TemplateName="This is the name" />
+        <controls:ProjectTemplateItem TemplateName="This is the name" IsSelected="True" />
+      </StackPanel>
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="controls|ProjectTemplateItem">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Background" BorderBrush="{StaticResource Stroke}" BorderThickness="1" Padding="10" CornerRadius="4">
+          <StackPanel Spacing="5">
+            <Image Width="64" Height="64" Source="{TemplateBinding Icon}" IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+            <Image Width="64" Height="64" Source="/Assets/no_icon.png" IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNull}}"/>
+            <TextBlock Text="{TemplateBinding TemplateName}"/>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <!-- SELECTED -->
+  <Style Selector="controls|ProjectTemplateItem[IsSelected=True] /template/ Border#PART_Background">
+    <Setter Property="Background" Value="{StaticResource Highlight}"/>
+  </Style>
+  <Style Selector="controls|ProjectTemplateItem[IsSelected=True] /template/ TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource ButtonText}"/>
+  </Style>
+
+  <!-- POINTER OVER -->
+  <Style Selector="controls|ProjectTemplateItem:pointerover /template/ Border#PART_Background">
+    <Setter Property="Background" Value="{StaticResource Highlight}"/>
+  </Style>
+  <Style Selector="controls|ProjectTemplateItem:pointerover /template/ TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource ButtonText}"/>
+  </Style>
+
+</Styles>

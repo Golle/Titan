@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Titan.Tools.Editor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Titan.Tools.Editor.Views.MainWindow"
+        Icon="/Assets/titan_editor.ico"
+        Title="Titan - The only game engine you'll ever need!">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <StackPanel>
+    <TextBlock Text="{Binding Greetings}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+  </StackPanel>
+
+</Window>

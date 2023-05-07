@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:Titan.Tools.Editor.ViewModels"
+        mc:Ignorable="d"
+        Width="600" Height="500"
+        x:Class="Titan.Tools.Editor.Views.SelectProjectWindow"
+        Title="StartupWindow"
+        Padding="10"
+        Background="{StaticResource Background}"
+        >
+
+  <Design.DataContext>
+    <viewModels:SelectProjectViewModel/>
+  </Design.DataContext>
+  <Grid ColumnDefinitions="*, 20, *">
+    <StackPanel Grid.Column="0">
+      <StackPanel Spacing="10">
+        <TextBlock>Recent projects</TextBlock>
+        <ItemsRepeater ItemsSource="{Binding RecentProjects}">
+          <ItemsRepeater.ItemTemplate>
+            <DataTemplate DataType="x:String">
+              <TextBlock Text="{Binding .}"/>
+            </DataTemplate>
+          </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Spacing="10" Grid.Column="2">
+      <Button Command="{Binding NewProjectCommand}" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Width="200" Height="40" HorizontalAlignment="Stretch">New project</Button>
+      <Button Command="{Binding OpenProjectCommand}" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Width="200" Height="40" HorizontalAlignment="Stretch">Open project</Button>
+    </StackPanel>
+
+  </Grid>
+
+
+</Window>

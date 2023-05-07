@@ -1,0 +1,57 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:Titan.Tools.Editor.ViewModels"
+        xmlns:controls="clr-namespace:Titan.Tools.Editor.Controls"
+        mc:Ignorable="d"
+        Width="500"
+        Height="420"
+        CanResize="False"
+        x:Class="Titan.Tools.Editor.Views.NewProject"
+        Title="Create project"
+        Name="CreateProject">
+
+  <Design.DataContext>
+    <viewModels:NewProjectViewModel Name="TheProject" Error="This is an error"/>
+  </Design.DataContext>
+
+  <Window.Styles>
+    <Style Selector="ItemsRepeater /template/ Border">
+      <Setter Property="Background" Value="red"/>
+    </Style>
+  </Window.Styles>
+
+  <StackPanel Spacing="10">
+    <TextBlock FontSize="20">Create Project</TextBlock>
+    <TextBlock>Select template</TextBlock>
+    <ItemsRepeater ItemsSource="{Binding Templates}">
+      <ItemsRepeater.Layout>
+        <WrapLayout HorizontalSpacing="10"/>
+      </ItemsRepeater.Layout>
+      <ItemsRepeater.ItemTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ProjectTemplateViewModel}">
+          <controls:ProjectTemplateItem
+            TemplateName="{Binding Template.Name}"
+            Icon="{Binding Icon}"
+            IsSelected="{Binding IsSelected}"
+            OnSelect="{Binding #CreateProject.DataContext.TemplateSelectedCommand}"
+            />
+        </DataTemplate>
+      </ItemsRepeater.ItemTemplate>
+    </ItemsRepeater>
+
+    <TextBlock>Project name</TextBlock>
+    <TextBox Watermark="Name" Text="{Binding Name}"/>
+    <TextBlock>Location</TextBlock>
+    <TextBox Watermark="Location" Text="{Binding ProjectLocation}"/>
+    <TextBlock Opacity="0.4" Text="{Binding FullProjectLocation, StringFormat='Full path: {0}'}"/>
+    <Separator Background="{StaticResource Stroke}" Margin="0"/>
+
+    <Grid ColumnDefinitions="*, 10, Auto">
+      <TextBlock Grid.Column="0" Foreground="red" Text="{Binding Error}" IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+      <Button Grid.Column="2" Command="{Binding CreateProjectCommand}">Create</Button>
+    </Grid>
+
+  </StackPanel>
+</Window>

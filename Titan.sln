@@ -25,7 +25,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A6873DBB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Tests", "tests\Titan.Tests\Titan.Tests.csproj", "{3CE0A7BC-9A54-47AF-B3EB-B25B3415F0F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Core", "src\Titan.Core\Titan.Core.csproj", "{9A742EC3-A722-4608-9F80-0F187685ECB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Titan.Core", "src\Titan.Core\Titan.Core.csproj", "{9A742EC3-A722-4608-9F80-0F187685ECB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titan.Tools.Editor", "src\Titan.Tools.Editor\Titan.Tools.Editor.csproj", "{ADD823C2-C308-47BF-8249-9EC5A43ADB44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,10 @@ Global
 		{9A742EC3-A722-4608-9F80-0F187685ECB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A742EC3-A722-4608-9F80-0F187685ECB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A742EC3-A722-4608-9F80-0F187685ECB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADD823C2-C308-47BF-8249-9EC5A43ADB44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADD823C2-C308-47BF-8249-9EC5A43ADB44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADD823C2-C308-47BF-8249-9EC5A43ADB44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADD823C2-C308-47BF-8249-9EC5A43ADB44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{47B948FB-0CD0-42FF-AE86-CE56306B4E39} = {A2AA1CDD-5A47-4C32-B8B7-40A07412B0A3}
 		{3CE0A7BC-9A54-47AF-B3EB-B25B3415F0F8} = {A6873DBB-C314-4B32-AD1C-CB79CAD8B9B8}
 		{9A742EC3-A722-4608-9F80-0F187685ECB6} = {D1A58AB3-F93F-43D1-8DDE-B62D0DFC669E}
+		{ADD823C2-C308-47BF-8249-9EC5A43ADB44} = {A2AA1CDD-5A47-4C32-B8B7-40A07412B0A3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E894497-3997-4874-82B1-2671C1372ACA}

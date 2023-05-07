@@ -1,0 +1,26 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20" Background="{StaticResource Background}">
+      <StackPanel Spacing="10">
+        <Button>This is a button</Button>
+
+      </StackPanel>
+
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="Button">
+    <Setter Property="Background" Value="{StaticResource Button}"/>
+    <Setter Property="Foreground" Value="{StaticResource ButtonText}"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="FontWeight" Value="600"/>
+  </Style>
+
+  <Style Selector="Button:pointerover /template/ ContentPresenter">
+    <Setter Property="Opacity" Value="0.85"/>
+    <Setter Property="Background" Value="{StaticResource Button}"/>
+    <Setter Property="Foreground" Value="{StaticResource ButtonText}"/>
+
+  </Style>
+</Styles>

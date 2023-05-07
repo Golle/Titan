@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <LanguageVersion>preview</LanguageVersion>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <AvaloniaResource Include="Assets\**" />
+    <None Remove=".gitignore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootDescriptor Include="Roots.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.0-preview7" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview7" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0-preview.3.23174.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\SelectProjectWindow.axaml.cs">
+      <DependentUpon>SelectProjectWindow.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+
+</Project>

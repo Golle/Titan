@@ -1,0 +1,14 @@
+{
+    "Name": "2D Game",
+    "EntryPoint": "Program.cs",
+    "Folders": [
+        "src",
+        "assets",
+        ".titan"
+    ],
+    "Files": [
+        "../common/.editorconfig",
+        "../common/.gitattributes",
+        "../common/.gitignore"
+    ]
+}
