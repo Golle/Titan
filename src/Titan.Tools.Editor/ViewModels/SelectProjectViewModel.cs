@@ -11,16 +11,16 @@ public record SelectProjectResult(string ProjectPath);
 internal partial class SelectProjectViewModel : ViewModelBase
 {
     private readonly IDialogService _dialogService;
-    private readonly IAppConfiguration _appConfiguration;
+    private readonly IRecentProjects _recentProjects;
 
-    public SelectProjectViewModel(IDialogService dialogService, IAppConfiguration appConfiguration)
+    [ObservableProperty]
+    private ObservableCollection<RecentProject> _projects = new();
+
+    public SelectProjectViewModel(IDialogService dialogService, IRecentProjects recentProjects)
     {
         _dialogService = dialogService;
-        _appConfiguration = appConfiguration;
+        _recentProjects = recentProjects;
     }
-
-    [ObservableProperty] 
-    private ObservableCollection<string> _recentProjects = new();
 
     [RelayCommand]
     private async Task OpenProject()
@@ -28,7 +28,6 @@ internal partial class SelectProjectViewModel : ViewModelBase
         var path = await _dialogService.OpenFileDialog(new[] { new FilePickerFileType("Titan Project") { Patterns = new[] { $"*{GlobalConfiguration.TitanProjectFileExtension}" } } });
         if (path != null)
         {
-            await AddToRecentProjects(path);
             Window?.Close(new SelectProjectResult(path));
         }
     }
@@ -39,26 +38,12 @@ internal partial class SelectProjectViewModel : ViewModelBase
         var result = await _dialogService.OpenNewProjectDialog(Window);
         if (result != null)
         {
-            await AddToRecentProjects(result.Path);
             Window?.Close(new SelectProjectResult(result.Path));
         }
     }
 
-    private async Task AddToRecentProjects(string? path)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return;
-        }
-        var config = await _appConfiguration.GetConfig();
-        if (config.RecentProjects.Add(path))
-        {
-            await _appConfiguration.SaveConfig(config);
-        }
-    }
-
     public SelectProjectViewModel()
-    : this(App.GetRequiredService<IDialogService>(), App.GetRequiredService<IAppConfiguration>())
+        : this(App.GetRequiredService<IDialogService>(), App.GetRequiredService<IRecentProjects>())
     {
         if (!Design.IsDesignMode)
         {
@@ -68,11 +53,10 @@ internal partial class SelectProjectViewModel : ViewModelBase
 
     public async void Load()
     {
-        RecentProjects.Clear();
-        var config = await _appConfiguration.GetConfig();
-        foreach (var recentProject in config.RecentProjects)
+        Projects.Clear();
+        foreach (var recentProject in await _recentProjects.GetProjects())
         {
-            RecentProjects.Add(recentProject);
+            Projects.Add(recentProject);
         }
     }
 }

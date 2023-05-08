@@ -18,7 +18,7 @@
     <StackPanel Grid.Column="0">
       <StackPanel Spacing="10">
         <TextBlock>Recent projects</TextBlock>
-        <ItemsRepeater ItemsSource="{Binding RecentProjects}">
+        <ItemsRepeater ItemsSource="{Binding Projects}">
           <ItemsRepeater.ItemTemplate>
             <DataTemplate DataType="x:String">
               <TextBlock Text="{Binding .}"/>

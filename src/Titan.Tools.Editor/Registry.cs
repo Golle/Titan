@@ -14,6 +14,7 @@ internal static class Registry
     public static IServiceProvider Build(IServiceCollection serviceCollection) =>
         serviceCollection
             .AddCore()
+            .AddConfiguration()
             .AddViewModels()
             .AddSingleton<IDialogService, DialogService>()
 
@@ -23,19 +24,26 @@ internal static class Registry
             .AddSingleton<IProjectGenerationService, ProjectGenerationService>()
             .AddSingleton<ITitanProjectFile, TitanProjectFile>()
 
-            .AddSingleton<IAppConfiguration, LocalAppConfiguration>()
 
             .BuildServiceProvider();
 
     private static IServiceCollection AddCore(this IServiceCollection collection) =>
         collection
             .AddSingleton<IFileSystem, FileSystem>()
-        
+
         ;
+
+    private static IServiceCollection AddConfiguration(this IServiceCollection collection) =>
+        collection
+            .AddSingleton<IAppConfiguration, LocalAppConfiguration>()
+            .AddSingleton<IRecentProjects, RecentProjects>()
+
+    ;
 
     private static IServiceCollection AddViewModels(this IServiceCollection collection) =>
         collection
             .AddTransient<SelectProjectViewModel>()
+            .AddTransient<NewProjectViewModel>()
 
     ;
 }
