@@ -1,0 +1,54 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Avalonia.Controls;
+using CommunityToolkit.Mvvm.Input;
+
+namespace Titan.Tools.Editor.ViewModels.Dialogs;
+
+public enum MessageBoxType
+{
+    Ok,
+    OkCancel,
+    YesNo
+}
+
+public enum MessageBoxResult
+{
+    Cancel = 0,
+    Ok = 1,
+    Yes = Ok,
+    No = Cancel
+}
+
+public partial class MessageBoxViewModel : ViewModelBase
+{
+    public string Title { get; }
+    public string Message { get; }
+
+    public bool IsOk { get; }
+    public bool IsOkCancel { get; }
+    public bool IsYesNo { get; }
+
+    [RelayCommand]
+    private void Close(MessageBoxResult result) => Window?.Close(result);
+    public MessageBoxViewModel(string title, string message, MessageBoxType type)
+    {
+        Title = title;
+        Message = message;
+        IsOk = type is MessageBoxType.Ok or MessageBoxType.OkCancel;
+        IsOkCancel = type is MessageBoxType.OkCancel;
+        IsYesNo = type is MessageBoxType.YesNo;
+        //Close = ReactiveCommand.Create<MessageBoxResult>(result => window.Close(result));
+    }
+
+
+    public MessageBoxViewModel()
+        : this("Design", "Fake message", MessageBoxType.OkCancel)
+    {
+    }
+}
+

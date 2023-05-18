@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Titan.Tools.Editor.Services;
 using Titan.Tools.Editor.ViewModels;
 
 namespace Titan.Tools.Editor.Views;
@@ -8,19 +7,17 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainWindowViewModel(App.GetRequiredService<IDialogService>())
-        {
-            Window = this
-        };
+        var viewModel = App.GetRequiredService<MainWindowViewModel>();
+        viewModel.Window = this;
+        DataContext = viewModel;
     }
 
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
-        if (Design.IsDesignMode)
+        if (!Design.IsDesignMode)
         {
-            return;
+            (DataContext as MainWindowViewModel)?.Startup();
         }
-        (DataContext as MainWindowViewModel)?.Startup();
     }
 }

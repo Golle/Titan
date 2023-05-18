@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Titan.Tools.Editor.Configuration;
 using Titan.Tools.Editor.Services;
+using Titan.Tools.Editor.ViewModels.Dialogs;
 
 namespace Titan.Tools.Editor.ViewModels;
 public record SelectProjectResult(string ProjectPath);
@@ -39,6 +40,30 @@ internal partial class SelectProjectViewModel : ViewModelBase
         if (result != null)
         {
             Window?.Close(new SelectProjectResult(result.Path));
+        }
+    }
+
+    [RelayCommand]
+    private void OpenRecentProject(RecentProject? project)
+    {
+        if (project != null)
+        {
+            Window?.Close(new SelectProjectResult(project.Path));
+        }
+    }
+
+    [RelayCommand]
+    private async Task RemoveProject(RecentProject? project)
+    {
+        if (project == null)
+        {
+            return;
+        }
+        var result = await _dialogService.ShowMessageBox("Delete Project Reference", $"Are you sure you want to remove the project {project.Name} from the list of recent projects?", MessageBoxType.YesNo);
+        if (result is MessageBoxResult.Yes)
+        {
+            Projects.Remove(project);
+            await _recentProjects.Remove(project);
         }
     }
 

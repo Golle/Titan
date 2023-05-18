@@ -1,7 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using Titan.Tools.Editor.ViewModels;
+using Titan.Tools.Editor.ViewModels.Dialogs;
 using Titan.Tools.Editor.Views;
+using Titan.Tools.Editor.Views.Dialogs;
 
 namespace Titan.Tools.Editor.Services;
 
@@ -35,5 +37,12 @@ internal class DialogService : IDialogService
             return result[0].Path.AbsolutePath;
         }
         return null;
+    }
+
+    public async Task<MessageBoxResult?> ShowMessageBox(string title, string? message, MessageBoxType type, Window? parent)
+    {
+        var dialog = new MessageBoxDialog(title, message ?? string.Empty, type);
+        var parentWindow = parent ?? App.GetMainWindow();
+        return await dialog.ShowDialog<MessageBoxResult>(parentWindow);
     }
 }

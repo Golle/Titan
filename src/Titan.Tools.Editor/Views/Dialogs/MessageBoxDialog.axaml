@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dialogs="clr-namespace:Titan.Tools.Editor.ViewModels.Dialogs"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
+        x:Class="Titan.Tools.Editor.Views.Dialogs.MessageBoxDialog"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Width="400"
+        SizeToContent="Height"
+        >
+
+  <Design.DataContext>
+    <dialogs:MessageBoxViewModel/>
+  </Design.DataContext>
+
+  <Window.Styles>
+    <Style Selector="StackPanel#PART_Buttons > Button">
+      <Setter Property="Padding" Value="16 6"></Setter>
+    </Style>
+  </Window.Styles>
+  <Panel>
+    <ExperimentalAcrylicBorder DockPanel.Dock="Top" IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.8" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+
+    <StackPanel Spacing="10">
+      <TextBlock Padding="5 5 5 0" FontSize="16" FontWeight="600" IsHitTestVisible="False" Text="{Binding Title}"/>
+      <Border Padding="10" VerticalAlignment="Center">
+        <StackPanel Spacing="10">
+          <TextBlock FontSize="14" Text="{Binding Message}" TextWrapping="Wrap"/>
+          <StackPanel Name="PART_Buttons" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+            <Button IsVisible="{Binding IsOk}" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:MessageBoxResult.Ok}">Ok</Button>
+            <Button IsVisible="{Binding IsOkCancel}" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:MessageBoxResult.Cancel}">Cancel</Button>
+            <Button IsVisible="{Binding IsYesNo}" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:MessageBoxResult.Yes}">Yes</Button>
+            <Button IsVisible="{Binding IsYesNo}" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:MessageBoxResult.No}">No</Button>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Panel>
+</Window>

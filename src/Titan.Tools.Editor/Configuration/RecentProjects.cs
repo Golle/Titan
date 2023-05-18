@@ -21,9 +21,10 @@ internal class RecentProjects : IRecentProjects
     public async Task AddOrUpdateProject(string name, string path)
     {
         var config = await _appConfiguration.GetConfig();
-        var project = config.RecentProjects.FirstOrDefault(p => p.Name == name && p.Path == path);
+        var project = config.RecentProjects.FirstOrDefault(p => p.Path == path);
         if (project != null)
         {
+            project.Name = name;
             project.LastAccessed = DateTime.Now;
         }
         else
@@ -37,5 +38,14 @@ internal class RecentProjects : IRecentProjects
         }
 
         await _appConfiguration.SaveConfig(config);
+    }
+
+    public async Task Remove(RecentProject project)
+    {
+        var config = await _appConfiguration.GetConfig();
+        if (config.RecentProjects.Remove(project))
+        {
+            await _appConfiguration.SaveConfig(config);
+        }
     }
 }

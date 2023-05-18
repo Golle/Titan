@@ -3,36 +3,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Titan.Tools.Editor.ViewModels"
+        xmlns:configuration="clr-namespace:Titan.Tools.Editor.Configuration"
+        xmlns:projectSelection="clr-namespace:Titan.Tools.Editor.Controls.ProjectSelection"
         mc:Ignorable="d"
         Width="600" Height="500"
         x:Class="Titan.Tools.Editor.Views.SelectProjectWindow"
         Title="StartupWindow"
-        Padding="10"
-        Background="{StaticResource Background}"
+        Background="{StaticResource BackgroundLighter}"
+
+        ExtendClientAreaToDecorationsHint="True"
         >
 
   <Design.DataContext>
-    <viewModels:SelectProjectViewModel/>
+    <viewModels:SelectProjectViewModel>
+      <viewModels:SelectProjectViewModel.Projects>
+        <configuration:RecentProject Name="A project" Path="c:/tmp/theproject.titan" LastAccessed="2020-01-01 10:10:23"/>
+      </viewModels:SelectProjectViewModel.Projects>
+    </viewModels:SelectProjectViewModel>
   </Design.DataContext>
-  <Grid ColumnDefinitions="*, 20, *">
-    <StackPanel Grid.Column="0">
-      <StackPanel Spacing="10">
-        <TextBlock>Recent projects</TextBlock>
-        <ItemsRepeater ItemsSource="{Binding Projects}">
-          <ItemsRepeater.ItemTemplate>
-            <DataTemplate DataType="x:String">
-              <TextBlock Text="{Binding .}"/>
-            </DataTemplate>
-          </ItemsRepeater.ItemTemplate>
-        </ItemsRepeater>
+  <DockPanel LastChildFill="True">
+    <TextBlock Margin="10" Foreground="{StaticResource Headline}" FontSize="20" DockPanel.Dock="Top">Select a project</TextBlock>
+    <Grid ColumnDefinitions="*, 20, *" Margin="10">
+      <StackPanel Grid.Column="0">
+        <StackPanel Spacing="10">
+          <TextBlock>Recent projects</TextBlock>
+          <ItemsRepeater Name="PART_RecentProjects" ItemsSource="{Binding Projects}">
+            <ItemsRepeater.ItemTemplate>
+              <DataTemplate DataType="configuration:RecentProject">
+                <projectSelection:RecentProjectControl ProjectName="{Binding Name}" Path="{Binding Path}" LastOpened="{Binding LastAccessed}" RemoveCommand="{Binding $parent[Window].DataContext.RemoveProjectCommand}" Command="{Binding $parent[Window].DataContext.OpenRecentProjectCommand}" CommandParameter="{Binding .}"/>
+              </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+          </ItemsRepeater>
+        </StackPanel>
       </StackPanel>
-    </StackPanel>
-    <StackPanel Spacing="10" Grid.Column="2">
-      <Button Command="{Binding NewProjectCommand}" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Width="200" Height="40" HorizontalAlignment="Stretch">New project</Button>
-      <Button Command="{Binding OpenProjectCommand}" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Width="200" Height="40" HorizontalAlignment="Stretch">Open project</Button>
-    </StackPanel>
-
-  </Grid>
-
-
+      <StackPanel Spacing="10" Grid.Column="2">
+        <Button Command="{Binding NewProjectCommand}" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Width="200" Height="40" HorizontalAlignment="Stretch">New project</Button>
+        <Button Command="{Binding OpenProjectCommand}" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Width="200" Height="40" HorizontalAlignment="Stretch">Open project</Button>
+      </StackPanel>
+    </Grid>
+  </DockPanel>
 </Window>

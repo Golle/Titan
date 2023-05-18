@@ -65,20 +65,29 @@ internal class ProjectGenerationService : IProjectGenerationService
             await _fileSystem.WriteText(Path.Combine(projectPath, solutionFileName), solutionFileContents);
 
             var projectFileContents = _csharpProjectFileGenerator.GenerateProjectFileContents(TitanProjectFilePath);
-            await _fileSystem.WriteText(Path.Combine(projectSourceCodePath, $"{projectName}.csproj"), projectFileContents);
+            var projectFileDestination = Path.Combine(projectSourceCodePath, $"{projectName}.csproj");
+            await _fileSystem.WriteText(projectFileDestination, projectFileContents);
 
-            var projectFileResult = await _titanProjectFile.Save(new TitanProject(projectName, solutionFileName), titanProjectFile);
+            var titanProject = new TitanProject
+            {
+                Name = projectName,
+                SolutionFile = solutionFileName,
+                BuildSettings = new TitanProjectBuildSettings
+                {
+                    CSharpProjectFile = Path.GetRelativePath(projectPath, projectFileDestination)
+                }
+            };
+            var projectFileResult = await _titanProjectFile.Save(titanProject, titanProjectFile);
             if (!projectFileResult.Success)
             {
                 return Result.Fail<string>(projectFileResult.Error ?? "Unknown error occured when saving the project file.");
             }
-
         }
         catch (Exception e)
         {
             return Result.Fail<string>($"{e.GetType().Name} - {e.Message}");
         }
-        return Result.Ok(projectPath);
+        return Result.Ok(titanProjectFile);
     }
 }
 

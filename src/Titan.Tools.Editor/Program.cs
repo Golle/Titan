@@ -1,9 +1,4 @@
 using Avalonia;
-using Titan.Tools.Editor.Core;
-using Titan.Tools.Editor.Project;
-using Titan.Tools.Editor.ProjectGeneration.CSharp;
-using Titan.Tools.Editor.ProjectGeneration.Templates;
-using Titan.Tools.Editor.Services;
 
 namespace Titan.Tools.Editor;
 

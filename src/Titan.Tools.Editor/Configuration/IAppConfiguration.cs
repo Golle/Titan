@@ -9,8 +9,8 @@ public class AppConfig
 
 public class RecentProject
 {
-    public required string Name { get; init; }
     public required string Path { get; init; }
+    public required string Name { get; set; }
     public required DateTime LastAccessed { get; set; }
 };
 

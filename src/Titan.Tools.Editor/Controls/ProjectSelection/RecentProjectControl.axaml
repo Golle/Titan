@@ -1,0 +1,37 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:projectSelection="clr-namespace:Titan.Tools.Editor.Controls.ProjectSelection">
+  <Design.PreviewWith>
+    <Border Padding="20" Width="300">
+      <projectSelection:RecentProjectControl ProjectName="The project" Path="c:/tmp/project.titan" LastOpened="2020-01-01 10:10:23"/>
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="projectSelection|RecentProjectControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border BorderBrush="{StaticResource Stroke}" BorderThickness="1" CornerRadius="4" Padding="10">
+          <StackPanel>
+            <Grid ColumnDefinitions="Auto, 10, *">
+              <TextBlock Grid.Column="0" Text="{TemplateBinding ProjectName}" FontSize="16" FontWeight="500"/>
+              <Button Command="{TemplateBinding RemoveCommand}" CommandParameter="{TemplateBinding CommandParameter}" FontSize="10" HorizontalAlignment="Right" Grid.Column="2">Remove</Button>
+            </Grid>
+            <TextBlock Text="{TemplateBinding Path}"/>
+            <TextBlock Text="{TemplateBinding LastOpened}"/>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="projectSelection|RecentProjectControl TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource ButtonText}"/>
+  </Style>
+
+  <Style Selector="projectSelection|RecentProjectControl Border">
+    <Setter Property="Background" Value="{StaticResource Tertiary}"/>
+  </Style>
+  <Style Selector="projectSelection|RecentProjectControl:pointerover Border">
+    <Setter Property="Opacity" Value="0.8"/>
+  </Style>
+</Styles>

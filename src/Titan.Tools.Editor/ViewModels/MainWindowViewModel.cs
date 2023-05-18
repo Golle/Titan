@@ -1,12 +1,18 @@
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Titan.Tools.Editor.Configuration;
+using Titan.Tools.Editor.Project;
 using Titan.Tools.Editor.Services;
+using Titan.Tools.Editor.Services.State;
 
 namespace Titan.Tools.Editor.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly IDialogService _dialogService;
+    private readonly ITitanProjectFile _titanProjectFile;
+    private readonly IRecentProjects _recentProjects;
+    private readonly IApplicationState _applicationState;
 
     [ObservableProperty]
     private string _greetings = "Welcome to the Titan Editor!";
@@ -14,9 +20,15 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private ProjectExplorerViewModel? _projectExplorer;
 
-    public MainWindowViewModel(IDialogService dialogService)
+    public ToolbarViewModel Toolbar { get; }
+
+    public MainWindowViewModel(ToolbarViewModel toolbar, IDialogService dialogService, ITitanProjectFile titanProjectFile, IRecentProjects recentProjects, IApplicationState applicationState)
     {
+        Toolbar = toolbar;
         _dialogService = dialogService;
+        _titanProjectFile = titanProjectFile;
+        _recentProjects = recentProjects;
+        _applicationState = applicationState;
     }
 
     public async void Startup()
@@ -28,13 +40,32 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        var project = await _titanProjectFile.Read(result.ProjectPath);
+        if (!project.Success || project.Data == null)
+        {
+            await _dialogService.ShowMessageBox("Open project failed", project.Error ?? "Unknown error", parent: Window);
+            //NOTE(Jens): currenlty no recovery from this. 
+            App.Exit(-1);
+        }
+        await _recentProjects.AddOrUpdateProject(project.Data!.Name, result.ProjectPath);
+
+        //NOTE(Jens): Set the current project
+        _applicationState.Initialize(project.Data, Path.GetDirectoryName(result.ProjectPath)!);
+
         //NOTE(Jens): implement the rest of the view models. should we maybe use service collection here?
         ProjectExplorer = new ProjectExplorerViewModel();
+        Toolbar.IsProjectLoaded = true;
         Greetings = $"Path: {result.ProjectPath}";
     }
 
     public MainWindowViewModel()
-    : this(App.GetRequiredService<IDialogService>())
+        : this(
+            App.GetRequiredService<ToolbarViewModel>(),
+            App.GetRequiredService<IDialogService>(),
+            App.GetRequiredService<ITitanProjectFile>(),
+            App.GetRequiredService<IRecentProjects>(),
+            App.GetRequiredService<IApplicationState>()
+        )
     {
         if (!Design.IsDesignMode)
         {

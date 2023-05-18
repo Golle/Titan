@@ -7,31 +7,36 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Titan.Tools.Editor.Views.MainWindow"
         Icon="/Assets/titan_editor.ico"
-        Title="Titan - The only game engine you'll ever need!">
-
+        Title="Titan - The only game engine you'll ever need!"
+        TransparencyLevelHint="AcrylicBlur"
+        >
+  <!-- this is not working properly in the current version ExtendClientAreaToDecorationsHint="True" -->
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
   <DockPanel LastChildFill="True">
-    <!-- Using a fixed Width on this element, or the window can't be moved. -->
-    <Menu DockPanel.Dock="Top" Padding="10 0" Width="120" HorizontalAlignment="Left">
-      <MenuItem Header="_File">
-        <MenuItem x:Name="SaveAll">
-          <MenuItem.Header>
-            <Grid ColumnDefinitions="150, Auto">
-              <TextBlock Grid.Column="0">Save All</TextBlock>
-              <TextBlock Grid.Column="1" HorizontalAlignment="Right">(Ctrl + S)</TextBlock>
-            </Grid>
-          </MenuItem.Header>
+    <Grid ColumnDefinitions="200,*" DockPanel.Dock="Top">
+      <!-- Using a fixed Width on this element, or the window can't be moved. -->
+      <Menu Padding="10 0" Width="120" HorizontalAlignment="Left">
+        <MenuItem Header="_File">
+          <MenuItem x:Name="SaveAll">
+            <MenuItem.Header>
+              <Grid ColumnDefinitions="150, Auto">
+                <TextBlock Grid.Column="0">Save All</TextBlock>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Right">(Ctrl + S)</TextBlock>
+              </Grid>
+            </MenuItem.Header>
+          </MenuItem>
+          <MenuItem Header="_Settings"/>
+          <Separator/>
+          <MenuItem Header="_Exit"/>
         </MenuItem>
-        <MenuItem Header="_Settings"/>
-        <Separator/>
-        <MenuItem Header="_Exit"/>
-      </MenuItem>
-      <MenuItem Header="_Build">
-        <MenuItem Header="Cook Assets"/>
-      </MenuItem>
-    </Menu>
+        <MenuItem Header="_Build">
+          <MenuItem Header="Cook Assets"/>
+        </MenuItem>
+      </Menu>
+      <ContentControl Grid.Column="1" VerticalAlignment="Top" Height="30" Width="300" Content="{Binding Toolbar}"/>
+    </Grid>
 
     <Grid Name="TheGrid" >
       <Grid.ColumnDefinitions>
@@ -47,9 +52,9 @@
         <RowDefinition MinHeight="200" Height="*"/>
       </Grid.RowDefinitions>
 
-      <ContentControl Grid.Row="0" Grid.Column="0" DockPanel.Dock="Left" Content="{Binding ProjectExplorer}" />
+      <ContentControl Grid.Row="0" Grid.Column="0" Content="{Binding ProjectExplorer}" />
       <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns"/>
-      <ContentControl Grid.Row="0" Grid.Column="2" DockPanel.Dock="Right" Content="{Binding Preview}"/>
+      <ContentControl Grid.Row="0" Grid.Column="2" Content="{Binding Preview}"/>
       <GridSplitter Grid.Row="0" Grid.Column="3" ResizeDirection="Columns"/>
       <ContentControl Grid.Row="0" Grid.Column="4" Content="{Binding Properties}"/>
 

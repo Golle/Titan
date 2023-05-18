@@ -11,6 +11,7 @@
   <Application.Resources>
     <!-- https://www.happyhues.co/palettes/12 -->
     <Color x:Key="Background">#232946</Color>
+    
     <Color x:Key="Button">#eebbc3</Color>
     <Color x:Key="ButtonText">#232946</Color>
     <Color x:Key="Headline">#fffffe</Color>
@@ -20,17 +21,22 @@
     <Color x:Key="Highlight">#eebbc3</Color>
     <Color x:Key="Secondary">#fffffe</Color>
     <Color x:Key="Tertiary">#eebbc3</Color>
+
+    <!-- Custom -->
+    <Color x:Key="BackgroundLighter">#303961</Color>
   </Application.Resources>
 
   <Application.Styles>
     <FluentTheme />
     <Style Selector="Window">
       <Setter Property="Background" Value="{StaticResource Background}"/>
-      <Setter Property="Padding" Value="10"/>
+      <!--<Setter Property="Padding" Value="10"/>-->
       <Setter Property="WindowStartupLocation" Value="CenterOwner"/>
     </Style>
     <StyleInclude Source="/Styles/Buttons.axaml"/>
     <StyleInclude Source="/Styles/ProjectTemplate.axaml"/>
+
+    <StyleInclude Source="/Controls/ProjectSelection/RecentProjectControl.axaml"/>
 
   </Application.Styles>
 </Application>
