@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:editor="clr-namespace:Titan.Tools.Editor"
+             xmlns:converters="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls"
              x:Class="Titan.Tools.Editor.App"
              RequestedThemeVariant="Dark"
              >
@@ -24,6 +25,12 @@
 
     <!-- Custom -->
     <Color x:Key="BackgroundLighter">#303961</Color>
+
+
+    <StreamGeometry x:Key="Document">M15.3,0.8H4.9C4.2,0.8,3.7,1.3,3.7,2V22c0,0.7,0.6,1.3,1.3,1.3h14.1c0.7,0,1.3-0.6,1.3-1.3V5.8     c0-0.3-0.1-0.7-0.4-0.9l-3.7-3.7C16,0.9,15.7,0.8,15.3,0.8z</StreamGeometry>
+    <StreamGeometry x:Key="Folder">M11.17,6l3.42,3.41.58.59H28V26H4V6h7.17m0-2H4A2,2,0,0,0,2,6V26a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2H16L12.59,4.59A2,2,0,0,0,11.17,4Z</StreamGeometry>
+
+    <converters:EnumToBoolConverter x:Key="EnumToBoolConverter"/> 
   </Application.Resources>
 
   <Application.Styles>
@@ -37,6 +44,7 @@
     <StyleInclude Source="/Styles/ProjectTemplate.axaml"/>
 
     <StyleInclude Source="/Controls/ProjectSelection/RecentProjectControl.axaml"/>
+    <StyleInclude Source="/Controls/Assets/FileEntryControl.axaml"/>
 
   </Application.Styles>
 </Application>

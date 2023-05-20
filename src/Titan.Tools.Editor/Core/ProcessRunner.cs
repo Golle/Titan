@@ -63,10 +63,16 @@ internal class ProcessRunner : IProcessRunner
         }
 
         CancellationTokenSource timeoutSource = new();
-        timeoutSource.CancelAfter(args.Timeout);
+        var token = CancellationToken.None;
+        if (args.Timeout != TimeSpan.MaxValue)
+        {
+            timeoutSource.CancelAfter(args.Timeout);
+            token = timeoutSource.Token;
+        }
         try
         {
-            await process.WaitForExitAsync(timeoutSource.Token);
+
+            await process.WaitForExitAsync(token);
         }
         catch (Exception e) when (e is OperationCanceledException or TaskCanceledException)
         {

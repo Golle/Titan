@@ -3,7 +3,6 @@
         xmlns:vm="using:Titan.Tools.Editor.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:Titan.Tools.Editor.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Titan.Tools.Editor.Views.MainWindow"
         Icon="/Assets/titan_editor.ico"
@@ -56,10 +55,20 @@
       <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns"/>
       <ContentControl Grid.Row="0" Grid.Column="2" Content="{Binding Preview}"/>
       <GridSplitter Grid.Row="0" Grid.Column="3" ResizeDirection="Columns"/>
-      <ContentControl Grid.Row="0" Grid.Column="4" Content="{Binding Properties}"/>
+      <ContentControl Grid.Row="0" Grid.Column="4" Content="{Binding Stuffs}"/>
 
       <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" ResizeDirection="Rows"/>
-      <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Content="{Binding Content}"/>
+      <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" >
+        <TabItem Header="Content" FontSize="14" Margin="0" Padding="5">
+          <ContentControl Content="{Binding Browser}"/>
+        </TabItem>
+        <TabItem Header="Console Output" FontSize="14" Margin="0" Padding="5">
+          <ContentControl Content="{Binding Terminal}"/>
+        </TabItem>
+        <TabItem Header="Log" FontSize="14" Margin="0" Padding="5">
+          <TextBlock>This is where the log is!</TextBlock>
+        </TabItem>
+      </TabControl>
     </Grid>
   </DockPanel>
 </Window>

@@ -113,7 +113,7 @@ public unsafe partial struct Kernel32
     [LibraryImport(DllName, SetLastError = true)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     public static partial void Sleep(uint milliseconds);
-    
+
     [LibraryImport(DllName, SetLastError = true)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
     public static partial uint GetCurrentThreadId();
@@ -130,4 +130,23 @@ public unsafe partial struct Kernel32
     public static partial bool SetDllDirectoryW(
         char* lpPathName
     );
+
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool AllocConsole();
+
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static partial nint GetConsoleWindow();
+
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool AttachConsole(uint dWProcessId);
+
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool FreeConsole();
 }

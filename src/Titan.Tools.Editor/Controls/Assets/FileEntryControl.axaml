@@ -1,0 +1,43 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:assets="clr-namespace:Titan.Tools.Editor.Controls.Assets"
+        xmlns:assets1="clr-namespace:Titan.Tools.Editor.Services.Assets">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <StackPanel Spacing="10">
+        <assets:FileEntryControl FileName="File 1" FileType="File" IsSelected="False"/>
+        <assets:FileEntryControl FileName="really long filename 1" FileType="File" IsSelected="True"/>
+        <assets:FileEntryControl FileName="Folder 1" FileType="Folder" IsSelected="False"/>
+        <assets:FileEntryControl FileName="Folder 1" FileType="Folder" IsSelected="True"/>
+        <assets:FileEntryControl FileName=".." FileType="ParentFolder" IsSelected="False"/>
+        <assets:FileEntryControl FileName=".." FileType="ParentFolder" IsSelected="True"/>
+      </StackPanel>
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="assets|FileEntryControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border BorderThickness="1" Padding="5" CornerRadius="4" Width="90" MinHeight="60">
+          <Grid RowDefinitions="Auto, 5, *">
+            <PathIcon Grid.Row="0" IsVisible="{Binding FileType, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static assets1:FileEntryType.File}}" Data="{StaticResource Document}" Height="{TemplateBinding IconSize}" Width="{TemplateBinding IconSize}" />
+            <PathIcon Grid.Row="0" IsVisible="{Binding FileType, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static assets1:FileEntryType.Folder}}" Data="{StaticResource Folder}" Height="{TemplateBinding IconSize}" Width="{TemplateBinding IconSize}"/>
+            <TextBlock Grid.Row="2" VerticalAlignment="Bottom" Text="{TemplateBinding FileName}" TextAlignment="Center" MaxWidth="100" TextWrapping="WrapWithOverflow"/>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="assets|FileEntryControl /template/ PathIcon">
+    <Setter Property="Foreground" Value="white"/>
+  </Style>
+
+  <Style Selector="assets|FileEntryControl /template/ Border">
+    <Setter Property="Background" Value="#222222"/>
+  </Style>
+  <Style Selector="assets|FileEntryControl:pointerover /template/ Border">
+
+    <Setter Property="Background" Value="#444444"/>
+  </Style>
+</Styles>

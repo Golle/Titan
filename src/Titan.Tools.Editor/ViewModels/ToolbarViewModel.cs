@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Titan.Platform.Win32;
 using Titan.Tools.Editor.Common;
 using Titan.Tools.Editor.Services;
 using Titan.Tools.Editor.Tools;

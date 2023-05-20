@@ -170,4 +170,15 @@ public static unsafe partial class USER32
         void* NotificationFilter,
         DEVICE_NOTIFY_FLAGS Flags
     );
+
+
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool UpdateWindow(HWND hwnd);
+
+    [LibraryImport(DllName, SetLastError = true)]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool RedrawWindow(HWND hWnd, RECT* lprcUpdate, void* /*HRGN*/ hrgnUpdate, uint* flags);
 }

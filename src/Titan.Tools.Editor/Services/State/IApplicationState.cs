@@ -6,5 +6,6 @@ public interface IApplicationState
 {
     TitanProject Project { get; }
     string ProjectDirectory { get; }
+    string AssetsDirectory{ get; }
     void Initialize(TitanProject project, string projectDirectory);
 }

@@ -6,8 +6,10 @@ internal class ApplicationState : IApplicationState
 {
     private TitanProject? _project;
     private string? _projectDirectory;
+    private string? _assetsDirectory;
     public TitanProject Project => _project ?? throw new InvalidOperationException($"The {nameof(ApplicationState)} has not been initialized.");
     public string ProjectDirectory => _projectDirectory ?? throw new InvalidOperationException($"The {nameof(ApplicationState)} has not been initialized.");
+    public string AssetsDirectory => _assetsDirectory ?? throw new InvalidOperationException($"The {nameof(ApplicationState)} has not been initialized.");
 
     public void Initialize(TitanProject project, string projectDirectory)
     {
@@ -17,6 +19,6 @@ internal class ApplicationState : IApplicationState
         }
         _project = project;
         _projectDirectory = projectDirectory;
-        
+        _assetsDirectory = Path.Combine(ProjectDirectory, "assets");
     }
 }

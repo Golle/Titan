@@ -5,6 +5,7 @@ using Titan.Tools.Editor.Project;
 using Titan.Tools.Editor.ProjectGeneration.CSharp;
 using Titan.Tools.Editor.ProjectGeneration.Templates;
 using Titan.Tools.Editor.Services;
+using Titan.Tools.Editor.Services.Assets;
 using Titan.Tools.Editor.Services.State;
 using Titan.Tools.Editor.Tools;
 using Titan.Tools.Editor.ViewModels;
@@ -27,6 +28,8 @@ internal static class Registry
             .AddSingleton<IProjectGenerationService, ProjectGenerationService>()
             .AddSingleton<ITitanProjectFile, TitanProjectFile>()
 
+
+            .AddSingleton<IContentBrowser, ContentBrowser>()
 
             
 
@@ -52,7 +55,9 @@ internal static class Registry
             .AddTransient<MainWindowViewModel>()
             .AddTransient<SelectProjectViewModel>()
             .AddTransient<NewProjectViewModel>()
-            .AddTransient<ToolbarViewModel>();
+            .AddTransient<ToolbarViewModel>()
+            .AddTransient<TerminalViewModel>()
+            .AddTransient<AssetBrowserViewModel>();
     
     private static IServiceCollection AddTools(this IServiceCollection collection) =>
         collection

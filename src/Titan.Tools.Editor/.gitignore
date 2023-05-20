@@ -1,0 +1,2 @@
+# the base ignore file in Titan ignores /tools, because that's where the built binaries are stored. 
+!/Tools

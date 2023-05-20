@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Titan.Tools.Editor.Common;
 using Titan.Tools.Editor.Configuration;
 using Titan.Tools.Editor.Project;
 using Titan.Tools.Editor.Services;
@@ -22,9 +23,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ToolbarViewModel Toolbar { get; }
 
-    public MainWindowViewModel(ToolbarViewModel toolbar, IDialogService dialogService, ITitanProjectFile titanProjectFile, IRecentProjects recentProjects, IApplicationState applicationState)
+    public TerminalViewModel Terminal { get; }
+    public AssetBrowserViewModel Browser { get; }
+
+    public MainWindowViewModel(ToolbarViewModel toolbar, TerminalViewModel terminal, AssetBrowserViewModel assetBrowser, IDialogService dialogService, ITitanProjectFile titanProjectFile, IRecentProjects recentProjects, IApplicationState applicationState)
     {
         Toolbar = toolbar;
+        Terminal = terminal;
+        Browser = assetBrowser;
         _dialogService = dialogService;
         _titanProjectFile = titanProjectFile;
         _recentProjects = recentProjects;
@@ -56,20 +62,24 @@ public partial class MainWindowViewModel : ViewModelBase
         ProjectExplorer = new ProjectExplorerViewModel();
         Toolbar.IsProjectLoaded = true;
         Greetings = $"Path: {result.ProjectPath}";
+        await Browser.LoadContents();
     }
+
+    #region DESIGNER
 
     public MainWindowViewModel()
         : this(
             App.GetRequiredService<ToolbarViewModel>(),
+            App.GetRequiredService<TerminalViewModel>(),
+            App.GetRequiredService<AssetBrowserViewModel>(),
             App.GetRequiredService<IDialogService>(),
             App.GetRequiredService<ITitanProjectFile>(),
             App.GetRequiredService<IRecentProjects>(),
             App.GetRequiredService<IApplicationState>()
         )
     {
-        if (!Design.IsDesignMode)
-        {
-            throw new InvalidOperationException("This constructor should only be used by the designer.");
-        }
+        Helper.CheckDesignMode(nameof(MainWindowViewModel));
     }
+
+    #endregion
 }
