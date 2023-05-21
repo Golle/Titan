@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace Titan.Tools.Editor.Configuration;
 internal static class GlobalConfiguration
 {
+    public static string TitanAssetMetadataFileExtension => ".tmeta";
     public static string TitanProjectFileExtension => ".titan";
     public static string BasePath => GetBasePath();
     public static string TemplatesPath => Path.Combine(BasePath, "templates");

@@ -6,6 +6,7 @@ using Titan.Tools.Editor.ProjectGeneration.CSharp;
 using Titan.Tools.Editor.ProjectGeneration.Templates;
 using Titan.Tools.Editor.Services;
 using Titan.Tools.Editor.Services.Assets;
+using Titan.Tools.Editor.Services.Metadata;
 using Titan.Tools.Editor.Services.State;
 using Titan.Tools.Editor.Tools;
 using Titan.Tools.Editor.ViewModels;
@@ -20,6 +21,7 @@ internal static class Registry
             .AddConfiguration()
             .AddViewModels()
             .AddTools()
+            .AddAssetMetadataTools()
             .AddSingleton<IDialogService, DialogService>()
 
             .AddSingleton<ISolutionFileGenerator, SolutionFileGenerator>()
@@ -47,6 +49,14 @@ internal static class Registry
             .AddSingleton<IAppConfiguration, LocalAppConfiguration>()
             .AddSingleton<IRecentProjects, RecentProjects>()
             .AddSingleton<IApplicationState, ApplicationState>()
+
+    ; 
+    
+    private static IServiceCollection AddAssetMetadataTools(this IServiceCollection collection) =>
+        collection
+            .AddSingleton<AssetsBackgroundService>()
+            .AddSingleton<AssetsFileWatcher>()
+            .AddTransient<IAssetFileProcessor, AssetFileMetadataProcessor>()
 
     ;
 

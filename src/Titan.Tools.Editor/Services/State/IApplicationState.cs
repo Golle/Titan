@@ -8,4 +8,5 @@ public interface IApplicationState
     string ProjectDirectory { get; }
     string AssetsDirectory{ get; }
     void Initialize(TitanProject project, string projectDirectory);
+    Task Stop();
 }

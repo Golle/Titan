@@ -20,4 +20,14 @@ public partial class MainWindow : Window
             (DataContext as MainWindowViewModel)?.Startup();
         }
     }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        if (!Design.IsDesignMode)
+        {
+            (DataContext as MainWindowViewModel)?.Shutdown();
+        }
+        base.OnClosed(e);
+
+    }
 }

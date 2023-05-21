@@ -63,7 +63,7 @@
           <ContentControl Content="{Binding Browser}"/>
         </TabItem>
         <TabItem Header="Console Output" FontSize="14" Margin="0" Padding="5">
-          <ContentControl Content="{Binding Terminal}"/>
+          <ContentControl Content="{Binding Terminal}" />
         </TabItem>
         <TabItem Header="Log" FontSize="14" Margin="0" Padding="5">
           <TextBlock>This is where the log is!</TextBlock>

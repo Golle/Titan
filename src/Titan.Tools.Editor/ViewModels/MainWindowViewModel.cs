@@ -20,9 +20,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private ProjectExplorerViewModel? _projectExplorer;
-
     public ToolbarViewModel Toolbar { get; }
-
     public TerminalViewModel Terminal { get; }
     public AssetBrowserViewModel Browser { get; }
 
@@ -63,6 +61,11 @@ public partial class MainWindowViewModel : ViewModelBase
         Toolbar.IsProjectLoaded = true;
         Greetings = $"Path: {result.ProjectPath}";
         await Browser.LoadContents();
+    }
+
+    public async void Shutdown()
+    {
+        await _applicationState.Stop();
     }
 
     #region DESIGNER
