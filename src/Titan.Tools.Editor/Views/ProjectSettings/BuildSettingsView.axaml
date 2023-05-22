@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:projectSettings="clr-namespace:Titan.Tools.Editor.ViewModels.ProjectSettings"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Titan.Tools.Editor.Views.ProjectSettings.BuildSettingsView">
+
+  <Design.DataContext>
+    <projectSettings:BuildSettingsViewModel/>
+  </Design.DataContext>
+
+
+  <StackPanel Spacing="10">
+
+    <StackPanel>
+      <TextBlock FontSize="20" Text="{Binding NativeAOT, StringFormat='NativeAOT: {0}'}"/>
+      <Grid ColumnDefinitions="Auto, 10, *">
+        <TextBlock Grid.Column="0">Compile the project as NativeAOT.</TextBlock>
+        <CheckBox HorizontalAlignment="Right" Grid.Column="2" IsChecked="{Binding NativeAOT}"/>
+      </Grid>
+    </StackPanel>
+    <Separator Background="{StaticResource Stroke}"></Separator>
+    <StackPanel>
+      <TextBlock FontSize="20" Text="{Binding Trimming, StringFormat='Trimming: {0}'}"/>
+      <Grid ColumnDefinitions="Auto, 10, *">
+        <TextBlock Grid.Column="0">Publish with trimming.</TextBlock>
+        <CheckBox HorizontalAlignment="Right" Grid.Column="2" IsChecked="{Binding Trimming}"/>
+      </Grid>
+    </StackPanel>
+    <Separator Background="{StaticResource Stroke}"></Separator>
+
+    <Button HorizontalAlignment="Right" HorizontalContentAlignment="Center" FontSize="16" Command="{Binding SaveChangesCommand}">Save changes</Button>
+  </StackPanel>
+</UserControl>

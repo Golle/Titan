@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:projectSettings="clr-namespace:Titan.Tools.Editor.ViewModels.ProjectSettings"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+        x:Class="Titan.Tools.Editor.Views.ProjectSettings.ProjectSettingsDialog"
+        Title="Project Settings"
+        Width="600"
+        MinHeight="450"
+        SizeToContent="Height"
+        >
+  <Design.DataContext>
+    <projectSettings:ProjectSettingsViewModel/>
+  </Design.DataContext>
+
+  <Window.Styles>
+    <Style Selector="TabControl TabItem">
+      <Setter Property="FontSize" Value="16"/>
+    </Style>
+
+    <Style Selector="ContentControl#PART_TabContent">
+      <Setter Property="Padding" Value="10"/>
+      <Setter Property="BorderBrush" Value="{StaticResource Stroke}"/>
+      <Setter Property="BorderThickness" Value="1 0 0 0"/>
+    </Style>
+  </Window.Styles>
+
+  <TabControl TabStripPlacement="Left" ItemsSource="{Binding Settings}">
+    <TabControl.ItemTemplate>
+      <DataTemplate DataType="projectSettings:IProjectSettings">
+        <TextBlock Text="{Binding Name}"/>
+      </DataTemplate>
+    </TabControl.ItemTemplate>
+    <TabControl.ContentTemplate>
+      <DataTemplate DataType="projectSettings:IProjectSettings">
+        <ContentControl Name="PART_TabContent" Content="{Binding .}"/>
+      </DataTemplate>
+    </TabControl.ContentTemplate>
+  </TabControl>
+</Window>

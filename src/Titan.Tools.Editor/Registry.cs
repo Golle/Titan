@@ -1,4 +1,6 @@
+using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using Titan.Tools.Editor.Common;
 using Titan.Tools.Editor.Configuration;
 using Titan.Tools.Editor.Core;
 using Titan.Tools.Editor.Project;
@@ -10,6 +12,7 @@ using Titan.Tools.Editor.Services.Metadata;
 using Titan.Tools.Editor.Services.State;
 using Titan.Tools.Editor.Tools;
 using Titan.Tools.Editor.ViewModels;
+using Titan.Tools.Editor.ViewModels.ProjectSettings;
 
 namespace Titan.Tools.Editor;
 
@@ -22,6 +25,7 @@ internal static class Registry
             .AddViewModels()
             .AddTools()
             .AddAssetMetadataTools()
+            .AddProjectSettings()
             .AddSingleton<IDialogService, DialogService>()
 
             .AddSingleton<ISolutionFileGenerator, SolutionFileGenerator>()
@@ -44,19 +48,36 @@ internal static class Registry
 
         ;
 
-    private static IServiceCollection AddConfiguration(this IServiceCollection collection) =>
+    private static IServiceCollection AddConfiguration(this IServiceCollection collection)
+    {
         collection
             .AddSingleton<IAppConfiguration, LocalAppConfiguration>()
             .AddSingleton<IRecentProjects, RecentProjects>()
-            .AddSingleton<IApplicationState, ApplicationState>()
+            ;
+        if (Design.IsDesignMode)
+        {
+            collection.AddSingleton<IApplicationState, DesignApplicationState>();
+        }
+        else
+        {
+            collection.AddSingleton<IApplicationState, ApplicationState>();
+        }
+        return collection;
+    }
 
-    ; 
-    
     private static IServiceCollection AddAssetMetadataTools(this IServiceCollection collection) =>
         collection
             .AddSingleton<AssetsBackgroundService>()
             .AddSingleton<AssetsFileWatcher>()
             .AddTransient<IAssetFileProcessor, AssetFileMetadataProcessor>()
+
+    ;
+
+    private static IServiceCollection AddProjectSettings(this IServiceCollection collection) =>
+        collection
+            .AddTransient<ProjectSettingsViewModel>()
+            .AddTransient<IProjectSettings, GeneralSettingsViewModel>()
+            .AddTransient<IProjectSettings, BuildSettingsViewModel>()
 
     ;
 
@@ -79,3 +100,25 @@ internal static class Registry
     ;
 }
 
+
+
+internal class DesignApplicationState : IApplicationState
+{
+    public TitanProject Project => new()
+    {
+        BuildSettings = new TitanProjectBuildSettings
+        {
+            CSharpProjectFile = "designer.csproj"
+        },
+        Name = "designer project",
+        SolutionFile = "designer.sln"
+    };
+    public string ProjectDirectory =>"c:/DESIGNER/";
+    public string AssetsDirectory => "c:/DESIGNER/assets";
+    public void Initialize(TitanProject project, string projectFilePath)
+    {
+    }
+
+    public Task Stop() => Task.CompletedTask;
+    public Task<Result> SaveChanges() => Task.FromResult(Result.Ok());
+}

@@ -4,6 +4,7 @@ using Titan.Tools.Editor.ViewModels;
 using Titan.Tools.Editor.ViewModels.Dialogs;
 using Titan.Tools.Editor.Views;
 using Titan.Tools.Editor.Views.Dialogs;
+using Titan.Tools.Editor.Views.ProjectSettings;
 
 namespace Titan.Tools.Editor.Services;
 
@@ -21,6 +22,13 @@ internal class DialogService : IDialogService
         var dialog = new SelectProjectWindow();
         var parentWindow = parent ?? App.GetMainWindow();
         return await dialog.ShowDialog<SelectProjectResult>(parentWindow);
+    }
+
+    public async Task OpenProjectSettingsDialog(Window? parent = null)
+    {
+        var dialog = new ProjectSettingsDialog();
+        var parentWindow = parent ?? App.GetMainWindow();
+        await dialog.ShowDialog(parentWindow);
     }
 
     public async Task<string?> OpenFileDialog(IReadOnlyList<FilePickerFileType>? fileTypes, Window? parent)

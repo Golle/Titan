@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Titan.Tools.Editor.Common;
 using Titan.Tools.Editor.Configuration;
 using Titan.Tools.Editor.Project;
@@ -24,6 +25,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public TerminalViewModel Terminal { get; }
     public AssetBrowserViewModel Browser { get; }
 
+    
+    [RelayCommand]
+    private async Task OpenProjectSettings() => await _dialogService.OpenProjectSettingsDialog(Window);
     public MainWindowViewModel(ToolbarViewModel toolbar, TerminalViewModel terminal, AssetBrowserViewModel assetBrowser, IDialogService dialogService, ITitanProjectFile titanProjectFile, IRecentProjects recentProjects, IApplicationState applicationState)
     {
         Toolbar = toolbar;
@@ -54,7 +58,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await _recentProjects.AddOrUpdateProject(project.Data!.Name, result.ProjectPath);
 
         //NOTE(Jens): Set the current project
-        _applicationState.Initialize(project.Data, Path.GetDirectoryName(result.ProjectPath)!);
+        _applicationState.Initialize(project.Data, result.ProjectPath);
 
         //NOTE(Jens): implement the rest of the view models. should we maybe use service collection here?
         ProjectExplorer = new ProjectExplorerViewModel();
