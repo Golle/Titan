@@ -1,7 +1,7 @@
 using Titan.Tools.Editor.Common;
 using Titan.Tools.Editor.ProjectGeneration.Templates;
 
-namespace Titan.Tools.Editor.Services;
+namespace Titan.Tools.Editor.ProjectGeneration;
 
 internal interface IProjectGenerationService
 {

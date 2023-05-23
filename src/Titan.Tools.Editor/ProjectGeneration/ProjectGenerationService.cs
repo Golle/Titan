@@ -5,7 +5,7 @@ using Titan.Tools.Editor.Project;
 using Titan.Tools.Editor.ProjectGeneration.CSharp;
 using Titan.Tools.Editor.ProjectGeneration.Templates;
 
-namespace Titan.Tools.Editor.Services;
+namespace Titan.Tools.Editor.ProjectGeneration;
 
 internal class ProjectGenerationService : IProjectGenerationService
 {
@@ -72,9 +72,36 @@ internal class ProjectGenerationService : IProjectGenerationService
             {
                 Name = projectName,
                 SolutionFile = solutionFileName,
+                
                 BuildSettings = new TitanProjectBuildSettings
                 {
-                    CSharpProjectFile = Path.GetRelativePath(projectPath, projectFileDestination)
+                    CSharpProjectFile = Path.GetRelativePath(projectPath, projectFileDestination),
+                    OutputPath = "release",
+                    CurrentConfiguration = "Debug",
+                    //Note(Jens): 2 default configurations that all projects should have.
+                    Configurations = new List<GameBuildConfiguration>
+                    {
+                        new()
+                        {
+                            Name = "Release",
+                            Configuration = "Release",
+                            ConsoleLogging = false,
+                            ConsoleWindow = false,
+                            DebugSymbols = false,
+                            NativeAOT = true,
+                            Trimming = true
+                        },
+                        new ()
+                        {
+                            Name = "Debug",
+                            Configuration = "Debug",
+                            ConsoleWindow = true,
+                            DebugSymbols = true,
+                            NativeAOT = false,
+                            Trimming = false,
+                            ConsoleLogging = true
+                        }
+                    }
                 }
             };
             var projectFileResult = await _titanProjectFile.Save(titanProject, titanProjectFile);

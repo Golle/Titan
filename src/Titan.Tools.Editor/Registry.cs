@@ -4,6 +4,7 @@ using Titan.Tools.Editor.Common;
 using Titan.Tools.Editor.Configuration;
 using Titan.Tools.Editor.Core;
 using Titan.Tools.Editor.Project;
+using Titan.Tools.Editor.ProjectGeneration;
 using Titan.Tools.Editor.ProjectGeneration.CSharp;
 using Titan.Tools.Editor.ProjectGeneration.Templates;
 using Titan.Tools.Editor.Services;
@@ -37,7 +38,7 @@ internal static class Registry
 
             .AddSingleton<IContentBrowser, ContentBrowser>()
 
-            
+
 
             .BuildServiceProvider();
 
@@ -89,7 +90,7 @@ internal static class Registry
             .AddTransient<ToolbarViewModel>()
             .AddTransient<TerminalViewModel>()
             .AddTransient<AssetBrowserViewModel>();
-    
+
     private static IServiceCollection AddTools(this IServiceCollection collection) =>
         collection
             .AddSingleton<ToolsProvider>()
@@ -101,19 +102,30 @@ internal static class Registry
 }
 
 
-
 internal class DesignApplicationState : IApplicationState
 {
     public TitanProject Project => new()
     {
         BuildSettings = new TitanProjectBuildSettings
         {
-            CSharpProjectFile = "designer.csproj"
+            CSharpProjectFile = "designer.csproj",
+            CurrentConfiguration = "DesignConf",
+            OutputPath = "release",
+            Configurations = new List<GameBuildConfiguration>
+            {
+                new()
+                {
+                    Name = "DesignConf",
+                    Configuration = "design_debug",
+                    NativeAOT = true,
+                    Trimming = false,
+                }
+            }
         },
         Name = "designer project",
         SolutionFile = "designer.sln"
     };
-    public string ProjectDirectory =>"c:/DESIGNER/";
+    public string ProjectDirectory => "c:/DESIGNER/";
     public string AssetsDirectory => "c:/DESIGNER/assets";
     public void Initialize(TitanProject project, string projectFilePath)
     {

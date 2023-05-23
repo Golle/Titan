@@ -19,37 +19,35 @@ internal class PublishTool : ITool
     public async Task<Result> Execute()
     {
         var buildSettings = _applicationState.Project.BuildSettings;
+        var configuration = buildSettings.GetCurrentOrDefaultConfiguration();
         List<string> argumentList = new()
         {
             "publish",
             buildSettings.CSharpProjectFile,
             "--self-contained true",
-            "-r win-x64"
+            "-r win-x64",
+            $"-c {configuration.Configuration}"
         };
-        if (!string.IsNullOrWhiteSpace(buildSettings.Configuration))
-        {
-            argumentList.Add($"-c {buildSettings.Configuration}");
-        }
-        var outputPath = GetOutputPath(buildSettings.OutputPath);
+        var outputPath = GetOutputPath(buildSettings.OutputPath, configuration.Configuration);
         argumentList.Add($"-o {outputPath}");
 
-        if (buildSettings.ConsoleWindow)
+        if (configuration.ConsoleWindow)
         {
             argumentList.Add("-p:ConsoleWindow=true");
         }
-        if (buildSettings.ConsoleLogging)
+        if (configuration.ConsoleLogging)
         {
             argumentList.Add("-p:ConsoleLogging=true");
         }
-        if (buildSettings.Trimming)
+        if (configuration.Trimming)
         {
             argumentList.Add("-p:PublishTrimmed=True");
         }
-        if (buildSettings.NativeAOT)
+        if (configuration.NativeAOT)
         {
             argumentList.Add("-p:PublishAot=True");
         }
-        if (buildSettings.DebugSymbols)
+        if (configuration.DebugSymbols)
         {
             argumentList.Add("-p:DebugSymbols=True");
         }
@@ -74,16 +72,16 @@ internal class PublishTool : ITool
         return Result.Ok();
     }
 
-    private string GetOutputPath(string? outputPath)
+    private string GetOutputPath(string outputPath, string configuration)
     {
         if (string.IsNullOrWhiteSpace(outputPath))
         {
-            return Path.Combine(_applicationState.ProjectDirectory, "release");
+            return Path.Combine(_applicationState.ProjectDirectory, "release", configuration);
         }
         if (Path.IsPathRooted(outputPath))
         {
             return outputPath;
         }
-        return Path.GetFullPath(Path.Combine(_applicationState.ProjectDirectory, outputPath));
+        return Path.GetFullPath(Path.Combine(_applicationState.ProjectDirectory, outputPath, configuration));
     }
 }

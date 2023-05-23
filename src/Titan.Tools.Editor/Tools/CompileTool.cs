@@ -18,16 +18,14 @@ internal class CompileTool : ITool
     public async Task<Result> Execute()
     {
         var buildSettings = _applicationState.Project.BuildSettings;
+        var configuration = buildSettings.GetCurrentOrDefaultConfiguration();
 
         List<string> argumentList = new()
         {
             "build",
-            buildSettings.CSharpProjectFile
+            buildSettings.CSharpProjectFile,
+            $"-c {configuration.Configuration}"
         };
-        if (!string.IsNullOrWhiteSpace(buildSettings.Configuration))
-        {
-            argumentList.Add($"-c {buildSettings.Configuration}");
-        }
         var arguments = string.Join(" ", argumentList);
         var result = await _processRunner.Run(new ProcessArgs("dotnet", arguments)
         {

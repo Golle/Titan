@@ -3,31 +3,64 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:projectSettings="clr-namespace:Titan.Tools.Editor.ViewModels.ProjectSettings"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
              x:Class="Titan.Tools.Editor.Views.ProjectSettings.BuildSettingsView">
 
   <Design.DataContext>
-    <projectSettings:BuildSettingsViewModel/>
+    <projectSettings:BuildSettingsViewModel />
   </Design.DataContext>
 
 
   <StackPanel Spacing="10">
+    <Grid ColumnDefinitions="Auto, 10, *">
+      <TextBlock Grid.Column="0" FontSize="20" Text="{Binding SelectedConfiguration.Name, StringFormat='Select build configuration ({0})'}" ></TextBlock>
+      <Button Grid.Column="2" Command="{Binding AddNewConfigurationCommand}" HorizontalAlignment="Right">Add</Button>
+    </Grid>
 
-    <StackPanel>
-      <TextBlock FontSize="20" Text="{Binding NativeAOT, StringFormat='NativeAOT: {0}'}"/>
-      <Grid ColumnDefinitions="Auto, 10, *">
-        <TextBlock Grid.Column="0">Compile the project as NativeAOT.</TextBlock>
-        <CheckBox HorizontalAlignment="Right" Grid.Column="2" IsChecked="{Binding NativeAOT}"/>
-      </Grid>
-    </StackPanel>
+    <ComboBox ItemsSource="{Binding Configurations}" SelectedItem="{Binding SelectedConfiguration}" HorizontalAlignment="Stretch">
+      <ComboBox.ItemTemplate>
+        <DataTemplate DataType="projectSettings:GameConfigurationViewModel">
+          <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+
     <Separator Background="{StaticResource Stroke}"></Separator>
-    <StackPanel>
-      <TextBlock FontSize="20" Text="{Binding Trimming, StringFormat='Trimming: {0}'}"/>
-      <Grid ColumnDefinitions="Auto, 10, *">
-        <TextBlock Grid.Column="0">Publish with trimming.</TextBlock>
-        <CheckBox HorizontalAlignment="Right" Grid.Column="2" IsChecked="{Binding Trimming}"/>
-      </Grid>
-    </StackPanel>
+
+    <Panel IsVisible="{Binding SelectedConfiguration, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <StackPanel Spacing="10" DataContext="{Binding SelectedConfiguration}">
+
+        <StackPanel>
+          <TextBlock FontSize="20" Text="{Binding NewName, StringFormat='Name: {0}'}"/>
+          <TextBlock>The name of the configuration used in the Titan editor</TextBlock>
+          <TextBox Margin="0 5 0 0" Text="{Binding NewName}" Watermark="Change the name"/>
+        </StackPanel>
+        <Separator Background="{StaticResource Stroke}"/>
+
+        <StackPanel>
+          <TextBlock FontSize="20" Text="{Binding Configuration, StringFormat='Configuration: {0}'}"/>
+          <TextBlock>The C# configuration, must match what is in the solution file.</TextBlock>
+          <TextBox Margin="0 5 0 0" Text="{Binding Configuration}"/>
+        </StackPanel>
+        <Separator Background="{StaticResource Stroke}"/>
+
+        <StackPanel>
+          <TextBlock FontSize="20" Text="{Binding NativeAOT, StringFormat='NativeAOT: {0}'}"/>
+          <Grid ColumnDefinitions="Auto, 10, *">
+            <TextBlock Grid.Column="0">Compile the project as NativeAOT.</TextBlock>
+            <CheckBox HorizontalAlignment="Right" Grid.Column="2" IsChecked="{Binding NativeAOT}"/>
+          </Grid>
+        </StackPanel>
+        <Separator Background="{StaticResource Stroke}"/>
+        <StackPanel>
+          <TextBlock FontSize="20" Text="{Binding Trimming, StringFormat='Trimming: {0}'}"/>
+          <Grid ColumnDefinitions="Auto, 10, *">
+            <TextBlock Grid.Column="0">Publish with trimming.</TextBlock>
+            <CheckBox HorizontalAlignment="Right" Grid.Column="2" IsChecked="{Binding Trimming}"/>
+          </Grid>
+        </StackPanel>
+      </StackPanel>
+    </Panel>
     <Separator Background="{StaticResource Stroke}"></Separator>
 
     <Button HorizontalAlignment="Right" HorizontalContentAlignment="Center" FontSize="16" Command="{Binding SaveChangesCommand}">Save changes</Button>

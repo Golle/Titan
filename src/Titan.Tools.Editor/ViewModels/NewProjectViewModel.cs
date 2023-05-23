@@ -4,8 +4,8 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Titan.Tools.Editor.Configuration;
+using Titan.Tools.Editor.ProjectGeneration;
 using Titan.Tools.Editor.ProjectGeneration.Templates;
-using Titan.Tools.Editor.Services;
 
 namespace Titan.Tools.Editor.ViewModels;
 
