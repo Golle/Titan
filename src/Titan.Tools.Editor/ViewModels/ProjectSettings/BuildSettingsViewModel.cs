@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Avalonia.Media.Fonts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Titan.Tools.Editor.Common;
@@ -10,7 +11,6 @@ namespace Titan.Tools.Editor.ViewModels.ProjectSettings;
 
 internal partial class GameConfigurationViewModel : ViewModelBase
 {
-
     [ObservableProperty]
     private string? _name;
 
@@ -25,6 +25,9 @@ internal partial class GameConfigurationViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _trimming;
+
+    [ObservableProperty]
+    private bool _deleted;
 
     public void SaveChanges(GameBuildConfiguration config)
     {
@@ -50,7 +53,13 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
     {
         _applicationState = applicationState;
         _dialogService = dialogService;
+        LoadConfigurations();
+    }
 
+
+    private void LoadConfigurations()
+    {
+        Configurations.Clear();
         var configs = _applicationState.Project.BuildSettings
             .Configurations.Select(c => new GameConfigurationViewModel
             {
@@ -60,10 +69,9 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
                 Trimming = c.Trimming,
                 Configuration = c.Configuration,
             });
-        _configurations.AddRange(configs);
-        _selectedConfiguration = _configurations.FirstOrDefault();
+        Configurations.AddRange(configs);
+        SelectedConfiguration = Configurations.FirstOrDefault();
     }
-
     [RelayCommand]
     private void AddNewConfiguration()
     {
@@ -80,9 +88,27 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
     [RelayCommand]
     private async Task SaveChanges()
     {
+        if (Configurations.All(c => c.Deleted))
+        {
+            await _dialogService.ShowMessageBox("ERROR", "There must be atleast one configuration.");
+            return;
+        }
+
+        if (Configurations.Select(c => c.NewName).Distinct().Count() != Configurations.Count)
+        {
+            await _dialogService.ShowMessageBox("ERROR", "Multiple configurations with the same name.");
+            return;
+        }
+
         var buildSettings = _applicationState.Project.BuildSettings;
         foreach (var config in Configurations)
         {
+            if (config.Deleted)
+            {
+                buildSettings.Configurations.RemoveAll(c => c.Name == config.Name);
+                continue;
+            }
+
             var buildConfig = buildSettings.Configurations.FirstOrDefault(c => c.Name == config.Name);
             if (buildConfig == null)
             {
@@ -99,6 +125,12 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
         if (!result.Success)
         {
             await _dialogService.ShowMessageBox("ERROR", result.Error);
+        }
+
+        // reload all the configs if we deleted one.
+        if (Configurations.Any(c => c.Deleted))
+        {
+            LoadConfigurations();
         }
     }
 

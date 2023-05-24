@@ -8,6 +8,7 @@
         Title="Project Settings"
         Width="600"
         MinHeight="450"
+        MaxHeight="500"
         SizeToContent="Height"
         >
   <Design.DataContext>
@@ -34,7 +35,9 @@
     </TabControl.ItemTemplate>
     <TabControl.ContentTemplate>
       <DataTemplate DataType="projectSettings:IProjectSettings">
-        <ContentControl Name="PART_TabContent" Content="{Binding .}"/>
+        <ScrollViewer>
+          <ContentControl Name="PART_TabContent" Content="{Binding .}"/>
+        </ScrollViewer>
       </DataTemplate>
     </TabControl.ContentTemplate>
   </TabControl>

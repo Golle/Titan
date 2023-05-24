@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:projectSettings="clr-namespace:Titan.Tools.Editor.ViewModels.ProjectSettings"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="650"
              x:Class="Titan.Tools.Editor.Views.ProjectSettings.BuildSettingsView">
 
   <Design.DataContext>
@@ -59,6 +59,17 @@
             <CheckBox HorizontalAlignment="Right" Grid.Column="2" IsChecked="{Binding Trimming}"/>
           </Grid>
         </StackPanel>
+
+        <Separator Background="{StaticResource Stroke}"/>
+        <StackPanel>
+          <TextBlock FontSize="20" Text="{Binding Deleted, StringFormat='Marked for deletion: {0}'}"/>
+          <Grid ColumnDefinitions="Auto, 10, *">
+            <TextBlock IsVisible="{Binding !Deleted}" Grid.Column="0">Delete this configuration.</TextBlock>
+            <TextBlock IsVisible="{Binding Deleted}" Grid.Column="0">This configuration will be deleted on save.</TextBlock>
+            <CheckBox HorizontalAlignment="Right" Grid.Column="2" IsChecked="{Binding Deleted}"/>
+          </Grid>
+        </StackPanel>
+
       </StackPanel>
     </Panel>
     <Separator Background="{StaticResource Stroke}"></Separator>
