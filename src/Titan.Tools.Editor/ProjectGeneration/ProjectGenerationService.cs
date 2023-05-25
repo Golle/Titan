@@ -76,7 +76,7 @@ internal class ProjectGenerationService : IProjectGenerationService
                 BuildSettings = new TitanProjectBuildSettings
                 {
                     CSharpProjectFile = Path.GetRelativePath(projectPath, projectFileDestination),
-                    OutputPath = "release",
+                    OutputPath = TitanProjectBuildSettings.DefaultOutputPath,
                     CurrentConfiguration = "Debug",
                     //Note(Jens): 2 default configurations that all projects should have.
                     Configurations = new List<GameBuildConfiguration>

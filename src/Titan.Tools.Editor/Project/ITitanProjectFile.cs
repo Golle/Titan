@@ -16,6 +16,7 @@ public class GameBuildConfiguration
 
 public class TitanProjectBuildSettings
 {
+    public const string DefaultOutputPath = "release";
     public required string CSharpProjectFile { get; init; }
     public required string OutputPath { get; set; }
     public required string CurrentConfiguration { get; init; }

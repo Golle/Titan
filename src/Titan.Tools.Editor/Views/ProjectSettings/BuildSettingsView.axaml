@@ -12,6 +12,13 @@
 
 
   <StackPanel Spacing="10">
+    <StackPanel>
+      <TextBlock FontSize="20">Output path</TextBlock>
+      <TextBlock>The base output path when publishing the game.</TextBlock>
+      <TextBox Margin="0 5 0 0" Text="{Binding OutputPath}" Watermark="Absolute or relative path to the project"/>
+    </StackPanel>
+    <Separator Background="{StaticResource Stroke}"/>
+
     <Grid ColumnDefinitions="Auto, 10, *">
       <TextBlock Grid.Column="0" FontSize="20" Text="{Binding SelectedConfiguration.Name, StringFormat='Select build configuration ({0})'}" ></TextBlock>
       <Button Grid.Column="2" Command="{Binding AddNewConfigurationCommand}" HorizontalAlignment="Right">Add</Button>

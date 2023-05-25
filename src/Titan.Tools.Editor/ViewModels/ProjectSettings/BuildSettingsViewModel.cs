@@ -48,6 +48,9 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
     private GameConfigurationViewModel? _selectedConfiguration;
 
     [ObservableProperty]
+    private string? _outputPath;
+
+    [ObservableProperty]
     private ObservableCollection<GameConfigurationViewModel> _configurations = new();
     public BuildSettingsViewModel(IApplicationState applicationState, IDialogService dialogService)
     {
@@ -56,11 +59,11 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
         LoadConfigurations();
     }
 
-
     private void LoadConfigurations()
     {
         Configurations.Clear();
-        var configs = _applicationState.Project.BuildSettings
+        var buildSettings = _applicationState.Project.BuildSettings;
+        var configs = buildSettings
             .Configurations.Select(c => new GameConfigurationViewModel
             {
                 Name = c.Name,
@@ -71,7 +74,9 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
             });
         Configurations.AddRange(configs);
         SelectedConfiguration = Configurations.FirstOrDefault();
+        OutputPath = buildSettings.OutputPath;
     }
+
     [RelayCommand]
     private void AddNewConfiguration()
     {
@@ -101,6 +106,10 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
         }
 
         var buildSettings = _applicationState.Project.BuildSettings;
+        buildSettings.OutputPath = string.IsNullOrEmpty(OutputPath)
+            ? TitanProjectBuildSettings.DefaultOutputPath
+            : GetRelativePath(_applicationState.ProjectDirectory, OutputPath);
+
         foreach (var config in Configurations)
         {
             if (config.Deleted)
@@ -134,6 +143,14 @@ internal partial class BuildSettingsViewModel : ViewModelBase, IProjectSettings
         }
     }
 
+    private static string GetRelativePath(string basePath, string path)
+    {
+        if (Path.IsPathRooted(path))
+        {
+            return Path.GetRelativePath(basePath, path);
+        }
+        return path;
+    }
 
     public BuildSettingsViewModel()
         : this(
