@@ -34,7 +34,7 @@
           <MenuItem Header="Cook Assets"/>
         </MenuItem>
       </Menu>
-      <ContentControl Grid.Column="1" VerticalAlignment="Top" Height="30" Width="300" Content="{Binding Toolbar}"/>
+      <ContentControl Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Height="30" Content="{Binding Toolbar}"/>
     </Grid>
 
     <Grid Name="TheGrid" >

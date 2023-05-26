@@ -7,19 +7,22 @@
              x:Class="Titan.Tools.Editor.Views.ToolbarView">
 
   <Design.DataContext>
-    <viewModels:ToolbarViewModel/>
+    <viewModels:ToolbarViewModel IsProjectLoaded="true"/>
   </Design.DataContext>
 
   <Border IsEnabled="{Binding IsProjectLoaded}">
-    <ItemsRepeater ItemsSource="{Binding Tools}">
-      <ItemsRepeater.Layout>
-        <StackLayout Orientation="Horizontal" Spacing="6"/>
-      </ItemsRepeater.Layout>
-      <ItemsRepeater.ItemTemplate>
-        <DataTemplate x:DataType="viewModels:ITool">
-          <Button Content="{Binding Name}" Command="{Binding $parent[UserControl].DataContext.ExecuteCommand}" CommandParameter="{Binding .}"/>
-        </DataTemplate>
-      </ItemsRepeater.ItemTemplate>
-    </ItemsRepeater>
+    <StackPanel Orientation="Horizontal" Spacing="6" Height="30">
+      <ComboBox ItemsSource="{Binding Configurations}" SelectedIndex="0" SelectedItem="{Binding SelectedConfiguration}" Width="150"/>
+      <ItemsRepeater ItemsSource="{Binding Tools}">
+        <ItemsRepeater.Layout>
+          <StackLayout Orientation="Horizontal" Spacing="6"/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate x:DataType="viewModels:ITool">
+            <Button Content="{Binding Name}" Command="{Binding $parent[UserControl].DataContext.ExecuteCommand}" CommandParameter="{Binding .}"/>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
+    </StackPanel>
   </Border>
 </UserControl>

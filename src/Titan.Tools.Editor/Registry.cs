@@ -93,10 +93,9 @@ internal static class Registry
 
     private static IServiceCollection AddTools(this IServiceCollection collection) =>
         collection
-            .AddSingleton<ToolsProvider>()
-            .AddSingleton<CompileTool>()
-            .AddSingleton<RunGameTool>()
-            .AddSingleton<PublishTool>()
+            .AddSingleton<ITool, CompileTool>()
+            .AddSingleton<ITool, RunGameTool>()
+            .AddSingleton<ITool, PublishTool>()
 
     ;
 }

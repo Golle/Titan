@@ -62,7 +62,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         //NOTE(Jens): implement the rest of the view models. should we maybe use service collection here?
         ProjectExplorer = new ProjectExplorerViewModel();
-        Toolbar.IsProjectLoaded = true;
+        await Toolbar.LoadContents();
         Greetings = $"Path: {result.ProjectPath}";
         await Browser.LoadContents();
     }

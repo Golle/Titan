@@ -15,6 +15,7 @@ internal class CompileTool : ITool
         _applicationState = applicationState;
         _processRunner = processRunner;
     }
+
     public async Task<Result> Execute()
     {
         var buildSettings = _applicationState.Project.BuildSettings;
