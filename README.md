@@ -1,3 +1,8 @@
+## Project Status (2023-12-09)
+This iteration of Titan has been paused. Currently reworking parts of it in a separate repo. I was not happy with where the engine+editor were going and decided to rethink it (Influenced by to many other engines, but I want to do my own thing).  
+The new iteration will use a lot of source generators to remove boiler plate code. There will be no editor (at this stage at least) and asset processing are automagically done by just specifying a folder.   
+More info soon.
+
 ## Titan
 This is a C# (.NET 8) only Game Engine (Reboot #56)   
 Titan currently uses DirectX 12 for graphics and XAudio2 for audio.   
